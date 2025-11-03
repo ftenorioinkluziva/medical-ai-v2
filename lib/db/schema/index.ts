@@ -1,0 +1,9 @@
+// Export all database schemas
+export * from './users'
+export * from './profiles'
+export * from './documents'
+export * from './embeddings'
+export * from './agents'
+export * from './analyses'
+export * from './knowledge-base'
+export * from './recommendations'
