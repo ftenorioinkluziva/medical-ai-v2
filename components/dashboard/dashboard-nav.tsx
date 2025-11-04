@@ -11,6 +11,13 @@ import { usePathname } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Menu, X } from 'lucide-react'
 import { handleSignOut } from '@/app/actions/auth'
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '@/components/ui/sheet'
 
 interface DashboardNavProps {
   userName: string
