@@ -15,6 +15,13 @@
       "when": 1762129586892,
       "tag": "0001_skinny_midnight",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1762193785792,
+      "tag": "0002_cute_thunderbolts",
+      "breakpoints": true
     }
   ]
 }

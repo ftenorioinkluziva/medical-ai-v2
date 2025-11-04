@@ -6,6 +6,7 @@
  */
 
 import { useEffect, useState } from 'react'
+import Link from 'next/link'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -21,6 +22,7 @@ import {
   CheckCircle2,
   Calendar,
   TrendingUp,
+  History,
 } from 'lucide-react'
 
 interface ExamRecommendation {
@@ -63,37 +65,34 @@ export function RecommendationsWidget() {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [generatedAt, setGeneratedAt] = useState<string | null>(null)
-  const [isCached, setIsCached] = useState(false)
+  const [analysisDate, setAnalysisDate] = useState<string | null>(null)
 
   useEffect(() => {
     loadRecommendations()
   }, [])
 
-  const loadRecommendations = async (forceRefresh = false) => {
+  const loadRecommendations = async () => {
     try {
       setIsLoading(true)
       setError(null)
 
-      const url = forceRefresh ? '/api/recommendations?refresh=true' : '/api/recommendations'
-      const response = await fetch(url)
+      const response = await fetch('/api/recommendations')
+
       if (!response.ok) {
-        throw new Error('Erro ao carregar recomendações')
+        const data = await response.json()
+        throw new Error(data.error || 'Erro ao carregar recomendações')
       }
 
       const data = await response.json()
       setRecommendations(data.recommendations)
       setGeneratedAt(data.generatedAt)
-      setIsCached(data.cached || false)
+      setAnalysisDate(data.analysisDate)
     } catch (err) {
       console.error('Error loading recommendations:', err)
       setError(err instanceof Error ? err.message : 'Erro desconhecido')
     } finally {
       setIsLoading(false)
     }
-  }
-
-  const handleRefresh = () => {
-    loadRecommendations(true)
   }
 
   const getCategoryIcon = (category: string) => {
@@ -152,7 +151,7 @@ export function RecommendationsWidget() {
                 }
               </p>
             </div>
-            <Button onClick={handleRefresh} variant="outline" size="sm" className="ml-auto">
+            <Button onClick={loadRecommendations} variant="outline" size="sm" className="ml-auto">
               Tentar Novamente
             </Button>
           </div>
@@ -175,30 +174,32 @@ export function RecommendationsWidget() {
   return (
     <Card>
       <CardHeader>
-        <div className="flex items-center justify-between">
+        <div className="flex items-start justify-between">
           <div>
             <CardTitle className="flex items-center gap-2">
               <Lightbulb className="h-5 w-5 text-yellow-600" />
               Recomendações Personalizadas
             </CardTitle>
             <CardDescription>
-              Sugestões baseadas no seu perfil e histórico
-              {generatedAt && (
+              Baseadas na sua última análise médica
+              {analysisDate && (
                 <span className="block mt-1 text-xs">
-                  Última atualização: {formatDate(generatedAt)}
-                  {isCached && <Badge variant="secondary" className="ml-2 text-xs">Cache</Badge>}
+                  Análise de: {formatDate(analysisDate)}
+                </span>
+              )}
+              {generatedAt && (
+                <span className="block mt-1 text-xs opacity-70">
+                  Recomendações geradas em: {formatDate(generatedAt)}
                 </span>
               )}
             </CardDescription>
           </div>
-          <Button
-            onClick={handleRefresh}
-            variant="ghost"
-            size="sm"
-            disabled={isLoading}
-          >
-            {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Atualizar'}
-          </Button>
+          <Link href="/recommendations">
+            <Button variant="ghost" size="sm" className="gap-2">
+              <History className="h-4 w-4" />
+              Histórico
+            </Button>
+          </Link>
         </div>
       </CardHeader>
       <CardContent>

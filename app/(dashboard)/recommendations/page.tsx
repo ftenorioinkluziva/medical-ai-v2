@@ -1,0 +1,456 @@
+'use client'
+
+/**
+ * Recommendations History Page
+ * Shows all recommendations generated for the user
+ */
+
+import { useEffect, useState } from 'react'
+import Link from 'next/link'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Separator } from '@/components/ui/separator'
+import {
+  Loader2,
+  ArrowLeft,
+  Lightbulb,
+  Activity,
+  Target,
+  CheckCircle2,
+  AlertCircle,
+  Calendar,
+  Stethoscope,
+} from 'lucide-react'
+
+interface RecommendationHistory {
+  id: string
+  analysisId: string
+  examRecommendations: any[]
+  lifestyleRecommendations: any[]
+  healthGoals: any[]
+  alerts: any[]
+  createdAt: string
+  analysisDate: string
+  agentName: string
+  agentTitle: string
+  agentColor: string
+}
+
+export default function RecommendationsHistoryPage() {
+  const [recommendations, setRecommendations] = useState<RecommendationHistory[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [selectedRec, setSelectedRec] = useState<RecommendationHistory | null>(null)
+
+  useEffect(() => {
+    loadHistory()
+  }, [])
+
+  const loadHistory = async () => {
+    try {
+      setIsLoading(true)
+      setError(null)
+
+      const response = await fetch('/api/recommendations/history')
+      if (!response.ok) {
+        throw new Error('Erro ao carregar histórico')
+      }
+
+      const data = await response.json()
+      setRecommendations(data.recommendations || [])
+
+      // Select first recommendation by default
+      if (data.recommendations && data.recommendations.length > 0) {
+        setSelectedRec(data.recommendations[0])
+      }
+    } catch (err) {
+      console.error('Error loading history:', err)
+      setError(err instanceof Error ? err.message : 'Erro desconhecido')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString)
+    return date.toLocaleDateString('pt-BR', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    })
+  }
+
+  const getUrgencyColor = (urgency: string) => {
+    switch (urgency) {
+      case 'high':
+        return 'destructive'
+      case 'medium':
+        return 'default'
+      case 'low':
+        return 'secondary'
+      default:
+        return 'outline'
+    }
+  }
+
+  const getPriorityColor = (priority: string) => {
+    switch (priority) {
+      case 'high':
+        return 'destructive'
+      case 'medium':
+        return 'default'
+      case 'low':
+        return 'secondary'
+      default:
+        return 'outline'
+    }
+  }
+
+  const getAlertColor = (type: string) => {
+    switch (type) {
+      case 'urgent':
+        return 'destructive'
+      case 'warning':
+        return 'default'
+      case 'info':
+        return 'secondary'
+      default:
+        return 'outline'
+    }
+  }
+
+  const getCategoryIcon = (category: string) => {
+    switch (category) {
+      case 'exercise':
+        return <Activity className="h-4 w-4" />
+      case 'nutrition':
+        return <Target className="h-4 w-4" />
+      default:
+        return <CheckCircle2 className="h-4 w-4" />
+    }
+  }
+
+  if (isLoading) {
+    return (
+      <div className="container mx-auto p-6">
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="text-center space-y-3">
+            <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" />
+            <p className="text-muted-foreground">Carregando histórico...</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="container mx-auto p-6 space-y-6">
+        <Link href="/dashboard">
+          <Button variant="ghost" className="gap-2">
+            <ArrowLeft className="h-4 w-4" />
+            Voltar
+          </Button>
+        </Link>
+        <Card className="border-red-200 bg-red-50">
+          <CardContent className="p-6">
+            <p className="text-red-600">{error}</p>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
+  if (recommendations.length === 0) {
+    return (
+      <div className="container mx-auto p-6 space-y-6">
+        <Link href="/dashboard">
+          <Button variant="ghost" className="gap-2">
+            <ArrowLeft className="h-4 w-4" />
+            Voltar
+          </Button>
+        </Link>
+        <Card>
+          <CardContent className="p-12 text-center">
+            <Lightbulb className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+            <h3 className="text-lg font-semibold mb-2">Nenhuma recomendação encontrada</h3>
+            <p className="text-muted-foreground mb-6">
+              Realize uma análise médica para receber recomendações personalizadas
+            </p>
+            <Link href="/analyze">
+              <Button>Iniciar Análise</Button>
+            </Link>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
+  return (
+    <div className="container mx-auto p-6 space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <div className="flex items-center gap-3">
+            <Link href="/dashboard">
+              <Button variant="ghost" size="sm" className="gap-2">
+                <ArrowLeft className="h-4 w-4" />
+                Voltar
+              </Button>
+            </Link>
+            <h1 className="text-3xl font-bold">Histórico de Recomendações</h1>
+          </div>
+          <p className="text-muted-foreground mt-2">
+            {recommendations.length} recomendação(ões) encontrada(s)
+          </p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Left sidebar - List of recommendations */}
+        <div className="lg:col-span-1 space-y-3">
+          <h2 className="font-semibold text-sm text-muted-foreground px-2">
+            Selecione uma recomendação
+          </h2>
+          <div className="space-y-2">
+            {recommendations.map((rec) => (
+              <Card
+                key={rec.id}
+                className={`cursor-pointer transition-colors hover:bg-muted/50 ${
+                  selectedRec?.id === rec.id ? 'border-primary bg-primary/5' : ''
+                }`}
+                onClick={() => setSelectedRec(rec)}
+              >
+                <CardHeader className="p-4">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <Stethoscope className="h-4 w-4 flex-shrink-0" style={{ color: rec.agentColor }} />
+                        <p className="text-sm font-medium truncate">{rec.agentName}</p>
+                      </div>
+                      <p className="text-xs text-muted-foreground flex items-center gap-1">
+                        <Calendar className="h-3 w-3" />
+                        {formatDate(rec.analysisDate)}
+                      </p>
+                    </div>
+                    {selectedRec?.id === rec.id && (
+                      <CheckCircle2 className="h-5 w-5 text-primary flex-shrink-0" />
+                    )}
+                  </div>
+                  <div className="flex gap-2 mt-2">
+                    <Badge variant="outline" className="text-xs">
+                      {rec.examRecommendations.length} exames
+                    </Badge>
+                    <Badge variant="outline" className="text-xs">
+                      {rec.lifestyleRecommendations.length} lifestyle
+                    </Badge>
+                  </div>
+                </CardHeader>
+              </Card>
+            ))}
+          </div>
+        </div>
+
+        {/* Right content - Selected recommendation details */}
+        <div className="lg:col-span-2">
+          {selectedRec && (
+            <Card>
+              <CardHeader>
+                <div className="flex items-start justify-between">
+                  <div>
+                    <CardTitle className="flex items-center gap-2">
+                      <Lightbulb className="h-5 w-5 text-yellow-600" />
+                      Recomendações Personalizadas
+                    </CardTitle>
+                    <CardDescription className="mt-2 space-y-1">
+                      <div className="flex items-center gap-2">
+                        <Stethoscope className="h-4 w-4" style={{ color: selectedRec.agentColor }} />
+                        <span>{selectedRec.agentTitle}</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-xs">
+                        <Calendar className="h-3 w-3" />
+                        <span>Análise: {formatDate(selectedRec.analysisDate)}</span>
+                      </div>
+                      <div className="text-xs opacity-70">
+                        Gerado em: {formatDate(selectedRec.createdAt)}
+                      </div>
+                    </CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <Tabs defaultValue="exams" className="w-full">
+                  <TabsList className="grid w-full grid-cols-4">
+                    <TabsTrigger value="exams">
+                      Exames ({selectedRec.examRecommendations.length})
+                    </TabsTrigger>
+                    <TabsTrigger value="lifestyle">
+                      Lifestyle ({selectedRec.lifestyleRecommendations.length})
+                    </TabsTrigger>
+                    <TabsTrigger value="goals">
+                      Metas ({selectedRec.healthGoals.length})
+                    </TabsTrigger>
+                    <TabsTrigger value="alerts">
+                      Alertas ({selectedRec.alerts.length})
+                    </TabsTrigger>
+                  </TabsList>
+
+                  {/* Exams Tab */}
+                  <TabsContent value="exams" className="space-y-4 mt-4">
+                    {selectedRec.examRecommendations.length === 0 ? (
+                      <p className="text-sm text-muted-foreground text-center py-8">
+                        Nenhum exame recomendado
+                      </p>
+                    ) : (
+                      selectedRec.examRecommendations.map((exam: any, index: number) => (
+                        <div key={index} className="border rounded-lg p-4 space-y-2">
+                          <div className="flex items-start justify-between gap-2">
+                            <h4 className="font-medium">{exam.exam}</h4>
+                            <Badge variant={getUrgencyColor(exam.urgency)}>
+                              {exam.urgency === 'high' ? 'Alta' : exam.urgency === 'medium' ? 'Média' : 'Baixa'}
+                            </Badge>
+                          </div>
+                          <p className="text-sm text-muted-foreground">{exam.reason}</p>
+                          <div className="text-xs text-muted-foreground pt-2 border-t">
+                            Prazo sugerido: {exam.suggestedTimeframe}
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </TabsContent>
+
+                  {/* Lifestyle Tab */}
+                  <TabsContent value="lifestyle" className="space-y-4 mt-4">
+                    {selectedRec.lifestyleRecommendations.length === 0 ? (
+                      <p className="text-sm text-muted-foreground text-center py-8">
+                        Nenhuma recomendação de lifestyle
+                      </p>
+                    ) : (
+                      selectedRec.lifestyleRecommendations.map((lifestyle: any, index: number) => (
+                        <div key={index} className="border rounded-lg p-4 space-y-2">
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="flex items-center gap-2">
+                              {getCategoryIcon(lifestyle.category)}
+                              <h4 className="font-medium capitalize">{lifestyle.category}</h4>
+                            </div>
+                            <Badge variant={getPriorityColor(lifestyle.priority)}>
+                              {lifestyle.priority === 'high' ? 'Alta' : lifestyle.priority === 'medium' ? 'Média' : 'Baixa'}
+                            </Badge>
+                          </div>
+                          <p className="text-sm">{lifestyle.recommendation}</p>
+                          <div className="text-xs text-muted-foreground pt-2 border-t">
+                            <strong>Benefício esperado:</strong> {lifestyle.expectedBenefit}
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </TabsContent>
+
+                  {/* Goals Tab */}
+                  <TabsContent value="goals" className="space-y-4 mt-4">
+                    {selectedRec.healthGoals.length === 0 ? (
+                      <p className="text-sm text-muted-foreground text-center py-8">
+                        Nenhuma meta de saúde definida
+                      </p>
+                    ) : (
+                      selectedRec.healthGoals.map((goal: any, index: number) => (
+                        <div key={index} className="border rounded-lg p-4 space-y-3">
+                          <h4 className="font-medium">{goal.goal}</h4>
+                          <div className="grid grid-cols-2 gap-4 text-sm">
+                            <div>
+                              <p className="text-muted-foreground text-xs">Status Atual</p>
+                              <p className="font-medium">{goal.currentStatus}</p>
+                            </div>
+                            <div>
+                              <p className="text-muted-foreground text-xs">Meta</p>
+                              <p className="font-medium">{goal.targetValue}</p>
+                            </div>
+                          </div>
+                          <div>
+                            <p className="text-muted-foreground text-xs mb-2">Prazo: {goal.timeframe}</p>
+                          </div>
+                          <Separator />
+                          <div>
+                            <p className="text-sm font-medium mb-2">Passos de Ação:</p>
+                            <ul className="space-y-1">
+                              {goal.actionSteps.map((step: string, stepIndex: number) => (
+                                <li key={stepIndex} className="text-sm flex items-start gap-2">
+                                  <CheckCircle2 className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
+                                  <span>{step}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </TabsContent>
+
+                  {/* Alerts Tab */}
+                  <TabsContent value="alerts" className="space-y-4 mt-4">
+                    {selectedRec.alerts.length === 0 ? (
+                      <p className="text-sm text-muted-foreground text-center py-8">
+                        Nenhum alerta
+                      </p>
+                    ) : (
+                      selectedRec.alerts.map((alert: any, index: number) => (
+                        <div
+                          key={index}
+                          className={`border rounded-lg p-4 space-y-2 ${
+                            alert.type === 'urgent'
+                              ? 'bg-red-50 border-red-200'
+                              : alert.type === 'warning'
+                              ? 'bg-yellow-50 border-yellow-200'
+                              : 'bg-blue-50 border-blue-200'
+                          }`}
+                        >
+                          <div className="flex items-start gap-2">
+                            <AlertCircle
+                              className={`h-5 w-5 flex-shrink-0 ${
+                                alert.type === 'urgent'
+                                  ? 'text-red-600'
+                                  : alert.type === 'warning'
+                                  ? 'text-yellow-600'
+                                  : 'text-blue-600'
+                              }`}
+                            />
+                            <div className="flex-1">
+                              <div className="flex items-start justify-between gap-2 mb-2">
+                                <p className="font-medium text-sm">{alert.message}</p>
+                                <Badge variant={getAlertColor(alert.type)}>
+                                  {alert.type === 'urgent' ? 'Urgente' : alert.type === 'warning' ? 'Atenção' : 'Info'}
+                                </Badge>
+                              </div>
+                              <p className="text-sm text-muted-foreground">
+                                <strong>Ação recomendada:</strong> {alert.action}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </TabsContent>
+                </Tabs>
+
+                {/* Disclaimer */}
+                <Card className="mt-6 bg-yellow-50 border-yellow-200">
+                  <CardContent className="p-4">
+                    <p className="text-xs text-yellow-900">
+                      <strong>⚠️ Aviso Importante:</strong> Estas recomendações são educacionais
+                      e <strong>NÃO substituem consulta médica profissional</strong>. Sempre consulte um profissional
+                      de saúde qualificado.
+                    </p>
+                  </CardContent>
+                </Card>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}

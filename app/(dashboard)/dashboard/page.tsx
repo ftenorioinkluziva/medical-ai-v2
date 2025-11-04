@@ -10,12 +10,10 @@ import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { StatsCards } from '@/components/dashboard/stats-cards'
 import { RecentDocuments } from '@/components/dashboard/recent-documents'
-import { HealthAlerts } from '@/components/dashboard/health-alerts'
-import { ParameterTrends } from '@/components/dashboard/parameter-trends'
 import { RecommendationsWidget } from '@/components/recommendations/recommendations-widget'
-import { Loader2, Sparkles, GitCompare, User } from 'lucide-react'
+import { WeeklyPlanWidget } from '@/components/weekly-plan/weekly-plan-widget'
+import { Loader2, User } from 'lucide-react'
 
 interface DashboardStats {
   documentsCount: number
@@ -88,65 +86,11 @@ export default function DashboardPage() {
         </p>
       </div>
 
-      {/* Stats Cards */}
-      <StatsCards
-        documentsCount={stats.documentsCount}
-        analysesCount={stats.analysesCount}
-        agentsUsedCount={stats.agentsUsedCount}
-        abnormalParametersCount={stats.abnormalParametersCount}
-      />
-
-      {/* Parameter Trends Chart */}
-      {stats.documentsCount > 0 && (
-        <div className="grid gap-6 grid-cols-1 lg:grid-cols-3">
-          <ParameterTrends trends={stats.parameterTrends} />
-          <HealthAlerts metrics={stats.healthMetrics} />
-        </div>
-      )}
-
-      {/* Quick Actions */}
-      <div className="grid gap-6 md:grid-cols-2">
-        <Card className="bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20">
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <Sparkles className="h-6 w-6 text-primary" />
-              <CardTitle>Nova Análise</CardTitle>
-            </div>
-            <CardDescription>
-              Consulte especialistas em IA sobre seus exames e dados de saúde
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Link href="/analyze">
-              <Button className="w-full" size="lg">
-                Iniciar Análise
-              </Button>
-            </Link>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-gradient-to-br from-blue-50 to-blue-25 border-blue-200">
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <GitCompare className="h-6 w-6 text-blue-600" />
-              <CardTitle>Comparar Exames</CardTitle>
-            </div>
-            <CardDescription>
-              Compare seus exames ao longo do tempo para acompanhar evolução
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Link href="/compare">
-              <Button variant="outline" className="w-full border-blue-600 text-blue-600 hover:bg-blue-50" size="lg">
-                Comparar Documentos
-              </Button>
-            </Link>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Recommendations Widget */}
+      {/* Recommendations Widget - TOPO */}
       <RecommendationsWidget />
+
+      {/* Weekly Plan Widget */}
+      <WeeklyPlanWidget />
 
       {/* Recent Documents */}
       <div className="grid gap-6 md:grid-cols-2">

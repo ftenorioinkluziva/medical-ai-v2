@@ -11,6 +11,14 @@ import { eq, desc } from 'drizzle-orm'
 import { analyzeWithAgent } from '@/lib/ai/agents/analyze'
 import { buildKnowledgeContext } from '@/lib/ai/knowledge'
 import type { StructuredMedicalDocument } from '@/lib/documents/structuring'
+import { generateRecommendationsFromAnalysis } from '@/lib/ai/recommendations/generate'
+import {
+  generateSupplementationStrategy,
+  generateShoppingList,
+  generateMealPlan,
+  generateWorkoutPlan,
+} from '@/lib/ai/weekly-plans/generators'
+import { weeklyPlans } from '@/lib/db/schema'
 
 export async function POST(
   request: NextRequest,
@@ -226,10 +234,11 @@ export async function POST(
     console.log('✅ [ANALYSIS-API] Analysis completed successfully')
 
     // Save analysis to history
+    let savedAnalysis: any = null
     try {
       const startSave = Date.now()
 
-      const [savedAnalysis] = await db.insert(analyses).values({
+      const [analysis] = await db.insert(analyses).values({
         userId: session.user.id,
         agentId,
         documentIds: userDocuments.map(d => d.id),
@@ -242,10 +251,68 @@ export async function POST(
         ragUsed: documentIds.length > 0,
       }).returning()
 
+      savedAnalysis = analysis
       console.log(`💾 [ANALYSIS-API] Saved to history: ${savedAnalysis.id} (${Date.now() - startSave}ms)`)
     } catch (saveError) {
       // Don't fail the request if save fails, just log
       console.error('⚠️ [ANALYSIS-API] Failed to save to history:', saveError)
+    }
+
+    // Generate recommendations automatically (non-blocking)
+    if (savedAnalysis) {
+      generateRecommendationsFromAnalysis(savedAnalysis.id, session.user.id)
+        .then((rec) => {
+          console.log(`✅ [ANALYSIS-API] Recommendations generated: ${rec.id}`)
+        })
+        .catch((error) => {
+          console.error('⚠️ [ANALYSIS-API] Failed to generate recommendations:', error)
+        })
+
+      // Generate weekly plan automatically (non-blocking)
+      generateWeeklyPlanFromAnalysis(savedAnalysis.id, savedAnalysis.analysis, session.user.id)
+        .then((plan) => {
+          console.log(`✅ [ANALYSIS-API] Weekly plan generated: ${plan.id}`)
+        })
+        .catch((error) => {
+          console.error('⚠️ [ANALYSIS-API] Failed to generate weekly plan:', error)
+        })
+    }
+
+    // Helper function to generate weekly plan
+    async function generateWeeklyPlanFromAnalysis(analysisId: string, analysisText: string, userId: string) {
+      console.log(`📅 [WEEKLY-PLAN] Generating plan for analysis: ${analysisId}`)
+
+      // Generate all plans in parallel
+      const [supplementation, shopping, meals, workout] = await Promise.all([
+        generateSupplementationStrategy(analysisText),
+        generateShoppingList(analysisText),
+        generateMealPlan(analysisText),
+        generateWorkoutPlan(analysisText),
+      ])
+
+      // Calculate week start date (next Monday)
+      const today = new Date()
+      const dayOfWeek = today.getDay()
+      const daysUntilMonday = dayOfWeek === 0 ? 1 : 8 - dayOfWeek
+      const weekStartDate = new Date(today)
+      weekStartDate.setDate(today.getDate() + daysUntilMonday)
+      const weekStartDateString = weekStartDate.toISOString().split('T')[0]
+
+      // Save to database
+      const [savedPlan] = await db
+        .insert(weeklyPlans)
+        .values({
+          userId,
+          analysisId,
+          weekStartDate: weekStartDateString,
+          supplementationStrategy: supplementation as any,
+          shoppingList: shopping as any,
+          mealPlan: meals as any,
+          workoutPlan: workout as any,
+        })
+        .returning()
+
+      return savedPlan
     }
 
     return NextResponse.json({
@@ -255,6 +322,7 @@ export async function POST(
       metadata: result.metadata,
       usage: result.usage,
       timestamp: new Date().toISOString(),
+      analysisId: savedAnalysis?.id,
     })
   } catch (error) {
     console.error('❌ [ANALYSIS-API] Error:', error)

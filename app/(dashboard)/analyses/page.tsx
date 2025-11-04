@@ -6,9 +6,11 @@
  */
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { AnalysisHistory } from '@/components/analyses/analysis-history'
 import { AnalysisViewModal } from '@/components/analyses/analysis-view-modal'
-import { History } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { History, TrendingUp } from 'lucide-react'
 
 interface Analysis {
   id: string
@@ -43,14 +45,22 @@ export default function AnalysesPage() {
   return (
     <div className="container mx-auto py-8 space-y-8">
       {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight flex items-center gap-3">
-          <History className="h-8 w-8" />
-          Histórico de Análises
-        </h1>
-        <p className="text-muted-foreground mt-2">
-          Visualize e revise todas as suas análises anteriores
-        </p>
+      <div className="flex items-start justify-between">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight flex items-center gap-3">
+            <History className="h-8 w-8" />
+            Histórico de Análises
+          </h1>
+          <p className="text-muted-foreground mt-2">
+            Visualize e revise todas as suas análises anteriores
+          </p>
+        </div>
+        <Link href="/analyses/compare">
+          <Button className="gap-2">
+            <TrendingUp className="h-4 w-4" />
+            Comparar Análises
+          </Button>
+        </Link>
       </div>
 
       {/* History Component */}
