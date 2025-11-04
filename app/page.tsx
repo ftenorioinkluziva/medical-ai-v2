@@ -1,149 +1,161 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  ArrowRight,
+  Bot,
+  Calendar,
+  FileText,
+  Heart,
+  Shield,
+  Target,
+  TrendingUp,
+  Users,
+  Zap,
+  Check,
+} from 'lucide-react'
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
-      <div className="container mx-auto px-4 py-16">
-        <div className="text-center space-y-6 mb-16">
-          <h1 className="text-5xl font-bold tracking-tight">
-            Medical AI v2
-          </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Sistema avançado de análise médica com Inteligência Artificial e agentes especializados
-          </p>
-          <div className="flex gap-4 justify-center">
-            <Button asChild size="lg">
-              <Link href="/login">Entrar</Link>
-            </Button>
-            <Button asChild variant="outline" size="lg">
-              <Link href="/register">Criar Conta</Link>
-            </Button>
+    <div className="min-h-screen bg-white">
+      {/* Navigation */}
+      <nav className="border-b-2 border-black">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Heart className="h-8 w-8" />
+              <span className="text-2xl font-bold">Medical AI</span>
+            </div>
+            <div className="hidden md:flex items-center gap-8">
+              <Link href="/recursos" className="hover:underline">Recursos</Link>
+              <Link href="/especialistas" className="hover:underline">Especialistas</Link>
+              <Link href="/como-funciona" className="hover:underline">Como Funciona</Link>
+            </div>
+            <div className="flex items-center gap-4">
+              <Button variant="ghost" asChild className="border-2 border-black hover:bg-gray-100 rounded-xl">
+                <Link href="/login">Login</Link>
+              </Button>
+              <Button asChild className="bg-lime text-black hover:bg-lime-500 border-2 border-black rounded-xl font-semibold">
+                <Link href="/register">Começar Grátis</Link>
+              </Button>
+            </div>
           </div>
         </div>
+      </nav>
 
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-16">
-          <Card>
-            <CardHeader>
-              <div className="h-12 w-12 rounded-lg bg-green-100 flex items-center justify-center mb-4">
-                <span className="text-2xl">🌿</span>
-              </div>
-              <CardTitle>Medicina Integrativa</CardTitle>
-              <CardDescription>
-                Análise holística considerando corpo, mente e estilo de vida
-              </CardDescription>
-            </CardHeader>
-          </Card>
+      {/* Hero Section */}
+      <section className="container mx-auto px-4 py-20">
+        <div className="grid lg:grid-cols-2 gap-12 items-center">
+          <div className="space-y-8">
+            <div className="inline-block">
+              <span className="bg-lime px-4 py-2 rounded-lg text-sm font-medium border-2 border-black">
+                Análise Médica com IA
+              </span>
+            </div>
 
-          <Card>
-            <CardHeader>
-              <div className="h-12 w-12 rounded-lg bg-purple-100 flex items-center justify-center mb-4">
-                <span className="text-2xl">⚖️</span>
-              </div>
-              <CardTitle>Endocrinologia</CardTitle>
-              <CardDescription>
-                Análise detalhada de hormônios e metabolismo
-              </CardDescription>
-            </CardHeader>
-          </Card>
+            <h1 className="text-5xl md:text-7xl font-bold leading-tight">
+              Transforme Seus Exames em{' '}
+              <span className="relative">
+                <span className="relative z-10">Insights</span>
+                <span className="absolute bottom-2 left-0 w-full h-4 bg-lime -rotate-1"></span>
+              </span>
+            </h1>
 
-          <Card>
-            <CardHeader>
-              <div className="h-12 w-12 rounded-lg bg-orange-100 flex items-center justify-center mb-4">
-                <span className="text-2xl">🥗</span>
-              </div>
-              <CardTitle>Nutrição</CardTitle>
-              <CardDescription>
-                Metabolismo, micronutrientes e saúde digestiva
-              </CardDescription>
-            </CardHeader>
-          </Card>
+            <p className="text-xl text-gray-700 leading-relaxed">
+              Análise médica inteligente com agentes especializados em Medicina Integrativa,
+              Endocrinologia, Nutrição e Fisiologia do Exercício.
+            </p>
 
-          <Card>
-            <CardHeader>
-              <div className="h-12 w-12 rounded-lg bg-blue-100 flex items-center justify-center mb-4">
-                <span className="text-2xl">💪</span>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Button
+                asChild
+                size="lg"
+                className="bg-black text-white hover:bg-gray-800 border-2 border-black rounded-xl text-lg px-8 h-14"
+              >
+                <Link href="/register">
+                  Começar Gratuitamente
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Link>
+              </Button>
+              <Button
+                asChild
+                variant="outline"
+                size="lg"
+                className="border-2 border-black hover:bg-gray-50 rounded-xl text-lg px-8 h-14"
+              >
+                <Link href="/como-funciona">
+                  Ver Como Funciona
+                </Link>
+              </Button>
+            </div>
+
+            <div className="flex flex-wrap gap-6 pt-4">
+              <div className="flex items-center gap-2">
+                <div className="h-10 w-10 rounded-full bg-lime border-2 border-black flex items-center justify-center">
+                  <Shield className="h-5 w-5" />
+                </div>
+                <span className="font-medium">100% Seguro</span>
               </div>
-              <CardTitle>Exercício</CardTitle>
-              <CardDescription>
-                Performance física e composição corporal
-              </CardDescription>
-            </CardHeader>
-          </Card>
+              <div className="flex items-center gap-2">
+                <div className="h-10 w-10 rounded-full bg-lime border-2 border-black flex items-center justify-center">
+                  <Zap className="h-5 w-5" />
+                </div>
+                <span className="font-medium">Análise de Saúde Completa</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="h-10 w-10 rounded-full bg-lime border-2 border-black flex items-center justify-center">
+                  <Users className="h-5 w-5" />
+                </div>
+                <span className="font-medium">Agentes Especializados</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="relative">
+            <div className="bg-lime border-4 border-black rounded-3xl p-8" style={{boxShadow: '8px 8px 0px 0px rgba(0,0,0,1)'}}>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-white border-2 border-black rounded-2xl p-6 space-y-2">
+                  <div className="h-12 w-12 rounded-full bg-lime border-2 border-black flex items-center justify-center">
+                    <Bot className="h-6 w-6" />
+                  </div>
+                  <h3 className="font-bold text-lg">Agentes</h3>
+                  <p className="text-sm text-gray-600">IA Especializada</p>
+                </div>
+                <div className="bg-white border-2 border-black rounded-2xl p-6 space-y-2">
+                  <div className="h-12 w-12 rounded-full bg-lime border-2 border-black flex items-center justify-center">
+                    <FileText className="h-6 w-6" />
+                  </div>
+                  <h3 className="font-bold text-lg">Upload</h3>
+                  <p className="text-sm text-gray-600">PDF e Imagens</p>
+                </div>
+                <div className="bg-white border-2 border-black rounded-2xl p-6 space-y-2">
+                  <div className="h-12 w-12 rounded-full bg-lime border-2 border-black flex items-center justify-center">
+                    <Target className="h-6 w-6" />
+                  </div>
+                  <h3 className="font-bold text-lg">Planos</h3>
+                  <p className="text-sm text-gray-600">Personalizados</p>
+                </div>
+                <div className="bg-white border-2 border-black rounded-2xl p-6 space-y-2">
+                  <div className="h-12 w-12 rounded-full bg-lime border-2 border-black flex items-center justify-center">
+                    <TrendingUp className="h-6 w-6" />
+                  </div>
+                  <h3 className="font-bold text-lg">Evolução</h3>
+                  <p className="text-sm text-gray-600">Acompanhamento</p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
+      </section>
 
-        <div className="max-w-3xl mx-auto space-y-8">
-          <Card>
-            <CardHeader>
-              <CardTitle>Recursos Principais</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-start gap-3">
-                <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-1">
-                  <span className="text-sm">✓</span>
-                </div>
-                <div>
-                  <h3 className="font-semibold">Upload de Documentos Médicos</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Processe PDFs e imagens de exames com extração inteligente de dados
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3">
-                <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-1">
-                  <span className="text-sm">✓</span>
-                </div>
-                <div>
-                  <h3 className="font-semibold">4 Agentes Especializados</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Análises personalizadas em medicina integrativa, endocrinologia, nutrição e exercício
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3">
-                <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-1">
-                  <span className="text-sm">✓</span>
-                </div>
-                <div>
-                  <h3 className="font-semibold">Perfil Médico Completo</h3>
-                  <p className="text-sm text-muted-foreground">
-                    16+ campos de saúde e estilo de vida para análises contextualizadas
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3">
-                <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-1">
-                  <span className="text-sm">✓</span>
-                </div>
-                <div>
-                  <h3 className="font-semibold">Chat com IA</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Converse com agentes especializados sobre seus dados de saúde
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-amber-50 border-amber-200">
-            <CardHeader>
-              <CardTitle className="text-amber-900">⚠️ Aviso Importante</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-amber-800">
-                Este sistema é uma ferramenta educacional e de apoio. As análises geradas por IA
-                <strong> NÃO substituem consulta médica profissional</strong>. Sempre consulte
-                um profissional de saúde qualificado para interpretação médica definitiva e
-                decisões de tratamento.
-              </p>
-            </CardContent>
-          </Card>
+      {/* Footer reduzido para exemplo */}
+      <footer className="py-12 bg-black text-white border-t-4 border-lime">
+        <div className="container mx-auto px-4 text-center">
+          <p className="text-gray-400">
+            © {new Date().getFullYear()} Medical AI v2. Análise Médica Inteligente com IA.
+          </p>
         </div>
-      </div>
+      </footer>
     </div>
   )
 }

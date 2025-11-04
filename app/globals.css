@@ -41,6 +41,19 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+  
+  /* Positivus Lime Colors */
+  --color-lime-50: #F5FFF0;
+  --color-lime-100: #E6FFD1;
+  --color-lime-200: #D4FFB3;
+  --color-lime-300: #C6FF8F;
+  --color-lime-400: #B9FF66;
+  --color-lime-500: #A3F04D;
+  --color-lime-600: #8DD633;
+  --color-lime-700: #76BD1A;
+  --color-lime-800: #5F9E00;
+  --color-lime-900: #487500;
+  --color-lime: #B9FF66;
 }
 
 :root {
