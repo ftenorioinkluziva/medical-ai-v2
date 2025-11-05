@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * Analysis Page
+ * Analysis Page - Minimal Health Design
  * Main page for medical document analysis
  */
 
@@ -12,7 +12,7 @@ import { DocumentList } from '@/components/documents/document-list'
 import { AgentSelector } from '@/components/agents/agent-selector'
 import { AnalysisInterface } from '@/components/analysis/analysis-interface'
 import { Button } from '@/components/ui/button'
-import { History } from 'lucide-react'
+import { History, Upload, FileText } from 'lucide-react'
 
 interface HealthAgent {
   id: string
@@ -35,12 +35,12 @@ export default function AnalyzePage() {
   }
 
   return (
-    <div className="container mx-auto py-8 space-y-8">
+    <div className="container mx-auto py-6 px-4 space-y-6">
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Análise Médica</h1>
-          <p className="text-muted-foreground mt-2">
+          <h1 className="text-2xl font-semibold text-gray-900">Análise Médica</h1>
+          <p className="text-gray-600 mt-1">
             Envie seus documentos médicos e consulte especialistas em IA
           </p>
         </div>
@@ -53,18 +53,24 @@ export default function AnalyzePage() {
       </div>
 
       {/* Main Content */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Column - Upload & Documents */}
         <div className="lg:col-span-1 space-y-6">
           {/* Upload Section */}
           <div>
-            <h2 className="text-lg font-semibold mb-4">Upload de Documentos</h2>
+            <div className="flex items-center gap-2 mb-4">
+              <Upload className="h-5 w-5 text-teal-600" />
+              <h2 className="text-lg font-semibold text-gray-900">Upload de Documentos</h2>
+            </div>
             <DocumentUpload onUploadComplete={handleUploadComplete} />
           </div>
 
           {/* Documents List Section */}
           <div>
-            <h2 className="text-lg font-semibold mb-4">Meus Documentos</h2>
+            <div className="flex items-center gap-2 mb-4">
+              <FileText className="h-5 w-5 text-teal-600" />
+              <h2 className="text-lg font-semibold text-gray-900">Meus Documentos</h2>
+            </div>
             <DocumentList
               refreshTrigger={refreshDocuments}
               onSelectDocument={(doc) => {
@@ -95,8 +101,11 @@ export default function AnalyzePage() {
 
           {/* Help Text */}
           {!selectedAgent && (
-            <div className="text-center py-12 text-muted-foreground">
-              <p className="text-sm">
+            <div className="text-center py-16 text-gray-500">
+              <div className="bg-teal-50 rounded-lg p-4 mb-4 inline-block">
+                <FileText className="h-12 w-12 text-teal-600" />
+              </div>
+              <p className="text-sm font-medium">
                 Selecione um especialista acima para começar a análise
               </p>
             </div>

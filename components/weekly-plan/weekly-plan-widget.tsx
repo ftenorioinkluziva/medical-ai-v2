@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * Weekly Plan Widget
+ * Weekly Plan Widget - Minimal Health Design
  * Display the latest weekly plan on dashboard
  */
 
@@ -89,11 +89,11 @@ export function WeeklyPlanWidget() {
 
   if (isLoading) {
     return (
-      <Card>
+      <Card className="hover:shadow-md transition-shadow">
         <CardContent className="flex items-center justify-center py-12">
           <div className="text-center space-y-3">
-            <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" />
-            <p className="text-muted-foreground">Carregando plano semanal...</p>
+            <Loader2 className="h-8 w-8 animate-spin mx-auto text-teal-600" />
+            <p className="text-gray-600">Carregando plano semanal...</p>
           </div>
         </CardContent>
       </Card>
@@ -104,17 +104,17 @@ export function WeeklyPlanWidget() {
     const isNoPlan = error && error.includes('Nenhum plano')
 
     return (
-      <Card className={isNoPlan ? 'border-blue-200 bg-blue-50' : 'border-red-200 bg-red-50'}>
+      <Card className="hover:shadow-md transition-shadow">
         <CardContent className="p-6">
-          <div className="flex items-start gap-3">
-            <AlertCircle
-              className={`h-5 w-5 flex-shrink-0 ${isNoPlan ? 'text-blue-600' : 'text-red-600'}`}
-            />
+          <div className={`flex items-start gap-3 p-4 rounded-lg border ${isNoPlan ? 'bg-sky-50 border-sky-200' : 'bg-red-50 border-red-200'}`}>
+            <div className={`p-2 rounded-lg shrink-0 ${isNoPlan ? 'bg-sky-100' : 'bg-red-100'}`}>
+              <AlertCircle className={`h-5 w-5 ${isNoPlan ? 'text-sky-600' : 'text-red-600'}`} />
+            </div>
             <div className="flex-1">
-              <p className={`font-medium ${isNoPlan ? 'text-blue-900' : 'text-red-900'}`}>
+              <p className={`font-semibold ${isNoPlan ? 'text-sky-900' : 'text-red-900'}`}>
                 {isNoPlan ? 'Nenhum plano semanal disponível' : 'Erro ao carregar plano'}
               </p>
-              <p className={`text-sm mt-1 ${isNoPlan ? 'text-blue-700' : 'text-red-700'}`}>
+              <p className={`text-sm mt-1 ${isNoPlan ? 'text-sky-700' : 'text-red-700'}`}>
                 {isNoPlan
                   ? 'Realize uma análise médica para gerar seu primeiro plano semanal personalizado.'
                   : error || 'Ocorreu um erro ao carregar o plano.'}
@@ -135,12 +135,12 @@ export function WeeklyPlanWidget() {
   const totalWorkouts = plan.workoutPlan.workouts.length
 
   return (
-    <Card>
+    <Card className="hover:shadow-md transition-shadow">
       <CardHeader>
         <div className="flex items-start justify-between">
           <div>
-            <CardTitle className="flex items-center gap-2">
-              <Calendar className="h-5 w-5 text-primary" />
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <Calendar className="h-5 w-5 text-teal-600" />
               Plano Semanal Personalizado
             </CardTitle>
             <CardDescription>
@@ -152,7 +152,7 @@ export function WeeklyPlanWidget() {
             </CardDescription>
           </div>
           <Link href="/weekly-plan">
-            <Button variant="ghost" size="sm" className="gap-2">
+            <Button variant="ghost" size="sm" className="gap-2 text-gray-600">
               Ver Completo
               <ArrowRight className="h-4 w-4" />
             </Button>
@@ -184,53 +184,61 @@ export function WeeklyPlanWidget() {
           {/* Overview Tab */}
           <TabsContent value="overview" className="mt-6 space-y-4">
             <div className="grid gap-4 md:grid-cols-2">
-              <div className="p-4 border rounded-lg">
+              <div className="p-4 border border-gray-200 rounded-lg hover:border-purple-300 hover:bg-purple-50/30 transition-all">
                 <div className="flex items-center gap-2 mb-2">
-                  <Pill className="h-5 w-5 text-purple-600" />
-                  <h4 className="font-semibold">Suplementação</h4>
+                  <div className="bg-purple-100 p-2 rounded-lg">
+                    <Pill className="h-4 w-4 text-purple-700" />
+                  </div>
+                  <h4 className="font-semibold text-gray-900">Suplementação</h4>
                 </div>
-                <p className="text-sm text-muted-foreground line-clamp-2">
+                <p className="text-sm text-gray-600 line-clamp-2">
                   {plan.supplementationStrategy.overview}
                 </p>
-                <Badge className="mt-2">{totalSupplements} suplementos</Badge>
+                <Badge variant="outline" className="mt-2">{totalSupplements} suplementos</Badge>
               </div>
 
-              <div className="p-4 border rounded-lg">
+              <div className="p-4 border border-gray-200 rounded-lg hover:border-emerald-300 hover:bg-emerald-50/30 transition-all">
                 <div className="flex items-center gap-2 mb-2">
-                  <ShoppingCart className="h-5 w-5 text-green-600" />
-                  <h4 className="font-semibold">Compras</h4>
+                  <div className="bg-emerald-100 p-2 rounded-lg">
+                    <ShoppingCart className="h-4 w-4 text-emerald-700" />
+                  </div>
+                  <h4 className="font-semibold text-gray-900">Compras</h4>
                 </div>
-                <p className="text-sm text-muted-foreground line-clamp-2">
+                <p className="text-sm text-gray-600 line-clamp-2">
                   {plan.shoppingList.overview}
                 </p>
-                <Badge className="mt-2">{totalCategories} categorias</Badge>
+                <Badge variant="outline" className="mt-2">{totalCategories} categorias</Badge>
               </div>
 
-              <div className="p-4 border rounded-lg">
+              <div className="p-4 border border-gray-200 rounded-lg hover:border-orange-300 hover:bg-orange-50/30 transition-all">
                 <div className="flex items-center gap-2 mb-2">
-                  <UtensilsCrossed className="h-5 w-5 text-orange-600" />
-                  <h4 className="font-semibold">Refeições</h4>
+                  <div className="bg-orange-100 p-2 rounded-lg">
+                    <UtensilsCrossed className="h-4 w-4 text-orange-700" />
+                  </div>
+                  <h4 className="font-semibold text-gray-900">Refeições</h4>
                 </div>
-                <p className="text-sm text-muted-foreground line-clamp-2">
+                <p className="text-sm text-gray-600 line-clamp-2">
                   {plan.mealPlan.overview}
                 </p>
-                <Badge className="mt-2">{totalMeals} dias planejados</Badge>
+                <Badge variant="outline" className="mt-2">{totalMeals} dias planejados</Badge>
               </div>
 
-              <div className="p-4 border rounded-lg">
+              <div className="p-4 border border-gray-200 rounded-lg hover:border-sky-300 hover:bg-sky-50/30 transition-all">
                 <div className="flex items-center gap-2 mb-2">
-                  <Dumbbell className="h-5 w-5 text-blue-600" />
-                  <h4 className="font-semibold">Treinos</h4>
+                  <div className="bg-sky-100 p-2 rounded-lg">
+                    <Dumbbell className="h-4 w-4 text-sky-700" />
+                  </div>
+                  <h4 className="font-semibold text-gray-900">Treinos</h4>
                 </div>
-                <p className="text-sm text-muted-foreground line-clamp-2">
+                <p className="text-sm text-gray-600 line-clamp-2">
                   {plan.workoutPlan.overview}
                 </p>
-                <Badge className="mt-2">{totalWorkouts} treinos</Badge>
+                <Badge variant="outline" className="mt-2">{totalWorkouts} treinos</Badge>
               </div>
             </div>
 
             <Link href="/weekly-plan">
-              <Button className="w-full" size="lg">
+              <Button className="w-full bg-teal-600 hover:bg-teal-700" size="lg">
                 <Sparkles className="mr-2 h-5 w-5" />
                 Ver Plano Completo
               </Button>
@@ -241,12 +249,19 @@ export function WeeklyPlanWidget() {
           <TabsContent value="supplements" className="mt-6">
             <div className="space-y-3">
               {plan.supplementationStrategy.supplements.slice(0, 3).map((supplement, index) => (
-                <div key={index} className="p-3 border rounded-lg">
-                  <h4 className="font-medium">{supplement.name}</h4>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    {supplement.dosage} - {supplement.timing}
-                  </p>
-                  <p className="text-xs text-muted-foreground mt-1">{supplement.purpose}</p>
+                <div key={index} className="p-3 border border-gray-200 rounded-lg hover:border-purple-300 hover:bg-purple-50/30 transition-all">
+                  <div className="flex items-start gap-2">
+                    <div className="bg-purple-100 p-1.5 rounded shrink-0">
+                      <Pill className="h-3 w-3 text-purple-700" />
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="font-semibold text-gray-900">{supplement.name}</h4>
+                      <p className="text-sm text-gray-600 mt-1">
+                        {supplement.dosage} - {supplement.timing}
+                      </p>
+                      <p className="text-xs text-gray-500 mt-1">{supplement.purpose}</p>
+                    </div>
+                  </div>
                 </div>
               ))}
               {totalSupplements > 3 && (
@@ -263,8 +278,8 @@ export function WeeklyPlanWidget() {
           <TabsContent value="shopping" className="mt-6">
             <div className="space-y-3">
               {plan.shoppingList.categories.slice(0, 2).map((category, index) => (
-                <div key={index} className="p-3 border rounded-lg">
-                  <h4 className="font-medium mb-2">{category.category}</h4>
+                <div key={index} className="p-3 border border-gray-200 rounded-lg hover:border-emerald-300 hover:bg-emerald-50/30 transition-all">
+                  <h4 className="font-semibold text-gray-900 mb-2">{category.category}</h4>
                   <div className="flex flex-wrap gap-1">
                     {category.items.slice(0, 5).map((item, idx) => (
                       <Badge key={idx} variant="outline">
@@ -287,11 +302,18 @@ export function WeeklyPlanWidget() {
           <TabsContent value="meals" className="mt-6">
             <div className="space-y-3">
               {plan.mealPlan.meals.slice(0, 3).map((day, index) => (
-                <div key={index} className="p-3 border rounded-lg">
-                  <h4 className="font-medium">{day.day}</h4>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Plano completo de café, almoço e jantar
-                  </p>
+                <div key={index} className="p-3 border border-gray-200 rounded-lg hover:border-orange-300 hover:bg-orange-50/30 transition-all">
+                  <div className="flex items-start gap-2">
+                    <div className="bg-orange-100 p-1.5 rounded shrink-0">
+                      <UtensilsCrossed className="h-3 w-3 text-orange-700" />
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="font-semibold text-gray-900">{day.day}</h4>
+                      <p className="text-sm text-gray-600 mt-1">
+                        Plano completo de café, almoço e jantar
+                      </p>
+                    </div>
+                  </div>
                 </div>
               ))}
               <Link href="/weekly-plan">
@@ -306,12 +328,17 @@ export function WeeklyPlanWidget() {
           <TabsContent value="workouts" className="mt-6">
             <div className="space-y-3">
               {plan.workoutPlan.workouts.slice(0, 3).map((workout, index) => (
-                <div key={index} className="p-3 border rounded-lg">
+                <div key={index} className="p-3 border border-gray-200 rounded-lg hover:border-sky-300 hover:bg-sky-50/30 transition-all">
                   <div className="flex items-center justify-between">
-                    <h4 className="font-medium">{workout.day}</h4>
-                    <Badge>{workout.type}</Badge>
+                    <div className="flex items-center gap-2">
+                      <div className="bg-sky-100 p-1.5 rounded shrink-0">
+                        <Dumbbell className="h-3 w-3 text-sky-700" />
+                      </div>
+                      <h4 className="font-semibold text-gray-900">{workout.day}</h4>
+                    </div>
+                    <Badge variant="outline">{workout.type}</Badge>
                   </div>
-                  <p className="text-sm text-muted-foreground mt-1">Treino completo com exercícios</p>
+                  <p className="text-sm text-gray-600 mt-1 pl-8">Treino completo com exercícios</p>
                 </div>
               ))}
               <Link href="/weekly-plan">
@@ -325,7 +352,7 @@ export function WeeklyPlanWidget() {
 
         {/* Disclaimer */}
         <div className="mt-6 pt-6 border-t">
-          <p className="text-xs text-center text-muted-foreground">
+          <p className="text-xs text-center text-gray-500">
             ⚕️ Este plano é educacional e não substitui acompanhamento médico profissional.
           </p>
         </div>

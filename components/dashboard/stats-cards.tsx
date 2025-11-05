@@ -1,11 +1,11 @@
 'use client'
 
 /**
- * Dashboard Stats Cards
- * Display key metrics
+ * Dashboard Stats Cards - Minimal Health Design
+ * Clean, functional display of key metrics
  */
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { FileText, Brain, TrendingUp, AlertCircle } from 'lucide-react'
 
 interface StatsCardsProps {
@@ -21,63 +21,69 @@ export function StatsCards({
   agentsUsedCount,
   abnormalParametersCount,
 }: StatsCardsProps) {
+  const stats = [
+    {
+      title: 'Documentos',
+      value: documentsCount,
+      description: 'Exames enviados',
+      icon: FileText,
+      color: 'text-sky-600',
+      bg: 'bg-sky-50',
+    },
+    {
+      title: 'Análises',
+      value: analysesCount,
+      description: 'Análises realizadas',
+      icon: Brain,
+      color: 'text-teal-600',
+      bg: 'bg-teal-50',
+    },
+    {
+      title: 'Especialistas',
+      value: agentsUsedCount,
+      description: 'Agentes consultados',
+      icon: TrendingUp,
+      color: 'text-emerald-600',
+      bg: 'bg-emerald-50',
+    },
+    {
+      title: 'Alertas',
+      value: abnormalParametersCount,
+      description: 'Valores alterados',
+      icon: AlertCircle,
+      color: abnormalParametersCount > 0 ? 'text-orange-600' : 'text-gray-400',
+      bg: abnormalParametersCount > 0 ? 'bg-orange-50' : 'bg-gray-50',
+    },
+  ]
+
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-      {/* Documents Card */}
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Documentos</CardTitle>
-          <FileText className="h-4 w-4 text-muted-foreground" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{documentsCount}</div>
-          <p className="text-xs text-muted-foreground">
-            Exames médicos enviados
-          </p>
-        </CardContent>
-      </Card>
-
-      {/* Analyses Card */}
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Análises</CardTitle>
-          <Brain className="h-4 w-4 text-muted-foreground" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{analysesCount}</div>
-          <p className="text-xs text-muted-foreground">
-            Análises realizadas
-          </p>
-        </CardContent>
-      </Card>
-
-      {/* Agents Used Card */}
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Agentes Usados</CardTitle>
-          <TrendingUp className="h-4 w-4 text-muted-foreground" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{agentsUsedCount}</div>
-          <p className="text-xs text-muted-foreground">
-            Especialistas consultados
-          </p>
-        </CardContent>
-      </Card>
-
-      {/* Alerts Card */}
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Alertas</CardTitle>
-          <AlertCircle className="h-4 w-4 text-muted-foreground" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{abnormalParametersCount}</div>
-          <p className="text-xs text-muted-foreground">
-            Valores fora do normal
-          </p>
-        </CardContent>
-      </Card>
+      {stats.map((stat, index) => {
+        const IconComponent = stat.icon
+        return (
+          <Card
+            key={index}
+            className="overflow-hidden hover:shadow-md transition-shadow"
+          >
+            <CardHeader className="pb-2">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-sm font-medium text-gray-600">
+                  {stat.title}
+                </CardTitle>
+                <div className={`${stat.bg} p-2 rounded-lg`}>
+                  <IconComponent className={`h-4 w-4 ${stat.color}`} />
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-semibold text-gray-900">{stat.value}</div>
+              <p className="text-xs text-gray-500 mt-1">
+                {stat.description}
+              </p>
+            </CardContent>
+          </Card>
+        )
+      })}
     </div>
   )
 }

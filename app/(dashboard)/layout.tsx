@@ -12,7 +12,7 @@ export default async function DashboardLayout({
   const session = await requireAuth()
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <DashboardNav
         userName={session.user?.name || ''}
         userRole={session.user?.role || 'patient'}

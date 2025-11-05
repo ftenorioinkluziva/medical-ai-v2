@@ -143,9 +143,9 @@ export function DocumentComparison({ documentIds }: DocumentComparisonProps) {
       trend === 'stable'
 
     if (trend === 'up') {
-      return <TrendingUp className={`h-4 w-4 ${isGood ? 'text-green-600' : 'text-red-600'}`} />
+      return <TrendingUp className={`h-4 w-4 ${isGood ? 'text-emerald-600' : 'text-red-600'}`} />
     } else if (trend === 'down') {
-      return <TrendingDown className={`h-4 w-4 ${isGood ? 'text-green-600' : 'text-red-600'}`} />
+      return <TrendingDown className={`h-4 w-4 ${isGood ? 'text-emerald-600' : 'text-red-600'}`} />
     } else {
       return <Minus className="h-4 w-4 text-gray-400" />
     }
@@ -154,7 +154,7 @@ export function DocumentComparison({ documentIds }: DocumentComparisonProps) {
   const getValueColor = (status: string) => {
     switch (status?.toLowerCase()) {
       case 'normal':
-        return 'text-green-600'
+        return 'text-emerald-600'
       case 'alto':
       case 'elevado':
         return 'text-red-600'
@@ -167,11 +167,11 @@ export function DocumentComparison({ documentIds }: DocumentComparisonProps) {
 
   if (isLoading) {
     return (
-      <Card>
+      <Card className="hover:shadow-md transition-shadow">
         <CardContent className="flex items-center justify-center py-12">
           <div className="text-center space-y-3">
-            <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" />
-            <p className="text-muted-foreground">Processando comparação...</p>
+            <Loader2 className="h-8 w-8 animate-spin mx-auto text-teal-600" />
+            <p className="text-sm text-gray-600">Processando comparação...</p>
           </div>
         </CardContent>
       </Card>
@@ -180,10 +180,10 @@ export function DocumentComparison({ documentIds }: DocumentComparisonProps) {
 
   if (documents.length === 0) {
     return (
-      <Card className="border-red-200 bg-red-50">
+      <Card className="border-red-200 bg-red-50/30 hover:shadow-md transition-shadow">
         <CardContent className="p-6 flex items-center gap-3">
           <AlertCircle className="h-5 w-5 text-red-600" />
-          <p className="text-red-600">Erro ao carregar documentos para comparação</p>
+          <p className="text-sm text-red-600">Erro ao carregar documentos para comparação</p>
         </CardContent>
       </Card>
     )
@@ -192,20 +192,20 @@ export function DocumentComparison({ documentIds }: DocumentComparisonProps) {
   return (
     <div className="space-y-6">
       {/* Documents Header */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Documentos Comparados</CardTitle>
-          <CardDescription>
+      <Card className="hover:shadow-md transition-shadow">
+        <CardHeader className="pb-4">
+          <CardTitle className="text-lg font-semibold text-gray-900">Documentos Comparados</CardTitle>
+          <CardDescription className="text-sm text-gray-600">
             Comparando {documents.length} documento{documents.length !== 1 ? 's' : ''}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {documents.map((doc, index) => (
-              <div key={doc.id} className="p-4 border rounded-lg">
-                <Badge className="mb-2">#{index + 1}</Badge>
-                <h4 className="font-medium text-sm mb-1 truncate">{doc.fileName}</h4>
-                <p className="text-xs text-muted-foreground">
+              <div key={doc.id} className="p-4 border border-gray-200 rounded-lg bg-white hover:border-teal-300 hover:bg-teal-50/30 transition-all">
+                <Badge className="mb-3 bg-teal-100 text-teal-700 border-teal-200">#{index + 1}</Badge>
+                <h4 className="font-semibold text-sm mb-1 truncate text-gray-900">{doc.fileName}</h4>
+                <p className="text-xs text-gray-500">
                   {format(new Date(doc.createdAt), "dd/MM/yyyy", { locale: ptBR })}
                 </p>
               </div>
@@ -215,18 +215,22 @@ export function DocumentComparison({ documentIds }: DocumentComparisonProps) {
       </Card>
 
       {/* Comparison Tables by Category */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Comparação de Parâmetros</CardTitle>
-          <CardDescription>
+      <Card className="hover:shadow-md transition-shadow">
+        <CardHeader className="pb-4">
+          <CardTitle className="text-lg font-semibold text-gray-900">Comparação de Parâmetros</CardTitle>
+          <CardDescription className="text-sm text-gray-600">
             Visualize a evolução dos parâmetros ao longo do tempo
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Tabs defaultValue={Array.from(comparisonData.keys())[0]} className="w-full">
-            <TabsList className="grid w-full" style={{ gridTemplateColumns: `repeat(${comparisonData.size}, minmax(0, 1fr))` }}>
+            <TabsList className="grid w-full bg-gray-100" style={{ gridTemplateColumns: `repeat(${comparisonData.size}, minmax(0, 1fr))` }}>
               {Array.from(comparisonData.keys()).map((category) => (
-                <TabsTrigger key={category} value={category}>
+                <TabsTrigger
+                  key={category}
+                  value={category}
+                  className="data-[state=active]:bg-teal-600 data-[state=active]:text-white"
+                >
                   {category}
                 </TabsTrigger>
               ))}
@@ -237,41 +241,45 @@ export function DocumentComparison({ documentIds }: DocumentComparisonProps) {
                 <div className="overflow-x-auto">
                   <table className="w-full border-collapse">
                     <thead>
-                      <tr className="border-b">
-                        <th className="text-left p-3 font-semibold bg-gray-50">Parâmetro</th>
+                      <tr className="border-b-2 border-gray-200">
+                        <th className="text-left p-4 font-semibold bg-teal-50 text-gray-900 rounded-tl-lg">
+                          Parâmetro
+                        </th>
                         {documents.map((doc, index) => (
-                          <th key={doc.id} className="text-center p-3 font-semibold bg-gray-50">
-                            #{index + 1}
-                            <div className="text-xs font-normal text-muted-foreground mt-1">
+                          <th key={doc.id} className="text-center p-4 font-semibold bg-teal-50 text-gray-900">
+                            <div className="text-sm font-semibold">#{index + 1}</div>
+                            <div className="text-xs font-normal text-gray-600 mt-1.5">
                               {format(new Date(doc.createdAt), 'dd/MM/yy')}
                             </div>
                           </th>
                         ))}
-                        <th className="text-center p-3 font-semibold bg-gray-50">Tendência</th>
+                        <th className="text-center p-4 font-semibold bg-teal-50 text-gray-900 rounded-tr-lg">
+                          Tendência
+                        </th>
                       </tr>
                     </thead>
                     <tbody>
                       {parameters.map((param) => (
-                        <tr key={param.name} className="border-b hover:bg-gray-50">
-                          <td className="p-3 font-medium">{param.name}</td>
+                        <tr key={param.name} className="border-b border-gray-100 hover:bg-teal-50/30 transition-colors">
+                          <td className="p-4 font-semibold text-gray-900">{param.name}</td>
                           {documents.map((doc) => {
                             const value = param.values.find((v) => v.documentId === doc.id)
                             return (
-                              <td key={doc.id} className="text-center p-3">
+                              <td key={doc.id} className="text-center p-4">
                                 {value ? (
-                                  <div>
-                                    <div className={`font-semibold ${getValueColor(value.status)}`}>
+                                  <div className="space-y-2">
+                                    <div className={`font-semibold text-sm ${getValueColor(value.status)}`}>
                                       {value.value} {value.unit}
                                     </div>
                                     {value.status && (
                                       <Badge
                                         variant="outline"
-                                        className={`text-xs mt-1 ${
+                                        className={`text-xs ${
                                           value.status === 'Normal'
-                                            ? 'border-green-600 text-green-600'
+                                            ? 'border-emerald-600 text-emerald-700 bg-emerald-50'
                                             : value.status === 'Alto' || value.status === 'Elevado'
-                                            ? 'border-red-600 text-red-600'
-                                            : 'border-orange-600 text-orange-600'
+                                            ? 'border-red-600 text-red-700 bg-red-50'
+                                            : 'border-orange-600 text-orange-700 bg-orange-50'
                                         }`}
                                       >
                                         {value.status}
@@ -279,16 +287,16 @@ export function DocumentComparison({ documentIds }: DocumentComparisonProps) {
                                     )}
                                   </div>
                                 ) : (
-                                  <span className="text-muted-foreground text-sm">-</span>
+                                  <span className="text-gray-400 text-sm">-</span>
                                 )}
                               </td>
                             )
                           })}
-                          <td className="text-center p-3">
+                          <td className="text-center p-4">
                             <div className="flex items-center justify-center gap-2">
                               {getTrendIcon(param.trend, param.values[param.values.length - 1]?.status)}
                               {param.percentageChange !== undefined && (
-                                <span className="text-xs text-muted-foreground">
+                                <span className="text-xs text-gray-600 font-medium">
                                   {param.percentageChange > 0 ? '+' : ''}
                                   {param.percentageChange.toFixed(1)}%
                                 </span>
@@ -302,8 +310,13 @@ export function DocumentComparison({ documentIds }: DocumentComparisonProps) {
                 </div>
 
                 {parameters.length === 0 && (
-                  <div className="text-center py-8 text-muted-foreground">
-                    Nenhum parâmetro encontrado nesta categoria
+                  <div className="text-center py-12">
+                    <div className="bg-gray-50 rounded-lg p-4 mb-4 inline-block">
+                      <AlertCircle className="h-10 w-10 text-gray-400" />
+                    </div>
+                    <p className="text-sm text-gray-600">
+                      Nenhum parâmetro encontrado nesta categoria
+                    </p>
                   </div>
                 )}
               </TabsContent>

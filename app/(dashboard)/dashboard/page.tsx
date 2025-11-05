@@ -1,8 +1,8 @@
 'use client'
 
 /**
- * Dashboard Page
- * Main dashboard with health analytics and widgets
+ * Dashboard Page - Minimal Health Design
+ * Clean, professional dashboard with focus on usability
  */
 
 import { useEffect, useState } from 'react'
@@ -10,10 +10,12 @@ import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { StatsCards } from '@/components/dashboard/stats-cards'
 import { RecentDocuments } from '@/components/dashboard/recent-documents'
+import { HealthAlerts } from '@/components/dashboard/health-alerts'
 import { RecommendationsWidget } from '@/components/recommendations/recommendations-widget'
 import { WeeklyPlanWidget } from '@/components/weekly-plan/weekly-plan-widget'
-import { Loader2, User } from 'lucide-react'
+import { Loader2, User, CheckCircle, Circle, ArrowRight } from 'lucide-react'
 
 interface DashboardStats {
   documentsCount: number
@@ -58,8 +60,8 @@ export default function DashboardPage() {
       <div className="container mx-auto p-6">
         <div className="flex items-center justify-center min-h-[60vh]">
           <div className="text-center space-y-3">
-            <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" />
-            <p className="text-muted-foreground">Carregando dashboard...</p>
+            <Loader2 className="h-8 w-8 animate-spin mx-auto text-teal-600" />
+            <p className="text-gray-600">Carregando dashboard...</p>
           </div>
         </div>
       </div>
@@ -77,73 +79,103 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="container mx-auto p-6 space-y-8">
+    <div className="container mx-auto p-6 space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold">Dashboard</h1>
-        <p className="text-muted-foreground mt-1">
-          Bem-vindo de volta, {session?.user?.name}!
+        <h1 className="text-2xl font-semibold text-gray-900">
+          Olá, {session?.user?.name?.split(' ')[0]}
+        </h1>
+        <p className="text-gray-600 mt-1">
+          Aqui está um resumo da sua saúde e atividades recentes
         </p>
       </div>
 
-      {/* Recommendations Widget - TOPO */}
+      {/* Stats Cards */}
+      <StatsCards
+        documentsCount={stats.documentsCount}
+        analysesCount={stats.analysesCount}
+        agentsUsedCount={stats.agentsUsedCount}
+        abnormalParametersCount={stats.abnormalParametersCount}
+      />
+
+      {/* Health Alerts */}
+      {stats.healthMetrics && stats.healthMetrics.length > 0 && (
+        <HealthAlerts metrics={stats.healthMetrics} />
+      )}
+
+      {/* Recommendations Widget */}
       <RecommendationsWidget />
 
       {/* Weekly Plan Widget */}
       <WeeklyPlanWidget />
 
-      {/* Recent Documents */}
+      {/* Two Column Layout */}
       <div className="grid gap-6 md:grid-cols-2">
+        {/* Recent Documents */}
         <RecentDocuments documents={stats.recentDocuments} />
 
-        {/* Profile Summary */}
-        <Card>
+        {/* Quick Actions */}
+        <Card className="hover:shadow-md transition-shadow">
           <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle className="flex items-center gap-2">
-                  <User className="h-5 w-5" />
-                  Perfil Médico
-                </CardTitle>
-                <CardDescription>Suas informações de saúde</CardDescription>
-              </div>
-              <Link href="/profile">
-                <Button variant="ghost" size="sm">
-                  Editar
-                </Button>
-              </Link>
-            </div>
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <User className="h-5 w-5 text-teal-600" />
+              Próximas Ações
+            </CardTitle>
+            <CardDescription>
+              Continue sua jornada de saúde
+            </CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <p className="text-sm text-muted-foreground">
-                  Mantenha seu perfil atualizado para análises mais precisas
-                </p>
-                <Link href="/profile">
-                  <Button variant="outline" className="w-full">
-                    Completar Perfil Médico
-                  </Button>
-                </Link>
-              </div>
-
-              <div className="pt-4 border-t space-y-2">
-                <h4 className="text-sm font-medium">Próximas Ações</h4>
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2 text-sm">
-                    <div className={`h-2 w-2 rounded-full ${stats.documentsCount > 0 ? 'bg-green-500' : 'bg-gray-300'}`} />
-                    <p className="text-muted-foreground">Upload de documentos</p>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm">
-                    <div className={`h-2 w-2 rounded-full ${stats.analysesCount > 0 ? 'bg-green-500' : 'bg-gray-300'}`} />
-                    <p className="text-muted-foreground">Consultar especialistas</p>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm">
-                    <div className={`h-2 w-2 rounded-full ${stats.documentsCount >= 2 ? 'bg-green-500' : 'bg-gray-300'}`} />
-                    <p className="text-muted-foreground">Comparar evolução</p>
-                  </div>
+          <CardContent className="space-y-4">
+            {/* Action Items */}
+            <div className="space-y-3">
+              <div className="flex items-center gap-3 p-3 rounded-lg bg-gray-50">
+                {stats.documentsCount > 0 ? (
+                  <CheckCircle className="h-5 w-5 text-emerald-600" />
+                ) : (
+                  <Circle className="h-5 w-5 text-gray-400" />
+                )}
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-gray-900">Upload de documentos</p>
+                  <p className="text-xs text-gray-600">Envie seus exames médicos</p>
                 </div>
               </div>
+
+              <div className="flex items-center gap-3 p-3 rounded-lg bg-gray-50">
+                {stats.analysesCount > 0 ? (
+                  <CheckCircle className="h-5 w-5 text-emerald-600" />
+                ) : (
+                  <Circle className="h-5 w-5 text-gray-400" />
+                )}
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-gray-900">Consultar especialistas</p>
+                  <p className="text-xs text-gray-600">Obtenha análises personalizadas</p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3 p-3 rounded-lg bg-gray-50">
+                {stats.documentsCount >= 2 ? (
+                  <CheckCircle className="h-5 w-5 text-emerald-600" />
+                ) : (
+                  <Circle className="h-5 w-5 text-gray-400" />
+                )}
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-gray-900">Acompanhar evolução</p>
+                  <p className="text-xs text-gray-600">Compare seus resultados</p>
+                </div>
+              </div>
+            </div>
+
+            {/* CTA Button */}
+            <div className="pt-2">
+              <Link href="/profile">
+                <Button
+                  variant="outline"
+                  className="w-full justify-between group"
+                >
+                  Atualizar Perfil Médico
+                  <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                </Button>
+              </Link>
             </div>
           </CardContent>
         </Card>

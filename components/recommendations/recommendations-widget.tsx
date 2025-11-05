@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * Recommendations Widget
+ * Recommendations Widget - Minimal Health Design
  * Display personalized health recommendations
  */
 
@@ -121,11 +121,11 @@ export function RecommendationsWidget() {
 
   if (isLoading) {
     return (
-      <Card>
+      <Card className="hover:shadow-md transition-shadow">
         <CardContent className="flex items-center justify-center py-12">
           <div className="text-center space-y-3">
-            <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" />
-            <p className="text-muted-foreground">Gerando recomendações personalizadas...</p>
+            <Loader2 className="h-8 w-8 animate-spin mx-auto text-teal-600" />
+            <p className="text-gray-600">Gerando recomendações personalizadas...</p>
           </div>
         </CardContent>
       </Card>
@@ -136,22 +136,29 @@ export function RecommendationsWidget() {
     const isNoAnalysis = error && error.includes('Nenhuma análise encontrada')
 
     return (
-      <Card className={isNoAnalysis ? "border-blue-200 bg-blue-50" : "border-red-200 bg-red-50"}>
+      <Card className="hover:shadow-md transition-shadow">
         <CardContent className="p-6">
-          <div className="flex items-start gap-3">
-            <AlertCircle className={`h-5 w-5 flex-shrink-0 ${isNoAnalysis ? 'text-blue-600' : 'text-red-600'}`} />
+          <div className={`flex items-start gap-3 p-4 rounded-lg border ${isNoAnalysis ? 'bg-sky-50 border-sky-200' : 'bg-red-50 border-red-200'}`}>
+            <div className={`p-2 rounded-lg shrink-0 ${isNoAnalysis ? 'bg-sky-100' : 'bg-red-100'}`}>
+              <AlertCircle className={`h-5 w-5 ${isNoAnalysis ? 'text-sky-600' : 'text-red-600'}`} />
+            </div>
             <div className="flex-1">
-              <p className={`font-medium ${isNoAnalysis ? 'text-blue-900' : 'text-red-900'}`}>
+              <p className={`font-semibold ${isNoAnalysis ? 'text-sky-900' : 'text-red-900'}`}>
                 {isNoAnalysis ? 'Nenhuma análise disponível' : 'Erro ao carregar recomendações'}
               </p>
-              <p className={`text-sm mt-1 ${isNoAnalysis ? 'text-blue-700' : 'text-red-700'}`}>
+              <p className={`text-sm mt-1 ${isNoAnalysis ? 'text-sky-700' : 'text-red-700'}`}>
                 {isNoAnalysis
                   ? 'Realize uma análise médica primeiro para receber recomendações personalizadas.'
                   : error || 'Ocorreu um erro ao carregar as recomendações.'
                 }
               </p>
             </div>
-            <Button onClick={loadRecommendations} variant="outline" size="sm" className="ml-auto">
+            <Button
+              onClick={loadRecommendations}
+              variant="outline"
+              size="sm"
+              className="ml-auto"
+            >
               Tentar Novamente
             </Button>
           </div>
@@ -172,12 +179,12 @@ export function RecommendationsWidget() {
   }
 
   return (
-    <Card>
+    <Card className="hover:shadow-md transition-shadow">
       <CardHeader>
         <div className="flex items-start justify-between">
           <div>
-            <CardTitle className="flex items-center gap-2">
-              <Lightbulb className="h-5 w-5 text-yellow-600" />
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <Lightbulb className="h-5 w-5 text-amber-500" />
               Recomendações Personalizadas
             </CardTitle>
             <CardDescription>
@@ -195,7 +202,7 @@ export function RecommendationsWidget() {
             </CardDescription>
           </div>
           <Link href="/recommendations">
-            <Button variant="ghost" size="sm" className="gap-2">
+            <Button variant="ghost" size="sm" className="gap-2 text-gray-600">
               <History className="h-4 w-4" />
               Histórico
             </Button>
@@ -220,27 +227,32 @@ export function RecommendationsWidget() {
           </TabsList>
 
           {/* Exams Tab */}
-          <TabsContent value="exams" className="mt-6 space-y-4">
+          <TabsContent value="exams" className="mt-6 space-y-3">
             {recommendations.examRecommendations.length === 0 ? (
-              <p className="text-sm text-muted-foreground text-center py-8">
+              <p className="text-sm text-gray-600 text-center py-8">
                 Nenhum exame recomendado no momento
               </p>
             ) : (
               recommendations.examRecommendations.map((exam, index) => (
-                <div key={index} className="p-4 border rounded-lg space-y-2">
+                <div
+                  key={index}
+                  className="p-4 rounded-lg border border-gray-200 bg-white hover:border-sky-300 hover:bg-sky-50/30 transition-all"
+                >
                   <div className="flex items-start justify-between">
                     <div className="flex items-start gap-3 flex-1">
-                      <ClipboardList className="h-5 w-5 text-primary mt-0.5" />
+                      <div className="bg-sky-100 p-2 rounded-lg shrink-0">
+                        <ClipboardList className="h-4 w-4 text-sky-700" />
+                      </div>
                       <div className="flex-1">
-                        <h4 className="font-medium">{exam.exam}</h4>
-                        <p className="text-sm text-muted-foreground mt-1">{exam.reason}</p>
+                        <h4 className="font-semibold text-gray-900">{exam.exam}</h4>
+                        <p className="text-sm text-gray-600 mt-1">{exam.reason}</p>
                       </div>
                     </div>
                     <Badge variant={getUrgencyColor(exam.urgency) as any}>
                       {exam.urgency === 'high' ? 'Urgente' : exam.urgency === 'medium' ? 'Moderado' : 'Baixo'}
                     </Badge>
                   </div>
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground pl-8">
+                  <div className="flex items-center gap-2 text-xs text-gray-500 pl-11 mt-2">
                     <Calendar className="h-3 w-3" />
                     {exam.suggestedTimeframe}
                   </div>
@@ -250,26 +262,31 @@ export function RecommendationsWidget() {
           </TabsContent>
 
           {/* Lifestyle Tab */}
-          <TabsContent value="lifestyle" className="mt-6 space-y-4">
+          <TabsContent value="lifestyle" className="mt-6 space-y-3">
             {recommendations.lifestyleRecommendations.length === 0 ? (
-              <p className="text-sm text-muted-foreground text-center py-8">
+              <p className="text-sm text-gray-600 text-center py-8">
                 Nenhuma recomendação de lifestyle no momento
               </p>
             ) : (
               recommendations.lifestyleRecommendations.map((lifestyle, index) => (
-                <div key={index} className="p-4 border rounded-lg space-y-2">
+                <div
+                  key={index}
+                  className="p-4 rounded-lg border border-gray-200 bg-white hover:border-teal-300 hover:bg-teal-50/30 transition-all"
+                >
                   <div className="flex items-start justify-between">
                     <div className="flex items-start gap-3 flex-1">
-                      {getCategoryIcon(lifestyle.category)}
+                      <div className="bg-teal-100 p-2 rounded-lg shrink-0">
+                        {getCategoryIcon(lifestyle.category)}
+                      </div>
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
-                          <h4 className="font-medium capitalize">{lifestyle.category}</h4>
+                          <h4 className="font-semibold capitalize text-gray-900">{lifestyle.category}</h4>
                           <Badge variant="outline" className="text-xs">
                             {lifestyle.priority === 'high' ? 'Alta Prioridade' : lifestyle.priority === 'medium' ? 'Média' : 'Baixa'}
                           </Badge>
                         </div>
-                        <p className="text-sm text-muted-foreground">{lifestyle.recommendation}</p>
-                        <p className="text-xs text-green-600 mt-2 flex items-center gap-1">
+                        <p className="text-sm text-gray-600">{lifestyle.recommendation}</p>
+                        <p className="text-xs text-emerald-600 mt-2 flex items-center gap-1 font-medium">
                           <TrendingUp className="h-3 w-3" />
                           {lifestyle.expectedBenefit}
                         </p>
@@ -282,27 +299,32 @@ export function RecommendationsWidget() {
           </TabsContent>
 
           {/* Goals Tab */}
-          <TabsContent value="goals" className="mt-6 space-y-4">
+          <TabsContent value="goals" className="mt-6 space-y-3">
             {recommendations.healthGoals.length === 0 ? (
-              <p className="text-sm text-muted-foreground text-center py-8">
+              <p className="text-sm text-gray-600 text-center py-8">
                 Nenhuma meta definida no momento
               </p>
             ) : (
               recommendations.healthGoals.map((goal, index) => (
-                <div key={index} className="p-4 border rounded-lg space-y-3">
+                <div
+                  key={index}
+                  className="p-4 rounded-lg border border-gray-200 bg-white hover:border-purple-300 hover:bg-purple-50/30 transition-all"
+                >
                   <div className="flex items-start gap-3">
-                    <Target className="h-5 w-5 text-primary mt-0.5" />
+                    <div className="bg-purple-100 p-2 rounded-lg shrink-0">
+                      <Target className="h-4 w-4 text-purple-700" />
+                    </div>
                     <div className="flex-1">
-                      <h4 className="font-medium">{goal.goal}</h4>
+                      <h4 className="font-semibold text-gray-900">{goal.goal}</h4>
                       <div className="grid grid-cols-2 gap-2 mt-2 text-sm">
                         <div>
-                          <span className="text-muted-foreground">Atual:</span> {goal.currentStatus}
+                          <span className="text-gray-600 font-medium">Atual:</span> <span className="text-gray-900">{goal.currentStatus}</span>
                         </div>
                         <div>
-                          <span className="text-muted-foreground">Meta:</span> {goal.targetValue}
+                          <span className="text-gray-600 font-medium">Meta:</span> <span className="text-gray-900">{goal.targetValue}</span>
                         </div>
                       </div>
-                      <p className="text-xs text-muted-foreground mt-1">
+                      <p className="text-xs text-gray-500 mt-1">
                         Prazo: {goal.timeframe}
                       </p>
                     </div>
@@ -310,13 +332,13 @@ export function RecommendationsWidget() {
 
                   {goal.actionSteps.length > 0 && (
                     <>
-                      <Separator />
+                      <Separator className="my-3" />
                       <div className="space-y-2">
-                        <h5 className="text-sm font-medium">Passos de Ação:</h5>
+                        <h5 className="text-sm font-semibold text-gray-900">Passos de Ação:</h5>
                         <ul className="space-y-1">
                           {goal.actionSteps.map((step, stepIndex) => (
-                            <li key={stepIndex} className="text-sm text-muted-foreground flex items-start gap-2">
-                              <CheckCircle2 className="h-4 w-4 text-green-600 mt-0.5 shrink-0" />
+                            <li key={stepIndex} className="text-sm text-gray-700 flex items-start gap-2">
+                              <CheckCircle2 className="h-4 w-4 text-emerald-600 mt-0.5 shrink-0" />
                               {step}
                             </li>
                           ))}
@@ -330,33 +352,35 @@ export function RecommendationsWidget() {
           </TabsContent>
 
           {/* Alerts Tab */}
-          <TabsContent value="alerts" className="mt-6 space-y-4">
+          <TabsContent value="alerts" className="mt-6 space-y-3">
             {recommendations.alerts.length === 0 ? (
               <div className="text-center py-8">
-                <CheckCircle2 className="h-12 w-12 mx-auto mb-4 text-green-600" />
-                <p className="text-sm font-medium text-green-600">Tudo Ótimo!</p>
-                <p className="text-xs text-muted-foreground mt-1">Nenhum alerta no momento</p>
+                <div className="bg-emerald-50 rounded-lg p-4 mb-4 inline-block">
+                  <CheckCircle2 className="h-12 w-12 text-emerald-600" />
+                </div>
+                <p className="text-sm font-semibold text-emerald-600">Tudo Ótimo!</p>
+                <p className="text-xs text-gray-600 mt-1">Nenhum alerta no momento</p>
               </div>
             ) : (
               recommendations.alerts.map((alert, index) => {
                 const alertConfig = {
-                  urgent: { bg: 'bg-red-50', border: 'border-red-200', text: 'text-red-600', icon: AlertCircle },
-                  warning: { bg: 'bg-orange-50', border: 'border-orange-200', text: 'text-orange-600', icon: AlertCircle },
-                  info: { bg: 'bg-blue-50', border: 'border-blue-200', text: 'text-blue-600', icon: AlertCircle },
+                  urgent: { bg: 'bg-red-50', border: 'border-red-200', iconBg: 'bg-red-100', color: 'text-red-600' },
+                  warning: { bg: 'bg-orange-50', border: 'border-orange-200', iconBg: 'bg-orange-100', color: 'text-orange-600' },
+                  info: { bg: 'bg-sky-50', border: 'border-sky-200', iconBg: 'bg-sky-100', color: 'text-sky-600' },
                 }[alert.type]
-
-                const Icon = alertConfig.icon
 
                 return (
                   <div
                     key={index}
-                    className={`p-4 border-2 rounded-lg ${alertConfig.bg} ${alertConfig.border}`}
+                    className={`p-4 rounded-lg border ${alertConfig.bg} ${alertConfig.border}`}
                   >
                     <div className="flex items-start gap-3">
-                      <Icon className={`h-5 w-5 ${alertConfig.text} mt-0.5`} />
+                      <div className={`p-2 rounded-lg shrink-0 ${alertConfig.iconBg}`}>
+                        <AlertCircle className={`h-4 w-4 ${alertConfig.color}`} />
+                      </div>
                       <div className="flex-1">
-                        <p className={`font-medium ${alertConfig.text}`}>{alert.message}</p>
-                        <p className="text-sm text-muted-foreground mt-1">{alert.action}</p>
+                        <p className={`font-semibold ${alertConfig.color}`}>{alert.message}</p>
+                        <p className="text-sm text-gray-600 mt-1">{alert.action}</p>
                       </div>
                     </div>
                   </div>
@@ -368,7 +392,7 @@ export function RecommendationsWidget() {
 
         {/* Disclaimer */}
         <div className="mt-6 pt-6 border-t">
-          <p className="text-xs text-muted-foreground text-center">
+          <p className="text-xs text-gray-500 text-center">
             ⚕️ Estas recomendações são educacionais e não substituem consulta médica profissional.
           </p>
         </div>

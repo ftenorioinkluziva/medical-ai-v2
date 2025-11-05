@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * Recent Documents Widget
+ * Recent Documents Widget - Minimal Health Design
  * Display last uploaded documents
  */
 
@@ -28,21 +28,23 @@ interface RecentDocumentsProps {
 export function RecentDocuments({ documents }: RecentDocumentsProps) {
   if (documents.length === 0) {
     return (
-      <Card>
+      <Card className="hover:shadow-md transition-shadow">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <FileText className="h-5 w-5" />
+          <CardTitle className="flex items-center gap-2 text-lg">
+            <FileText className="h-5 w-5 text-teal-600" />
             Últimos Documentos
           </CardTitle>
           <CardDescription>Seus exames mais recentes</CardDescription>
         </CardHeader>
         <CardContent className="text-center py-8">
-          <FileText className="h-12 w-12 mx-auto mb-4 text-muted-foreground opacity-50" />
-          <p className="text-sm text-muted-foreground mb-4">
+          <div className="bg-gray-50 rounded-lg p-4 mb-4 inline-block">
+            <FileText className="h-12 w-12 text-gray-400" />
+          </div>
+          <p className="text-sm text-gray-600 mb-4">
             Você ainda não enviou nenhum documento
           </p>
           <Link href="/analyze">
-            <Button size="sm">
+            <Button size="sm" className="bg-teal-600 hover:bg-teal-700">
               Enviar Primeiro Documento
             </Button>
           </Link>
@@ -52,18 +54,18 @@ export function RecentDocuments({ documents }: RecentDocumentsProps) {
   }
 
   return (
-    <Card>
+    <Card className="hover:shadow-md transition-shadow">
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle className="flex items-center gap-2">
-              <FileText className="h-5 w-5" />
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <FileText className="h-5 w-5 text-teal-600" />
               Últimos Documentos
             </CardTitle>
             <CardDescription>Seus exames mais recentes</CardDescription>
           </div>
           <Link href="/documents">
-            <Button variant="ghost" size="sm">
+            <Button variant="ghost" size="sm" className="text-gray-600">
               Ver Todos
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
@@ -78,14 +80,16 @@ export function RecentDocuments({ documents }: RecentDocumentsProps) {
             return (
               <div
                 key={doc.id}
-                className="flex items-center justify-between p-3 rounded-lg border hover:bg-gray-50 transition-colors"
+                className="flex items-center justify-between p-3 rounded-lg border border-gray-200 hover:border-teal-200 hover:bg-teal-50/30 transition-all"
               >
                 <div className="flex items-start gap-3 flex-1 min-w-0">
-                  <FileText className="h-5 w-5 text-primary mt-0.5 shrink-0" />
+                  <div className="bg-teal-50 p-2 rounded-lg shrink-0">
+                    <FileText className="h-4 w-4 text-teal-600" />
+                  </div>
                   <div className="flex-1 min-w-0">
-                    <h4 className="font-medium text-sm truncate">{doc.fileName}</h4>
+                    <h4 className="font-medium text-sm truncate text-gray-900">{doc.fileName}</h4>
                     <div className="flex items-center gap-2 mt-1">
-                      <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                      <div className="flex items-center gap-1 text-xs text-gray-500">
                         <Calendar className="h-3 w-3" />
                         {format(new Date(doc.createdAt), "dd/MM/yyyy", { locale: ptBR })}
                       </div>

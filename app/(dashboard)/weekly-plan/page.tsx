@@ -75,11 +75,11 @@ export default function WeeklyPlanPage() {
 
   if (isLoading) {
     return (
-      <div className="container mx-auto p-6">
+      <div className="container mx-auto py-6 px-4">
         <div className="flex items-center justify-center min-h-[60vh]">
-          <div className="text-center space-y-3">
-            <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" />
-            <p className="text-muted-foreground">Carregando plano semanal...</p>
+          <div className="text-center space-y-4">
+            <Loader2 className="h-8 w-8 animate-spin mx-auto text-teal-600" />
+            <p className="text-sm text-gray-600">Carregando plano semanal...</p>
           </div>
         </div>
       </div>
@@ -87,23 +87,23 @@ export default function WeeklyPlanPage() {
   }
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
+    <div className="container mx-auto py-6 px-4 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 mb-2">
             <Link href="/dashboard">
-              <Button variant="ghost" size="sm" className="gap-2">
+              <Button variant="ghost" size="sm" className="gap-2 text-gray-600 hover:text-gray-900">
                 <ArrowLeft className="h-4 w-4" />
                 Voltar
               </Button>
             </Link>
-            <h1 className="text-3xl font-bold flex items-center gap-3">
-              <Calendar className="h-8 w-8" />
-              Plano Semanal Personalizado
-            </h1>
           </div>
-          <p className="text-muted-foreground mt-2">
+          <h1 className="text-2xl font-semibold text-gray-900 flex items-center gap-3">
+            <Calendar className="h-6 w-6 text-teal-600" />
+            Plano Semanal Personalizado
+          </h1>
+          <p className="text-gray-600 mt-1">
             Seu guia completo de saúde para a semana
           </p>
         </div>
@@ -111,10 +111,10 @@ export default function WeeklyPlanPage() {
 
       {/* Error State */}
       {error && (
-        <Card className="border-red-200 bg-red-50">
+        <Card className="border-red-200 bg-red-50/30 hover:shadow-md transition-shadow">
           <CardContent className="p-6 flex items-center gap-3">
             <AlertCircle className="h-5 w-5 text-red-600" />
-            <p className="text-red-600">{error}</p>
+            <p className="text-sm text-red-600">{error}</p>
             <Button onClick={loadPlans} variant="outline" size="sm" className="ml-auto">
               Tentar Novamente
             </Button>
@@ -124,15 +124,17 @@ export default function WeeklyPlanPage() {
 
       {/* No Plans State */}
       {!error && plans.length === 0 && (
-        <Card>
+        <Card className="hover:shadow-md transition-shadow">
           <CardContent className="p-12 text-center">
-            <FileText className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-            <h3 className="text-lg font-semibold mb-2">Nenhum plano semanal disponível</h3>
-            <p className="text-muted-foreground mb-6">
+            <div className="bg-teal-50 rounded-lg p-4 mb-4 inline-block">
+              <FileText className="h-12 w-12 text-teal-600" />
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Nenhum plano semanal disponível</h3>
+            <p className="text-sm text-gray-600 mb-6">
               Realize uma análise médica para gerar seu primeiro plano semanal personalizado
             </p>
             <Link href="/analyze">
-              <Button>Fazer Análise Médica</Button>
+              <Button className="bg-teal-600 hover:bg-teal-700">Fazer Análise Médica</Button>
             </Link>
           </CardContent>
         </Card>
@@ -144,29 +146,29 @@ export default function WeeklyPlanPage() {
           {/* Sidebar - Plans History */}
           {plans.length > 1 && (
             <div className="lg:col-span-1">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">Planos Anteriores</CardTitle>
-                  <CardDescription>{plans.length} planos gerados</CardDescription>
+              <Card className="hover:shadow-md transition-shadow">
+                <CardHeader className="pb-4">
+                  <CardTitle className="text-lg font-semibold text-gray-900">Planos Anteriores</CardTitle>
+                  <CardDescription className="text-sm text-gray-600">{plans.length} planos gerados</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-2">
                   {plans.map((plan) => (
                     <div
                       key={plan.id}
                       onClick={() => setSelectedPlan(plan)}
-                      className={`p-3 rounded-lg border cursor-pointer transition-colors ${
+                      className={`p-3 rounded-lg border cursor-pointer transition-all ${
                         selectedPlan.id === plan.id
-                          ? 'border-primary bg-primary/5'
-                          : 'hover:bg-muted/50'
+                          ? 'border-teal-300 bg-teal-50 shadow-sm'
+                          : 'border-gray-200 hover:border-teal-200 hover:bg-teal-50/30'
                       }`}
                     >
-                      <div className="flex items-center gap-2 mb-1">
-                        <Calendar className="h-4 w-4" />
-                        <p className="text-sm font-medium">
+                      <div className="flex items-center gap-2 mb-1.5">
+                        <Calendar className="h-4 w-4 text-teal-600" />
+                        <p className="text-sm font-semibold text-gray-900">
                           {format(new Date(plan.weekStartDate), 'dd/MM/yyyy', { locale: ptBR })}
                         </p>
                       </div>
-                      <p className="text-xs text-muted-foreground">
+                      <p className="text-xs text-gray-500">
                         {format(new Date(plan.createdAt), "dd/MM 'às' HH:mm", { locale: ptBR })}
                       </p>
                     </div>
@@ -179,19 +181,19 @@ export default function WeeklyPlanPage() {
           {/* Main Content */}
           <div className={plans.length > 1 ? 'lg:col-span-3' : 'lg:col-span-4'}>
             {/* Plan Info Card */}
-            <Card className="mb-6">
-              <CardHeader>
+            <Card className="mb-6 hover:shadow-md transition-shadow">
+              <CardHeader className="pb-4">
                 <div className="flex items-start justify-between">
                   <div>
-                    <CardTitle>
+                    <CardTitle className="text-lg font-semibold text-gray-900">
                       Semana de {format(new Date(selectedPlan.weekStartDate), "dd 'de' MMMM", { locale: ptBR })}
                     </CardTitle>
-                    <CardDescription>
+                    <CardDescription className="text-sm text-gray-600 mt-1">
                       Gerado em: {format(new Date(selectedPlan.createdAt), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
                       {selectedPlan.agentName && ` • ${selectedPlan.agentName}`}
                     </CardDescription>
                   </div>
-                  <Button onClick={() => window.print()} variant="outline">
+                  <Button onClick={() => window.print()} variant="outline" className="text-gray-700">
                     Imprimir
                   </Button>
                 </div>
@@ -200,20 +202,20 @@ export default function WeeklyPlanPage() {
 
             {/* Tabs for Different Sections */}
             <Tabs defaultValue="supplements" className="w-full">
-              <TabsList className="grid w-full grid-cols-4">
-                <TabsTrigger value="supplements" className="gap-2">
+              <TabsList className="grid w-full grid-cols-4 bg-gray-100">
+                <TabsTrigger value="supplements" className="gap-2 data-[state=active]:bg-purple-600 data-[state=active]:text-white">
                   <Pill className="h-4 w-4" />
                   Suplementação
                 </TabsTrigger>
-                <TabsTrigger value="shopping" className="gap-2">
+                <TabsTrigger value="shopping" className="gap-2 data-[state=active]:bg-sky-600 data-[state=active]:text-white">
                   <ShoppingCart className="h-4 w-4" />
                   Compras
                 </TabsTrigger>
-                <TabsTrigger value="meals" className="gap-2">
+                <TabsTrigger value="meals" className="gap-2 data-[state=active]:bg-orange-600 data-[state=active]:text-white">
                   <UtensilsCrossed className="h-4 w-4" />
                   Refeições
                 </TabsTrigger>
-                <TabsTrigger value="workout" className="gap-2">
+                <TabsTrigger value="workout" className="gap-2 data-[state=active]:bg-emerald-600 data-[state=active]:text-white">
                   <Dumbbell className="h-4 w-4" />
                   Treinos
                 </TabsTrigger>
@@ -221,31 +223,31 @@ export default function WeeklyPlanPage() {
 
               {/* Supplementation Tab */}
               <TabsContent value="supplements" className="mt-6 space-y-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Estratégia de Suplementação</CardTitle>
-                    <CardDescription>
+                <Card className="hover:shadow-md transition-shadow">
+                  <CardHeader className="pb-4">
+                    <CardTitle className="text-lg font-semibold text-gray-900">Estratégia de Suplementação</CardTitle>
+                    <CardDescription className="text-sm text-gray-600 mt-1 leading-relaxed">
                       {selectedPlan.supplementationStrategy.overview}
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     {selectedPlan.supplementationStrategy.supplements?.map((supplement: any, index: number) => (
-                      <div key={index} className="p-4 border rounded-lg">
-                        <div className="flex items-start justify-between mb-2">
-                          <h4 className="font-semibold text-lg">{supplement.name}</h4>
-                          <Badge>{supplement.dosage}</Badge>
+                      <div key={index} className="p-4 border border-gray-200 rounded-lg bg-white hover:border-purple-300 hover:bg-purple-50/30 transition-all">
+                        <div className="flex items-start justify-between mb-3">
+                          <h4 className="font-semibold text-base text-gray-900">{supplement.name}</h4>
+                          <Badge className="bg-purple-100 text-purple-700 border-purple-200">{supplement.dosage}</Badge>
                         </div>
-                        <div className="space-y-2 text-sm">
+                        <div className="space-y-2.5 text-sm">
                           <div className="flex items-center gap-2">
-                            <Clock className="h-4 w-4 text-muted-foreground" />
-                            <p className="text-muted-foreground">{supplement.timing}</p>
+                            <Clock className="h-4 w-4 text-gray-500 shrink-0" />
+                            <p className="text-gray-600">{supplement.timing}</p>
                           </div>
                           <div className="flex items-start gap-2">
-                            <Target className="h-4 w-4 text-muted-foreground mt-0.5" />
-                            <p className="text-muted-foreground">{supplement.purpose}</p>
+                            <Target className="h-4 w-4 text-gray-500 shrink-0 mt-0.5" />
+                            <p className="text-gray-600 leading-relaxed">{supplement.purpose}</p>
                           </div>
                           {supplement.duration && (
-                            <p className="text-xs text-muted-foreground">Duração: {supplement.duration}</p>
+                            <p className="text-xs text-gray-500 mt-2">Duração: {supplement.duration}</p>
                           )}
                         </div>
                       </div>
@@ -254,15 +256,15 @@ export default function WeeklyPlanPage() {
                     {selectedPlan.supplementationStrategy.hormonalSupport &&
                      selectedPlan.supplementationStrategy.hormonalSupport.length > 0 && (
                       <>
-                        <Separator />
+                        <Separator className="my-6" />
                         <div>
-                          <h4 className="font-semibold mb-3">Suporte Hormonal</h4>
+                          <h4 className="font-semibold text-base text-gray-900 mb-4">Suporte Hormonal</h4>
                           <div className="space-y-3">
                             {selectedPlan.supplementationStrategy.hormonalSupport.map((hormone: any, index: number) => (
-                              <div key={index} className="p-4 bg-purple-50 border border-purple-200 rounded-lg">
-                                <h5 className="font-medium text-purple-900">{hormone.hormone}</h5>
-                                <p className="text-sm text-purple-700 mt-1">{hormone.strategy}</p>
-                                <p className="text-xs text-purple-600 mt-2">
+                              <div key={index} className="p-4 border border-purple-200 rounded-lg bg-white hover:bg-purple-50/30 transition-colors">
+                                <h5 className="font-semibold text-sm text-gray-900">{hormone.hormone}</h5>
+                                <p className="text-sm text-gray-700 mt-2 leading-relaxed">{hormone.strategy}</p>
+                                <p className="text-xs text-gray-600 mt-2">
                                   Monitoramento: {hormone.monitoring}
                                 </p>
                               </div>
@@ -275,14 +277,14 @@ export default function WeeklyPlanPage() {
                     {selectedPlan.supplementationStrategy.nextExamRecommendations &&
                      selectedPlan.supplementationStrategy.nextExamRecommendations.length > 0 && (
                       <>
-                        <Separator />
+                        <Separator className="my-6" />
                         <div>
-                          <h4 className="font-semibold mb-3">Exames Recomendados para o Próximo Ciclo</h4>
-                          <ul className="space-y-2">
+                          <h4 className="font-semibold text-base text-gray-900 mb-4">Exames Recomendados para o Próximo Ciclo</h4>
+                          <ul className="space-y-2.5">
                             {selectedPlan.supplementationStrategy.nextExamRecommendations.map((exam: string, index: number) => (
-                              <li key={index} className="flex items-start gap-2 text-sm">
-                                <span className="text-primary">•</span>
-                                {exam}
+                              <li key={index} className="flex items-start gap-2.5 text-sm">
+                                <span className="text-teal-600 mt-0.5">•</span>
+                                <span className="text-gray-700 leading-relaxed">{exam}</span>
                               </li>
                             ))}
                           </ul>
@@ -295,12 +297,12 @@ export default function WeeklyPlanPage() {
 
               {/* Shopping List Tab */}
               <TabsContent value="shopping" className="mt-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Lista de Compras</CardTitle>
-                    <CardDescription>{selectedPlan.shoppingList.overview}</CardDescription>
+                <Card className="hover:shadow-md transition-shadow">
+                  <CardHeader className="pb-4">
+                    <CardTitle className="text-lg font-semibold text-gray-900">Lista de Compras</CardTitle>
+                    <CardDescription className="text-sm text-gray-600 mt-1 leading-relaxed">{selectedPlan.shoppingList.overview}</CardDescription>
                     {selectedPlan.shoppingList.estimatedCost && (
-                      <Badge variant="outline" className="mt-2 w-fit">
+                      <Badge variant="outline" className="mt-3 w-fit bg-sky-100 text-sky-700 border-sky-200">
                         Custo estimado: {selectedPlan.shoppingList.estimatedCost}
                       </Badge>
                     )}
@@ -308,38 +310,41 @@ export default function WeeklyPlanPage() {
                   <CardContent className="space-y-6">
                     {selectedPlan.shoppingList.categories?.map((category: any, index: number) => (
                       <div key={index}>
-                        <h4 className="font-semibold text-lg mb-3 flex items-center gap-2">
-                          <ShoppingCart className="h-5 w-5 text-primary" />
+                        <h4 className="font-semibold text-base text-gray-900 mb-4 flex items-center gap-2">
+                          <ShoppingCart className="h-5 w-5 text-sky-600" />
                           {category.category}
                         </h4>
-                        <div className="grid gap-2 md:grid-cols-2">
+                        <div className="grid gap-3 md:grid-cols-2">
                           {category.items.map((item: any, itemIndex: number) => (
                             <div
                               key={itemIndex}
-                              className={`p-3 border rounded-lg ${
+                              className={`p-4 border rounded-lg transition-all ${
                                 item.priority === 'high'
-                                  ? 'border-red-200 bg-red-50'
+                                  ? 'border-red-200 bg-white hover:bg-red-50/30'
                                   : item.priority === 'medium'
-                                  ? 'border-yellow-200 bg-yellow-50'
-                                  : ''
+                                  ? 'border-amber-200 bg-white hover:bg-amber-50/30'
+                                  : 'border-gray-200 bg-white hover:border-sky-300 hover:bg-sky-50/30'
                               }`}
                             >
-                              <div className="flex items-start justify-between">
-                                <p className="font-medium">{item.item}</p>
+                              <div className="flex items-start justify-between mb-2">
+                                <p className="font-semibold text-sm text-gray-900">{item.item}</p>
                                 {item.priority && (
                                   <Badge
-                                    variant={item.priority === 'high' ? 'destructive' : 'secondary'}
-                                    className="text-xs"
+                                    className={`text-xs ${
+                                      item.priority === 'high'
+                                        ? 'bg-red-100 text-red-700 border-red-200'
+                                        : 'bg-amber-100 text-amber-700 border-amber-200'
+                                    }`}
                                   >
                                     {item.priority}
                                   </Badge>
                                 )}
                               </div>
                               {item.quantity && (
-                                <p className="text-sm text-muted-foreground mt-1">{item.quantity}</p>
+                                <p className="text-sm text-gray-600 mt-1">{item.quantity}</p>
                               )}
                               {item.notes && (
-                                <p className="text-xs text-muted-foreground mt-1 italic">{item.notes}</p>
+                                <p className="text-xs text-gray-500 mt-2 italic leading-relaxed">{item.notes}</p>
                               )}
                             </div>
                           ))}
@@ -350,13 +355,13 @@ export default function WeeklyPlanPage() {
 
                     {selectedPlan.shoppingList.tips && selectedPlan.shoppingList.tips.length > 0 && (
                       <>
-                        <Separator />
-                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                          <h4 className="font-semibold mb-2 text-blue-900">Dicas de Compra</h4>
-                          <ul className="space-y-1">
+                        <Separator className="my-6" />
+                        <div className="border border-sky-200 rounded-lg p-4 bg-white hover:bg-sky-50/30 transition-colors">
+                          <h4 className="font-semibold text-base text-gray-900 mb-3">Dicas de Compra</h4>
+                          <ul className="space-y-2">
                             {selectedPlan.shoppingList.tips.map((tip: string, index: number) => (
-                              <li key={index} className="text-sm text-blue-800 flex items-start gap-2">
-                                <span className="text-blue-600">•</span>
+                              <li key={index} className="text-sm text-gray-700 flex items-start gap-2.5 leading-relaxed">
+                                <span className="text-sky-600 mt-0.5">•</span>
                                 {tip}
                               </li>
                             ))}
@@ -368,47 +373,47 @@ export default function WeeklyPlanPage() {
                 </Card>
               </TabsContent>
 
-              {/* Meal Plan Tab - Part 1 (will continue in next message) */}
+              {/* Meal Plan Tab */}
               <TabsContent value="meals" className="mt-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Plano de Refeições</CardTitle>
-                    <CardDescription>{selectedPlan.mealPlan.overview}</CardDescription>
+                <Card className="hover:shadow-md transition-shadow">
+                  <CardHeader className="pb-4">
+                    <CardTitle className="text-lg font-semibold text-gray-900">Plano de Refeições</CardTitle>
+                    <CardDescription className="text-sm text-gray-600 mt-1 leading-relaxed">{selectedPlan.mealPlan.overview}</CardDescription>
                     {selectedPlan.mealPlan.dailyCalories && (
-                      <Badge variant="outline" className="mt-2 w-fit">
+                      <Badge variant="outline" className="mt-3 w-fit bg-orange-100 text-orange-700 border-orange-200">
                         {selectedPlan.mealPlan.dailyCalories} calorias/dia
                       </Badge>
                     )}
                     {selectedPlan.mealPlan.macros && (
-                      <div className="flex gap-2 mt-2">
+                      <div className="flex gap-2 mt-3 flex-wrap">
                         {selectedPlan.mealPlan.macros.protein && (
-                          <Badge variant="outline">Proteína: {selectedPlan.mealPlan.macros.protein}</Badge>
+                          <Badge variant="outline" className="bg-emerald-100 text-emerald-700 border-emerald-200">Proteína: {selectedPlan.mealPlan.macros.protein}</Badge>
                         )}
                         {selectedPlan.mealPlan.macros.carbs && (
-                          <Badge variant="outline">Carbos: {selectedPlan.mealPlan.macros.carbs}</Badge>
+                          <Badge variant="outline" className="bg-sky-100 text-sky-700 border-sky-200">Carbos: {selectedPlan.mealPlan.macros.carbs}</Badge>
                         )}
                         {selectedPlan.mealPlan.macros.fats && (
-                          <Badge variant="outline">Gorduras: {selectedPlan.mealPlan.macros.fats}</Badge>
+                          <Badge variant="outline" className="bg-amber-100 text-amber-700 border-amber-200">Gorduras: {selectedPlan.mealPlan.macros.fats}</Badge>
                         )}
                       </div>
                     )}
                   </CardHeader>
                   <CardContent className="space-y-6">
                     {selectedPlan.mealPlan.meals?.map((day: any, index: number) => (
-                      <div key={index} className="border rounded-lg p-4">
-                        <h4 className="font-bold text-lg mb-4">{day.day}</h4>
+                      <div key={index} className="border border-gray-200 rounded-lg p-5 bg-white hover:border-orange-300 hover:bg-orange-50/20 transition-all">
+                        <h4 className="font-semibold text-base text-gray-900 mb-5">{day.day}</h4>
 
-                        <div className="space-y-4">
+                        <div className="space-y-5">
                           {/* Breakfast */}
                           <div>
-                            <h5 className="font-semibold text-sm text-orange-600 mb-2">☀️ Café da Manhã</h5>
-                            <div className="pl-4 space-y-1">
-                              <p className="font-medium">{day.breakfast.name}</p>
-                              <div className="flex gap-2 text-xs text-muted-foreground">
+                            <h5 className="font-semibold text-sm text-orange-600 mb-3">☀️ Café da Manhã</h5>
+                            <div className="pl-4 space-y-2">
+                              <p className="font-semibold text-sm text-gray-900">{day.breakfast.name}</p>
+                              <div className="flex gap-3 text-xs text-gray-600">
                                 {day.breakfast.calories && <span>📊 {day.breakfast.calories}</span>}
                                 {day.breakfast.prepTime && <span>⏱️ {day.breakfast.prepTime}</span>}
                               </div>
-                              <ul className="text-sm text-muted-foreground mt-1">
+                              <ul className="text-sm text-gray-600 space-y-1 mt-2 leading-relaxed">
                                 {day.breakfast.ingredients.map((ing: string, i: number) => (
                                   <li key={i}>• {ing}</li>
                                 ))}
@@ -418,14 +423,14 @@ export default function WeeklyPlanPage() {
 
                           {/* Lunch */}
                           <div>
-                            <h5 className="font-semibold text-sm text-green-600 mb-2">🌞 Almoço</h5>
-                            <div className="pl-4 space-y-1">
-                              <p className="font-medium">{day.lunch.name}</p>
-                              <div className="flex gap-2 text-xs text-muted-foreground">
+                            <h5 className="font-semibold text-sm text-emerald-600 mb-3">🌞 Almoço</h5>
+                            <div className="pl-4 space-y-2">
+                              <p className="font-semibold text-sm text-gray-900">{day.lunch.name}</p>
+                              <div className="flex gap-3 text-xs text-gray-600">
                                 {day.lunch.calories && <span>📊 {day.lunch.calories}</span>}
                                 {day.lunch.prepTime && <span>⏱️ {day.lunch.prepTime}</span>}
                               </div>
-                              <ul className="text-sm text-muted-foreground mt-1">
+                              <ul className="text-sm text-gray-600 space-y-1 mt-2 leading-relaxed">
                                 {day.lunch.ingredients.map((ing: string, i: number) => (
                                   <li key={i}>• {ing}</li>
                                 ))}
@@ -435,14 +440,14 @@ export default function WeeklyPlanPage() {
 
                           {/* Dinner */}
                           <div>
-                            <h5 className="font-semibold text-sm text-blue-600 mb-2">🌙 Jantar</h5>
-                            <div className="pl-4 space-y-1">
-                              <p className="font-medium">{day.dinner.name}</p>
-                              <div className="flex gap-2 text-xs text-muted-foreground">
+                            <h5 className="font-semibold text-sm text-sky-600 mb-3">🌙 Jantar</h5>
+                            <div className="pl-4 space-y-2">
+                              <p className="font-semibold text-sm text-gray-900">{day.dinner.name}</p>
+                              <div className="flex gap-3 text-xs text-gray-600">
                                 {day.dinner.calories && <span>📊 {day.dinner.calories}</span>}
                                 {day.dinner.prepTime && <span>⏱️ {day.dinner.prepTime}</span>}
                               </div>
-                              <ul className="text-sm text-muted-foreground mt-1">
+                              <ul className="text-sm text-gray-600 space-y-1 mt-2 leading-relaxed">
                                 {day.dinner.ingredients.map((ing: string, i: number) => (
                                   <li key={i}>• {ing}</li>
                                 ))}
@@ -453,13 +458,13 @@ export default function WeeklyPlanPage() {
                           {/* Snacks */}
                           {day.snacks && day.snacks.length > 0 && (
                             <div>
-                              <h5 className="font-semibold text-sm text-purple-600 mb-2">🍎 Lanches</h5>
+                              <h5 className="font-semibold text-sm text-purple-600 mb-3">🍎 Lanches</h5>
                               <div className="pl-4 space-y-2">
                                 {day.snacks.map((snack: any, i: number) => (
                                   <div key={i} className="text-sm">
-                                    <span className="font-medium">{snack.name}</span>
-                                    <span className="text-muted-foreground"> ({snack.timing})</span>
-                                    {snack.calories && <span className="text-xs text-muted-foreground ml-2">• {snack.calories}</span>}
+                                    <span className="font-semibold text-gray-900">{snack.name}</span>
+                                    <span className="text-gray-600"> ({snack.timing})</span>
+                                    {snack.calories && <span className="text-xs text-gray-500 ml-2">• {snack.calories}</span>}
                                   </div>
                                 ))}
                               </div>
@@ -471,13 +476,13 @@ export default function WeeklyPlanPage() {
 
                     {selectedPlan.mealPlan.mealPrepTips && selectedPlan.mealPlan.mealPrepTips.length > 0 && (
                       <>
-                        <Separator />
-                        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                          <h4 className="font-semibold mb-2 text-green-900">Dicas de Meal Prep</h4>
-                          <ul className="space-y-1">
+                        <Separator className="my-6" />
+                        <div className="border border-orange-200 rounded-lg p-4 bg-white hover:bg-orange-50/30 transition-colors">
+                          <h4 className="font-semibold text-base text-gray-900 mb-3">Dicas de Meal Prep</h4>
+                          <ul className="space-y-2">
                             {selectedPlan.mealPlan.mealPrepTips.map((tip: string, index: number) => (
-                              <li key={index} className="text-sm text-green-800 flex items-start gap-2">
-                                <span className="text-green-600">•</span>
+                              <li key={index} className="text-sm text-gray-700 flex items-start gap-2.5 leading-relaxed">
+                                <span className="text-orange-600 mt-0.5">•</span>
                                 {tip}
                               </li>
                             ))}
@@ -491,36 +496,35 @@ export default function WeeklyPlanPage() {
 
               {/* Workout Plan Tab */}
               <TabsContent value="workout" className="mt-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Plano de Treinamento</CardTitle>
-                    <CardDescription>{selectedPlan.workoutPlan.overview}</CardDescription>
+                <Card className="hover:shadow-md transition-shadow">
+                  <CardHeader className="pb-4">
+                    <CardTitle className="text-lg font-semibold text-gray-900">Plano de Treinamento</CardTitle>
+                    <CardDescription className="text-sm text-gray-600 mt-1 leading-relaxed">{selectedPlan.workoutPlan.overview}</CardDescription>
                     {selectedPlan.workoutPlan.weeklyGoal && (
-                      <Badge variant="outline" className="mt-2 w-fit">
+                      <Badge variant="outline" className="mt-3 w-fit bg-emerald-100 text-emerald-700 border-emerald-200">
                         Meta: {selectedPlan.workoutPlan.weeklyGoal}
                       </Badge>
                     )}
                   </CardHeader>
                   <CardContent className="space-y-6">
                     {selectedPlan.workoutPlan.workouts?.map((workout: any, index: number) => (
-                      <div key={index} className="border rounded-lg p-4">
-                        <div className="flex items-start justify-between mb-4">
+                      <div key={index} className="border border-gray-200 rounded-lg p-5 bg-white hover:border-emerald-300 hover:bg-emerald-50/20 transition-all">
+                        <div className="flex items-start justify-between mb-5">
                           <div>
-                            <h4 className="font-bold text-lg">{workout.day}</h4>
-                            <p className="text-sm text-muted-foreground">{workout.type}</p>
+                            <h4 className="font-semibold text-base text-gray-900">{workout.day}</h4>
+                            <p className="text-sm text-gray-600 mt-1">{workout.type}</p>
                           </div>
-                          <div className="text-right">
-                            <Badge>{workout.duration}</Badge>
+                          <div className="text-right flex gap-2">
+                            <Badge className="bg-emerald-100 text-emerald-700 border-emerald-200">{workout.duration}</Badge>
                             {workout.intensity && (
                               <Badge
-                                variant={
+                                className={
                                   workout.intensity === 'high'
-                                    ? 'destructive'
+                                    ? 'bg-red-100 text-red-700 border-red-200'
                                     : workout.intensity === 'medium'
-                                    ? 'default'
-                                    : 'secondary'
+                                    ? 'bg-amber-100 text-amber-700 border-amber-200'
+                                    : 'bg-gray-100 text-gray-700 border-gray-200'
                                 }
-                                className="ml-2"
                               >
                                 {workout.intensity === 'high' ? 'Alta' : workout.intensity === 'medium' ? 'Média' : 'Baixa'}
                               </Badge>
@@ -529,31 +533,31 @@ export default function WeeklyPlanPage() {
                         </div>
 
                         {workout.warmup && (
-                          <div className="mb-3 p-2 bg-yellow-50 border border-yellow-200 rounded">
-                            <p className="text-sm">
-                              <strong>Aquecimento:</strong> {workout.warmup}
+                          <div className="mb-4 p-3 border border-amber-200 rounded-lg bg-white hover:bg-amber-50/30 transition-colors">
+                            <p className="text-sm text-gray-700">
+                              <strong className="text-gray-900">Aquecimento:</strong> {workout.warmup}
                             </p>
                           </div>
                         )}
 
-                        <div className="space-y-2">
+                        <div className="space-y-3">
                           {workout.exercises.map((exercise: any, exIndex: number) => (
-                            <div key={exIndex} className="p-3 bg-muted/50 rounded-lg">
-                              <p className="font-medium">{exercise.name}</p>
-                              <div className="flex gap-4 text-sm text-muted-foreground mt-1">
+                            <div key={exIndex} className="p-4 bg-gray-50 rounded-lg border border-gray-200 hover:border-emerald-300 hover:bg-emerald-50/30 transition-all">
+                              <p className="font-semibold text-sm text-gray-900">{exercise.name}</p>
+                              <div className="flex gap-4 text-sm text-gray-600 mt-2">
                                 {exercise.sets && <span>Séries: {exercise.sets}</span>}
                                 {exercise.reps && <span>Repetições: {exercise.reps}</span>}
                                 {exercise.duration && <span>Duração: {exercise.duration}</span>}
                               </div>
-                              {exercise.notes && <p className="text-xs text-muted-foreground mt-1 italic">{exercise.notes}</p>}
+                              {exercise.notes && <p className="text-xs text-gray-500 mt-2 italic leading-relaxed">{exercise.notes}</p>}
                             </div>
                           ))}
                         </div>
 
                         {workout.cooldown && (
-                          <div className="mt-3 p-2 bg-blue-50 border border-blue-200 rounded">
-                            <p className="text-sm">
-                              <strong>Alongamento:</strong> {workout.cooldown}
+                          <div className="mt-4 p-3 border border-sky-200 rounded-lg bg-white hover:bg-sky-50/30 transition-colors">
+                            <p className="text-sm text-gray-700">
+                              <strong className="text-gray-900">Alongamento:</strong> {workout.cooldown}
                             </p>
                           </div>
                         )}
@@ -561,9 +565,9 @@ export default function WeeklyPlanPage() {
                     ))}
 
                     {selectedPlan.workoutPlan.restDays && selectedPlan.workoutPlan.restDays.length > 0 && (
-                      <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                        <h4 className="font-semibold mb-2">Dias de Descanso</h4>
-                        <p className="text-sm text-muted-foreground">
+                      <div className="border border-gray-200 rounded-lg p-4 bg-white hover:bg-gray-50 transition-colors">
+                        <h4 className="font-semibold text-base text-gray-900 mb-2">Dias de Descanso</h4>
+                        <p className="text-sm text-gray-600">
                           {selectedPlan.workoutPlan.restDays.join(', ')}
                         </p>
                       </div>
@@ -571,13 +575,13 @@ export default function WeeklyPlanPage() {
 
                     {selectedPlan.workoutPlan.progressionTips && selectedPlan.workoutPlan.progressionTips.length > 0 && (
                       <>
-                        <Separator />
-                        <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
-                          <h4 className="font-semibold mb-2 text-purple-900">Dicas de Progressão</h4>
-                          <ul className="space-y-1">
+                        <Separator className="my-6" />
+                        <div className="border border-emerald-200 rounded-lg p-4 bg-white hover:bg-emerald-50/30 transition-colors">
+                          <h4 className="font-semibold text-base text-gray-900 mb-3">Dicas de Progressão</h4>
+                          <ul className="space-y-2">
                             {selectedPlan.workoutPlan.progressionTips.map((tip: string, index: number) => (
-                              <li key={index} className="text-sm text-purple-800 flex items-start gap-2">
-                                <span className="text-purple-600">•</span>
+                              <li key={index} className="text-sm text-gray-700 flex items-start gap-2.5 leading-relaxed">
+                                <span className="text-emerald-600 mt-0.5">•</span>
                                 {tip}
                               </li>
                             ))}
@@ -591,10 +595,10 @@ export default function WeeklyPlanPage() {
             </Tabs>
 
             {/* Disclaimer */}
-            <Card className="mt-6 bg-yellow-50 border-yellow-200">
-              <CardContent className="p-4">
-                <p className="text-sm text-yellow-900">
-                  <strong>⚠️ Aviso Importante:</strong> Este plano semanal é educacional e <strong>NÃO substitui acompanhamento médico, nutricional ou de educador físico profissional</strong>. Sempre consulte profissionais de saúde antes de iniciar qualquer suplementação, mudança alimentar ou programa de exercícios.
+            <Card className="mt-6 border-amber-200 bg-white hover:shadow-md transition-shadow">
+              <CardContent className="p-5">
+                <p className="text-sm text-gray-700 leading-relaxed">
+                  <strong className="text-amber-700">⚠️ Aviso Importante:</strong> Este plano semanal é educacional e <strong>NÃO substitui acompanhamento médico, nutricional ou de educador físico profissional</strong>. Sempre consulte profissionais de saúde antes de iniciar qualquer suplementação, mudança alimentar ou programa de exercícios.
                 </p>
               </CardContent>
             </Card>
