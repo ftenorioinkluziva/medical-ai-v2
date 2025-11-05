@@ -302,9 +302,11 @@ export default function WeeklyPlanPage() {
                     <CardTitle className="text-lg font-semibold text-gray-900">Lista de Compras</CardTitle>
                     <CardDescription className="text-sm text-gray-600 mt-1 leading-relaxed">{selectedPlan.shoppingList.overview}</CardDescription>
                     {selectedPlan.shoppingList.estimatedCost && (
-                      <Badge variant="outline" className="mt-3 w-fit bg-sky-100 text-sky-700 border-sky-200">
-                        Custo estimado: {selectedPlan.shoppingList.estimatedCost}
-                      </Badge>
+                      <div className="mt-3 p-3 bg-sky-50 border border-sky-200 rounded-lg space-y-2">
+                        <p className="text-sm text-sky-900 leading-relaxed font-medium">
+                          {selectedPlan.shoppingList.estimatedCost}
+                        </p>
+                      </div>
                     )}
                   </CardHeader>
                   <CardContent className="space-y-6">
@@ -379,21 +381,25 @@ export default function WeeklyPlanPage() {
                   <CardHeader className="pb-4">
                     <CardTitle className="text-lg font-semibold text-gray-900">Plano de Refeições</CardTitle>
                     <CardDescription className="text-sm text-gray-600 mt-1 leading-relaxed">{selectedPlan.mealPlan.overview}</CardDescription>
-                    {selectedPlan.mealPlan.dailyCalories && (
-                      <Badge variant="outline" className="mt-3 w-fit bg-orange-100 text-orange-700 border-orange-200">
-                        {selectedPlan.mealPlan.dailyCalories} calorias/dia
-                      </Badge>
-                    )}
-                    {selectedPlan.mealPlan.macros && (
-                      <div className="flex gap-2 mt-3 flex-wrap">
-                        {selectedPlan.mealPlan.macros.protein && (
-                          <Badge variant="outline" className="bg-emerald-100 text-emerald-700 border-emerald-200">Proteína: {selectedPlan.mealPlan.macros.protein}</Badge>
+                    {(selectedPlan.mealPlan.dailyCalories || selectedPlan.mealPlan.macros) && (
+                      <div className="mt-3 p-3 bg-orange-50 border border-orange-200 rounded-lg space-y-2">
+                        {selectedPlan.mealPlan.dailyCalories && (
+                          <p className="text-sm text-orange-900 font-medium">
+                            {selectedPlan.mealPlan.dailyCalories} calorias/dia
+                          </p>
                         )}
-                        {selectedPlan.mealPlan.macros.carbs && (
-                          <Badge variant="outline" className="bg-sky-100 text-sky-700 border-sky-200">Carbos: {selectedPlan.mealPlan.macros.carbs}</Badge>
-                        )}
-                        {selectedPlan.mealPlan.macros.fats && (
-                          <Badge variant="outline" className="bg-amber-100 text-amber-700 border-amber-200">Gorduras: {selectedPlan.mealPlan.macros.fats}</Badge>
+                        {selectedPlan.mealPlan.macros && (
+                          <div className="flex gap-3 flex-wrap text-sm text-orange-900">
+                            {selectedPlan.mealPlan.macros.protein && (
+                              <span>Proteína: {selectedPlan.mealPlan.macros.protein}</span>
+                            )}
+                            {selectedPlan.mealPlan.macros.carbs && (
+                              <span>• Carbos: {selectedPlan.mealPlan.macros.carbs}</span>
+                            )}
+                            {selectedPlan.mealPlan.macros.fats && (
+                              <span>• Gorduras: {selectedPlan.mealPlan.macros.fats}</span>
+                            )}
+                          </div>
                         )}
                       </div>
                     )}
@@ -501,9 +507,11 @@ export default function WeeklyPlanPage() {
                     <CardTitle className="text-lg font-semibold text-gray-900">Plano de Treinamento</CardTitle>
                     <CardDescription className="text-sm text-gray-600 mt-1 leading-relaxed">{selectedPlan.workoutPlan.overview}</CardDescription>
                     {selectedPlan.workoutPlan.weeklyGoal && (
-                      <Badge variant="outline" className="mt-3 w-fit bg-emerald-100 text-emerald-700 border-emerald-200">
-                        Meta: {selectedPlan.workoutPlan.weeklyGoal}
-                      </Badge>
+                      <div className="mt-3 p-3 bg-emerald-50 border border-emerald-200 rounded-lg">
+                        <p className="text-sm text-emerald-900 font-medium">
+                          Meta: {selectedPlan.workoutPlan.weeklyGoal}
+                        </p>
+                      </div>
                     )}
                   </CardHeader>
                   <CardContent className="space-y-6">
