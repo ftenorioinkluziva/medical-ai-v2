@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import { LoginForm } from '@/components/auth/login-form'
 
 export default function LoginPage() {
@@ -10,7 +11,9 @@ export default function LoginPage() {
             Análise médica inteligente com IA
           </p>
         </div>
-        <LoginForm />
+        <Suspense fallback={<div>Carregando...</div>}>
+          <LoginForm />
+        </Suspense>
       </div>
     </div>
   )
