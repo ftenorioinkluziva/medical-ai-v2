@@ -16,6 +16,20 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
+# Accept build arguments for environment variables needed during build
+ARG DATABASE_URL
+ARG GOOGLE_GENERATIVE_AI_API_KEY
+ARG OPENAI_API_KEY
+ARG NEXTAUTH_URL
+ARG NEXTAUTH_SECRET
+
+# Set environment variables for build
+ENV DATABASE_URL=$DATABASE_URL
+ENV GOOGLE_GENERATIVE_AI_API_KEY=$GOOGLE_GENERATIVE_AI_API_KEY
+ENV OPENAI_API_KEY=$OPENAI_API_KEY
+ENV NEXTAUTH_URL=$NEXTAUTH_URL
+ENV NEXTAUTH_SECRET=$NEXTAUTH_SECRET
+
 # Build the application
 RUN corepack enable pnpm && pnpm run build
 

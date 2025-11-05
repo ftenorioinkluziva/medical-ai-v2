@@ -68,11 +68,22 @@ O script irá:
 - ✅ Verificar conexão SSH
 - ✅ Instalar Docker (se necessário)
 - ✅ Copiar arquivos para o servidor
+- ✅ Build da aplicação (requer DATABASE_URL válida)
 - ✅ Configurar containers
 - ✅ Executar migrações do banco de dados (no seu banco externo)
 - ✅ (Opcional) Seed do banco com agentes padrão
 
-**Importante:** O deploy usa seu banco de dados existente (Supabase ou outro PostgreSQL). Não cria um container PostgreSQL.
+**Importante:** O deploy usa seu banco de dados Neon existente. Não cria um container PostgreSQL.
+
+**⚠️ ANTES DE EXECUTAR O DEPLOY:**
+
+Adicione o IP do servidor no whitelist do Neon:
+1. Acesse [Neon Console](https://console.neon.tech)
+2. Selecione seu projeto (neondb)
+3. Vá em **Settings** → **IP Allow**
+4. Clique em **Add IP Address**
+5. Adicione: `135.181.47.220/32`
+6. Salve as alterações
 
 ### 4. Configurar Variáveis de Ambiente
 
@@ -90,21 +101,23 @@ nano .env.production
 **Conteúdo do `.env.production`:**
 
 ```bash
-# Database (copie do seu .env local)
-DATABASE_URL=sua_database_url_do_supabase
+# Database (copie EXATAMENTE do seu .env.local)
+DATABASE_URL='sua_database_url_do_neon_aqui'
 
 # NextAuth
 NEXTAUTH_SECRET=gere_com_openssl_rand_base64_32
 NEXTAUTH_URL=https://seu-dominio.com
 
-# AI APIs (copie do seu .env local - mesmas chaves)
-GOOGLE_AI_API_KEY=sua_google_ai_key_do_env_local
-OPENAI_API_KEY=sua_openai_key_do_env_local
+# AI APIs (copie EXATAMENTE do seu .env.local - mesmas chaves)
+GOOGLE_GENERATIVE_AI_API_KEY=sua_google_generative_ai_api_key_aqui
+OPENAI_API_KEY=sua_openai_api_key_aqui
 
 # Application
 NODE_ENV=production
 PORT=3000
 ```
+
+**⚠️ IMPORTANTE:** Copie as credenciais EXATAMENTE do seu arquivo `.env.local` que está na sua máquina local.
 
 **Gerar NEXTAUTH_SECRET:**
 ```bash
@@ -112,9 +125,10 @@ openssl rand -base64 32
 ```
 
 **Importante:**
-- Use a **mesma DATABASE_URL** do `.env` local
-- Use as **mesmas API keys** (GOOGLE_AI_API_KEY e OPENAI_API_KEY) do `.env` local
+- Use a **mesma DATABASE_URL** do `.env.local`
+- Use as **mesmas API keys** do `.env.local`
 - NEXTAUTH_URL deve ser o domínio final com HTTPS
+- **Antes de fazer o build**, adicione o IP **135.181.47.220** no whitelist do Neon (banco de dados)
 
 Após configurar, reinicie os containers:
 ```bash

@@ -6,6 +6,12 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        DATABASE_URL: ${DATABASE_URL}
+        GOOGLE_GENERATIVE_AI_API_KEY: ${GOOGLE_GENERATIVE_AI_API_KEY}
+        OPENAI_API_KEY: ${OPENAI_API_KEY}
+        NEXTAUTH_URL: ${NEXTAUTH_URL}
+        NEXTAUTH_SECRET: ${NEXTAUTH_SECRET}
     container_name: medical-ai-app
     restart: unless-stopped
     environment:
@@ -17,7 +23,7 @@ services:
       NEXTAUTH_URL: ${NEXTAUTH_URL}
 
       # AI APIs
-      GOOGLE_AI_API_KEY: ${GOOGLE_AI_API_KEY}
+      GOOGLE_GENERATIVE_AI_API_KEY: ${GOOGLE_GENERATIVE_AI_API_KEY}
       OPENAI_API_KEY: ${OPENAI_API_KEY}
 
       # Node Environment
