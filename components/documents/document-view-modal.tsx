@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
 import { Button } from '@/components/ui/button'
+import { StructuredDataDisplay } from './structured-data-display'
 import {
   FileText,
   Calendar,
@@ -198,22 +199,11 @@ export function DocumentViewModal({ document, isOpen, onClose }: DocumentViewMod
               <>
                 <Separator />
                 <div>
-                  <h3 className="text-sm font-semibold text-gray-600 mb-3 flex items-center gap-2">
+                  <h3 className="text-sm font-semibold text-gray-600 mb-4 flex items-center gap-2">
                     <Database className="h-4 w-4" />
                     DADOS ESTRUTURADOS
                   </h3>
-                  <div className="space-y-3">
-                    {document.structuredData.modules.map((module: any, index: number) => (
-                      <div key={index} className="p-4 rounded-lg bg-gray-50 border border-gray-200">
-                        <h4 className="font-medium text-sm mb-2 text-gray-900">
-                          {module.type || `Módulo ${index + 1}`}
-                        </h4>
-                        <pre className="text-xs text-gray-600 whitespace-pre-wrap">
-                          {JSON.stringify(module, null, 2)}
-                        </pre>
-                      </div>
-                    ))}
-                  </div>
+                  <StructuredDataDisplay modules={document.structuredData.modules} />
                 </div>
               </>
             )}
