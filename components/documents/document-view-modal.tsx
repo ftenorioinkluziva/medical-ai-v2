@@ -208,26 +208,6 @@ export function DocumentViewModal({ document, isOpen, onClose }: DocumentViewMod
               </>
             )}
 
-            {/* Extracted Text Section */}
-            {document.extractedText && (
-              <>
-                <Separator />
-                <div>
-                  <h3 className="text-sm font-semibold text-gray-600 mb-3 flex items-center gap-2">
-                    <FileText className="h-4 w-4" />
-                    TEXTO EXTRAÍDO
-                  </h3>
-                  <div className="p-4 rounded-lg bg-gray-50 border border-gray-200">
-                    <p className="text-sm text-gray-700 whitespace-pre-wrap font-mono leading-relaxed">
-                      {document.extractedText}
-                    </p>
-                  </div>
-                  <p className="text-xs text-gray-500 mt-2">
-                    {document.extractedText.length.toLocaleString()} caracteres extraídos
-                  </p>
-                </div>
-              </>
-            )}
           </div>
         </ScrollArea>
 

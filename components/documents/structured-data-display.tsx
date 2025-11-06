@@ -71,32 +71,41 @@ export function StructuredDataDisplay({ modules }: StructuredDataDisplayProps) {
 
   const renderParameterValue = (param: Parameter) => {
     const hasReference = param.referenceRange && param.referenceRange !== 'N/A'
+    const isAbnormal = param.status && param.status !== 'normal'
 
     return (
-      <div className="flex items-start justify-between py-2 border-b border-gray-200 last:border-0 gap-3">
-        <div className="flex items-start gap-2 flex-1 min-w-0">
-          <div className="mt-1 flex-shrink-0">
-            {getStatusIcon(param.status)}
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-gray-900 break-words">{param.name}</p>
-            {hasReference && (
-              <p className="text-xs text-gray-500 break-words">
-                Ref: {param.referenceRange}
-              </p>
+      <div className={`grid grid-cols-[auto_1fr_auto] gap-3 py-3 px-3 border-b border-gray-200 last:border-0 hover:bg-gray-50 transition-colors ${isAbnormal ? 'bg-yellow-50/50' : ''}`}>
+        {/* Icon + Name + Reference */}
+        <div className="flex items-center justify-center flex-shrink-0">
+          {getStatusIcon(param.status)}
+        </div>
+
+        <div className="flex-1 min-w-0">
+          <div className="flex items-baseline gap-2 flex-wrap">
+            <p className="font-semibold text-sm text-gray-900">{param.name}</p>
+            {isAbnormal && (
+              <Badge variant="outline" className={`text-xs ${getStatusColor(param.status)}`}>
+                {getStatusLabel(param.status)}
+              </Badge>
             )}
           </div>
-        </div>
-        <div className="flex-shrink-0 text-right ml-2">
-          <p className="text-sm font-semibold text-gray-900 whitespace-nowrap">
-            {param.value}
-            {param.unit && <span className="text-xs font-normal text-gray-600 ml-1">{param.unit}</span>}
-          </p>
-          {param.status && param.status !== 'normal' && (
-            <Badge variant="outline" className={`text-xs mt-1 inline-block ${getStatusColor(param.status)}`}>
-              {getStatusLabel(param.status)}
-            </Badge>
+          {hasReference && (
+            <p className="text-xs text-gray-500 mt-0.5">
+              Referência: {param.referenceRange}
+            </p>
           )}
+        </div>
+
+        {/* Value */}
+        <div className="flex items-center justify-end flex-shrink-0">
+          <div className={`text-right px-3 py-1 rounded-md ${isAbnormal ? 'bg-white border border-yellow-300' : 'bg-gray-100'}`}>
+            <span className="font-bold text-base text-gray-900">
+              {param.value}
+            </span>
+            {param.unit && (
+              <span className="text-xs text-gray-600 ml-1 font-normal">{param.unit}</span>
+            )}
+          </div>
         </div>
       </div>
     )
@@ -144,11 +153,16 @@ export function StructuredDataDisplay({ modules }: StructuredDataDisplayProps) {
 
               {/* Parameters */}
               {hasParameters ? (
-                <div className="space-y-1">
-                  <p className="text-xs font-semibold text-gray-600 uppercase tracking-wide mb-2">
-                    Parâmetros ({module.parameters.length})
-                  </p>
-                  <div className="bg-gray-50 rounded-lg p-2 overflow-x-auto">
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs font-bold text-gray-700 uppercase tracking-wide">
+                      Parâmetros
+                    </p>
+                    <Badge variant="secondary" className="text-xs">
+                      {module.parameters.length} exames
+                    </Badge>
+                  </div>
+                  <div className="border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm">
                     {module.parameters.map((param, paramIndex) => (
                       <div key={paramIndex}>
                         {renderParameterValue(param)}
