@@ -61,19 +61,6 @@ export function AnalysisViewModal({ analysis, isOpen, onClose }: AnalysisViewMod
 
         <ScrollArea className="h-[calc(90vh-180px)]">
           <div className="px-6 py-4 space-y-6">
-            {/* Prompt Section */}
-            <div>
-              <h3 className="text-sm font-semibold text-muted-foreground mb-2 flex items-center gap-2">
-                <FileText className="h-4 w-4" />
-                PERGUNTA
-              </h3>
-              <div className="bg-muted p-4 rounded-lg">
-                <p className="text-sm">{analysis.prompt}</p>
-              </div>
-            </div>
-
-            <Separator />
-
             {/* Analysis Section */}
             <div>
               <h3 className="text-sm font-semibold text-muted-foreground mb-3 flex items-center gap-2">
