@@ -74,14 +74,15 @@ export function StructuredDataDisplay({ modules }: StructuredDataDisplayProps) {
     const isAbnormal = param.status && param.status !== 'normal'
 
     return (
-      <div className={`grid grid-cols-[auto_1fr_auto] gap-3 py-3 px-3 border-b border-gray-200 last:border-0 hover:bg-gray-50 transition-colors ${isAbnormal ? 'bg-yellow-50/50' : ''}`}>
-        {/* Icon + Name + Reference */}
-        <div className="flex items-center justify-center flex-shrink-0">
+      <div className={`grid grid-cols-[40px_1fr_140px] gap-4 py-3 px-4 border-b border-gray-200 last:border-0 hover:bg-gray-50 transition-colors ${isAbnormal ? 'bg-yellow-50/50' : ''}`}>
+        {/* Icon */}
+        <div className="flex items-center justify-center">
           {getStatusIcon(param.status)}
         </div>
 
-        <div className="flex-1 min-w-0">
-          <div className="flex items-baseline gap-2 flex-wrap">
+        {/* Name + Reference */}
+        <div className="flex flex-col justify-center min-w-0">
+          <div className="flex items-center gap-2 flex-wrap">
             <p className="font-semibold text-sm text-gray-900">{param.name}</p>
             {isAbnormal && (
               <Badge variant="outline" className={`text-xs ${getStatusColor(param.status)}`}>
@@ -91,19 +92,19 @@ export function StructuredDataDisplay({ modules }: StructuredDataDisplayProps) {
           </div>
           {hasReference && (
             <p className="text-xs text-gray-500 mt-0.5">
-              Referência: {param.referenceRange}
+              Ref: {param.referenceRange}
             </p>
           )}
         </div>
 
         {/* Value */}
-        <div className="flex items-center justify-end flex-shrink-0">
-          <div className={`text-right px-3 py-1 rounded-md ${isAbnormal ? 'bg-white border border-yellow-300' : 'bg-gray-100'}`}>
-            <span className="font-bold text-base text-gray-900">
+        <div className="flex items-center justify-end">
+          <div className={`px-4 py-2 rounded-md min-w-[120px] text-center ${isAbnormal ? 'bg-white border-2 border-yellow-400' : 'bg-gray-100'}`}>
+            <span className="font-bold text-lg text-gray-900">
               {param.value}
             </span>
             {param.unit && (
-              <span className="text-xs text-gray-600 ml-1 font-normal">{param.unit}</span>
+              <span className="text-xs text-gray-600 ml-1 font-medium">{param.unit}</span>
             )}
           </div>
         </div>
