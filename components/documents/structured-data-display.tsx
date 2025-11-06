@@ -1,11 +1,11 @@
 /**
  * Structured Data Display Component
- * Renders structured medical data in a user-friendly format
+ * Renders structured medical data in a professional lab report format
  */
 
 import { Badge } from '@/components/ui/badge'
-import { Alert, AlertDescription } from '@/components/ui/alert'
-import { CheckCircle2, AlertCircle, Activity, AlertTriangle } from 'lucide-react'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { CheckCircle2, AlertCircle, AlertTriangle, User, Building2 } from 'lucide-react'
 
 interface Parameter {
   name: string
@@ -69,125 +69,108 @@ export function StructuredDataDisplay({ modules }: StructuredDataDisplayProps) {
     }
   }
 
-  const renderParameterValue = (param: Parameter) => {
-    const hasReference = param.referenceRange && param.referenceRange !== 'N/A'
-    const isAbnormal = param.status && param.status !== 'normal'
-
+  const renderParametersTable = (parameters: Parameter[]) => {
     return (
-      <div className={`grid grid-cols-[40px_1fr_140px] gap-4 py-3 px-4 border-b border-gray-200 last:border-0 hover:bg-gray-50 transition-colors ${isAbnormal ? 'bg-yellow-50/50' : ''}`}>
-        {/* Icon */}
-        <div className="flex items-center justify-center">
-          {getStatusIcon(param.status)}
-        </div>
+      <div className="overflow-x-auto">
+        <table className="w-full">
+          <thead>
+            <tr className="border-b-2 border-gray-300">
+              <th className="text-left py-2 px-3 text-xs font-semibold text-gray-600 uppercase">Parâmetro</th>
+              <th className="text-center py-2 px-3 text-xs font-semibold text-gray-600 uppercase">Valor</th>
+              <th className="text-center py-2 px-3 text-xs font-semibold text-gray-600 uppercase">Unidade</th>
+              <th className="text-center py-2 px-3 text-xs font-semibold text-gray-600 uppercase">Referência</th>
+              <th className="text-center py-2 px-3 text-xs font-semibold text-gray-600 uppercase">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {parameters.map((param, index) => {
+              const isAbnormal = param.status && param.status !== 'normal'
+              const hasReference = param.referenceRange && param.referenceRange !== 'N/A'
 
-        {/* Name + Reference */}
-        <div className="flex flex-col justify-center min-w-0">
-          <div className="flex items-center gap-2 flex-wrap">
-            <p className="font-semibold text-sm text-gray-900">{param.name}</p>
-            {isAbnormal && (
-              <Badge variant="outline" className={`text-xs ${getStatusColor(param.status)}`}>
-                {getStatusLabel(param.status)}
-              </Badge>
-            )}
-          </div>
-          {hasReference && (
-            <p className="text-xs text-gray-500 mt-0.5">
-              Ref: {param.referenceRange}
-            </p>
-          )}
-        </div>
-
-        {/* Value */}
-        <div className="flex items-center justify-end">
-          <div className={`px-4 py-2 rounded-md min-w-[120px] text-center ${isAbnormal ? 'bg-white border-2 border-yellow-400' : 'bg-gray-100'}`}>
-            <span className="font-bold text-lg text-gray-900">
-              {param.value}
-            </span>
-            {param.unit && (
-              <span className="text-xs text-gray-600 ml-1 font-medium">{param.unit}</span>
-            )}
-          </div>
-        </div>
+              return (
+                <tr
+                  key={index}
+                  className={`border-b border-gray-200 hover:bg-gray-50 transition-colors ${isAbnormal ? 'bg-red-50' : ''}`}
+                >
+                  <td className="py-3 px-3 text-sm font-medium text-gray-900">{param.name}</td>
+                  <td className="py-3 px-3 text-sm font-semibold text-gray-900 text-center">{param.value}</td>
+                  <td className="py-3 px-3 text-xs text-gray-600 text-center">{param.unit || '-'}</td>
+                  <td className="py-3 px-3 text-xs text-gray-600 text-center">{hasReference ? param.referenceRange : '-'}</td>
+                  <td className="py-3 px-3 text-center">
+                    {isAbnormal ? (
+                      <Badge variant="destructive" className="text-xs flex items-center gap-1 justify-center">
+                        <AlertCircle className="h-3 w-3" />
+                        {getStatusLabel(param.status)}
+                      </Badge>
+                    ) : (
+                      <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-300">
+                        <CheckCircle2 className="h-3 w-3 mr-1" />
+                        Normal
+                      </Badge>
+                    )}
+                  </td>
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
       </div>
     )
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {modules.map((module, index) => {
         const title = module.moduleName || module.type || `Módulo ${index + 1}`
         const hasParameters = module.parameters && Array.isArray(module.parameters) && module.parameters.length > 0
         const moduleStatus = module.status
 
         return (
-          <div key={index} className="rounded-lg border border-gray-200 overflow-hidden">
+          <div key={index} className="space-y-4">
             {/* Module Header */}
-            <div className="bg-gradient-to-r from-teal-50 to-blue-50 p-3 border-b border-gray-200">
-              <div className="flex flex-col gap-2">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <h4 className="font-semibold text-sm text-gray-900 break-words">{title}</h4>
-                  {moduleStatus && (
-                    <Badge variant="outline" className={`${getStatusColor(moduleStatus)} flex-shrink-0`}>
-                      {getStatusIcon(moduleStatus)}
-                      <span className="ml-1">{getStatusLabel(moduleStatus)}</span>
-                    </Badge>
-                  )}
-                </div>
+            <div className="flex items-center justify-between pb-3 border-b-2 border-gray-200">
+              <div className="flex items-center gap-3">
+                <h3 className="text-lg font-bold text-gray-900 uppercase">{title}</h3>
                 {module.category && (
-                  <p className="text-xs text-gray-600 break-words">
-                    <span className="font-medium">Categoria:</span> {module.category}
-                  </p>
+                  <span className="text-sm text-gray-600">{module.category}</span>
                 )}
               </div>
-            </div>
-
-            {/* Module Content */}
-            <div className="p-3 bg-white">
-              {/* Summary */}
-              {module.summary && (
-                <Alert className="mb-3 border-teal-200 bg-teal-50">
-                  <AlertDescription className="text-xs text-gray-700 break-words">
-                    <span className="font-medium">Resumo:</span> {module.summary}
-                  </AlertDescription>
-                </Alert>
-              )}
-
-              {/* Parameters */}
-              {hasParameters ? (
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <p className="text-xs font-bold text-gray-700 uppercase tracking-wide">
-                      Parâmetros
-                    </p>
-                    <Badge variant="secondary" className="text-xs">
-                      {module.parameters.length} exames
-                    </Badge>
-                  </div>
-                  <div className="border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm">
-                    {module.parameters.map((param, paramIndex) => (
-                      <div key={paramIndex}>
-                        {renderParameterValue(param)}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ) : (
-                /* Fallback for non-standard structure */
-                <div className="bg-gray-50 rounded-lg p-3 overflow-x-auto">
-                  <pre className="text-xs text-gray-700 whitespace-pre-wrap font-mono break-all">
-                    {JSON.stringify(
-                      Object.fromEntries(
-                        Object.entries(module).filter(([key]) =>
-                          !['moduleName', 'type', 'category', 'status', 'summary', 'parameters'].includes(key)
-                        )
-                      ),
-                      null,
-                      2
-                    )}
-                  </pre>
-                </div>
+              {moduleStatus && (
+                <Badge variant={moduleStatus === 'abnormal' ? 'destructive' : 'outline'} className="flex items-center gap-1">
+                  {getStatusIcon(moduleStatus)}
+                  <span>{getStatusLabel(moduleStatus)}</span>
+                </Badge>
               )}
             </div>
+
+            {/* Summary */}
+            {module.summary && (
+              <div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded">
+                <p className="text-sm text-gray-800 italic">{module.summary}</p>
+              </div>
+            )}
+
+            {/* Parameters Table */}
+            {hasParameters ? (
+              <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+                {renderParametersTable(module.parameters)}
+              </div>
+            ) : (
+              /* Fallback for non-standard structure */
+              <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                <pre className="text-xs text-gray-700 whitespace-pre-wrap font-mono overflow-x-auto">
+                  {JSON.stringify(
+                    Object.fromEntries(
+                      Object.entries(module).filter(([key]) =>
+                        !['moduleName', 'type', 'category', 'status', 'summary', 'parameters'].includes(key)
+                      )
+                    ),
+                    null,
+                    2
+                  )}
+                </pre>
+              </div>
+            )}
           </div>
         )
       })}
