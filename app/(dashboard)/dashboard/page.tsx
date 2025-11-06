@@ -12,6 +12,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button'
 import { RecommendationsWidget } from '@/components/recommendations/recommendations-widget'
 import { WeeklyPlanWidget } from '@/components/weekly-plan/weekly-plan-widget'
+import { DocumentUploadWidget } from '@/components/documents/document-upload-widget'
+import { RecentDocumentsWidget } from '@/components/documents/recent-documents-widget'
+import { RecentAnalysesWidget } from '@/components/analyses/recent-analyses-widget'
 import { Loader2, User, ArrowRight } from 'lucide-react'
 
 interface DashboardStats {
@@ -29,6 +32,7 @@ export default function DashboardPage() {
   const { data: session } = useSession()
   const [stats, setStats] = useState<DashboardStats | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [refreshKey, setRefreshKey] = useState(0)
 
   useEffect(() => {
     loadStats()
@@ -50,6 +54,11 @@ export default function DashboardPage() {
     } finally {
       setIsLoading(false)
     }
+  }
+
+  const handleUploadComplete = () => {
+    // Refresh the documents list by updating the key
+    setRefreshKey((prev) => prev + 1)
   }
 
   if (isLoading) {
@@ -114,11 +123,18 @@ export default function DashboardPage() {
         </CardContent>
       </Card>
 
-      {/* Recommendations Widget */}
-      <RecommendationsWidget />
+      {/* Documents and Analyses Section - 3 Column Grid */}
+      <div className="grid gap-6 lg:grid-cols-3">
+        <DocumentUploadWidget onUploadComplete={handleUploadComplete} />
+        <RecentDocumentsWidget key={refreshKey} limit={5} />
+        <RecentAnalysesWidget limit={5} />
+      </div>
 
-      {/* Weekly Plan Widget */}
-      <WeeklyPlanWidget />
+      {/* Recommendations and Weekly Plan Section - 2 Column Grid */}
+      <div className="grid gap-6 lg:grid-cols-2">
+        <RecommendationsWidget />
+        <WeeklyPlanWidget />
+      </div>
 
 
     </div>
