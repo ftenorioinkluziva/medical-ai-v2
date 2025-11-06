@@ -73,32 +73,30 @@ export function StructuredDataDisplay({ modules }: StructuredDataDisplayProps) {
     const hasReference = param.referenceRange && param.referenceRange !== 'N/A'
 
     return (
-      <div className="flex items-center justify-between py-2 border-b border-gray-200 last:border-0">
-        <div className="flex items-start gap-2 flex-1">
-          <div className="mt-1">
+      <div className="flex items-start justify-between py-2 border-b border-gray-200 last:border-0 gap-3">
+        <div className="flex items-start gap-2 flex-1 min-w-0">
+          <div className="mt-1 flex-shrink-0">
             {getStatusIcon(param.status)}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-gray-900">{param.name}</p>
+            <p className="text-sm font-medium text-gray-900 break-words">{param.name}</p>
             {hasReference && (
-              <p className="text-xs text-gray-500">
-                Referência: {param.referenceRange}
+              <p className="text-xs text-gray-500 break-words">
+                Ref: {param.referenceRange}
               </p>
             )}
           </div>
         </div>
-        <div className="flex items-center gap-2 ml-4">
-          <div className="text-right">
-            <p className="text-sm font-semibold text-gray-900">
-              {param.value}
-              {param.unit && <span className="text-xs font-normal text-gray-600 ml-1">{param.unit}</span>}
-            </p>
-            {param.status && param.status !== 'normal' && (
-              <Badge variant="outline" className={`text-xs mt-1 ${getStatusColor(param.status)}`}>
-                {getStatusLabel(param.status)}
-              </Badge>
-            )}
-          </div>
+        <div className="flex-shrink-0 text-right ml-2">
+          <p className="text-sm font-semibold text-gray-900 whitespace-nowrap">
+            {param.value}
+            {param.unit && <span className="text-xs font-normal text-gray-600 ml-1">{param.unit}</span>}
+          </p>
+          {param.status && param.status !== 'normal' && (
+            <Badge variant="outline" className={`text-xs mt-1 inline-block ${getStatusColor(param.status)}`}>
+              {getStatusLabel(param.status)}
+            </Badge>
+          )}
         </div>
       </div>
     )
@@ -114,33 +112,31 @@ export function StructuredDataDisplay({ modules }: StructuredDataDisplayProps) {
         return (
           <div key={index} className="rounded-lg border border-gray-200 overflow-hidden">
             {/* Module Header */}
-            <div className="bg-gradient-to-r from-teal-50 to-blue-50 p-4 border-b border-gray-200">
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <h4 className="font-semibold text-base text-gray-900">{title}</h4>
-                    {moduleStatus && (
-                      <Badge variant="outline" className={getStatusColor(moduleStatus)}>
-                        {getStatusIcon(moduleStatus)}
-                        <span className="ml-1">{getStatusLabel(moduleStatus)}</span>
-                      </Badge>
-                    )}
-                  </div>
-                  {module.category && (
-                    <p className="text-xs text-gray-600">
-                      <span className="font-medium">Categoria:</span> {module.category}
-                    </p>
+            <div className="bg-gradient-to-r from-teal-50 to-blue-50 p-3 border-b border-gray-200">
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h4 className="font-semibold text-sm text-gray-900 break-words">{title}</h4>
+                  {moduleStatus && (
+                    <Badge variant="outline" className={`${getStatusColor(moduleStatus)} flex-shrink-0`}>
+                      {getStatusIcon(moduleStatus)}
+                      <span className="ml-1">{getStatusLabel(moduleStatus)}</span>
+                    </Badge>
                   )}
                 </div>
+                {module.category && (
+                  <p className="text-xs text-gray-600 break-words">
+                    <span className="font-medium">Categoria:</span> {module.category}
+                  </p>
+                )}
               </div>
             </div>
 
             {/* Module Content */}
-            <div className="p-4 bg-white">
+            <div className="p-3 bg-white">
               {/* Summary */}
               {module.summary && (
-                <Alert className="mb-4 border-teal-200 bg-teal-50">
-                  <AlertDescription className="text-sm text-gray-700">
+                <Alert className="mb-3 border-teal-200 bg-teal-50">
+                  <AlertDescription className="text-xs text-gray-700 break-words">
                     <span className="font-medium">Resumo:</span> {module.summary}
                   </AlertDescription>
                 </Alert>
@@ -149,10 +145,10 @@ export function StructuredDataDisplay({ modules }: StructuredDataDisplayProps) {
               {/* Parameters */}
               {hasParameters ? (
                 <div className="space-y-1">
-                  <p className="text-xs font-semibold text-gray-600 uppercase tracking-wide mb-3">
+                  <p className="text-xs font-semibold text-gray-600 uppercase tracking-wide mb-2">
                     Parâmetros ({module.parameters.length})
                   </p>
-                  <div className="bg-gray-50 rounded-lg p-3">
+                  <div className="bg-gray-50 rounded-lg p-2 overflow-x-auto">
                     {module.parameters.map((param, paramIndex) => (
                       <div key={paramIndex}>
                         {renderParameterValue(param)}
@@ -162,8 +158,8 @@ export function StructuredDataDisplay({ modules }: StructuredDataDisplayProps) {
                 </div>
               ) : (
                 /* Fallback for non-standard structure */
-                <div className="bg-gray-50 rounded-lg p-3">
-                  <pre className="text-xs text-gray-700 whitespace-pre-wrap font-mono">
+                <div className="bg-gray-50 rounded-lg p-3 overflow-x-auto">
+                  <pre className="text-xs text-gray-700 whitespace-pre-wrap font-mono break-all">
                     {JSON.stringify(
                       Object.fromEntries(
                         Object.entries(module).filter(([key]) =>
