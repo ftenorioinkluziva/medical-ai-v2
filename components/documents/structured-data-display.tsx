@@ -4,8 +4,7 @@
  */
 
 import { Badge } from '@/components/ui/badge'
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
-import { CheckCircle2, AlertCircle, AlertTriangle, User, Building2 } from 'lucide-react'
+import { CheckCircle2, AlertCircle, AlertTriangle } from 'lucide-react'
 
 interface Parameter {
   name: string
@@ -52,7 +51,7 @@ export function StructuredDataDisplay({ modules }: StructuredDataDisplayProps) {
       case 'critical':
         return <AlertCircle className="h-4 w-4 text-red-600" />
       default:
-        return <Activity className="h-4 w-4 text-gray-600" />
+        return <CheckCircle2 className="h-4 w-4 text-gray-600" />
     }
   }
 
