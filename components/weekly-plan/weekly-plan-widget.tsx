@@ -6,7 +6,6 @@
  */
 
 import { useEffect, useState } from 'react'
-import Link from 'next/link'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -19,8 +18,6 @@ import {
   UtensilsCrossed,
   Dumbbell,
   AlertCircle,
-  ArrowRight,
-  Sparkles,
 } from 'lucide-react'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
@@ -137,48 +134,28 @@ export function WeeklyPlanWidget() {
   return (
     <Card className="hover:shadow-md transition-shadow">
       <CardHeader>
-        <div className="flex items-start justify-between">
-          <div>
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <Calendar className="h-5 w-5 text-teal-600" />
-              Plano Semanal Personalizado
-            </CardTitle>
-            <CardDescription>
-              Semana iniciando em:{' '}
-              {format(new Date(plan.weekStartDate), "dd 'de' MMMM", { locale: ptBR })}
-              <span className="block mt-1 text-xs opacity-70">
-                Gerado em: {format(new Date(plan.createdAt), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
-              </span>
-            </CardDescription>
-          </div>
-          <Link href="/weekly-plan">
-            <Button variant="ghost" size="sm" className="gap-2 text-gray-600">
-              Ver Completo
-              <ArrowRight className="h-4 w-4" />
-            </Button>
-          </Link>
+        <div>
+          <CardTitle className="flex items-center gap-2 text-lg">
+            <Calendar className="h-5 w-5 text-teal-600" />
+            Plano Semanal Personalizado
+          </CardTitle>
+          <CardDescription>
+            Semana iniciando em:{' '}
+            {format(new Date(plan.weekStartDate), "dd 'de' MMMM", { locale: ptBR })}
+            <span className="block mt-1 text-xs opacity-70">
+              Gerado em: {format(new Date(plan.createdAt), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
+            </span>
+          </CardDescription>
         </div>
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="overview" className="w-full">
           <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="overview">Visão Geral</TabsTrigger>
-            <TabsTrigger value="supplements">
-              <Pill className="h-4 w-4 mr-1" />
-              {totalSupplements}
-            </TabsTrigger>
-            <TabsTrigger value="shopping">
-              <ShoppingCart className="h-4 w-4 mr-1" />
-              {totalCategories}
-            </TabsTrigger>
-            <TabsTrigger value="meals">
-              <UtensilsCrossed className="h-4 w-4 mr-1" />
-              {totalMeals}
-            </TabsTrigger>
-            <TabsTrigger value="workouts">
-              <Dumbbell className="h-4 w-4 mr-1" />
-              {totalWorkouts}
-            </TabsTrigger>
+            <TabsTrigger value="supplements">Suplementação</TabsTrigger>
+            <TabsTrigger value="shopping">Compras</TabsTrigger>
+            <TabsTrigger value="meals">Refeições</TabsTrigger>
+            <TabsTrigger value="workouts">Treinos</TabsTrigger>
           </TabsList>
 
           {/* Overview Tab */}
@@ -191,7 +168,7 @@ export function WeeklyPlanWidget() {
                   </div>
                   <h4 className="font-semibold text-gray-900">Suplementação</h4>
                 </div>
-                <p className="text-sm text-gray-600 line-clamp-2">
+                <p className="text-sm text-gray-600">
                   {plan.supplementationStrategy.overview}
                 </p>
                 <Badge variant="outline" className="mt-2">{totalSupplements} suplementos</Badge>
@@ -204,7 +181,7 @@ export function WeeklyPlanWidget() {
                   </div>
                   <h4 className="font-semibold text-gray-900">Compras</h4>
                 </div>
-                <p className="text-sm text-gray-600 line-clamp-2">
+                <p className="text-sm text-gray-600">
                   {plan.shoppingList.overview}
                 </p>
                 <Badge variant="outline" className="mt-2">{totalCategories} categorias</Badge>
@@ -217,7 +194,7 @@ export function WeeklyPlanWidget() {
                   </div>
                   <h4 className="font-semibold text-gray-900">Refeições</h4>
                 </div>
-                <p className="text-sm text-gray-600 line-clamp-2">
+                <p className="text-sm text-gray-600">
                   {plan.mealPlan.overview}
                 </p>
                 <Badge variant="outline" className="mt-2">{totalMeals} dias planejados</Badge>
@@ -230,25 +207,21 @@ export function WeeklyPlanWidget() {
                   </div>
                   <h4 className="font-semibold text-gray-900">Treinos</h4>
                 </div>
-                <p className="text-sm text-gray-600 line-clamp-2">
+                <p className="text-sm text-gray-600">
                   {plan.workoutPlan.overview}
                 </p>
                 <Badge variant="outline" className="mt-2">{totalWorkouts} treinos</Badge>
               </div>
             </div>
-
-            <Link href="/weekly-plan">
-              <Button className="w-full bg-teal-600 hover:bg-teal-700" size="lg">
-                <Sparkles className="mr-2 h-5 w-5" />
-                Ver Plano Completo
-              </Button>
-            </Link>
           </TabsContent>
 
-          {/* Supplements Preview */}
+          {/* Supplements Tab */}
           <TabsContent value="supplements" className="mt-6">
+            <div className="mb-4">
+              <p className="text-sm text-gray-600">{plan.supplementationStrategy.overview}</p>
+            </div>
             <div className="space-y-3">
-              {plan.supplementationStrategy.supplements.slice(0, 3).map((supplement, index) => (
+              {plan.supplementationStrategy.supplements.map((supplement, index) => (
                 <div key={index} className="p-3 border border-gray-200 rounded-lg hover:border-purple-300 hover:bg-purple-50/30 transition-all">
                   <div className="flex items-start gap-2">
                     <div className="bg-purple-100 p-1.5 rounded shrink-0">
@@ -264,88 +237,168 @@ export function WeeklyPlanWidget() {
                   </div>
                 </div>
               ))}
-              {totalSupplements > 3 && (
-                <Link href="/weekly-plan">
-                  <Button variant="outline" className="w-full">
-                    Ver todos os {totalSupplements} suplementos
-                  </Button>
-                </Link>
-              )}
             </div>
           </TabsContent>
 
-          {/* Shopping Preview */}
+          {/* Shopping Tab */}
           <TabsContent value="shopping" className="mt-6">
+            <div className="mb-4">
+              <p className="text-sm text-gray-600">{plan.shoppingList.overview}</p>
+            </div>
             <div className="space-y-3">
-              {plan.shoppingList.categories.slice(0, 2).map((category, index) => (
+              {plan.shoppingList.categories.map((category, index) => (
                 <div key={index} className="p-3 border border-gray-200 rounded-lg hover:border-emerald-300 hover:bg-emerald-50/30 transition-all">
                   <h4 className="font-semibold text-gray-900 mb-2">{category.category}</h4>
                   <div className="flex flex-wrap gap-1">
-                    {category.items.slice(0, 5).map((item, idx) => (
+                    {category.items.map((item, idx) => (
                       <Badge key={idx} variant="outline">
                         {item.item}
                       </Badge>
                     ))}
-                    {category.items.length > 5 && <Badge variant="outline">+{category.items.length - 5}</Badge>}
                   </div>
                 </div>
               ))}
-              <Link href="/weekly-plan">
-                <Button variant="outline" className="w-full">
-                  Ver lista completa
-                </Button>
-              </Link>
             </div>
           </TabsContent>
 
-          {/* Meals Preview */}
+          {/* Meals Tab */}
           <TabsContent value="meals" className="mt-6">
-            <div className="space-y-3">
-              {plan.mealPlan.meals.slice(0, 3).map((day, index) => (
-                <div key={index} className="p-3 border border-gray-200 rounded-lg hover:border-orange-300 hover:bg-orange-50/30 transition-all">
-                  <div className="flex items-start gap-2">
-                    <div className="bg-orange-100 p-1.5 rounded shrink-0">
-                      <UtensilsCrossed className="h-3 w-3 text-orange-700" />
-                    </div>
-                    <div className="flex-1">
-                      <h4 className="font-semibold text-gray-900">{day.day}</h4>
-                      <p className="text-sm text-gray-600 mt-1">
-                        Plano completo de café, almoço e jantar
-                      </p>
-                    </div>
+            <div className="mb-4">
+              <p className="text-sm text-gray-600">{plan.mealPlan.overview}</p>
+            </div>
+            <div className="space-y-4">
+              {plan.mealPlan.meals.map((day: any, index: number) => (
+                <div key={index} className="border border-gray-200 rounded-lg p-4 bg-white hover:border-orange-300 hover:bg-orange-50/20 transition-all">
+                  <h4 className="font-semibold text-gray-900 mb-4">{day.day}</h4>
+
+                  <div className="space-y-4">
+                    {/* Breakfast */}
+                    {day.breakfast && (
+                      <div>
+                        <h5 className="font-semibold text-sm text-orange-600 mb-2">☀️ Café da Manhã</h5>
+                        <div className="pl-4 space-y-1">
+                          <p className="font-semibold text-sm text-gray-900">{day.breakfast.name}</p>
+                          <ul className="text-xs text-gray-600 space-y-0.5 mt-1">
+                            {day.breakfast.ingredients?.map((ing: string, i: number) => (
+                              <li key={i}>• {ing}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Lunch */}
+                    {day.lunch && (
+                      <div>
+                        <h5 className="font-semibold text-sm text-emerald-600 mb-2">🌞 Almoço</h5>
+                        <div className="pl-4 space-y-1">
+                          <p className="font-semibold text-sm text-gray-900">{day.lunch.name}</p>
+                          <ul className="text-xs text-gray-600 space-y-0.5 mt-1">
+                            {day.lunch.ingredients?.map((ing: string, i: number) => (
+                              <li key={i}>• {ing}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Dinner */}
+                    {day.dinner && (
+                      <div>
+                        <h5 className="font-semibold text-sm text-sky-600 mb-2">🌙 Jantar</h5>
+                        <div className="pl-4 space-y-1">
+                          <p className="font-semibold text-sm text-gray-900">{day.dinner.name}</p>
+                          <ul className="text-xs text-gray-600 space-y-0.5 mt-1">
+                            {day.dinner.ingredients?.map((ing: string, i: number) => (
+                              <li key={i}>• {ing}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Snacks */}
+                    {day.snacks && day.snacks.length > 0 && (
+                      <div>
+                        <h5 className="font-semibold text-sm text-purple-600 mb-2">🍎 Lanches</h5>
+                        <div className="pl-4 space-y-1">
+                          {day.snacks.map((snack: any, i: number) => (
+                            <div key={i} className="text-xs">
+                              <span className="font-semibold text-gray-900">{snack.name}</span>
+                              <span className="text-gray-600"> ({snack.timing})</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}
-              <Link href="/weekly-plan">
-                <Button variant="outline" className="w-full">
-                  Ver cardápio completo
-                </Button>
-              </Link>
             </div>
           </TabsContent>
 
-          {/* Workouts Preview */}
+          {/* Workouts Tab */}
           <TabsContent value="workouts" className="mt-6">
-            <div className="space-y-3">
-              {plan.workoutPlan.workouts.slice(0, 3).map((workout, index) => (
-                <div key={index} className="p-3 border border-gray-200 rounded-lg hover:border-sky-300 hover:bg-sky-50/30 transition-all">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <div className="bg-sky-100 p-1.5 rounded shrink-0">
-                        <Dumbbell className="h-3 w-3 text-sky-700" />
-                      </div>
+            <div className="mb-4">
+              <p className="text-sm text-gray-600">{plan.workoutPlan.overview}</p>
+            </div>
+            <div className="space-y-4">
+              {plan.workoutPlan.workouts.map((workout: any, index: number) => (
+                <div key={index} className="border border-gray-200 rounded-lg p-4 bg-white hover:border-sky-300 hover:bg-sky-50/20 transition-all">
+                  <div className="flex items-start justify-between mb-4">
+                    <div>
                       <h4 className="font-semibold text-gray-900">{workout.day}</h4>
+                      <p className="text-sm text-gray-600 mt-1">{workout.type}</p>
                     </div>
-                    <Badge variant="outline">{workout.type}</Badge>
+                    <div className="flex gap-2">
+                      {workout.duration && (
+                        <Badge className="bg-sky-100 text-sky-700 border-sky-200">{workout.duration}</Badge>
+                      )}
+                      {workout.intensity && (
+                        <Badge
+                          className={
+                            workout.intensity === 'high'
+                              ? 'bg-red-100 text-red-700 border-red-200'
+                              : workout.intensity === 'medium'
+                              ? 'bg-amber-100 text-amber-700 border-amber-200'
+                              : 'bg-gray-100 text-gray-700 border-gray-200'
+                          }
+                        >
+                          {workout.intensity === 'high' ? 'Alta' : workout.intensity === 'medium' ? 'Média' : 'Baixa'}
+                        </Badge>
+                      )}
+                    </div>
                   </div>
-                  <p className="text-sm text-gray-600 mt-1 pl-8">Treino completo com exercícios</p>
+
+                  {workout.warmup && (
+                    <div className="mb-3 p-2 bg-amber-50 border border-amber-200 rounded text-xs">
+                      <strong>Aquecimento:</strong> {workout.warmup}
+                    </div>
+                  )}
+
+                  <div className="space-y-2">
+                    {workout.exercises?.map((exercise: any, exIndex: number) => (
+                      <div key={exIndex} className="p-3 bg-gray-50 rounded border border-gray-200 hover:border-sky-300 hover:bg-sky-50/30 transition-all">
+                        <p className="font-semibold text-sm text-gray-900">{exercise.name}</p>
+                        <div className="flex gap-3 text-xs text-gray-600 mt-1">
+                          {exercise.sets && <span>Séries: {exercise.sets}</span>}
+                          {exercise.reps && <span>Reps: {exercise.reps}</span>}
+                          {exercise.duration && <span>Duração: {exercise.duration}</span>}
+                        </div>
+                        {exercise.notes && (
+                          <p className="text-xs text-gray-500 mt-1 italic">{exercise.notes}</p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+
+                  {workout.cooldown && (
+                    <div className="mt-3 p-2 bg-sky-50 border border-sky-200 rounded text-xs">
+                      <strong>Alongamento:</strong> {workout.cooldown}
+                    </div>
+                  )}
                 </div>
               ))}
-              <Link href="/weekly-plan">
-                <Button variant="outline" className="w-full">
-                  Ver treinos completos
-                </Button>
-              </Link>
             </div>
           </TabsContent>
         </Tabs>
