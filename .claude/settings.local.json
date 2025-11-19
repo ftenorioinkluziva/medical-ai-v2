@@ -9,7 +9,11 @@
       "Bash(git reset:*)",
       "mcp__ide__getDiagnostics",
       "Bash(npx tsx:*)",
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "Bash(git checkout:*)",
+      "Bash(pnpm db:generate:*)",
+      "Bash(pnpm db:migrate:*)",
+      "Bash(pnpm db:push:*)"
     ],
     "deny": [],
     "ask": []
