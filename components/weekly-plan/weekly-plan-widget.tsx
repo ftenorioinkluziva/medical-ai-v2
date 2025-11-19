@@ -52,21 +52,29 @@ interface WeeklyPlan {
   createdAt: string
 }
 
-export function WeeklyPlanWidget() {
+interface WeeklyPlanWidgetProps {
+  patientId?: string
+}
+
+export function WeeklyPlanWidget({ patientId }: WeeklyPlanWidgetProps = {}) {
   const [plan, setPlan] = useState<WeeklyPlan | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     loadPlan()
-  }, [])
+  }, [patientId])
 
   const loadPlan = async () => {
     try {
       setIsLoading(true)
       setError(null)
 
-      const response = await fetch('/api/weekly-plan')
+      const endpoint = patientId
+        ? `/api/weekly-plan?patientId=${patientId}`
+        : '/api/weekly-plan'
+
+      const response = await fetch(endpoint)
       if (!response.ok) {
         const data = await response.json()
         throw new Error(data.error || 'Erro ao carregar plano')

@@ -2,12 +2,15 @@
 
 import { SessionProvider } from 'next-auth/react'
 import { Toaster } from 'sonner'
+import { PatientProvider } from '@/lib/contexts/patient-context'
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <SessionProvider>
-      {children}
-      <Toaster position="top-right" richColors />
+      <PatientProvider>
+        {children}
+        <Toaster position="top-right" richColors />
+      </PatientProvider>
     </SessionProvider>
   )
 }

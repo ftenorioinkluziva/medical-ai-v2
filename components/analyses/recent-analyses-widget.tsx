@@ -41,9 +41,10 @@ interface Analysis {
 interface RecentAnalysesWidgetProps {
   limit?: number
   onAnalysesLoad?: (count: number) => void
+  patientId?: string
 }
 
-export function RecentAnalysesWidget({ limit = 5, onAnalysesLoad }: RecentAnalysesWidgetProps) {
+export function RecentAnalysesWidget({ limit = 5, onAnalysesLoad, patientId }: RecentAnalysesWidgetProps) {
   const [analyses, setAnalyses] = useState<Analysis[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -52,14 +53,18 @@ export function RecentAnalysesWidget({ limit = 5, onAnalysesLoad }: RecentAnalys
 
   useEffect(() => {
     loadAnalyses()
-  }, [])
+  }, [patientId])
 
   const loadAnalyses = async () => {
     try {
       setIsLoading(true)
       setError(null)
 
-      const response = await fetch('/api/analyses/history')
+      const endpoint = patientId
+        ? `/api/analyses/history?patientId=${patientId}&limit=${limit}`
+        : `/api/analyses/history?limit=${limit}`
+
+      const response = await fetch(endpoint)
       if (!response.ok) {
         throw new Error('Erro ao carregar análises')
       }
@@ -188,7 +193,7 @@ export function RecentAnalysesWidget({ limit = 5, onAnalysesLoad }: RecentAnalys
 
               {/* View All Link */}
               <div className="pt-2">
-                <Link href="/analyses">
+                <Link href="/analyze">
                   <Button
                     variant="outline"
                     className="w-full justify-between group"

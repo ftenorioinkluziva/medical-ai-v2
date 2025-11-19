@@ -22,16 +22,20 @@ export async function GET(request: NextRequest) {
 
     // Parse query params
     const { searchParams } = new URL(request.url)
+    const patientId = searchParams.get('patientId')
     const agentId = searchParams.get('agentId')
     const startDate = searchParams.get('startDate')
     const endDate = searchParams.get('endDate')
     const limit = parseInt(searchParams.get('limit') || '50')
     const offset = parseInt(searchParams.get('offset') || '0')
 
-    console.log(`📜 [HISTORY-API] Fetching analyses for user: ${session.user.id}`)
+    // Support patientId for doctors
+    const userId = patientId && session.user.role === 'doctor' ? patientId : session.user.id
+
+    console.log(`📜 [HISTORY-API] Fetching analyses for user: ${userId}${patientId ? ' (doctor view)' : ''}`)
 
     // Build query conditions
-    const conditions: any[] = [eq(analyses.userId, session.user.id)]
+    const conditions: any[] = [eq(analyses.userId, userId)]
 
     if (agentId) {
       conditions.push(eq(analyses.agentId, agentId))

@@ -1,18 +1,20 @@
 'use client'
 
 /**
- * Analysis Page - Minimal Health Design
- * Main page for medical document analysis
+ * Analysis Page - Unified Analysis and History
+ * Main page for medical document analysis with integrated history
  */
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { DocumentUpload } from '@/components/documents/document-upload'
-import { DocumentList } from '@/components/documents/document-list'
+import { useSearchParams } from 'next/navigation'
 import { AgentSelector } from '@/components/agents/agent-selector'
 import { AnalysisInterface } from '@/components/analysis/analysis-interface'
+import { AnalysisHistory } from '@/components/analyses/analysis-history'
+import { AnalysisViewModal } from '@/components/analyses/analysis-view-modal'
 import { Button } from '@/components/ui/button'
-import { History, Upload, FileText } from 'lucide-react'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { History, FileText, Upload, Sparkles, TrendingUp } from 'lucide-react'
 
 interface HealthAgent {
   id: string
@@ -25,13 +27,50 @@ interface HealthAgent {
   modelName: string
 }
 
-export default function AnalyzePage() {
-  const [selectedAgent, setSelectedAgent] = useState<HealthAgent | null>(null)
-  const [refreshDocuments, setRefreshDocuments] = useState(0)
+interface Analysis {
+  id: string
+  agentId: string
+  agentName: string
+  agentKey: string
+  prompt: string
+  analysis: string
+  modelUsed: string
+  tokensUsed: number | null
+  processingTimeMs: number | null
+  ragUsed: boolean
+  documentIds: string[] | null
+  createdAt: string
+}
 
-  const handleUploadComplete = () => {
-    // Refresh document list
-    setRefreshDocuments((prev) => prev + 1)
+export default function AnalyzePage() {
+  const searchParams = useSearchParams()
+  const [selectedAgent, setSelectedAgent] = useState<HealthAgent | null>(null)
+  const [activeTab, setActiveTab] = useState('new')
+  const [selectedAnalysis, setSelectedAnalysis] = useState<Analysis | null>(null)
+  const [isModalOpen, setIsModalOpen] = useState(false)
+
+  // Check URL params to open history tab if requested
+  useEffect(() => {
+    const tab = searchParams?.get('tab')
+    if (tab === 'history') {
+      setActiveTab('history')
+    }
+  }, [searchParams])
+
+  const handleViewAnalysis = (analysis: Analysis) => {
+    setSelectedAnalysis(analysis)
+    setIsModalOpen(true)
+  }
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false)
+    setTimeout(() => setSelectedAnalysis(null), 300)
+  }
+
+  const handleAnalysisComplete = (result: any) => {
+    console.log('Analysis complete:', result)
+    // Switch to history tab to see the new analysis
+    setActiveTab('history')
   }
 
   return (
@@ -39,49 +78,42 @@ export default function AnalyzePage() {
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-900">Análise Médica</h1>
+          <h1 className="text-2xl font-semibold text-gray-900">Análise Médica com IA</h1>
           <p className="text-gray-600 mt-1">
-            Envie seus documentos médicos e consulte especialistas em IA
+            Consulte especialistas em IA e visualize suas análises anteriores
           </p>
         </div>
-        <Link href="/analyses">
-          <Button variant="outline" className="gap-2">
-            <History className="h-4 w-4" />
-            Histórico
-          </Button>
-        </Link>
+        <div className="flex gap-2">
+          <Link href="/documents">
+            <Button variant="outline" className="gap-2">
+              <Upload className="h-4 w-4" />
+              Enviar Documentos
+            </Button>
+          </Link>
+          <Link href="/analyses/compare">
+            <Button variant="outline" className="gap-2">
+              <TrendingUp className="h-4 w-4" />
+              Comparar Análises
+            </Button>
+          </Link>
+        </div>
       </div>
 
-      {/* Main Content */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left Column - Upload & Documents */}
-        <div className="lg:col-span-1 space-y-6">
-          {/* Upload Section */}
-          <div>
-            <div className="flex items-center gap-2 mb-4">
-              <Upload className="h-5 w-5 text-teal-600" />
-              <h2 className="text-lg font-semibold text-gray-900">Upload de Documentos</h2>
-            </div>
-            <DocumentUpload onUploadComplete={handleUploadComplete} />
-          </div>
+      {/* Tabs */}
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="new" className="gap-2">
+            <Sparkles className="h-4 w-4" />
+            Nova Análise
+          </TabsTrigger>
+          <TabsTrigger value="history" className="gap-2">
+            <History className="h-4 w-4" />
+            Histórico de Análises
+          </TabsTrigger>
+        </TabsList>
 
-          {/* Documents List Section */}
-          <div>
-            <div className="flex items-center gap-2 mb-4">
-              <FileText className="h-5 w-5 text-teal-600" />
-              <h2 className="text-lg font-semibold text-gray-900">Meus Documentos</h2>
-            </div>
-            <DocumentList
-              refreshTrigger={refreshDocuments}
-              onSelectDocument={(doc) => {
-                console.log('Selected document:', doc)
-              }}
-            />
-          </div>
-        </div>
-
-        {/* Right Column - Agent Selection & Analysis */}
-        <div className="lg:col-span-2 space-y-6">
+        {/* New Analysis Tab */}
+        <TabsContent value="new" className="space-y-6 mt-6">
           {/* Agent Selector */}
           <AgentSelector
             selectedAgentId={selectedAgent?.id}
@@ -93,9 +125,7 @@ export default function AnalyzePage() {
             <AnalysisInterface
               selectedAgentId={selectedAgent.id}
               selectedAgentName={selectedAgent.name}
-              onAnalysisComplete={(result) => {
-                console.log('Analysis complete:', result)
-              }}
+              onAnalysisComplete={handleAnalysisComplete}
             />
           )}
 
@@ -105,13 +135,28 @@ export default function AnalyzePage() {
               <div className="bg-teal-50 rounded-lg p-4 mb-4 inline-block">
                 <FileText className="h-12 w-12 text-teal-600" />
               </div>
-              <p className="text-sm font-medium">
+              <p className="text-sm font-medium mb-2">
                 Selecione um especialista acima para começar a análise
+              </p>
+              <p className="text-xs text-gray-400">
+                Você precisará selecionar documentos e fazer sua pergunta após escolher o especialista
               </p>
             </div>
           )}
-        </div>
-      </div>
+        </TabsContent>
+
+        {/* History Tab */}
+        <TabsContent value="history" className="mt-6">
+          <AnalysisHistory onViewAnalysis={handleViewAnalysis} />
+        </TabsContent>
+      </Tabs>
+
+      {/* View Modal */}
+      <AnalysisViewModal
+        analysis={selectedAnalysis}
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+      />
     </div>
   )
 }

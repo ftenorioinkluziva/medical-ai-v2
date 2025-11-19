@@ -40,9 +40,10 @@ interface UploadResult {
 
 interface DocumentUploadWidgetProps {
   onUploadComplete?: (result: UploadResult) => void
+  patientId?: string
 }
 
-export function DocumentUploadWidget({ onUploadComplete }: DocumentUploadWidgetProps) {
+export function DocumentUploadWidget({ onUploadComplete, patientId }: DocumentUploadWidgetProps) {
   const [file, setFile] = useState<File | null>(null)
   const [documentType, setDocumentType] = useState<string>('other')
   const [isDragging, setIsDragging] = useState(false)
@@ -122,6 +123,9 @@ export function DocumentUploadWidget({ onUploadComplete }: DocumentUploadWidgetP
       const formData = new FormData()
       formData.append('file', file)
       formData.append('documentType', documentType)
+      if (patientId) {
+        formData.append('patientId', patientId)
+      }
 
       const response = await fetch('/api/documents/upload', {
         method: 'POST',

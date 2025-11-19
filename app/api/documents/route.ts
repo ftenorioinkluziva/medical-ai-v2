@@ -24,12 +24,16 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    console.log(`📚 [DOCUMENTS-API] Listing documents for user: ${session.user.id}`)
-
     // Get query parameters
     const { searchParams } = new URL(request.url)
+    const patientId = searchParams.get('patientId')
     const limit = parseInt(searchParams.get('limit') || '50')
     const documentType = searchParams.get('documentType')
+
+    // Support patientId for doctors
+    const userId = patientId && session.user.role === 'doctor' ? patientId : session.user.id
+
+    console.log(`📚 [DOCUMENTS-API] Listing documents for user: ${userId}${patientId ? ' (doctor view)' : ''}`)
 
     // Build query
     let query = db
@@ -45,7 +49,7 @@ export async function GET(request: NextRequest) {
         createdAt: documents.createdAt,
       })
       .from(documents)
-      .where(eq(documents.userId, session.user.id))
+      .where(eq(documents.userId, userId))
       .orderBy(desc(documents.createdAt))
       .limit(limit)
 

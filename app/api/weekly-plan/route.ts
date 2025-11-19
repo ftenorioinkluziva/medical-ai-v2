@@ -20,7 +20,12 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    console.log(`📋 [WEEKLY-PLAN-API] Fetching plans for user: ${session.user.id}`)
+    // Support patientId for doctors
+    const { searchParams } = new URL(request.url)
+    const patientId = searchParams.get('patientId')
+    const userId = patientId && session.user.role === 'doctor' ? patientId : session.user.id
+
+    console.log(`📋 [WEEKLY-PLAN-API] Fetching plans for user: ${userId}${patientId ? ' (doctor view)' : ''}`)
 
     // Get all weekly plans with analysis and agent info
     const userPlans = await db
@@ -42,7 +47,7 @@ export async function GET(request: NextRequest) {
       .from(weeklyPlans)
       .leftJoin(analyses, eq(weeklyPlans.analysisId, analyses.id))
       .leftJoin(healthAgents, eq(analyses.agentId, healthAgents.id))
-      .where(eq(weeklyPlans.userId, session.user.id))
+      .where(eq(weeklyPlans.userId, userId))
       .orderBy(desc(weeklyPlans.createdAt))
 
     console.log(`✅ [WEEKLY-PLAN-API] Found ${userPlans.length} plans`)

@@ -14,16 +14,18 @@ export default auth((req) => {
   const publicRoutes = ['/', '/login', '/register']
   const isPublicRoute = publicRoutes.includes(pathname)
 
-  // Auth routes (redirect to dashboard if already authenticated)
+  // Auth routes (redirect to appropriate dashboard if already authenticated)
   const authRoutes = ['/login', '/register']
   const isAuthRoute = authRoutes.includes(pathname)
 
   if (isAuthRoute && isAuthenticated) {
-    return NextResponse.redirect(new URL('/dashboard', req.url))
+    // Redirect doctors to /doctor, others to /dashboard
+    const redirectUrl = req.auth?.user?.role === 'doctor' ? '/doctor' : '/dashboard'
+    return NextResponse.redirect(new URL(redirectUrl, req.url))
   }
 
   // Protected routes (require authentication)
-  const protectedPrefixes = ['/dashboard', '/agents', '/documents', '/profile', '/history', '/settings', '/admin']
+  const protectedPrefixes = ['/dashboard', '/agents', '/documents', '/profile', '/history', '/settings', '/admin', '/doctor']
   const isProtectedRoute = protectedPrefixes.some(prefix => pathname.startsWith(prefix))
 
   if (isProtectedRoute && !isAuthenticated) {
@@ -38,6 +40,11 @@ export default auth((req) => {
     if (userRole !== 'admin') {
       return NextResponse.redirect(new URL('/dashboard', req.url))
     }
+  }
+
+  // Doctor routes - redirect doctors from /dashboard to /doctor
+  if (pathname === '/dashboard' && req.auth?.user?.role === 'doctor') {
+    return NextResponse.redirect(new URL('/doctor', req.url))
   }
 
   return NextResponse.next()

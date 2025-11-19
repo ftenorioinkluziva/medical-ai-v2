@@ -51,7 +51,12 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    console.log(`💡 [RECOMMENDATIONS-API] Fetching latest recommendation for user: ${session.user.id}`)
+    // Support patientId for doctors
+    const { searchParams } = new URL(request.url)
+    const patientId = searchParams.get('patientId')
+    const userId = patientId && session.user.role === 'doctor' ? patientId : session.user.id
+
+    console.log(`💡 [RECOMMENDATIONS-API] Fetching latest recommendation for user: ${userId}${patientId ? ' (doctor view)' : ''}`)
 
     // Get the latest recommendation
     const [latestRec] = await db
@@ -67,7 +72,7 @@ export async function GET(request: NextRequest) {
       })
       .from(recommendationsTable)
       .leftJoin(analyses, eq(recommendationsTable.analysisId, analyses.id))
-      .where(eq(recommendationsTable.userId, session.user.id))
+      .where(eq(recommendationsTable.userId, userId))
       .orderBy(desc(recommendationsTable.createdAt))
       .limit(1)
 

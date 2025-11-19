@@ -128,7 +128,10 @@ export function MedicalProfileForm({ userId, onProfileSaved }: MedicalProfileFor
     const loadProfile = async () => {
       try {
         setLoading(true)
-        const response = await fetch('/api/profile')
+        const endpoint = userId
+          ? `/api/profile?patientId=${userId}`
+          : '/api/profile'
+        const response = await fetch(endpoint)
 
         if (!response.ok) {
           throw new Error('Erro ao carregar perfil')
@@ -155,7 +158,7 @@ export function MedicalProfileForm({ userId, onProfileSaved }: MedicalProfileFor
     }
 
     loadProfile()
-  }, [])
+  }, [userId])
 
   const handleInputChange = (field: keyof MedicalProfile, value: any) => {
     setProfile((prev) => ({
@@ -203,7 +206,10 @@ export function MedicalProfileForm({ userId, onProfileSaved }: MedicalProfileFor
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(profile),
+        body: JSON.stringify({
+          ...profile,
+          patientId: userId, // Include patientId for doctors editing patient profiles
+        }),
       })
 
       if (!response.ok) {

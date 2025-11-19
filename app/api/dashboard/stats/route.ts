@@ -20,19 +20,24 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    console.log(`📊 [DASHBOARD-API] Fetching stats for user: ${session.user.id}`)
+    // Support patientId for doctors
+    const { searchParams } = new URL(request.url)
+    const patientId = searchParams.get('patientId')
+    const userId = patientId && session.user.role === 'doctor' ? patientId : session.user.id
+
+    console.log(`📊 [DASHBOARD-API] Fetching stats for user: ${userId}${patientId ? ' (doctor view)' : ''}`)
 
     // Get documents count
     const [docsCount] = await db
       .select({ count: sql<number>`count(*)::int` })
       .from(documents)
-      .where(eq(documents.userId, session.user.id))
+      .where(eq(documents.userId, userId))
 
     // Get analyses count
     const [analysesCount] = await db
       .select({ count: sql<number>`count(*)::int` })
       .from(analyses)
-      .where(eq(analyses.userId, session.user.id))
+      .where(eq(analyses.userId, userId))
 
     // Get recent documents (last 5)
     const recentDocuments = await db
@@ -44,7 +49,7 @@ export async function GET(request: NextRequest) {
         structuredData: documents.structuredData,
       })
       .from(documents)
-      .where(eq(documents.userId, session.user.id))
+      .where(eq(documents.userId, userId))
       .orderBy(desc(documents.createdAt))
       .limit(5)
 
@@ -57,7 +62,7 @@ export async function GET(request: NextRequest) {
         createdAt: analyses.createdAt,
       })
       .from(analyses)
-      .where(eq(analyses.userId, session.user.id))
+      .where(eq(analyses.userId, userId))
       .orderBy(desc(analyses.createdAt))
       .limit(5)
 
@@ -67,7 +72,7 @@ export async function GET(request: NextRequest) {
         agentId: analyses.agentId,
       })
       .from(analyses)
-      .where(eq(analyses.userId, session.user.id))
+      .where(eq(analyses.userId, userId))
       .groupBy(analyses.agentId)
 
     // Extract health metrics from recent documents

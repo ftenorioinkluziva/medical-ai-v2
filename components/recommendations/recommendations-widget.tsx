@@ -60,7 +60,11 @@ interface Recommendations {
   alerts: Alert[]
 }
 
-export function RecommendationsWidget() {
+interface RecommendationsWidgetProps {
+  patientId?: string
+}
+
+export function RecommendationsWidget({ patientId }: RecommendationsWidgetProps = {}) {
   const [recommendations, setRecommendations] = useState<Recommendations | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -69,14 +73,18 @@ export function RecommendationsWidget() {
 
   useEffect(() => {
     loadRecommendations()
-  }, [])
+  }, [patientId])
 
   const loadRecommendations = async () => {
     try {
       setIsLoading(true)
       setError(null)
 
-      const response = await fetch('/api/recommendations')
+      const endpoint = patientId
+        ? `/api/recommendations?patientId=${patientId}`
+        : '/api/recommendations'
+
+      const response = await fetch(endpoint)
 
       if (!response.ok) {
         const data = await response.json()

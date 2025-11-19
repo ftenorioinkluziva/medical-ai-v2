@@ -25,12 +25,16 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    console.log(`📤 [UPLOAD-API] Upload request from user: ${session.user.id}`)
-
     // Get form data
     const formData = await request.formData()
     const file = formData.get('file') as File | null
     const documentType = formData.get('documentType') as string | null
+    const patientId = formData.get('patientId') as string | null
+
+    // Support patientId for doctors
+    const userId = patientId && session.user.role === 'doctor' ? patientId : session.user.id
+
+    console.log(`📤 [UPLOAD-API] Upload request from user: ${session.user.id} for patient: ${userId}${patientId ? ' (doctor upload)' : ''}`)
 
     if (!file) {
       return NextResponse.json(
@@ -74,7 +78,7 @@ export async function POST(request: NextRequest) {
     const buffer = Buffer.from(arrayBuffer)
 
     // Process document (simplified - no embeddings)
-    const result = await processDocument(buffer, file.name, session.user.id, {
+    const result = await processDocument(buffer, file.name, userId, {
       documentType: documentType || undefined,
     })
 

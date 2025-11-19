@@ -20,24 +20,29 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    console.log(`👤 [PROFILE-API] Fetching profile for user: ${session.user.id}`)
+    // Support patientId for doctors
+    const { searchParams } = new URL(request.url)
+    const patientId = searchParams.get('patientId')
+    const userId = patientId && session.user.role === 'doctor' ? patientId : session.user.id
+
+    console.log(`👤 [PROFILE-API] Fetching profile for user: ${userId}${patientId ? ' (doctor view)' : ''}`)
 
     // Get user profile
     const [profile] = await db
       .select()
       .from(medicalProfiles)
-      .where(eq(medicalProfiles.userId, session.user.id))
+      .where(eq(medicalProfiles.userId, userId))
       .limit(1)
 
     if (!profile) {
-      console.log(`👤 [PROFILE-API] No profile found for user: ${session.user.id}`)
+      console.log(`👤 [PROFILE-API] No profile found for user: ${userId}`)
       return NextResponse.json({
         success: true,
         profile: null,
       })
     }
 
-    console.log(`✅ [PROFILE-API] Profile found for user: ${session.user.id}`)
+    console.log(`✅ [PROFILE-API] Profile found for user: ${userId}`)
 
     return NextResponse.json({
       success: true,
@@ -69,13 +74,17 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json()
 
-    console.log(`👤 [PROFILE-API] Saving profile for user: ${session.user.id}`)
+    // Support patientId for doctors
+    const patientId = body.patientId
+    const userId = patientId && session.user.role === 'doctor' ? patientId : session.user.id
+
+    console.log(`👤 [PROFILE-API] Saving profile for user: ${userId}${patientId ? ' (doctor editing)' : ''}`)
 
     // Check if profile exists
     const [existingProfile] = await db
       .select()
       .from(medicalProfiles)
-      .where(eq(medicalProfiles.userId, session.user.id))
+      .where(eq(medicalProfiles.userId, userId))
       .limit(1)
 
     let savedProfile
@@ -134,17 +143,17 @@ export async function POST(request: NextRequest) {
 
           updatedAt: new Date(),
         })
-        .where(eq(medicalProfiles.userId, session.user.id))
+        .where(eq(medicalProfiles.userId, userId))
         .returning()
 
       savedProfile = updated
-      console.log(`✅ [PROFILE-API] Profile updated for user: ${session.user.id}`)
+      console.log(`✅ [PROFILE-API] Profile updated for user: ${userId}`)
     } else {
       // Create new profile
       const [created] = await db
         .insert(medicalProfiles)
         .values({
-          userId: session.user.id,
+          userId: userId,
           // Basic Info
           age: body.age || null,
           gender: body.gender || null,
@@ -195,7 +204,7 @@ export async function POST(request: NextRequest) {
         .returning()
 
       savedProfile = created
-      console.log(`✅ [PROFILE-API] Profile created for user: ${session.user.id}`)
+      console.log(`✅ [PROFILE-API] Profile created for user: ${userId}`)
     }
 
     return NextResponse.json({

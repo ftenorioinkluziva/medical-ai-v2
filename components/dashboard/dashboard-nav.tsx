@@ -31,7 +31,6 @@ export function DashboardNav({ userName, userRole }: DashboardNavProps) {
   const navLinks = [
     { href: '/dashboard', label: 'Dashboard' },
     { href: '/analyze', label: 'Análise' },
-    { href: '/analyses', label: 'Histórico' },
     { href: '/recommendations', label: 'Recomendações' },
     { href: '/weekly-plan', label: 'Plano Semanal' },
     { href: '/compare', label: 'Comparar' },

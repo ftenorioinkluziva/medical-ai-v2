@@ -39,9 +39,10 @@ interface Document {
 interface RecentDocumentsWidgetProps {
   limit?: number
   onDocumentsLoad?: (count: number) => void
+  patientId?: string
 }
 
-export function RecentDocumentsWidget({ limit = 5, onDocumentsLoad }: RecentDocumentsWidgetProps) {
+export function RecentDocumentsWidget({ limit = 5, onDocumentsLoad, patientId }: RecentDocumentsWidgetProps) {
   const [documents, setDocuments] = useState<Document[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -50,14 +51,18 @@ export function RecentDocumentsWidget({ limit = 5, onDocumentsLoad }: RecentDocu
 
   useEffect(() => {
     loadDocuments()
-  }, [])
+  }, [patientId])
 
   const loadDocuments = async () => {
     try {
       setIsLoading(true)
       setError(null)
 
-      const response = await fetch('/api/documents')
+      const endpoint = patientId
+        ? `/api/documents?patientId=${patientId}&limit=${limit}`
+        : `/api/documents?limit=${limit}`
+
+      const response = await fetch(endpoint)
       if (!response.ok) {
         throw new Error('Erro ao carregar documentos')
       }

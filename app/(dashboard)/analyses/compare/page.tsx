@@ -135,7 +135,7 @@ export default function CompareAnalysesPage() {
       <div className="flex items-center justify-between">
         <div>
           <div className="flex items-center gap-3">
-            <Link href="/analyses">
+            <Link href="/analyze">
               <Button variant="ghost" size="sm" className="gap-2">
                 <ArrowLeft className="h-4 w-4" />
                 Voltar
