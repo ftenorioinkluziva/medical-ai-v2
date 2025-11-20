@@ -3,6 +3,9 @@
  * Populates the Logical Brain with functional medicine data
  */
 
+import { config } from 'dotenv'
+config({ path: '.env.local' })
+
 import { db } from '../lib/db/client'
 import { biomarkersReference, calculatedMetrics, protocols } from '../lib/db/schema'
 import { sql } from 'drizzle-orm'
@@ -417,7 +420,7 @@ const protocolsData = [
     sourceRef: 'Dra. Katia Haranaka'
   },
   {
-    triggerCondition: 't3_livre < 3.3 OR t3_reverso > 15',
+    triggerCondition: 't3_livre < 2.3 OR t3_reverso > 0.25',
     type: 'Suplementação',
     title: 'Kit Conversão Tireoide',
     description: 'Suplementar Zinco, Selênio e Magnésio para ativar a enzima deiodinase.',
@@ -431,17 +434,17 @@ const protocolsData = [
     sourceRef: 'Dra. Katia Haranaka'
   },
   {
-    triggerCondition: 'vo2_max < 35',
+    triggerCondition: 'ferritina < 70 OR hemoglobina < 13',
     type: 'Treino',
     title: 'Construção de Base Aeróbia',
-    description: 'Focar em cardio de Zona 2 (baixa intensidade, longa duração) para aumentar densidade mitocondrial.',
+    description: 'Focar em cardio de Zona 2 (baixa intensidade, longa duração) para aumentar densidade mitocondrial e capacidade de transporte de oxigênio.',
     sourceRef: 'Dr. Guilherme Freccia'
   },
   {
-    triggerCondition: 'sarcopenia OR idade > 50',
+    triggerCondition: 'creatinina > 1.2',
     type: 'Treino',
-    title: 'Treino de Potência para Idosos',
-    description: 'Realizar movimentos com intenção de velocidade (mesmo com carga leve) para recrutar fibras tipo 2 e evitar quedas.',
+    title: 'Treino de Potência para Preservação Muscular',
+    description: 'Realizar movimentos com intenção de velocidade (mesmo com carga leve) para recrutar fibras tipo 2 e evitar perda muscular.',
     sourceRef: 'Dr. Guilherme Freccia'
   },
   {
@@ -480,25 +483,22 @@ async function seed() {
     console.log(`   ✅ Inserted/updated ${metricsData.length} metrics`)
 
     console.log('\n📋 Seeding Protocols...')
-    let protocolCount = 0
-    for (const proto of protocolsData) {
-      const existing = await db.select()
-        .from(protocols)
-        .where(sql`${protocols.triggerCondition} = ${proto.triggerCondition} AND ${protocols.title} = ${proto.title}`)
-        .limit(1)
+    // First, delete all old protocols to ensure clean state
+    await db.delete(protocols)
+    console.log('   🗑️ Cleared existing protocols')
 
-      if (existing.length === 0) {
-        await db.insert(protocols).values(proto as any)
-        protocolCount++
-      }
+    // Insert all protocols fresh
+    for (const proto of protocolsData) {
+      await db.insert(protocols).values(proto as any)
     }
+    const protocolCount = protocolsData.length
     console.log(`   ✅ Inserted ${protocolCount} new protocols`)
 
     console.log('\n✅ Medical Knowledge Seed completed successfully!')
     console.log('\n📊 Summary:')
     console.log(`   - Biomarkers: ${biomarkersData.length}`)
     console.log(`   - Metrics: ${metricsData.length}`)
-    console.log(`   - Protocols: ${protocolCount} new (${protocolsData.length} total)`)
+    console.log(`   - Protocols: ${protocolCount}`)
   } catch (error) {
     console.error('\n❌ Error seeding knowledge base:', error)
     process.exit(1)

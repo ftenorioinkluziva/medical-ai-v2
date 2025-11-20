@@ -34,6 +34,8 @@ export async function evaluateBiomarkers(
   const biomarkerMap = new Map<string, number>()
   biomarkers.forEach(b => biomarkerMap.set(b.slug, b.value))
 
+  console.log('📊 [EVALUATOR] Biomarker map:', Array.from(biomarkerMap.keys()).sort())
+
   // Get all biomarker reference data
   const biomarkerRefs = await db
     .select()
@@ -204,17 +206,25 @@ export async function evaluateBiomarkers(
       // Parse trigger condition
       let condition = protocol.triggerCondition.toLowerCase()
 
-      // Replace biomarker slugs with their values
-      const slugMatches = condition.match(/[a-z_]+/g)
+      // Extract all potential biomarker slugs (alphanumeric + underscore)
+      const slugMatches = condition.match(/[a-z][a-z0-9_]*/g)
       if (!slugMatches) return false
 
-      for (const slug of slugMatches) {
+      // Sort by length (longest first) to avoid partial replacements
+      const sortedSlugs = [...new Set(slugMatches)].sort((a, b) => b.length - a.length)
+
+      for (const slug of sortedSlugs) {
         // Skip logical operators
         if (['or', 'and'].includes(slug)) continue
 
         const value = biomarkerMap.get(slug)
         if (value !== undefined) {
-          condition = condition.replace(new RegExp(`\\b${slug}\\b`, 'g'), value.toString())
+          // Use a more specific regex that handles underscores correctly
+          // Match the slug when it's NOT preceded or followed by alphanumeric or underscore
+          condition = condition.replace(
+            new RegExp(`(?<![a-z0-9_])${slug.replace(/_/g, '_')}(?![a-z0-9_])`, 'g'),
+            value.toString()
+          )
         }
       }
 

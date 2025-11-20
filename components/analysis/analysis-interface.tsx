@@ -12,6 +12,8 @@ import { Textarea } from '@/components/ui/textarea'
 import { Card } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
+import { AnalysisChat } from './analysis-chat'
+import { AnalysisSelector } from './analysis-selector'
 
 interface AnalysisRequest {
   agentId: string
@@ -29,23 +31,41 @@ interface Document {
 interface AnalysisResult {
   success: boolean
   analysis?: string
+  analysisId?: string
   agent?: {
     id: string
     name: string
     title: string
+    agentKey?: string
   }
   metadata?: any
   usage?: any
   error?: string
 }
 
+interface SelectedAnalysis {
+  id: string
+  agentId: string
+  agentName: string
+  agentTitle: string
+  agentColor: string
+  agentKey: string
+  analysis: string
+  createdAt: string
+  documentIds: string[] | null
+}
+
 export function AnalysisInterface({
   selectedAgentId,
   selectedAgentName,
+  selectedAgentColor,
+  selectedAgentKey,
   onAnalysisComplete,
 }: {
   selectedAgentId: string | null
   selectedAgentName?: string
+  selectedAgentColor?: string
+  selectedAgentKey?: string
   onAnalysisComplete?: (result: AnalysisResult) => void
 }) {
   const [documents, setDocuments] = useState<Document[]>([])
@@ -54,6 +74,7 @@ export function AnalysisInterface({
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [result, setResult] = useState<AnalysisResult | null>(null)
   const [isLoadingDocuments, setIsLoadingDocuments] = useState(true)
+  const [selectedAnalysisForChat, setSelectedAnalysisForChat] = useState<SelectedAnalysis | null>(null)
 
   // Load user documents
   useEffect(() => {
@@ -257,6 +278,39 @@ export function AnalysisInterface({
             </div>
           )}
         </Card>
+      )}
+
+      {/* Chat with Agent (only show after successful analysis) */}
+      {result?.success && result?.analysisId && selectedAgentName && (
+        <AnalysisChat
+          analysisId={result.analysisId}
+          agentName={selectedAgentName}
+          agentColor={selectedAgentColor || 'teal'}
+          agentInitial={selectedAgentKey?.substring(0, 2).toUpperCase() || 'AI'}
+          className="mt-6"
+        />
+      )}
+
+      {/* Or select an existing analysis to chat with */}
+      {!result?.analysisId && (
+        <div className="space-y-4">
+          <div className="text-center">
+            <p className="text-sm text-muted-foreground">
+              Ou escolha uma análise anterior para conversar com o especialista
+            </p>
+          </div>
+          <AnalysisSelector
+            onSelectAnalysis={(analysis) => setSelectedAnalysisForChat(analysis)}
+          />
+          {selectedAnalysisForChat && (
+            <AnalysisChat
+              analysisId={selectedAnalysisForChat.id}
+              agentName={selectedAnalysisForChat.agentName}
+              agentColor={selectedAnalysisForChat.agentColor}
+              agentInitial={selectedAnalysisForChat.agentKey.substring(0, 2).toUpperCase()}
+            />
+          )}
+        </div>
       )}
 
       {/* Disclaimer */}

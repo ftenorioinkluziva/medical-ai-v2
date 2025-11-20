@@ -17,6 +17,7 @@
   "dependencies": {
     "@ai-sdk/google": "^2.0.26",
     "@ai-sdk/openai": "^2.0.59",
+    "@ai-sdk/react": "^2.0.97",
     "@auth/drizzle-adapter": "^1.11.1",
     "@hookform/resolvers": "^5.2.2",
     "@radix-ui/react-alert-dialog": "^1.1.15",

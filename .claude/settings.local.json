@@ -16,7 +16,15 @@
       "Bash(pnpm db:push:*)",
       "Bash(pnpm dev)",
       "Bash(timeout 10 bash:*)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(test:*)",
+      "Bash(cat:*)",
+      "Bash(pnpm list:*)",
+      "WebSearch",
+      "WebFetch(domain:ai-sdk.dev)",
+      "Bash(pnpm add:*)",
+      "Bash(set \"NODE_OPTIONS=-r dotenv/config\")",
+      "Bash(pnpm tsx:*)"
     ],
     "deny": [],
     "ask": []
