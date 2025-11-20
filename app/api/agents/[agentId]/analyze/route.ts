@@ -217,6 +217,13 @@ export async function POST(
       }
     }
 
+    // Prepare structured documents for Logical Brain
+    const structuredDocuments: StructuredMedicalDocument[] = userDocuments
+      .map(doc => doc.structuredData as StructuredMedicalDocument)
+      .filter((sd): sd is StructuredMedicalDocument => sd !== null && sd.modules !== undefined)
+
+    console.log(`🧠 [ANALYSIS-API] Structured documents for Logical Brain: ${structuredDocuments.length}`)
+
     // Generate analysis
     console.log('🤖 [ANALYSIS-API] Generating analysis...')
     console.log(`📊 [ANALYSIS-API] Context sizes: documents=${documentsContext.length}, profile=${medicalProfileContext.length}, knowledge=${knowledgeContext.length}`)
@@ -228,6 +235,8 @@ export async function POST(
         documentsContext,
         medicalProfileContext,
         knowledgeContext,
+        structuredDocuments, // NOVO: Passa documentos estruturados para o Cérebro Lógico
+        documentIds: userDocuments.map(d => d.id), // NOVO: Passa IDs dos documentos
       }
     )
 

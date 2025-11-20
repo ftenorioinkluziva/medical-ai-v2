@@ -85,8 +85,15 @@ export function WeeklyPlanWidget({ patientId }: WeeklyPlanWidgetProps = {}) {
         setPlan(data.plans[0]) // Get the most recent plan
       }
     } catch (err) {
-      console.error('Error loading weekly plan:', err)
-      setError(err instanceof Error ? err.message : 'Erro desconhecido')
+      const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido'
+
+      // Only log to console if it's an unexpected error (not the "no plan" case)
+      if (!errorMessage.includes('Nenhum plano') &&
+          !errorMessage.includes('Realize uma análise médica primeiro')) {
+        console.error('Error loading weekly plan:', err)
+      }
+
+      setError(errorMessage)
     } finally {
       setIsLoading(false)
     }

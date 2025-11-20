@@ -13,7 +13,10 @@
       "Bash(git checkout:*)",
       "Bash(pnpm db:generate:*)",
       "Bash(pnpm db:migrate:*)",
-      "Bash(pnpm db:push:*)"
+      "Bash(pnpm db:push:*)",
+      "Bash(pnpm dev)",
+      "Bash(timeout 10 bash:*)",
+      "Bash(curl:*)"
     ],
     "deny": [],
     "ask": []

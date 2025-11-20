@@ -17,6 +17,7 @@ import {
   Shield,
   Activity,
   TrendingUp,
+  Brain,
 } from 'lucide-react'
 
 export default function AdminPage() {
@@ -47,6 +48,15 @@ export default function AdminPage() {
       color: 'text-purple-600',
       bgColor: 'bg-purple-50',
       borderColor: 'border-purple-200',
+    },
+    {
+      title: 'Cérebro Lógico',
+      description: 'Gerenciar biomarcadores e protocolos',
+      icon: Brain,
+      href: '/admin/medical-knowledge',
+      color: 'text-cyan-600',
+      bgColor: 'bg-cyan-50',
+      borderColor: 'border-cyan-200',
     },
     {
       title: 'Estatísticas',

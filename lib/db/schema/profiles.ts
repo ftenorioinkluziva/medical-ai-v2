@@ -56,6 +56,18 @@ export const medicalProfiles = pgTable('medical_profiles', {
   healthObjectives: text('health_objectives'),
   notes: text('notes'),
 
+  // Biomarkers Snapshot (from Logical Brain)
+  latestBiomarkers: json('latest_biomarkers').$type<{
+    [slug: string]: {
+      value: number
+      unit?: string
+      date: string
+      documentId: string
+      status: 'optimal' | 'suboptimal' | 'abnormal'
+    }
+  }>(),
+  biomarkersUpdatedAt: timestamp('biomarkers_updated_at'),
+
   // Timestamps
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),

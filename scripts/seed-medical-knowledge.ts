@@ -189,6 +189,174 @@ const biomarkersData = [
     optimalMin: '600.0',
     metaphor: 'Combustível da cognição e da bainha de mielina.',
     sourceRef: 'Dra. Katia Haranaka'
+  },
+  {
+    slug: 'lipoproteina_a',
+    name: 'Lipoproteína (a)',
+    category: 'Cardiovascular',
+    unit: 'nmol/L',
+    optimalMax: 30.0, // Meta funcional estrita
+    labMax: 75.0,
+    clinicalInsight: 'Marcador genético de risco cardíaco e trombose. Não responde bem a dieta/estatinas. Valores altos exigem controle rigoroso de outros fatores (inflamação/oxidação).',
+    sourceRef: 'Medicina Funcional'
+  },
+  {
+    slug: 'acido_urico',
+    name: 'Ácido Úrico',
+    category: 'Metabólico',
+    unit: 'mg/dL',
+    optimalMax: 4.5, // Meta funcional (acima disso já indica estresse oxidativo/metabólico)
+    labMax: 7.0,
+    clinicalInsight: 'Não é só gota. É um marcador de estresse oxidativo e resistência à insulina (frutose). Valores acima de 5.0 já indicam risco cardiovascular aumentado.',
+    sourceRef: 'Dra. Katia Haranaka'
+  },
+  {
+    slug: 'fibrinogenio',
+    name: 'Fibrinogênio',
+    category: 'Inflamação/Coagulação',
+    unit: 'mg/dL',
+    optimalMin: 200.0,
+    optimalMax: 300.0,
+    labMax: 393.0,
+    clinicalInsight: 'Marcador de viscosidade do sangue e inflamação. Valores altos aumentam risco de trombose e infarto ("sangue grosso").',
+    sourceRef: 'Medicina Funcional'
+  },
+  {
+    slug: 'apo_b',
+    name: 'Apolipoproteína B',
+    category: 'Cardiovascular',
+    unit: 'mg/dL',
+    optimalMax: 80.0,
+    labMax: 100.0, // Laboratórios variam, mas funcional busca < 80
+    clinicalInsight: 'Conta o número real de partículas aterogênicas (LDL, VLDL). Mais preciso que o colesterol LDL calculado.',
+    sourceRef: 'Medicina de Precisão'
+  },
+
+  // --- NOVO: HORMÔNIOS SEXUAIS (MASCULINO) ---
+  {
+    slug: 'testosterona_total',
+    name: 'Testosterona Total',
+    category: 'Hormônios',
+    unit: 'ng/dL',
+    optimalMin: 600.0, // Alvo de performance/longevidade
+    optimalMax: 900.0,
+    labMin: 249.0, // O laboratório aceita valores muito baixos como "normal"
+    clinicalInsight: 'Vitalidade, força e proteção cardíaca. Valores de laboratório "normais" (ex: 300) são insuficientes para saúde ótima em homens.',
+    sourceRef: 'Dr. Guilherme Freccia'
+  },
+  {
+    slug: 'testosterona_livre',
+    name: 'Testosterona Livre',
+    category: 'Hormônios',
+    unit: 'ng/dL',
+    optimalMin: 12.0, // Estimativa funcional
+    clinicalInsight: 'A fração que realmente funciona. Se a SHBG for alta, a livre cai, causando sintomas mesmo com Total normal.',
+    sourceRef: 'Dr. Guilherme Freccia'
+  },
+  {
+    slug: 'estradiol',
+    name: 'Estradiol (E2)',
+    category: 'Hormônios',
+    unit: 'pg/mL',
+    optimalMin: 20.0,
+    optimalMax: 30.0, // Homens precisam de um pouco, mas não muito
+    clinicalInsight: 'Em homens, o excesso causa gordura abdominal e perda de libido. A falta causa risco ósseo e cardíaco. O equilíbrio é chave.',
+    sourceRef: 'Medicina Funcional'
+  },
+  {
+    slug: 'shbg',
+    name: 'SHBG',
+    category: 'Hormônios',
+    unit: 'nmol/L',
+    optimalMin: 20.0,
+    optimalMax: 40.0,
+    clinicalInsight: 'Proteína que "prende" a testosterona. Se estiver muito alta (ex: insulina baixa demais ou envelhecimento), rouba a testosterona livre.',
+    sourceRef: 'Medicina Funcional'
+  },
+  {
+    slug: 'progesterona',
+    name: 'Progesterona',
+    category: 'Hormônios',
+    unit: 'ng/mL',
+    optimalMax: 0.15, // Para homens
+    clinicalInsight: 'Em homens, níveis elevados podem inibir a testosterona ou indicar conversão adrenal alterada.',
+    sourceRef: 'Medicina Funcional'
+  },
+  {
+    slug: 'cortisol_manha',
+    name: 'Cortisol (Manhã)',
+    category: 'Hormônios/Estresse',
+    unit: 'ug/dL',
+    optimalMin: 10.0,
+    optimalMax: 18.0,
+    clinicalInsight: 'Hormônio da vida. Baixo demais = burnout/fadiga adrenal. Alto demais = estresse agudo/catabolismo muscular.',
+    sourceRef: 'Medicina Funcional'
+  },
+
+  // --- NOVO: HEMATOLOGIA E IMUNIDADE ---
+  {
+    slug: 'leucocitos',
+    name: 'Leucócitos Totais',
+    category: 'Imunidade',
+    unit: '/mm3',
+    optimalMin: 5000.0,
+    optimalMax: 7500.0,
+    clinicalInsight: 'Sistema de defesa. Abaixo de 5000 pode indicar baixa reserva imunológica ou infecções virais crônicas. Acima de 10000, infecção aguda.',
+    sourceRef: 'Dra. Katia Haranaka'
+  },
+  {
+    slug: 'vcm',
+    name: 'VCM (Volume Corpuscular Médio)',
+    category: 'Hematológico',
+    unit: 'fL',
+    optimalMin: 88.0,
+    optimalMax: 92.0,
+    labMin: 80.0,
+    labMax: 98.0,
+    clinicalInsight: 'Tamanho da hemácia. < 88 tende a deficiência de ferro. > 92 tende a deficiência de B12/Folato (Metilação) ou hipotireoidismo.',
+    sourceRef: 'Dra. Katia Haranaka'
+  },
+  {
+    slug: 'rdw',
+    name: 'RDW',
+    category: 'Hematológico',
+    unit: '%',
+    optimalMax: 12.0, // Dra. Katia é bem estrita aqui
+    labMax: 14.0,
+    clinicalInsight: 'Variação do tamanho das células. Marcador de "controle de qualidade" da medula. Valores altos (>13%) indicam deficiência nutricional e inflamação.',
+    sourceRef: 'Dra. Katia Haranaka'
+  },
+
+  // --- NOVO: MINERAIS E ELETRÓLITOS ---
+  {
+    slug: 'magnesio',
+    name: 'Magnésio',
+    category: 'Mineral',
+    unit: 'mg/dL',
+    optimalMin: 2.2, // Funcional busca o quartil superior
+    labMin: 1.6,
+    clinicalInsight: 'Essencial para 300+ enzimas. No sangue é pouco representativo (melhor no eritrócito), mas se estiver baixo no sangue, a deficiência tecidual é grave.',
+    sourceRef: 'Dra. Katia Haranaka'
+  },
+  {
+    slug: 'zinco',
+    name: 'Zinco Sérico',
+    category: 'Mineral',
+    unit: 'ug/dL',
+    optimalMin: 90.0,
+    optimalMax: 120.0,
+    clinicalInsight: 'Vital para testosterona, imunidade e conversão da tireoide. Baixo zinco = baixa testosterona e T3.',
+    sourceRef: 'Dra. Katia Haranaka'
+  },
+  {
+    slug: 'acido_folico',
+    name: 'Ácido Fólico (Folato)',
+    category: 'Vitamina',
+    unit: 'ng/mL',
+    optimalMin: 10.0, // Funcional busca > 10 ou > 15
+    labMin: 3.0,
+    clinicalInsight: 'Essencial para metilação e redução da homocisteína. Deficiência causa danos ao DNA.',
+    sourceRef: 'Medicina Funcional'
   }
 ]
 
@@ -208,6 +376,14 @@ const metricsData = [
     targetMin: '20.0',
     riskInsight: 'Se baixo, indica que o corpo está convertendo hormônio ativo em inativo (hibernação).',
     sourceRef: 'Dra. Katia Haranaka'
+  },
+  {
+    slug: 'tfg_estimada',
+    name: 'Taxa de Filtração Glomerular (Estimada)',
+    formula: 'Variável (CKD-EPI)', // O agente deve identificar o valor pronto do exame
+    targetMin: 90.0,
+    riskInsight: 'Abaixo de 90 indica perda de função renal leve. Abaixo de 60 é insuficiência renal moderada. Monitorar hidratação e creatinina.',
+    sourceRef: 'Nefrologia Funcional'
   }
 ]
 

@@ -6,7 +6,7 @@
  */
 
 import { useState } from 'react'
-import { Upload, FileText, Loader2, CheckCircle2, XCircle } from 'lucide-react'
+import { Upload, FileText, Loader2, CheckCircle2, XCircle, Sparkles } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -51,6 +51,7 @@ export function KnowledgeUpload({ onUploadComplete }: { onUploadComplete?: () =>
 
   const [isUploading, setIsUploading] = useState(false)
   const [uploadResult, setUploadResult] = useState<UploadResult | null>(null)
+  const [isGenerating, setIsGenerating] = useState(false)
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0]
@@ -136,6 +137,54 @@ export function KnowledgeUpload({ onUploadComplete }: { onUploadComplete?: () =>
     }
   }
 
+  const handleGenerateMetadata = async () => {
+    if (!file) {
+      alert('Selecione um arquivo primeiro')
+      return
+    }
+
+    setIsGenerating(true)
+
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+
+      const response = await fetch('/api/admin/knowledge/generate-metadata', {
+        method: 'POST',
+        body: formData,
+      })
+
+      const result = await response.json()
+
+      if (result.success && result.metadata) {
+        // Fill form fields with generated metadata
+        setTitle(result.metadata.title || '')
+        setCategory(result.metadata.category || 'general')
+        setSource(result.metadata.source || '')
+        setSummary(result.metadata.summary || '')
+        setTags(result.metadata.tags || '')
+
+        // Show success message
+        setUploadResult({
+          success: true,
+          error: `Metadados gerados com sucesso! (${(result.stats.processingTimeMs / 1000).toFixed(1)}s)`,
+        })
+      } else {
+        setUploadResult({
+          success: false,
+          error: result.error || 'Erro ao gerar metadados',
+        })
+      }
+    } catch (error) {
+      setUploadResult({
+        success: false,
+        error: error instanceof Error ? error.message : 'Erro ao gerar metadados',
+      })
+    } finally {
+      setIsGenerating(false)
+    }
+  }
+
   const handleReset = () => {
     setFile(null)
     setTitle('')
@@ -157,12 +206,34 @@ export function KnowledgeUpload({ onUploadComplete }: { onUploadComplete?: () =>
             type="file"
             accept=".pdf,.txt,.md,.doc,.docx"
             onChange={handleFileSelect}
-            disabled={isUploading}
+            disabled={isUploading || isGenerating}
           />
           {file && (
-            <p className="text-sm text-muted-foreground">
-              {file.name} • {(file.size / 1024).toFixed(0)} KB
-            </p>
+            <div className="space-y-2">
+              <p className="text-sm text-muted-foreground">
+                {file.name} • {(file.size / 1024).toFixed(0)} KB
+              </p>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleGenerateMetadata}
+                disabled={isUploading || isGenerating}
+                className="w-full"
+              >
+                {isGenerating ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Gerando metadados com IA...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="mr-2 h-4 w-4" />
+                    Gerar Metadados com IA
+                  </>
+                )}
+              </Button>
+            </div>
           )}
         </div>
 
@@ -174,14 +245,14 @@ export function KnowledgeUpload({ onUploadComplete }: { onUploadComplete?: () =>
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Ex: Interpretação de Hemograma Completo"
-            disabled={isUploading}
+            disabled={isUploading || isGenerating}
           />
         </div>
 
         {/* Category */}
         <div className="space-y-2">
           <Label htmlFor="category">Categoria *</Label>
-          <Select value={category} onValueChange={setCategory} disabled={isUploading}>
+          <Select value={category} onValueChange={setCategory} disabled={isUploading || isGenerating}>
             <SelectTrigger>
               <SelectValue />
             </SelectTrigger>
@@ -203,7 +274,7 @@ export function KnowledgeUpload({ onUploadComplete }: { onUploadComplete?: () =>
             value={source}
             onChange={(e) => setSource(e.target.value)}
             placeholder="Ex: Sociedade Brasileira de Hematologia"
-            disabled={isUploading}
+            disabled={isUploading || isGenerating}
           />
         </div>
 
@@ -216,7 +287,7 @@ export function KnowledgeUpload({ onUploadComplete }: { onUploadComplete?: () =>
             onChange={(e) => setSummary(e.target.value)}
             placeholder="Breve descrição do conteúdo..."
             rows={3}
-            disabled={isUploading}
+            disabled={isUploading || isGenerating}
           />
         </div>
 
@@ -228,7 +299,7 @@ export function KnowledgeUpload({ onUploadComplete }: { onUploadComplete?: () =>
             value={tags}
             onChange={(e) => setTags(e.target.value)}
             placeholder="Ex: hemograma, interpretação, valores de referência"
-            disabled={isUploading}
+            disabled={isUploading || isGenerating}
           />
         </div>
 
@@ -237,7 +308,7 @@ export function KnowledgeUpload({ onUploadComplete }: { onUploadComplete?: () =>
           <Button
             className="flex-1"
             onClick={handleUpload}
-            disabled={!file || !title || !category || isUploading}
+            disabled={!file || !title || !category || isUploading || isGenerating}
           >
             {isUploading ? (
               <>
@@ -252,7 +323,7 @@ export function KnowledgeUpload({ onUploadComplete }: { onUploadComplete?: () =>
             )}
           </Button>
 
-          {(file || uploadResult) && !isUploading && (
+          {(file || uploadResult) && !isUploading && !isGenerating && (
             <Button variant="outline" onClick={handleReset}>
               Limpar
             </Button>
