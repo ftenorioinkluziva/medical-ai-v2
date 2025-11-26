@@ -30,6 +30,12 @@ export const healthAgents = pgTable('health_agents', {
   // Access Control
   allowedRoles: json('allowed_roles').$type<string[]>().notNull(), // ['patient', 'doctor', 'admin']
 
+  // Knowledge Base Configuration
+  knowledgeAccessType: varchar('knowledge_access_type', { length: 20 }).notNull().default('full'), // 'full' | 'restricted'
+  allowedCategories: json('allowed_categories').$type<string[]>().default([]), // Categories the agent can access
+  excludedArticleIds: json('excluded_article_ids').$type<string[]>().default([]), // Specific articles to exclude
+  includedArticleIds: json('included_article_ids').$type<string[]>().default([]), // Specific articles to include
+
   // Status
   isActive: boolean('is_active').notNull().default(true),
   displayOrder: integer('display_order').notNull().default(0),

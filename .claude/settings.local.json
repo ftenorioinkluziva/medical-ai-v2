@@ -24,7 +24,10 @@
       "WebFetch(domain:ai-sdk.dev)",
       "Bash(pnpm add:*)",
       "Bash(set \"NODE_OPTIONS=-r dotenv/config\")",
-      "Bash(pnpm tsx:*)"
+      "Bash(pnpm tsx:*)",
+      "Bash(echo:*)",
+      "Bash(scripts/migrate.mjs)",
+      "Bash(psql:*)"
     ],
     "deny": [],
     "ask": []

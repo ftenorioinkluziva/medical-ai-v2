@@ -18,7 +18,9 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
-import { Loader2 } from 'lucide-react'
+import { Checkbox } from '@/components/ui/checkbox'
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+import { Loader2, BookOpen, Lock, Unlock } from 'lucide-react'
 
 interface AgentFormProps {
   agent?: any | null
@@ -28,6 +30,8 @@ interface AgentFormProps {
 
 export function AgentForm({ agent, onSuccess, onCancel }: AgentFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [categories, setCategories] = useState<Array<{ category: string; label: string; count: number }>>([])
+  const [isLoadingCategories, setIsLoadingCategories] = useState(false)
   const [formData, setFormData] = useState({
     agentKey: '',
     name: '',
@@ -43,7 +47,31 @@ export function AgentForm({ agent, onSuccess, onCancel }: AgentFormProps) {
     isActive: true,
     requiresApproval: false,
     tags: '',
+    knowledgeAccessType: 'full' as 'full' | 'restricted',
+    allowedCategories: [] as string[],
+    excludedArticleIds: [] as string[],
+    includedArticleIds: [] as string[],
   })
+
+  // Load categories on mount
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        setIsLoadingCategories(true)
+        const response = await fetch('/api/admin/knowledge/categories')
+        if (response.ok) {
+          const data = await response.json()
+          setCategories(data.categories || [])
+        }
+      } catch (error) {
+        console.error('Error loading categories:', error)
+      } finally {
+        setIsLoadingCategories(false)
+      }
+    }
+
+    loadCategories()
+  }, [])
 
   useEffect(() => {
     if (agent) {
@@ -62,12 +90,34 @@ export function AgentForm({ agent, onSuccess, onCancel }: AgentFormProps) {
         isActive: agent.isActive !== undefined ? agent.isActive : true,
         requiresApproval: agent.requiresApproval || false,
         tags: agent.tags ? agent.tags.join(', ') : '',
+        knowledgeAccessType: agent.knowledgeAccessType || 'full',
+        allowedCategories: agent.allowedCategories || [],
+        excludedArticleIds: agent.excludedArticleIds || [],
+        includedArticleIds: agent.includedArticleIds || [],
       })
     }
   }, [agent])
 
   const handleChange = (field: string, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
+  }
+
+  const handleCategoryToggle = (category: string, checked: boolean) => {
+    setFormData((prev) => ({
+      ...prev,
+      allowedCategories: checked
+        ? [...prev.allowedCategories, category]
+        : prev.allowedCategories.filter((c) => c !== category),
+    }))
+  }
+
+  const getTotalArticles = () => {
+    if (formData.knowledgeAccessType === 'full') {
+      return categories.reduce((sum, cat) => sum + cat.count, 0)
+    }
+    return categories
+      .filter((cat) => formData.allowedCategories.includes(cat.category))
+      .reduce((sum, cat) => sum + cat.count, 0)
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -95,6 +145,10 @@ export function AgentForm({ agent, onSuccess, onCancel }: AgentFormProps) {
           .split(',')
           .map((t) => t.trim())
           .filter((t) => t.length > 0),
+        knowledgeAccessType: formData.knowledgeAccessType,
+        allowedCategories: formData.allowedCategories,
+        excludedArticleIds: formData.excludedArticleIds,
+        includedArticleIds: formData.includedArticleIds,
       }
 
       const url = agent
@@ -311,6 +365,104 @@ export function AgentForm({ agent, onSuccess, onCancel }: AgentFormProps) {
             />
           </div>
         </div>
+      </div>
+
+      {/* Knowledge Configuration */}
+      <div className="space-y-4">
+        <div className="flex items-center gap-2">
+          <BookOpen className="h-5 w-5" />
+          <h3 className="font-semibold text-lg">Configuração de Conhecimento</h3>
+        </div>
+        <p className="text-sm text-muted-foreground">
+          Defina quais artigos da base de conhecimento este agente pode acessar
+        </p>
+
+        {/* Access Type */}
+        <RadioGroup
+          value={formData.knowledgeAccessType}
+          onValueChange={(value) => handleChange('knowledgeAccessType', value)}
+        >
+          <div className="flex items-center space-x-2 p-4 border rounded-lg cursor-pointer hover:bg-muted/50">
+            <RadioGroupItem value="full" id="access-full" />
+            <Label htmlFor="access-full" className="flex-1 cursor-pointer">
+              <div className="flex items-center gap-2">
+                <Unlock className="h-4 w-4 text-green-600" />
+                <span className="font-medium">Acesso Total</span>
+              </div>
+              <p className="text-sm text-muted-foreground mt-1">
+                Agente pode acessar toda a base de conhecimento ({categories.reduce((sum, cat) => sum + cat.count, 0)} artigos)
+              </p>
+            </Label>
+          </div>
+
+          <div className="flex items-center space-x-2 p-4 border rounded-lg cursor-pointer hover:bg-muted/50">
+            <RadioGroupItem value="restricted" id="access-restricted" />
+            <Label htmlFor="access-restricted" className="flex-1 cursor-pointer">
+              <div className="flex items-center gap-2">
+                <Lock className="h-4 w-4 text-orange-600" />
+                <span className="font-medium">Acesso Restrito</span>
+              </div>
+              <p className="text-sm text-muted-foreground mt-1">
+                Agente acessa apenas categorias selecionadas
+              </p>
+            </Label>
+          </div>
+        </RadioGroup>
+
+        {/* Categories Selection (only show if restricted) */}
+        {formData.knowledgeAccessType === 'restricted' && (
+          <div className="space-y-3 p-4 border rounded-lg bg-muted/30">
+            <div className="flex items-center justify-between">
+              <Label className="text-base">Categorias Permitidas</Label>
+              <span className="text-sm text-muted-foreground">
+                {getTotalArticles()} artigos selecionados
+              </span>
+            </div>
+
+            {isLoadingCategories ? (
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Carregando categorias...
+              </div>
+            ) : categories.length === 0 ? (
+              <p className="text-sm text-muted-foreground">
+                Nenhuma categoria disponível. Adicione artigos à base de conhecimento primeiro.
+              </p>
+            ) : (
+              <div className="grid gap-3 md:grid-cols-2">
+                {categories.map((cat) => (
+                  <div
+                    key={cat.category}
+                    className="flex items-center space-x-2 p-3 border rounded-md hover:bg-background"
+                  >
+                    <Checkbox
+                      id={`cat-${cat.category}`}
+                      checked={formData.allowedCategories.includes(cat.category)}
+                      onCheckedChange={(checked) =>
+                        handleCategoryToggle(cat.category, checked as boolean)
+                      }
+                    />
+                    <Label
+                      htmlFor={`cat-${cat.category}`}
+                      className="flex-1 cursor-pointer"
+                    >
+                      <div className="font-medium">{cat.label}</div>
+                      <div className="text-xs text-muted-foreground">
+                        {cat.count} {cat.count === 1 ? 'artigo' : 'artigos'}
+                      </div>
+                    </Label>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {formData.allowedCategories.length === 0 && !isLoadingCategories && categories.length > 0 && (
+              <p className="text-sm text-orange-600 bg-orange-50 p-3 rounded-md">
+                ⚠️ Atenção: Nenhuma categoria selecionada. O agente não terá acesso a nenhum conhecimento.
+              </p>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Settings */}

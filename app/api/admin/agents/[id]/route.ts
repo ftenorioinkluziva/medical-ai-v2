@@ -96,6 +96,10 @@ export async function PUT(
     if (body.isActive !== undefined) updateData.isActive = body.isActive
     if (body.requiresApproval !== undefined) updateData.requiresApproval = body.requiresApproval
     if (body.tags !== undefined) updateData.tags = body.tags
+    if (body.knowledgeAccessType !== undefined) updateData.knowledgeAccessType = body.knowledgeAccessType
+    if (body.allowedCategories !== undefined) updateData.allowedCategories = body.allowedCategories
+    if (body.excludedArticleIds !== undefined) updateData.excludedArticleIds = body.excludedArticleIds
+    if (body.includedArticleIds !== undefined) updateData.includedArticleIds = body.includedArticleIds
 
     updateData.updatedAt = new Date()
 

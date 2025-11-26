@@ -6,12 +6,13 @@
  */
 
 import { useState, useEffect } from 'react'
+import Link from 'next/link'
 import { KnowledgeUpload } from '@/components/admin/knowledge-upload'
 import { KnowledgeList } from '@/components/admin/knowledge-list'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { BookOpen, Upload, List, BarChart3 } from 'lucide-react'
+import { BookOpen, Upload, List, BarChart3, ArrowLeft } from 'lucide-react'
 
 interface KnowledgeStats {
   totalArticles: number
@@ -65,13 +66,21 @@ export default function KnowledgeBasePage() {
   }
 
   return (
-    <div className="container mx-auto py-8 space-y-8">
+    <div className="container mx-auto p-6 space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold tracking-tight flex items-center gap-3">
-          <BookOpen className="h-8 w-8" />
-          Base de Conhecimento Médico
-        </h1>
+        <div className="flex items-center gap-3">
+          <Link href="/admin">
+            <Button variant="ghost" size="sm" className="gap-2">
+              <ArrowLeft className="h-4 w-4" />
+              Voltar
+            </Button>
+          </Link>
+          <h1 className="text-3xl font-bold flex items-center gap-3">
+            <BookOpen className="h-8 w-8" />
+            Base de Conhecimento Médico
+          </h1>
+        </div>
         <p className="text-muted-foreground mt-2">
           Gerencie artigos, guidelines e referências médicas para análises mais fundamentadas
         </p>

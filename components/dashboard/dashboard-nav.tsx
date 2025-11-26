@@ -28,19 +28,18 @@ export function DashboardNav({ userName, userRole }: DashboardNavProps) {
   const [isOpen, setIsOpen] = useState(false)
   const pathname = usePathname()
 
-  const navLinks = [
-    { href: '/dashboard', label: 'Dashboard' },
-    { href: '/analyze', label: 'Análise' },
-    { href: '/recommendations', label: 'Recomendações' },
-    { href: '/weekly-plan', label: 'Plano Semanal' },
-    { href: '/compare', label: 'Comparar' },
-    { href: '/documents', label: 'Documentos' },
-    { href: '/profile', label: 'Perfil' },
-  ]
-
-  if (userRole === 'admin') {
-    navLinks.push({ href: '/admin', label: 'Admin' })
-  }
+  // Admin users only see Admin link, others see regular dashboard links
+  const navLinks = userRole === 'admin'
+    ? [{ href: '/admin', label: 'Admin' }]
+    : [
+        { href: '/dashboard', label: 'Dashboard' },
+        { href: '/analyze', label: 'Análise' },
+        { href: '/recommendations', label: 'Recomendações' },
+        { href: '/weekly-plan', label: 'Plano Semanal' },
+        { href: '/compare', label: 'Comparar' },
+        { href: '/documents', label: 'Documentos' },
+        { href: '/profile', label: 'Perfil' },
+      ]
 
   const isActive = (href: string) => pathname === href
 
@@ -49,7 +48,7 @@ export function DashboardNav({ userName, userRole }: DashboardNavProps) {
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         {/* Logo */}
         <div className="flex items-center gap-6">
-          <Link href="/dashboard" className="flex items-center gap-2 group">
+          <Link href={userRole === 'admin' ? '/admin' : '/dashboard'} className="flex items-center gap-2 group">
             <div className="h-9 w-9 rounded-lg bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center shadow-sm">
               <Heart className="h-5 w-5 text-white" />
             </div>

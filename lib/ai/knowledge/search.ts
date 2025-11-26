@@ -28,6 +28,7 @@ export async function searchKnowledgeBase(
     limit?: number
     threshold?: number
     categories?: string[]
+    articleIds?: string[] | null // null = all articles, [] = none, [...ids] = specific articles
     provider?: 'google' | 'openai'
   } = {}
 ): Promise<KnowledgeSearchResult[]> {
@@ -35,10 +36,17 @@ export async function searchKnowledgeBase(
     limit = 5,
     threshold = 0.7,
     categories,
+    articleIds,
     provider = 'openai',
   } = options
 
   console.log(`🔍 [KNOWLEDGE] Searching for: "${query.substring(0, 50)}..."`)
+
+  // If articleIds is an empty array, return no results (restricted agent with no articles)
+  if (articleIds !== undefined && articleIds !== null && articleIds.length === 0) {
+    console.log(`⚠️ [KNOWLEDGE] No articles allowed for this agent`)
+    return []
+  }
 
   // Generate embedding for the query
   const { embedding } = await generateEmbedding(query, { provider })
@@ -46,56 +54,49 @@ export async function searchKnowledgeBase(
   // Convert embedding to PostgreSQL vector format
   const embeddingVector = '[' + embedding.join(',') + ']'
 
-  // Build SQL query with category filter if provided
-  let searchQuery: any
+  // Build WHERE conditions
+  const whereConditions = [
+    sql`ka.is_verified = 'verified'`,
+    sql`1 - (ke.embedding <=> ${embeddingVector}::vector) >= ${threshold}`,
+  ]
 
+  // Add category filter if provided
   if (categories && categories.length > 0) {
-    // Convert array to PostgreSQL format
     const categoriesArray = `{${categories.join(',')}}`
-
-    searchQuery = sql`
-      SELECT
-        ke.id,
-        ke.article_id,
-        ka.title,
-        ka.category,
-        ka.subcategory,
-        ke.content,
-        ka.source,
-        ka.tags,
-        ka.relevance_score,
-        1 - (ke.embedding <=> ${embeddingVector}::vector) as similarity
-      FROM knowledge_embeddings ke
-      INNER JOIN knowledge_articles ka ON ke.article_id = ka.id
-      WHERE
-        ka.is_verified = 'verified'
-        AND ka.category = ANY(${categoriesArray}::text[])
-        AND 1 - (ke.embedding <=> ${embeddingVector}::vector) >= ${threshold}
-      ORDER BY ke.embedding <=> ${embeddingVector}::vector
-      LIMIT ${limit}
-    `
-  } else {
-    searchQuery = sql`
-      SELECT
-        ke.id,
-        ke.article_id,
-        ka.title,
-        ka.category,
-        ka.subcategory,
-        ke.content,
-        ka.source,
-        ka.tags,
-        ka.relevance_score,
-        1 - (ke.embedding <=> ${embeddingVector}::vector) as similarity
-      FROM knowledge_embeddings ke
-      INNER JOIN knowledge_articles ka ON ke.article_id = ka.id
-      WHERE
-        ka.is_verified = 'verified'
-        AND 1 - (ke.embedding <=> ${embeddingVector}::vector) >= ${threshold}
-      ORDER BY ke.embedding <=> ${embeddingVector}::vector
-      LIMIT ${limit}
-    `
+    whereConditions.push(sql`ka.category = ANY(${categoriesArray}::text[])`)
   }
+
+  // Add article ID filter if provided
+  if (articleIds && articleIds.length > 0) {
+    const articleIdsArray = `{${articleIds.join(',')}}`
+    whereConditions.push(sql`ka.id = ANY(${articleIdsArray}::uuid[])`)
+  }
+
+  // Combine WHERE conditions
+  const whereClause = whereConditions.reduce((acc, condition, index) => {
+    if (index === 0) return condition
+    return sql`${acc} AND ${condition}`
+  })
+
+  // Build complete query
+  const searchQuery = sql`
+    SELECT
+      ke.id,
+      ke.article_id,
+      ka.title,
+      ka.category,
+      ka.subcategory,
+      ke.content,
+      ka.source,
+      ka.tags,
+      ka.relevance_score,
+      1 - (ke.embedding <=> ${embeddingVector}::vector) as similarity
+    FROM knowledge_embeddings ke
+    INNER JOIN knowledge_articles ka ON ke.article_id = ka.id
+    WHERE ${whereClause}
+    ORDER BY ke.embedding <=> ${embeddingVector}::vector
+    LIMIT ${limit}
+  `
 
   // Search with cosine similarity
   const results = await db.execute(searchQuery)
@@ -139,35 +140,50 @@ export async function buildKnowledgeContext(
     maxChunks?: number
     maxCharsPerChunk?: number
     categories?: string[]
+    articleIds?: string[] | null
+    agentId?: string // New: automatically get article IDs from agent config
   } = {}
 ): Promise<string> {
   const {
     maxChunks = 5,
     maxCharsPerChunk = 1000,
     categories,
+    articleIds: providedArticleIds,
+    agentId,
   } = options
 
   console.log(`🧠 [KNOWLEDGE] Building context for query...`)
 
-  // First try with category filter
-  let results = await searchKnowledgeBase(query, {
-    limit: maxChunks,
-    threshold: 0.5, // Lowered from 0.6 to 0.5
-    categories,
-  })
+  // Get article IDs from agent config if agentId is provided
+  let articleIds = providedArticleIds
+  if (agentId && articleIds === undefined) {
+    const { getAllowedArticleIds } = await import('../rag/agent-knowledge-filter')
+    articleIds = await getAllowedArticleIds(agentId)
 
-  // If no results and categories were specified, try without category filter
-  if (results.length === 0 && categories && categories.length > 0) {
-    console.log(`⚠️ [KNOWLEDGE] No results in categories [${categories.join(', ')}], searching all categories...`)
-    results = await searchKnowledgeBase(query, {
-      limit: maxChunks,
-      threshold: 0.5,
-      categories: undefined, // Remove category filter
-    })
+    if (articleIds && articleIds.length > 0) {
+      console.log(`🔐 [KNOWLEDGE] Agent restricted to ${articleIds.length} articles`)
+    } else if (articleIds && articleIds.length === 0) {
+      console.log(`⚠️ [KNOWLEDGE] Agent has no articles configured`)
+      return ''
+    }
   }
 
+  // Search with provided filters (NO FALLBACK for restricted agents)
+  const results = await searchKnowledgeBase(query, {
+    limit: maxChunks,
+    threshold: 0.5,
+    categories,
+    articleIds,
+  })
+
   if (results.length === 0) {
-    console.log('⚠️ [KNOWLEDGE] No relevant knowledge found')
+    if (articleIds && articleIds.length > 0) {
+      console.log(`⚠️ [KNOWLEDGE] No relevant knowledge found in agent's restricted articles`)
+    } else if (categories && categories.length > 0) {
+      console.log(`⚠️ [KNOWLEDGE] No relevant knowledge found in categories [${categories.join(', ')}]`)
+    } else {
+      console.log('⚠️ [KNOWLEDGE] No relevant knowledge found')
+    }
     return ''
   }
 

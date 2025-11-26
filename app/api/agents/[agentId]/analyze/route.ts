@@ -160,7 +160,7 @@ export async function POST(
       knowledgeContext = await buildKnowledgeContext(analysisPrompt, {
         maxChunks: 3,
         maxCharsPerChunk: 1200,
-        categories: [agent.agentKey], // Search by agent specialty
+        agentId: agentId, // Use agent's knowledge configuration
       })
 
       if (knowledgeContext) {

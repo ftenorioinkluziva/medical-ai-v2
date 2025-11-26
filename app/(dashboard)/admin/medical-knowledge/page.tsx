@@ -3,11 +3,13 @@
  * Manage biomarkers and protocols from the Logical Brain
  */
 
+import Link from 'next/link'
 import { db } from '@/lib/db/client'
 import { biomarkersReference, calculatedMetrics, protocols } from '@/lib/db/schema'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Activity, Calculator, FileText } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Activity, Calculator, FileText, ArrowLeft } from 'lucide-react'
 
 export const metadata = {
   title: 'Conhecimento Médico | Admin',
@@ -63,11 +65,19 @@ export default async function MedicalKnowledgePage() {
   }, {} as Record<string, typeof protocolsList>)
 
   return (
-    <div className="container mx-auto py-8 space-y-8">
+    <div className="container mx-auto p-6 space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold mb-2">Cérebro Lógico - Conhecimento Médico</h1>
-        <p className="text-muted-foreground">
+        <div className="flex items-center gap-3">
+          <Link href="/admin">
+            <Button variant="ghost" size="sm" className="gap-2">
+              <ArrowLeft className="h-4 w-4" />
+              Voltar
+            </Button>
+          </Link>
+          <h1 className="text-3xl font-bold">Cérebro Lógico - Conhecimento Médico</h1>
+        </div>
+        <p className="text-muted-foreground mt-2">
           Base de conhecimento para análise determinística de biomarcadores
         </p>
       </div>
