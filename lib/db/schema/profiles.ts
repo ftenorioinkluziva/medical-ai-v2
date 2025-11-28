@@ -36,6 +36,10 @@ export const medicalProfiles = pgTable('medical_profiles', {
   exerciseIntensity: varchar('exercise_intensity', { length: 50 }),
   physicalLimitations: text('physical_limitations'),
 
+  // Functional Tests (Biomarcadores Funcionais)
+  handgripStrength: real('handgrip_strength'), // kg - Força de Preensão Manual (dinamômetro)
+  sitToStandTime: real('sit_to_stand_time'), // seconds - Teste Sentar-Levantar 5x
+
   // Nutrition
   currentDiet: text('current_diet'),
   dailyWaterIntake: real('daily_water_intake'), // liters

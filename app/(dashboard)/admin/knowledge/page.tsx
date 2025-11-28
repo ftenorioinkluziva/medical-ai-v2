@@ -68,22 +68,30 @@ export default function KnowledgeBasePage() {
   return (
     <div className="container mx-auto p-6 space-y-6">
       {/* Header */}
-      <div>
-        <div className="flex items-center gap-3">
-          <Link href="/admin">
-            <Button variant="ghost" size="sm" className="gap-2">
-              <ArrowLeft className="h-4 w-4" />
-              Voltar
-            </Button>
-          </Link>
-          <h1 className="text-3xl font-bold flex items-center gap-3">
-            <BookOpen className="h-8 w-8" />
-            Base de Conhecimento Médico
-          </h1>
+      <div className="flex items-center justify-between">
+        <div>
+          <div className="flex items-center gap-3">
+            <Link href="/admin">
+              <Button variant="ghost" size="sm" className="gap-2">
+                <ArrowLeft className="h-4 w-4" />
+                Voltar
+              </Button>
+            </Link>
+            <h1 className="text-3xl font-bold flex items-center gap-3">
+              <BookOpen className="h-8 w-8" />
+              Base de Conhecimento Médico
+            </h1>
+          </div>
+          <p className="text-muted-foreground mt-2">
+            Gerencie artigos, guidelines e referências médicas para análises mais fundamentadas
+          </p>
         </div>
-        <p className="text-muted-foreground mt-2">
-          Gerencie artigos, guidelines e referências médicas para análises mais fundamentadas
-        </p>
+        <Link href="/admin/knowledge/analyze">
+          <Button variant="outline" className="gap-2">
+            <BarChart3 className="h-4 w-4" />
+            Analisar Configuração
+          </Button>
+        </Link>
       </div>
 
       {/* Stats Cards */}

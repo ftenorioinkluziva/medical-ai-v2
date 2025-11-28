@@ -12,6 +12,7 @@ export interface AnalyzeWithAgentOptions {
   documentsContext?: string
   medicalProfileContext?: string
   knowledgeContext?: string
+  previousAnalysesContext?: string
   ragContext?: string
   structuredDocuments?: StructuredMedicalDocument[]
   documentIds?: string[]
@@ -29,6 +30,7 @@ export async function analyzeWithAgent(
     documentsContext = '',
     medicalProfileContext = '',
     knowledgeContext = '',
+    previousAnalysesContext = '',
     ragContext = '',
     structuredDocuments = [],
     documentIds = [],
@@ -36,6 +38,12 @@ export async function analyzeWithAgent(
 
   console.log(`🤖 [AGENT] Starting analysis with: ${agent.name}`)
   console.log(`📊 [AGENT] Model: ${agent.modelName}, Temp: ${agent.modelConfig.temperature}`)
+
+  if (previousAnalysesContext) {
+    // Count number of previous analyses included
+    const analysisCount = (previousAnalysesContext.match(/## Análise Prévia:/g) || []).length
+    console.log(`📋 [AGENT] Including ${analysisCount} previous analysis/analyses from other specialists`)
+  }
 
   // ========== CÉREBRO LÓGICO (LOGICAL BRAIN) ==========
   let logicalContext = ''
@@ -84,6 +92,12 @@ export async function analyzeWithAgent(
   if (medicalProfileContext) {
     parts.push('\n\n## Perfil Médico do Paciente')
     parts.push(medicalProfileContext)
+  }
+
+  if (previousAnalysesContext) {
+    parts.push('\n\n## Análises Prévias de Outros Especialistas')
+    parts.push('As análises abaixo foram realizadas por outros especialistas e podem fornecer insights adicionais:')
+    parts.push(previousAnalysesContext)
   }
 
   const userPrompt = parts.join('\n')

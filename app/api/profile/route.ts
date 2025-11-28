@@ -121,6 +121,10 @@ export async function POST(request: NextRequest) {
           exerciseIntensity: body.exerciseIntensity || null,
           physicalLimitations: body.physicalLimitations || null,
 
+          // Functional Tests
+          handgripStrength: body.handgripStrength || null,
+          sitToStandTime: body.sitToStandTime || null,
+
           // Nutrition
           currentDiet: body.currentDiet || null,
           dailyWaterIntake: body.dailyWaterIntake || null,
@@ -180,6 +184,10 @@ export async function POST(request: NextRequest) {
           exerciseDuration: body.exerciseDuration || null,
           exerciseIntensity: body.exerciseIntensity || null,
           physicalLimitations: body.physicalLimitations || null,
+
+          // Functional Tests
+          handgripStrength: body.handgripStrength || null,
+          sitToStandTime: body.sitToStandTime || null,
 
           // Nutrition
           currentDiet: body.currentDiet || null,

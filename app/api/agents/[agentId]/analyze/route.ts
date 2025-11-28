@@ -11,14 +11,7 @@ import { eq, desc } from 'drizzle-orm'
 import { analyzeWithAgent } from '@/lib/ai/agents/analyze'
 import { buildKnowledgeContext } from '@/lib/ai/knowledge'
 import type { StructuredMedicalDocument } from '@/lib/documents/structuring'
-import { generateRecommendationsFromAnalysis } from '@/lib/ai/recommendations/generate'
-import {
-  generateSupplementationStrategy,
-  generateShoppingList,
-  generateMealPlan,
-  generateWorkoutPlan,
-} from '@/lib/ai/weekly-plans/generators'
-import { weeklyPlans } from '@/lib/db/schema'
+import { getKnowledgeConfig } from '@/lib/db/settings'
 
 export async function POST(
   request: NextRequest,
@@ -64,18 +57,20 @@ export async function POST(
     const {
       documentIds = [],
       includeProfile = true,
+      previousAnalysisIds = [],
     } = body
 
     // Use analysis_prompt from agent configuration
     const analysisPrompt = agent.analysisPrompt || 'Analise os dados médicos fornecidos.'
 
     console.log(`🤖 [ANALYSIS-API] Starting analysis with agent: ${agent.name}`)
-    console.log(`📊 [ANALYSIS-API] User: ${session.user.id}, Documents: ${documentIds.length}, Include Profile: ${includeProfile}`)
+    console.log(`📊 [ANALYSIS-API] User: ${session.user.id}, Documents: ${documentIds.length}, Include Profile: ${includeProfile}, Previous Analyses: ${previousAnalysisIds.length}`)
 
     // Build context
     let documentsContext = ''
     let medicalProfileContext = ''
     let knowledgeContext = ''
+    let previousAnalysesContext = ''
     let userDocuments: any[] = []
     let profile: any = null
 
@@ -157,9 +152,13 @@ export async function POST(
     // 2. Knowledge Base Context (medical knowledge)
     console.log('🧠 [ANALYSIS-API] Searching knowledge base...')
     try {
+      // Load knowledge base configuration from database
+      const knowledgeConfig = await getKnowledgeConfig()
+      console.log(`⚙️ [ANALYSIS-API] Knowledge config: maxChunks=${knowledgeConfig.maxChunks}, threshold=${knowledgeConfig.similarityThreshold}`)
+
       knowledgeContext = await buildKnowledgeContext(analysisPrompt, {
-        maxChunks: 3,
-        maxCharsPerChunk: 1200,
+        maxChunks: knowledgeConfig.maxChunks,
+        maxCharsPerChunk: knowledgeConfig.maxCharsPerChunk,
         agentId: agentId, // Use agent's knowledge configuration
       })
 
@@ -212,8 +211,56 @@ export async function POST(
           profileParts.push(`**Dieta Atual:** ${fetchedProfile.currentDiet}`)
         }
 
+        // Biomarcadores Funcionais
+        if (fetchedProfile.handgripStrength) {
+          profileParts.push(`**Força de Preensão Manual:** ${fetchedProfile.handgripStrength} kg (biomarcador de integridade neuromuscular e preditor de mortalidade)`)
+        }
+
+        if (fetchedProfile.sitToStandTime) {
+          const sarcopeniaRisk = fetchedProfile.sitToStandTime > 15 ? ' ⚠️ ALTO RISCO DE SARCOPENIA' : ''
+          profileParts.push(`**Teste Sentar-Levantar 5x:** ${fetchedProfile.sitToStandTime} segundos (potência de membros inferiores)${sarcopeniaRisk}`)
+        }
+
         medicalProfileContext = profileParts.join('\n')
         console.log('✅ [ANALYSIS-API] Medical profile included')
+      }
+    }
+
+    // 4. Previous Analyses Context (insights from other agents)
+    if (previousAnalysisIds && previousAnalysisIds.length > 0) {
+      console.log(`📋 [ANALYSIS-API] Loading ${previousAnalysisIds.length} previous analyses...`)
+
+      try {
+        const { inArray } = await import('drizzle-orm')
+
+        const previousAnalyses = await db
+          .select({
+            id: analyses.id,
+            agentName: healthAgents.name,
+            analysis: analyses.analysis,
+            createdAt: analyses.createdAt,
+          })
+          .from(analyses)
+          .leftJoin(healthAgents, eq(analyses.agentId, healthAgents.id))
+          .where(inArray(analyses.id, previousAnalysisIds))
+
+        if (previousAnalyses.length > 0) {
+          const analysesParts: string[] = []
+
+          for (const prevAnalysis of previousAnalyses) {
+            analysesParts.push(`
+## Análise Prévia: ${prevAnalysis.agentName || 'Agente Desconhecido'}
+**Data:** ${new Date(prevAnalysis.createdAt).toLocaleDateString('pt-BR')}
+
+${prevAnalysis.analysis}
+`)
+          }
+
+          previousAnalysesContext = analysesParts.join('\n---\n')
+          console.log(`✅ [ANALYSIS-API] Included ${previousAnalyses.length} previous analyses (${previousAnalysesContext.length} chars)`)
+        }
+      } catch (error) {
+        console.error('⚠️ [ANALYSIS-API] Error loading previous analyses:', error)
       }
     }
 
@@ -226,7 +273,7 @@ export async function POST(
 
     // Generate analysis
     console.log('🤖 [ANALYSIS-API] Generating analysis...')
-    console.log(`📊 [ANALYSIS-API] Context sizes: documents=${documentsContext.length}, profile=${medicalProfileContext.length}, knowledge=${knowledgeContext.length}`)
+    console.log(`📊 [ANALYSIS-API] Context sizes: documents=${documentsContext.length}, profile=${medicalProfileContext.length}, knowledge=${knowledgeContext.length}, previousAnalyses=${previousAnalysesContext.length}`)
 
     const result = await analyzeWithAgent(
       agent,
@@ -235,6 +282,7 @@ export async function POST(
         documentsContext,
         medicalProfileContext,
         knowledgeContext,
+        previousAnalysesContext,
         structuredDocuments, // NOVO: Passa documentos estruturados para o Cérebro Lógico
         documentIds: userDocuments.map(d => d.id), // NOVO: Passa IDs dos documentos
       }
@@ -256,7 +304,7 @@ export async function POST(
         analysis: result.analysis,
         modelUsed: result.metadata?.model || agent.modelName,
         tokensUsed: result.usage?.totalTokens || null,
-        processingTimeMs: result.metadata?.durationMs || null,
+        processingTimeMs: result.metadata?.processingTimeMs || null,
         ragUsed: documentIds.length > 0,
       }).returning()
 
@@ -265,63 +313,6 @@ export async function POST(
     } catch (saveError) {
       // Don't fail the request if save fails, just log
       console.error('⚠️ [ANALYSIS-API] Failed to save to history:', saveError)
-    }
-
-    // Generate recommendations automatically (non-blocking)
-    if (savedAnalysis) {
-      generateRecommendationsFromAnalysis(savedAnalysis.id, session.user.id)
-        .then((rec) => {
-          console.log(`✅ [ANALYSIS-API] Recommendations generated: ${rec.id}`)
-        })
-        .catch((error) => {
-          console.error('⚠️ [ANALYSIS-API] Failed to generate recommendations:', error)
-        })
-
-      // Generate weekly plan automatically (non-blocking)
-      generateWeeklyPlanFromAnalysis(savedAnalysis.id, savedAnalysis.analysis, session.user.id)
-        .then((plan) => {
-          console.log(`✅ [ANALYSIS-API] Weekly plan generated: ${plan.id}`)
-        })
-        .catch((error) => {
-          console.error('⚠️ [ANALYSIS-API] Failed to generate weekly plan:', error)
-        })
-    }
-
-    // Helper function to generate weekly plan
-    async function generateWeeklyPlanFromAnalysis(analysisId: string, analysisText: string, userId: string) {
-      console.log(`📅 [WEEKLY-PLAN] Generating plan for analysis: ${analysisId}`)
-
-      // Generate all plans in parallel
-      const [supplementation, shopping, meals, workout] = await Promise.all([
-        generateSupplementationStrategy(analysisText),
-        generateShoppingList(analysisText),
-        generateMealPlan(analysisText),
-        generateWorkoutPlan(analysisText),
-      ])
-
-      // Calculate week start date (next Monday)
-      const today = new Date()
-      const dayOfWeek = today.getDay()
-      const daysUntilMonday = dayOfWeek === 0 ? 1 : 8 - dayOfWeek
-      const weekStartDate = new Date(today)
-      weekStartDate.setDate(today.getDate() + daysUntilMonday)
-      const weekStartDateString = weekStartDate.toISOString().split('T')[0]
-
-      // Save to database
-      const [savedPlan] = await db
-        .insert(weeklyPlans)
-        .values({
-          userId,
-          analysisId,
-          weekStartDate: weekStartDateString,
-          supplementationStrategy: supplementation as any,
-          shoppingList: shopping as any,
-          mealPlan: meals as any,
-          workoutPlan: workout as any,
-        })
-        .returning()
-
-      return savedPlan
     }
 
     return NextResponse.json({

@@ -19,6 +19,7 @@ interface AnalysisRequest {
   agentId: string
   documentIds?: string[]
   includeProfile?: boolean
+  previousAnalysisIds?: string[]
 }
 
 interface Document {
@@ -26,6 +27,15 @@ interface Document {
   fileName: string
   documentType: string
   createdAt: string
+}
+
+interface PreviousAnalysis {
+  id: string
+  agentId: string
+  agentName: string
+  agentColor: string
+  createdAt: string
+  documentIds: string[] | null
 }
 
 interface AnalysisResult {
@@ -75,6 +85,9 @@ export function AnalysisInterface({
   const [result, setResult] = useState<AnalysisResult | null>(null)
   const [isLoadingDocuments, setIsLoadingDocuments] = useState(true)
   const [selectedAnalysisForChat, setSelectedAnalysisForChat] = useState<SelectedAnalysis | null>(null)
+  const [previousAnalyses, setPreviousAnalyses] = useState<PreviousAnalysis[]>([])
+  const [selectedPreviousAnalysisIds, setSelectedPreviousAnalysisIds] = useState<string[]>([])
+  const [isLoadingAnalyses, setIsLoadingAnalyses] = useState(true)
 
   // Load user documents
   useEffect(() => {
@@ -95,6 +108,41 @@ export function AnalysisInterface({
     loadDocuments()
   }, [])
 
+  // Load previous analyses (from other agents)
+  useEffect(() => {
+    const loadPreviousAnalyses = async () => {
+      if (!selectedAgentId) {
+        setIsLoadingAnalyses(false)
+        return
+      }
+
+      try {
+        const response = await fetch('/api/analyses/history')
+        if (response.ok) {
+          const data = await response.json()
+          // Filter out analyses from the current agent
+          const otherAgentAnalyses = (data.analyses || [])
+            .filter((a: any) => a.agentId !== selectedAgentId)
+            .map((a: any) => ({
+              id: a.id,
+              agentId: a.agentId,
+              agentName: a.agentName,
+              agentColor: a.agentColor || '#666',
+              createdAt: a.createdAt,
+              documentIds: a.documentIds,
+            }))
+          setPreviousAnalyses(otherAgentAnalyses)
+        }
+      } catch (error) {
+        console.error('Error loading previous analyses:', error)
+      } finally {
+        setIsLoadingAnalyses(false)
+      }
+    }
+
+    loadPreviousAnalyses()
+  }, [selectedAgentId])
+
   const handleAnalyze = async () => {
     if (!selectedAgentId) return
 
@@ -110,6 +158,7 @@ export function AnalysisInterface({
         body: JSON.stringify({
           documentIds: selectedDocumentIds,
           includeProfile,
+          previousAnalysisIds: selectedPreviousAnalysisIds,
         } as AnalysisRequest),
       })
 
@@ -132,6 +181,12 @@ export function AnalysisInterface({
   const toggleDocument = (docId: string) => {
     setSelectedDocumentIds((prev) =>
       prev.includes(docId) ? prev.filter((id) => id !== docId) : [...prev, docId]
+    )
+  }
+
+  const togglePreviousAnalysis = (analysisId: string) => {
+    setSelectedPreviousAnalysisIds((prev) =>
+      prev.includes(analysisId) ? prev.filter((id) => id !== analysisId) : [...prev, analysisId]
     )
   }
 
@@ -199,6 +254,64 @@ export function AnalysisInterface({
               {selectedDocumentIds.length} documento(s) selecionado(s)
             </p>
           </div>
+
+          {/* Previous Analyses Selector (Optional) */}
+          {previousAnalyses.length > 0 && (
+            <div className="space-y-2">
+              <Label>Incluir análises anteriores (opcional)</Label>
+              <p className="text-xs text-muted-foreground">
+                Selecione análises de outros agentes para enriquecer o contexto
+              </p>
+              {isLoadingAnalyses ? (
+                <div className="flex items-center justify-center py-4 text-muted-foreground">
+                  <Loader2 className="h-5 w-5 animate-spin mr-2" />
+                  <span className="text-sm">Carregando análises...</span>
+                </div>
+              ) : (
+                <div className="space-y-2 max-h-48 overflow-y-auto border rounded-md p-3">
+                  {previousAnalyses.map((analysis) => (
+                    <div
+                      key={analysis.id}
+                      className="flex items-start space-x-2 p-2 hover:bg-muted/50 rounded-md cursor-pointer"
+                      onClick={() => togglePreviousAnalysis(analysis.id)}
+                    >
+                      <Checkbox
+                        id={`analysis-${analysis.id}`}
+                        checked={selectedPreviousAnalysisIds.includes(analysis.id)}
+                        onCheckedChange={() => togglePreviousAnalysis(analysis.id)}
+                      />
+                      <Label
+                        htmlFor={`analysis-${analysis.id}`}
+                        className="text-sm font-normal cursor-pointer flex-1"
+                      >
+                        <div className="flex items-center gap-2">
+                          <div
+                            className="h-2 w-2 rounded-full flex-shrink-0"
+                            style={{ backgroundColor: analysis.agentColor }}
+                          />
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium truncate">{analysis.agentName}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {new Date(analysis.createdAt).toLocaleDateString('pt-BR', {
+                                day: '2-digit',
+                                month: 'short',
+                                year: 'numeric',
+                              })}
+                            </p>
+                          </div>
+                        </div>
+                      </Label>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {selectedPreviousAnalysisIds.length > 0 && (
+                <p className="text-xs text-muted-foreground">
+                  {selectedPreviousAnalysisIds.length} análise(s) selecionada(s)
+                </p>
+              )}
+            </div>
+          )}
 
           {/* Options */}
           <div className="space-y-3 border-t pt-4">

@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Separator } from '@/components/ui/separator'
+import { toast } from 'sonner'
 import {
   Loader2,
   ArrowLeft,
@@ -22,6 +23,7 @@ import {
   AlertCircle,
   Calendar,
   Stethoscope,
+  RefreshCw,
 } from 'lucide-react'
 
 interface RecommendationHistory {
@@ -43,6 +45,7 @@ export default function RecommendationsHistoryPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [selectedRec, setSelectedRec] = useState<RecommendationHistory | null>(null)
+  const [isGenerating, setIsGenerating] = useState(false)
 
   useEffect(() => {
     loadHistory()
@@ -70,6 +73,45 @@ export default function RecommendationsHistoryPage() {
       setError(err instanceof Error ? err.message : 'Erro desconhecido')
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  const handleGenerateFromLatestAnalysis = async () => {
+    try {
+      setIsGenerating(true)
+
+      // Get latest analysis
+      const analysisResponse = await fetch('/api/analyses/history')
+      if (!analysisResponse.ok) {
+        throw new Error('Nenhuma análise encontrada')
+      }
+
+      const analysisData = await analysisResponse.json()
+      if (!analysisData.analyses || analysisData.analyses.length === 0) {
+        throw new Error('Nenhuma análise encontrada. Faça uma análise primeiro.')
+      }
+
+      const latestAnalysis = analysisData.analyses[0]
+
+      // Generate recommendations
+      const response = await fetch('/api/recommendations/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ analysisId: latestAnalysis.id }),
+      })
+
+      if (!response.ok) {
+        const data = await response.json()
+        throw new Error(data.error || 'Erro ao gerar recomendações')
+      }
+
+      toast.success('Recomendações geradas com sucesso!')
+      await loadHistory() // Reload history
+    } catch (error) {
+      console.error('Error generating recommendations:', error)
+      toast.error(error instanceof Error ? error.message : 'Erro ao gerar recomendações')
+    } finally {
+      setIsGenerating(false)
     }
   }
 
@@ -179,11 +221,26 @@ export default function RecommendationsHistoryPage() {
             <Lightbulb className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
             <h3 className="text-lg font-semibold mb-2">Nenhuma recomendação encontrada</h3>
             <p className="text-muted-foreground mb-6">
-              Realize uma análise médica para receber recomendações personalizadas
+              Gere recomendações a partir da sua última análise ou realize uma nova análise médica
             </p>
-            <Link href="/analyze">
-              <Button>Iniciar Análise</Button>
-            </Link>
+            <div className="flex gap-3 justify-center">
+              <Button onClick={handleGenerateFromLatestAnalysis} disabled={isGenerating}>
+                {isGenerating ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Gerando...
+                  </>
+                ) : (
+                  <>
+                    <RefreshCw className="h-4 w-4 mr-2" />
+                    Gerar da Última Análise
+                  </>
+                )}
+              </Button>
+              <Link href="/analyze">
+                <Button variant="outline">Fazer Nova Análise</Button>
+              </Link>
+            </div>
           </CardContent>
         </Card>
       </div>

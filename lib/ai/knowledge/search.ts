@@ -114,11 +114,12 @@ export async function searchKnowledgeBase(
     relevanceScore: row.relevance_score,
   })) as KnowledgeSearchResult[]
 
-  console.log(`✅ [KNOWLEDGE] Found ${searchResults.length} relevant articles`)
+  // Count unique articles
+  const uniqueArticleIds = [...new Set(searchResults.map(r => r.articleId))]
+  console.log(`✅ [KNOWLEDGE] Found ${searchResults.length} relevant chunks from ${uniqueArticleIds.length} articles`)
 
   // Update usage count for found articles
   if (searchResults.length > 0) {
-    const articleIds = [...new Set(searchResults.map(r => r.articleId))]
 
     // Use IN instead of ANY for simpler syntax
     await db.execute(sql`
@@ -205,7 +206,9 @@ ${content}
 
   const context = contextParts.join('\n---\n')
 
-  console.log(`✅ [KNOWLEDGE] Built context with ${results.length} articles (${context.length} chars)`)
+  // Count unique articles in results
+  const uniqueArticles = [...new Set(results.map(r => r.articleId))]
+  console.log(`✅ [KNOWLEDGE] Built context with ${results.length} chunks from ${uniqueArticles.length} articles (${context.length} chars)`)
 
   return context
 }

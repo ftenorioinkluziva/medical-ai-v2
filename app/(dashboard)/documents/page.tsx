@@ -12,7 +12,6 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { DocumentUpload } from '@/components/documents/document-upload'
-import { DocumentDetails } from '@/components/documents/document-details'
 import {
   Loader2,
   FileText,
@@ -41,17 +40,12 @@ interface Document {
   createdAt: string
 }
 
-interface SelectedDocument extends Document {
-  // For DocumentDetails component
-}
-
 export default function DocumentsPage() {
   const [documents, setDocuments] = useState<Document[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [refreshTrigger, setRefreshTrigger] = useState(0)
-  const [selectedDocument, setSelectedDocument] = useState<Document | null>(null)
 
   useEffect(() => {
     loadDocuments()
@@ -272,15 +266,16 @@ export default function DocumentsPage() {
                               <Badge variant="outline">{doc.documentType || 'Documento'}</Badge>
                             </div>
                           </div>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="gap-2"
-                            onClick={() => setSelectedDocument(doc)}
-                          >
-                            <Eye className="h-4 w-4" />
-                            Visualizar
-                          </Button>
+                          <Link href={`/documents/${doc.id}`}>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="gap-2"
+                            >
+                              <Eye className="h-4 w-4" />
+                              Visualizar
+                            </Button>
+                          </Link>
                         </div>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4 text-sm">
                           <div>
@@ -328,14 +323,6 @@ export default function DocumentsPage() {
             </p>
           </CardContent>
         </Card>
-      )}
-
-      {/* Document Details Modal */}
-      {selectedDocument && (
-        <DocumentDetails
-          document={selectedDocument}
-          onClose={() => setSelectedDocument(null)}
-        />
       )}
     </div>
   )
