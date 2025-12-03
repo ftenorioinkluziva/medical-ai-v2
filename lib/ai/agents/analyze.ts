@@ -102,6 +102,16 @@ export async function analyzeWithAgent(
 
   const userPrompt = parts.join('\n')
 
+  // ✅ Enable thinking mode for complex agents (better reasoning)
+  const useThinkingMode =
+    agent.agentKey === 'integrativa' ||
+    agent.agentKey === 'endocrinologia' ||
+    agent.agentKey === 'cardiologia'
+
+  if (useThinkingMode) {
+    console.log(`🧠 [AGENT] Enabling thinking mode for complex analysis`)
+  }
+
   // Generate analysis using AI SDK with system_prompt from agent
   const result = await generateMedicalAnalysis(
     agent.systemPrompt,
@@ -113,6 +123,8 @@ export async function analyzeWithAgent(
       maxTokens: agent.modelConfig.maxOutputTokens,
       topP: agent.modelConfig.topP,
       topK: agent.modelConfig.topK,
+      enableCaching: true,  // ✅ Always enable caching for agents
+      useThinkingMode,  // ✅ Enable for complex agents
     }
   )
 

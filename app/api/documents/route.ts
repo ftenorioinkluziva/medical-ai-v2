@@ -43,6 +43,7 @@ export async function GET(request: NextRequest) {
         fileSize: documents.fileSize,
         mimeType: documents.fileType, // fileType column stores the MIME type
         documentType: documents.documentType,
+        documentDate: documents.documentDate, // ✅ Include document date (real exam date)
         processingStatus: documents.processingStatus,
         extractedText: documents.extractedText,
         structuredData: documents.structuredData, // Include structured data
@@ -50,7 +51,7 @@ export async function GET(request: NextRequest) {
       })
       .from(documents)
       .where(eq(documents.userId, userId))
-      .orderBy(desc(documents.createdAt))
+      .orderBy(desc(documents.documentDate), desc(documents.createdAt)) // ✅ Order by exam date first, then upload date
       .limit(limit)
 
     const userDocuments = await query

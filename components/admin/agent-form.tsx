@@ -32,6 +32,24 @@ export function AgentForm({ agent, onSuccess, onCancel }: AgentFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [categories, setCategories] = useState<Array<{ category: string; label: string; count: number }>>([])
   const [isLoadingCategories, setIsLoadingCategories] = useState(false)
+  // Model limits configuration (from official Gemini API docs)
+  const modelLimits: Record<string, { maxOutputTokens: number; contextWindow: string; description: string }> = {
+    // Gemini 3 Series
+    'gemini-3-pro-preview': { maxOutputTokens: 65536, contextWindow: '1M', description: 'Melhor modelo disponível' },
+
+    // Gemini 2.5 Series
+    'gemini-2.5-flash': { maxOutputTokens: 65536, contextWindow: '1M', description: 'Rápido e econômico' },
+    'gemini-2.5-flash-lite': { maxOutputTokens: 65536, contextWindow: '1M', description: 'Mais rápido que Flash' },
+    'gemini-2.5-pro': { maxOutputTokens: 65536, contextWindow: '1M', description: 'Mais capaz que Flash' },
+
+    // Gemini 2.0 Series
+    'gemini-2.0-flash': { maxOutputTokens: 8192, contextWindow: '1M', description: 'Alternativa estável' },
+
+    // Gemini 1.5 Series
+    'gemini-1.5-flash': { maxOutputTokens: 8192, contextWindow: '1M', description: 'Geração anterior' },
+    'gemini-1.5-pro': { maxOutputTokens: 8192, contextWindow: '2M', description: 'Context estendido' },
+  }
+
   const [formData, setFormData] = useState({
     agentKey: '',
     name: '',
@@ -43,7 +61,11 @@ export function AgentForm({ agent, onSuccess, onCancel }: AgentFormProps) {
     analysisPrompt: '',
     modelName: 'gemini-2.5-flash',
     temperature: 0.7,
-    maxOutputTokens: 8000,
+    maxOutputTokens: 8192,
+    topP: undefined as number | undefined,
+    topK: undefined as number | undefined,
+    presencePenalty: 0,
+    frequencyPenalty: 0,
     isActive: true,
     requiresApproval: false,
     tags: '',
@@ -86,7 +108,11 @@ export function AgentForm({ agent, onSuccess, onCancel }: AgentFormProps) {
         analysisPrompt: agent.analysisPrompt || '',
         modelName: agent.modelName || 'gemini-2.5-flash',
         temperature: agent.modelConfig?.temperature || 0.7,
-        maxOutputTokens: agent.modelConfig?.maxOutputTokens || 8000,
+        maxOutputTokens: agent.modelConfig?.maxOutputTokens || 8192,
+        topP: agent.modelConfig?.topP,
+        topK: agent.modelConfig?.topK,
+        presencePenalty: agent.modelConfig?.presencePenalty || 0,
+        frequencyPenalty: agent.modelConfig?.frequencyPenalty || 0,
         isActive: agent.isActive !== undefined ? agent.isActive : true,
         requiresApproval: agent.requiresApproval || false,
         tags: agent.tags ? agent.tags.join(', ') : '',
@@ -138,6 +164,10 @@ export function AgentForm({ agent, onSuccess, onCancel }: AgentFormProps) {
         modelConfig: {
           temperature: parseFloat(formData.temperature.toString()),
           maxOutputTokens: parseInt(formData.maxOutputTokens.toString()),
+          ...(formData.topP !== undefined && { topP: parseFloat(formData.topP.toString()) }),
+          ...(formData.topK !== undefined && { topK: parseInt(formData.topK.toString()) }),
+          ...(formData.presencePenalty !== 0 && { presencePenalty: parseFloat(formData.presencePenalty.toString()) }),
+          ...(formData.frequencyPenalty !== 0 && { frequencyPenalty: parseFloat(formData.frequencyPenalty.toString()) }),
         },
         isActive: formData.isActive,
         requiresApproval: formData.requiresApproval,
@@ -321,25 +351,48 @@ export function AgentForm({ agent, onSuccess, onCancel }: AgentFormProps) {
         <h3 className="font-semibold text-lg">Configuração do Modelo</h3>
 
         <div className="space-y-2">
-          <Label htmlFor="modelName">Modelo</Label>
+          <Label htmlFor="modelName">Modelo *</Label>
           <Select
             value={formData.modelName}
             onValueChange={(value) => handleChange('modelName', value)}
           >
             <SelectTrigger>
-              <SelectValue />
+              <SelectValue placeholder="Selecione um modelo" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="gemini-2.5-flash">Gemini 2.5 Flash</SelectItem>
-              <SelectItem value="gemini-2.0-flash-exp">Gemini 2.0 Flash Exp</SelectItem>
-              <SelectItem value="gemini-pro">Gemini Pro</SelectItem>
+              <SelectItem value="gemini-3-pro-preview">
+                🆕 Gemini 3 Pro Preview - 1M context, 65K output
+              </SelectItem>
+              <SelectItem value="gemini-2.5-flash">
+                ⭐ Gemini 2.5 Flash - 1M context, 65K output (recomendado)
+              </SelectItem>
+              <SelectItem value="gemini-2.5-flash-lite">
+                ⚡ Gemini 2.5 Flash Lite - 1M context, 65K output (mais rápido)
+              </SelectItem>
+              <SelectItem value="gemini-2.5-pro">
+                💎 Gemini 2.5 Pro - 1M context, 65K output (mais capaz)
+              </SelectItem>
+              <SelectItem value="gemini-2.0-flash">
+                Gemini 2.0 Flash - 1M context, 8K output
+              </SelectItem>
+              <SelectItem value="gemini-1.5-flash">
+                Gemini 1.5 Flash - 1M context, 8K output
+              </SelectItem>
+              <SelectItem value="gemini-1.5-pro">
+                Gemini 1.5 Pro - 2M context, 8K output
+              </SelectItem>
             </SelectContent>
           </Select>
+          <p className="text-xs text-muted-foreground">
+            🆕 Gemini 3: Mais recente | ⭐ 2.5 Flash: Melhor custo-benefício | 💎 2.5 Pro: Mais capaz
+          </p>
         </div>
 
         <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
-            <Label htmlFor="temperature">Temperature</Label>
+            <Label htmlFor="temperature">
+              Temperature (Criatividade)
+            </Label>
             <Input
               id="temperature"
               type="number"
@@ -349,20 +402,187 @@ export function AgentForm({ agent, onSuccess, onCancel }: AgentFormProps) {
               value={formData.temperature}
               onChange={(e) => handleChange('temperature', parseFloat(e.target.value))}
             />
-            <p className="text-xs text-muted-foreground">0 = preciso, 2 = criativo</p>
+            <div className="text-xs space-y-1">
+              <p className="font-medium text-muted-foreground">
+                Controla a aleatoriedade e criatividade das respostas:
+              </p>
+              <ul className="list-disc list-inside text-muted-foreground space-y-0.5">
+                <li><strong>0.0-0.3:</strong> Muito preciso, factual, consistente</li>
+                <li><strong>0.4-0.7:</strong> Balanceado (recomendado para análises)</li>
+                <li><strong>0.8-1.2:</strong> Mais criativo, variado</li>
+                <li><strong>1.3-2.0:</strong> Muito criativo, menos previsível</li>
+              </ul>
+              <p className="text-amber-600 mt-1">
+                💡 Para análises médicas: use 0.5-0.7 (preciso mas não robótico)
+              </p>
+            </div>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="maxOutputTokens">Max Output Tokens</Label>
+            <Label htmlFor="maxOutputTokens">
+              Max Output Tokens (Tamanho da Resposta)
+            </Label>
             <Input
               id="maxOutputTokens"
               type="number"
-              step="100"
-              min="1000"
-              max="32000"
+              step="1024"
+              min="1024"
+              max={modelLimits[formData.modelName]?.maxOutputTokens || 8192}
               value={formData.maxOutputTokens}
               onChange={(e) => handleChange('maxOutputTokens', parseInt(e.target.value))}
             />
+            <div className="text-xs space-y-1">
+              <p className="font-medium text-muted-foreground">
+                Limite máximo de tokens (palavras) na resposta:
+              </p>
+              <p className="text-muted-foreground">
+                Máximo para {formData.modelName}: <strong>{(modelLimits[formData.modelName]?.maxOutputTokens || 8192).toLocaleString()} tokens</strong>
+                {formData.modelName.includes('2.5') || formData.modelName.includes('3') ? ' (~49K palavras)' : ' (~6K palavras)'}
+              </p>
+              <ul className="list-disc list-inside text-muted-foreground space-y-0.5">
+                <li><strong>2048-4096:</strong> Análise resumida</li>
+                <li><strong>4096-8192:</strong> Análise detalhada (recomendado)</li>
+                <li><strong>8192+:</strong> Análise muito extensa</li>
+              </ul>
+              <p className="text-amber-600 mt-1">
+                💡 Use 8192 para análises completas com recomendações detalhadas
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Advanced Parameters */}
+        <div className="space-y-4 pt-4 border-t">
+          <div className="space-y-2">
+            <h4 className="font-medium text-sm">Parâmetros Avançados (Opcional)</h4>
+            <p className="text-xs text-muted-foreground">
+              Configure parâmetros avançados de amostragem e controle de repetição.
+              Deixe em branco para usar valores padrão do modelo.
+            </p>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="topP">
+                Top P - Nucleus Sampling (Diversidade)
+              </Label>
+              <Input
+                id="topP"
+                type="number"
+                step="0.05"
+                min="0"
+                max="1"
+                value={formData.topP || ''}
+                onChange={(e) => handleChange('topP', e.target.value ? parseFloat(e.target.value) : undefined)}
+                placeholder="Padrão: automático"
+              />
+              <div className="text-xs space-y-1">
+                <p className="font-medium text-muted-foreground">
+                  Controla a diversidade considerando probabilidade acumulada:
+                </p>
+                <ul className="list-disc list-inside text-muted-foreground space-y-0.5">
+                  <li><strong>0.1-0.5:</strong> Respostas muito focadas e previsíveis</li>
+                  <li><strong>0.6-0.9:</strong> Balanceado (comum para uso geral)</li>
+                  <li><strong>0.9-1.0:</strong> Mais diversidade e criatividade</li>
+                </ul>
+                <p className="text-blue-600 mt-1">
+                  💡 Deixe vazio para usar padrão. Não combine com Temperature alta.
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="topK">
+                Top K (Limitador de Opções)
+              </Label>
+              <Input
+                id="topK"
+                type="number"
+                step="1"
+                min="1"
+                max="40"
+                value={formData.topK || ''}
+                onChange={(e) => handleChange('topK', e.target.value ? parseInt(e.target.value) : undefined)}
+                placeholder="Padrão: automático"
+              />
+              <div className="text-xs space-y-1">
+                <p className="font-medium text-muted-foreground">
+                  Limita quantas palavras candidatas o modelo considera:
+                </p>
+                <ul className="list-disc list-inside text-muted-foreground space-y-0.5">
+                  <li><strong>1-10:</strong> Muito restrito, mais previsível</li>
+                  <li><strong>20-40:</strong> Balanceado (permite variação)</li>
+                  <li><strong>Vazio:</strong> Sem limite (recomendado)</li>
+                </ul>
+                <p className="text-blue-600 mt-1">
+                  💡 Raramente necessário ajustar. Use apenas para respostas muito focadas.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="presencePenalty">
+                Presence Penalty (Anti-Repetição de Conceitos)
+              </Label>
+              <Input
+                id="presencePenalty"
+                type="number"
+                step="0.1"
+                min="-2"
+                max="2"
+                value={formData.presencePenalty}
+                onChange={(e) => handleChange('presencePenalty', parseFloat(e.target.value) || 0)}
+              />
+              <div className="text-xs space-y-1">
+                <p className="font-medium text-muted-foreground">
+                  Penaliza palavras/conceitos que já apareceram no texto:
+                </p>
+                <ul className="list-disc list-inside text-muted-foreground space-y-0.5">
+                  <li><strong>0.0:</strong> Sem penalização (padrão)</li>
+                  <li><strong>0.1-0.5:</strong> Leve redução de repetições</li>
+                  <li><strong>0.6-1.5:</strong> Incentiva variedade de termos</li>
+                  <li><strong>1.6-2.0:</strong> Forte diversificação (pode perder contexto)</li>
+                  <li><strong>Negativo:</strong> Incentiva repetição (raramente útil)</li>
+                </ul>
+                <p className="text-amber-600 mt-1">
+                  💡 Use 0.3-0.6 se análises repetem muito os mesmos termos médicos
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="frequencyPenalty">
+                Frequency Penalty (Anti-Repetição de Palavras)
+              </Label>
+              <Input
+                id="frequencyPenalty"
+                type="number"
+                step="0.1"
+                min="-2"
+                max="2"
+                value={formData.frequencyPenalty}
+                onChange={(e) => handleChange('frequencyPenalty', parseFloat(e.target.value) || 0)}
+              />
+              <div className="text-xs space-y-1">
+                <p className="font-medium text-muted-foreground">
+                  Penaliza palavras baseado em QUANTAS vezes aparecem:
+                </p>
+                <ul className="list-disc list-inside text-muted-foreground space-y-0.5">
+                  <li><strong>0.0:</strong> Sem penalização (padrão)</li>
+                  <li><strong>0.1-0.5:</strong> Reduz repetições excessivas</li>
+                  <li><strong>0.6-1.5:</strong> Força vocabulário mais variado</li>
+                  <li><strong>1.6-2.0:</strong> Máxima variação (pode prejudicar clareza)</li>
+                </ul>
+                <p className="text-amber-600 mt-1">
+                  💡 Use 0.2-0.4 se recomendações ficam muito repetitivas
+                </p>
+                <p className="text-blue-600 mt-1">
+                  ℹ️ Diferença do Presence: este conta FREQUÊNCIA, Presence apenas SE apareceu
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </div>

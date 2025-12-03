@@ -52,8 +52,9 @@ export const knowledgeEmbeddings = pgTable('knowledge_embeddings', {
   chunkIndex: integer('chunk_index').notNull(),
   content: text('content').notNull(),
 
-  // Vector embedding (1536 for OpenAI, 768 for Google)
-  embedding: vector('embedding', { dimensions: 1536 }).notNull(),
+  // Vector embedding (768 for Google text-embedding-004)
+  // Changed from 1536 (OpenAI) to 768 (Google) for cost savings
+  embedding: vector('embedding', { dimensions: 768 }).notNull(),
 
   // Metadata
   embeddingModel: varchar('embedding_model', { length: 100 }).notNull(),

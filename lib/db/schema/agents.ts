@@ -19,12 +19,21 @@ export const healthAgents = pgTable('health_agents', {
   analysisPrompt: text('analysis_prompt').notNull(),
 
   // Model Config
-  modelName: varchar('model_name', { length: 100 }).notNull(), // e.g., gemini-2.5-flash, gpt-4o
+  modelName: varchar('model_name', { length: 100 }).notNull(), // e.g., gemini-2.5-flash, gemini-3-pro-preview
   modelConfig: json('model_config').notNull().$type<{
+    // Core parameters
     temperature: number
     topP?: number
     topK?: number
     maxOutputTokens: number
+
+    // Repetition control (NEW - Gemini API)
+    presencePenalty?: number    // -2.0 to 2.0, penalizes tokens that have appeared
+    frequencyPenalty?: number   // -2.0 to 2.0, penalizes tokens based on frequency
+
+    // Advanced control (NEW - Gemini API)
+    stopSequences?: string[]    // Up to 5 sequences that stop generation
+    seed?: number              // For reproducibility in testing
   }>(),
 
   // Access Control

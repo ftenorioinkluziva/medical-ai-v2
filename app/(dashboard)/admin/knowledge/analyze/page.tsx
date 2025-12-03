@@ -364,33 +364,63 @@ export default function KnowledgeAnalyzePage() {
         <CardContent className="space-y-4">
           <div className="flex items-end gap-4">
             <div className="flex-1">
-              <Label htmlFor="chunks">Número de Chunks (maxChunks)</Label>
+              <Label htmlFor="chunks">
+                Número de Chunks (maxChunks)
+              </Label>
               <Input
                 id="chunks"
                 type="number"
                 min="1"
                 max="500"
+                step="1"
                 value={simulatedChunks}
-                onChange={(e) => setSimulatedChunks(parseInt(e.target.value) || 0)}
+                onChange={(e) => {
+                  const value = e.target.value
+                  if (value === '') {
+                    setSimulatedChunks(1)
+                  } else {
+                    const parsed = parseInt(value)
+                    if (!isNaN(parsed) && parsed >= 1 && parsed <= 500) {
+                      setSimulatedChunks(parsed)
+                    }
+                  }
+                }}
+                onBlur={(e) => {
+                  // Ensure valid value on blur
+                  const value = parseInt(e.target.value)
+                  if (isNaN(value) || value < 1) {
+                    setSimulatedChunks(data.recommendations.balanced)
+                  }
+                }}
                 className="mt-1"
+                placeholder="Digite um valor entre 1 e 500"
               />
+              <p className="text-xs text-muted-foreground mt-1">
+                Digite qualquer valor ou use os presets abaixo
+              </p>
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-2 flex-wrap">
               <Button
                 variant="outline"
+                size="sm"
                 onClick={() => setSimulatedChunks(data.recommendations.conservative)}
+                className="whitespace-nowrap"
               >
                 Conservador
               </Button>
               <Button
                 variant="outline"
+                size="sm"
                 onClick={() => setSimulatedChunks(data.recommendations.balanced)}
+                className="whitespace-nowrap"
               >
                 Balanceado
               </Button>
               <Button
                 variant="outline"
+                size="sm"
                 onClick={() => setSimulatedChunks(data.recommendations.comprehensive)}
+                className="whitespace-nowrap"
               >
                 Comprehensivo
               </Button>

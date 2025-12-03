@@ -34,7 +34,11 @@ export async function POST(request: NextRequest) {
     const file = formData.get('file') as File | null
     const title = formData.get('title') as string
     const category = formData.get('category') as string
+    const subcategory = formData.get('subcategory') as string | null
     const source = formData.get('source') as string | null
+    const sourceUrl = formData.get('sourceUrl') as string | null
+    const author = formData.get('author') as string | null
+    const publishedDateStr = formData.get('publishedDate') as string | null
     const summary = formData.get('summary') as string | null
     const tags = formData.get('tags') as string | null
 
@@ -123,9 +127,13 @@ export async function POST(request: NextRequest) {
       ? tags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0)
       : undefined
 
+    // Parse published date
+    const publishedDate = publishedDateStr ? new Date(publishedDateStr) : undefined
+
     console.log('🧠 [KNOWLEDGE-UPLOAD] Adding article to knowledge base...')
     console.log(`📊 [KNOWLEDGE-UPLOAD] Title: ${title}`)
     console.log(`📊 [KNOWLEDGE-UPLOAD] Category: ${category}`)
+    console.log(`📊 [KNOWLEDGE-UPLOAD] Subcategory: ${subcategory || 'none'}`)
     console.log(`📊 [KNOWLEDGE-UPLOAD] Content length: ${extractedText.length} chars`)
     console.log(`📊 [KNOWLEDGE-UPLOAD] Tags: ${parsedTags?.join(', ') || 'none'}`)
 
@@ -134,8 +142,12 @@ export async function POST(request: NextRequest) {
       {
         title,
         category,
+        subcategory: subcategory || undefined,
         content: extractedText,
         source: source || undefined,
+        sourceUrl: sourceUrl || undefined,
+        author: author || undefined,
+        publishedDate,
         summary: summary || undefined,
         tags: parsedTags,
         isVerified: 'verified', // Admin uploads are auto-verified

@@ -37,7 +37,7 @@ export async function searchKnowledgeBase(
     threshold = 0.7,
     categories,
     articleIds,
-    provider = 'openai',
+    provider = 'google',  // ✅ Fixed: Changed from 'openai' to 'google'
   } = options
 
   console.log(`🔍 [KNOWLEDGE] Searching for: "${query.substring(0, 50)}..."`)
@@ -119,14 +119,17 @@ export async function searchKnowledgeBase(
   console.log(`✅ [KNOWLEDGE] Found ${searchResults.length} relevant chunks from ${uniqueArticleIds.length} articles`)
 
   // Update usage count for found articles
-  if (searchResults.length > 0) {
-
-    // Use IN instead of ANY for simpler syntax
-    await db.execute(sql`
-      UPDATE knowledge_articles
-      SET usage_count = usage_count + 1
-      WHERE id IN ${articleIds}
-    `)
+  if (uniqueArticleIds.length > 0) {
+    try {
+      // ✅ Fixed: Use Drizzle's update() with inArray() instead of raw SQL
+      await db
+        .update(knowledgeArticles)
+        .set({ usageCount: sql`usage_count + 1` })
+        .where(inArray(knowledgeArticles.id, uniqueArticleIds))
+    } catch (error) {
+      console.warn('⚠️ [KNOWLEDGE] Failed to update usage count:', error)
+      // Don't fail the whole search if usage count update fails
+    }
   }
 
   return searchResults

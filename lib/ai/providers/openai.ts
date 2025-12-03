@@ -1,35 +1,69 @@
 import { createOpenAI } from '@ai-sdk/openai'
 
-if (!process.env.OPENAI_API_KEY) {
-  throw new Error('OPENAI_API_KEY environment variable is not set')
+/**
+ * OpenAI Provider (Optional - Legacy Support)
+ * Only initialized if OPENAI_API_KEY is present
+ */
+
+// Lazy initialization - only fails when actually used
+function getOpenAIInstance() {
+  if (!process.env.OPENAI_API_KEY) {
+    throw new Error(
+      'OPENAI_API_KEY environment variable is not set. ' +
+      'OpenAI provider is optional and only needed for legacy support. ' +
+      'The system now uses Google AI by default.'
+    )
+  }
+  return createOpenAI({
+    apiKey: process.env.OPENAI_API_KEY,
+  })
 }
 
-// Initialize OpenAI provider
-export const openai = createOpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+// Export a proxy that initializes on first access
+let _openaiInstance: ReturnType<typeof createOpenAI> | null = null
+
+export const openai = new Proxy({} as ReturnType<typeof createOpenAI>, {
+  get(target, prop) {
+    if (!_openaiInstance) {
+      _openaiInstance = getOpenAIInstance()
+    }
+    return (_openaiInstance as any)[prop]
+  }
 })
 
-// Common model configurations
+// Common model configurations (lazy getters)
 export const openaiModels = {
   // GPT-4o - Flagship model for complex tasks
-  gpt4o: openai('gpt-4o'),
+  get gpt4o() {
+    return openai('gpt-4o')
+  },
 
   // GPT-4o mini - Cost-effective alternative
-  gpt4oMini: openai('gpt-4o-mini'),
+  get gpt4oMini() {
+    return openai('gpt-4o-mini')
+  },
 
   // GPT-4 Turbo with Vision - For image analysis
-  gpt4Vision: openai('gpt-4-turbo'),
+  get gpt4Vision() {
+    return openai('gpt-4-turbo')
+  },
 
   // Embeddings models
   embeddings: {
     // text-embedding-3-small - Cost-effective, 1536 dimensions
-    small: openai.textEmbeddingModel('text-embedding-3-small'),
+    get small() {
+      return openai.textEmbeddingModel('text-embedding-3-small')
+    },
 
     // text-embedding-3-large - Higher quality, 3072 dimensions (can be reduced)
-    large: openai.textEmbeddingModel('text-embedding-3-large'),
+    get large() {
+      return openai.textEmbeddingModel('text-embedding-3-large')
+    },
 
     // ada-002 - Legacy, still good, 1536 dimensions
-    ada: openai.textEmbeddingModel('text-embedding-ada-002'),
+    get ada() {
+      return openai.textEmbeddingModel('text-embedding-ada-002')
+    },
   },
 }
 

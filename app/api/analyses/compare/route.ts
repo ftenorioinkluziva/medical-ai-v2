@@ -6,7 +6,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth/config'
 import { db } from '@/lib/db/client'
-import { analyses, healthAgents } from '@/lib/db/schema'
+import { analyses, healthAgents, documents } from '@/lib/db/schema'
 import { eq, desc, inArray } from 'drizzle-orm'
 import { generateText } from 'ai'
 import { google } from '@ai-sdk/google'
@@ -41,6 +41,7 @@ export async function POST(request: NextRequest) {
         id: analyses.id,
         analysis: analyses.analysis,
         prompt: analyses.prompt,
+        documentIds: analyses.documentIds, // ✅ Get document IDs
         createdAt: analyses.createdAt,
         agentName: healthAgents.name,
         agentTitle: healthAgents.title,
@@ -60,15 +61,57 @@ export async function POST(request: NextRequest) {
 
     console.log(`📊 [COMPARE-ANALYSES] Found ${selectedAnalyses.length} analyses`)
 
+    // ✅ Fetch document dates for each analysis
+    const analysisWithDates = await Promise.all(
+      selectedAnalyses.map(async (analysis) => {
+        let documentDate: Date | null = null
+        let documentNames: string[] = []
+
+        if (analysis.documentIds && Array.isArray(analysis.documentIds) && analysis.documentIds.length > 0) {
+          const docs = await db
+            .select({
+              documentDate: documents.documentDate,
+              fileName: documents.fileName,
+              createdAt: documents.createdAt,
+            })
+            .from(documents)
+            .where(inArray(documents.id, analysis.documentIds))
+            .orderBy(desc(documents.documentDate), desc(documents.createdAt))
+            .limit(1) // Get the most recent document
+
+          if (docs.length > 0) {
+            documentDate = docs[0].documentDate || docs[0].createdAt
+            documentNames = docs.map(d => d.fileName)
+          }
+        }
+
+        return {
+          ...analysis,
+          documentDate,
+          documentNames,
+          displayDate: documentDate || analysis.createdAt,
+        }
+      })
+    )
+
+    // Sort by document date (real exam date) instead of analysis creation date
+    const sortedAnalyses = analysisWithDates.sort((a, b) =>
+      new Date(a.displayDate).getTime() - new Date(b.displayDate).getTime()
+    )
+
     // Build context from all analyses
     let context = '# Análises Médicas para Comparação\n\n'
-    context += `Total de análises: ${selectedAnalyses.length}\n`
-    context += `Período: ${new Date(selectedAnalyses[0].createdAt).toLocaleDateString('pt-BR')} até ${new Date(selectedAnalyses[selectedAnalyses.length - 1].createdAt).toLocaleDateString('pt-BR')}\n\n`
+    context += `Total de análises: ${sortedAnalyses.length}\n`
+    context += `Período: ${new Date(sortedAnalyses[0].displayDate).toLocaleDateString('pt-BR')} até ${new Date(sortedAnalyses[sortedAnalyses.length - 1].displayDate).toLocaleDateString('pt-BR')}\n\n`
 
-    selectedAnalyses.forEach((analysis, index) => {
-      context += `## Análise ${index + 1} - ${new Date(analysis.createdAt).toLocaleDateString('pt-BR')}\n`
-      context += `**Especialista:** ${analysis.agentTitle}\n\n`
-      context += `**Análise Completa:**\n${analysis.analysis}\n\n`
+    sortedAnalyses.forEach((analysis, index) => {
+      const displayDate = new Date(analysis.displayDate).toLocaleDateString('pt-BR')
+      context += `## Análise ${index + 1} - ${displayDate}${analysis.documentDate ? ' (Data do Exame)' : ' (Data da Análise)'}\n`
+      context += `**Especialista:** ${analysis.agentTitle}\n`
+      if (analysis.documentNames.length > 0) {
+        context += `**Documentos:** ${analysis.documentNames.join(', ')}\n`
+      }
+      context += `\n**Análise Completa:**\n${analysis.analysis}\n\n`
       context += '---\n\n'
     })
 

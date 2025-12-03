@@ -85,13 +85,14 @@ export async function POST(
           id: documents.id,
           fileName: documents.fileName,
           documentType: documents.documentType,
+          documentDate: documents.documentDate, // ✅ Include document date
           extractedText: documents.extractedText,
           structuredData: documents.structuredData,
           createdAt: documents.createdAt,
         })
         .from(documents)
         .where(inArray(documents.id, documentIds))
-        .orderBy(desc(documents.createdAt))
+        .orderBy(desc(documents.documentDate), desc(documents.createdAt)) // ✅ Order by exam date first
 
       if (userDocuments.length > 0) {
         const documentParts: string[] = []
@@ -103,7 +104,11 @@ export async function POST(
             // Build structured context
             let docContext = `\n## Documento: ${doc.fileName}\n`
             docContext += `**Tipo:** ${structuredData.documentType}\n`
-            docContext += `**Data:** ${new Date(doc.createdAt).toLocaleDateString('pt-BR')}\n\n`
+            // ✅ Use documentDate (real exam date) instead of createdAt (upload date)
+            const displayDate = doc.documentDate
+              ? new Date(doc.documentDate).toLocaleDateString('pt-BR')
+              : new Date(doc.createdAt).toLocaleDateString('pt-BR')
+            docContext += `**Data do Exame:** ${displayDate}\n\n`
 
             // Patient info
             if (structuredData.patientInfo && Object.keys(structuredData.patientInfo).length > 0) {

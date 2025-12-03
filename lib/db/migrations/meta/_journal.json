@@ -57,6 +57,13 @@
       "when": 1764248087971,
       "tag": "0007_neat_thena",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1764664180590,
+      "tag": "0008_numerous_zuras",
+      "breakpoints": true
     }
   ]
 }
