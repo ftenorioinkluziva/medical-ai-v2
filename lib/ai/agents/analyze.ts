@@ -3,10 +3,11 @@
  * Handles medical analysis using configured agents
  */
 
-import { generateMedicalAnalysis } from '../core/generate'
+import { generateStructuredMedicalAnalysis } from '../core/generate'
 import type { HealthAgent } from '@/lib/db/schema'
 import type { StructuredMedicalDocument } from '@/lib/documents/structuring'
 import { runLogicalAnalysis, formatLogicalAnalysisForPrompt } from '@/lib/logic'
+import { buildParametersContext, validateMentionedParameters, extractAvailableParameters } from '../synthesis/parameter-extractor'
 
 export interface AnalyzeWithAgentOptions {
   documentsContext?: string
@@ -16,6 +17,8 @@ export interface AnalyzeWithAgentOptions {
   ragContext?: string
   structuredDocuments?: StructuredMedicalDocument[]
   documentIds?: string[]
+  instruction?: string
+  enableValidation?: boolean
 }
 
 /**
@@ -34,15 +37,31 @@ export async function analyzeWithAgent(
     ragContext = '',
     structuredDocuments = [],
     documentIds = [],
+    instruction = '',
+    enableValidation = true,
   } = options
 
   console.log(`🤖 [AGENT] Starting analysis with: ${agent.name}`)
   console.log(`📊 [AGENT] Model: ${agent.modelName}, Temp: ${agent.modelConfig.temperature}`)
+  console.log(`🔍 [AGENT] Validation enabled: ${enableValidation}`)
 
   if (previousAnalysesContext) {
     // Count number of previous analyses included
     const analysisCount = (previousAnalysesContext.match(/## Análise Prévia:/g) || []).length
     console.log(`📋 [AGENT] Including ${analysisCount} previous analysis/analyses from other specialists`)
+  }
+
+  // Extract available parameters for validation
+  let parametersContext = ''
+  let availableParameters: string[] = []
+
+  if (structuredDocuments.length > 0 && enableValidation) {
+    parametersContext = buildParametersContext(structuredDocuments)
+    const extracted = extractAvailableParameters(structuredDocuments)
+    availableParameters = extracted.allParameters
+
+    console.log(`✅ [AGENT] Extracted ${availableParameters.length} available parameters for validation`)
+    console.log(`   First 10:`, availableParameters.slice(0, 10).join(', '), '...')
   }
 
   // ========== CÉREBRO LÓGICO (LOGICAL BRAIN) ==========
@@ -74,13 +93,26 @@ export async function analyzeWithAgent(
   // ========== BUILD COMPREHENSIVE PROMPT ==========
   const parts = [agent.analysisPrompt]
 
-  // Logical analysis comes FIRST (most reliable data)
+  // Add instruction if provided (used for specialized agents)
+  if (instruction) {
+    parts.push('\n\n' + instruction)
+  }
+
+  // Parameters list comes FIRST (validation layer)
+  if (parametersContext) {
+    parts.push('\n\n' + parametersContext)
+  }
+
+  // Logical analysis comes SECOND (most reliable data)
   if (logicalContext) {
     parts.push('\n\n' + logicalContext)
   }
 
   if (knowledgeContext) {
     parts.push('\n\n## Base de Conhecimento Médico (Referências)')
+    parts.push('⚠️ ATENÇÃO: Este é conhecimento médico GERAL para CONTEXTO e INTERPRETAÇÃO.')
+    parts.push('NÃO use este conhecimento para INVENTAR ou INFERIR valores de parâmetros que não foram testados.')
+    parts.push('Se um parâmetro mencionado aqui NÃO está na lista "PARÂMETROS DISPONÍVEIS", diga "não testado".\n')
     parts.push(knowledgeContext)
   }
 
@@ -112,8 +144,8 @@ export async function analyzeWithAgent(
     console.log(`🧠 [AGENT] Enabling thinking mode for complex analysis`)
   }
 
-  // Generate analysis using AI SDK with system_prompt from agent
-  const result = await generateMedicalAnalysis(
+  // Generate structured analysis using AI SDK with system_prompt from agent
+  const result = await generateStructuredMedicalAnalysis(
     agent.systemPrompt,
     userPrompt,
     ragContext,
@@ -123,15 +155,41 @@ export async function analyzeWithAgent(
       maxTokens: agent.modelConfig.maxOutputTokens,
       topP: agent.modelConfig.topP,
       topK: agent.modelConfig.topK,
-      enableCaching: true,  // ✅ Always enable caching for agents
+      enableCaching: false,  // ❌ CACHE DESABILITADO - estava causando alucinações persistentes
       useThinkingMode,  // ✅ Enable for complex agents
     }
   )
 
   console.log(`✅ [AGENT] Analysis completed for: ${agent.name}`)
+  console.log(`   💡 Insights: ${result.insights.length}`)
+  console.log(`   🎯 Action Items: ${result.actionItems.length}`)
+
+  // Optional validation (informational only, does not block)
+  if (enableValidation && availableParameters.length > 0) {
+    console.log(`🔍 [AGENT] Checking analysis for parameter mentions...`)
+
+    const analysisText = result.analysis
+    const validation = validateMentionedParameters(analysisText, availableParameters)
+
+    if (!validation.valid) {
+      // ℹ️ Just log as informational - don't block the analysis
+      console.log(`ℹ️  [AGENT] Detected mentions of parameters not in available list:`)
+      console.log(`   Mentioned:`, validation.hallucinatedParameters)
+      console.log(`   Note: These may be contextual (e.g., "not available" or "suggested for next evaluation")`)
+      validation.warnings.forEach(w => console.log(`   `, w))
+    } else {
+      console.log(`✅ [AGENT] All parameter mentions are from available parameters`)
+    }
+  }
 
   return {
-    ...result,
+    analysis: result.analysis,
+    insights: result.insights,
+    actionItems: result.actionItems,
+    model: result.model,
+    usage: result.usage,
+    finishReason: result.finishReason,
+    metadata: result.metadata,
     agent: {
       id: agent.id,
       agentKey: agent.agentKey,

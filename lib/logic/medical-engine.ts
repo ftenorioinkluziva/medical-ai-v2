@@ -155,11 +155,8 @@ export function formatLogicalAnalysisForPrompt(analysis: LogicalAnalysis): strin
 
     for (const metric of analysis.metrics) {
       if (metric.value === null) {
-        sections.push(`⚪ **${metric.name}**: Não calculável`)
-        if (metric.error) {
-          sections.push(`   - ${metric.error}`)
-        }
-        sections.push('')
+        // ❌ SKIP metrics that couldn't be calculated to avoid AI hallucination
+        // The AI was seeing "Biomarcador necessário não fornecido: t3_livre" and mentioning it
         continue
       }
 
