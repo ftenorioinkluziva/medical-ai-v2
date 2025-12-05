@@ -11,7 +11,7 @@ import { eq } from 'drizzle-orm'
 const DEFAULT_SETTINGS = {
   'knowledge.maxChunks': 184,
   'knowledge.maxCharsPerChunk': 1200,
-  'knowledge.similarityThreshold': 0.5,
+  'knowledge.similarityThreshold': 0.1,
 }
 
 /**

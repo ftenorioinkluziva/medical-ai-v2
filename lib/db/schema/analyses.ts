@@ -19,6 +19,8 @@ export const analyses = pgTable('analyses', {
 
   // Output
   analysis: text('analysis').notNull(),
+  insights: json('insights').$type<string[]>(), // Structured key insights
+  actionItems: json('action_items').$type<string[]>(), // Actionable recommendations
 
   // Metadata
   modelUsed: varchar('model_used', { length: 100 }),

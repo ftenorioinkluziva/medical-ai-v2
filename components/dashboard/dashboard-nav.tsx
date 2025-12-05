@@ -35,6 +35,7 @@ export function DashboardNav({ userName, userRole }: DashboardNavProps) {
     : [
         { href: '/dashboard', label: 'Dashboard' },
         { href: '/analyze', label: 'Análise' },
+        { href: '/analyze-complete', label: 'Análise Completa' },
         { href: '/recommendations', label: 'Recomendações' },
         { href: '/weekly-plan', label: 'Plano Semanal' },
         { href: '/compare', label: 'Comparar' },

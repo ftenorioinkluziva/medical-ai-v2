@@ -75,6 +75,13 @@ export function WeeklyPlanWidget({ patientId }: WeeklyPlanWidgetProps = {}) {
         : '/api/weekly-plan'
 
       const response = await fetch(endpoint)
+
+      // Diferenciar 404 (nenhum plano) de erro real (500)
+      if (response.status === 404) {
+        setError('Nenhum plano semanal disponível. Faça sua primeira análise!')
+        return
+      }
+
       if (!response.ok) {
         const data = await response.json()
         throw new Error(data.error || 'Erro ao carregar plano')

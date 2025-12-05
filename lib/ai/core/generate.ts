@@ -3,8 +3,9 @@
  * Using Vercel AI SDK
  */
 
-import { generateText } from 'ai'
+import { generateText, generateObject } from 'ai'
 import { getGoogleModel, googleSafetySettings } from '../providers/google'
+import { structuredAnalysisSchema, type StructuredAnalysis } from '../schemas/analysis-schema'
 
 export interface GenerateOptions {
   model?: string
@@ -165,6 +166,152 @@ export async function generateMedicalAnalysis(
 
   return {
     analysis: result.text,
+    model,
+    usage: result.usage,
+    finishReason: result.finishReason,
+    metadata: {
+      temperature,
+      maxTokens: optimalMaxTokens,
+      processingTimeMs: endTime - startTime,
+      ragUsed: !!ragContext,
+      inputLength: totalInputLength,
+      autoCalculatedTokens: !maxTokens,
+      cachingEnabled: enableCaching,
+      thinkingModeEnabled: useThinkingMode,
+    },
+  }
+}
+
+/**
+ * Generate structured medical analysis with insights and action items
+ * Uses structured output to ensure consistent formatting
+ */
+export async function generateStructuredMedicalAnalysis(
+  systemPrompt: string,
+  userPrompt: string,
+  ragContext?: string,
+  options: GenerateOptions = {}
+) {
+  const {
+    model = 'gemini-2.5-flash',
+    temperature = 0.3,
+    maxTokens,
+    topP = 0.9,
+    topK = 40,
+    enableCaching = true,
+    useThinkingMode = false,
+  } = options
+
+  // Calculate optimal maxTokens dynamically
+  const optimalMaxTokens = calculateOptimalMaxTokens(
+    systemPrompt,
+    userPrompt,
+    ragContext,
+    maxTokens
+  )
+
+  // Build messages with context caching support
+  const messages: any[] = []
+
+  // System prompt with caching
+  messages.push({
+    role: 'system',
+    content: systemPrompt,
+    ...(enableCaching && {
+      experimental_providerMetadata: {
+        google: {
+          cacheControl: { type: 'ephemeral' }
+        }
+      }
+    })
+  })
+
+  // Build user message parts
+  const userParts: string[] = []
+
+  // RAG context (cacheable)
+  if (ragContext) {
+    userParts.push('## Contexto Especializado (Base de Conhecimento)')
+    userParts.push(ragContext)
+    userParts.push('\n')
+  }
+
+  // Actual data to analyze
+  userParts.push('## Dados para Análise')
+  userParts.push(userPrompt)
+
+  userParts.push('\n## IMPORTANTE')
+  userParts.push('Esta análise é gerada por IA para fins educacionais e NÃO substitui consulta médica profissional.')
+  userParts.push('Sempre consulte um profissional de saúde qualificado para interpretação médica definitiva.')
+
+  // Instructions for structured output
+  userParts.push('\n## FORMATO DE RESPOSTA')
+  userParts.push('Você deve retornar sua análise no seguinte formato estruturado:')
+  userParts.push('')
+  userParts.push('1. **analysis**: Análise médica completa em MARKDOWN bem formatado')
+  userParts.push('   - Use ## para títulos de seções principais')
+  userParts.push('   - Use ### para subtítulos quando apropriado')
+  userParts.push('   - Use **negrito** para destacar valores, achados importantes e termos clínicos')
+  userParts.push('   - Use bullet points (-) para listas')
+  userParts.push('   - Deixe linha em branco entre parágrafos')
+  userParts.push('   - Organize conforme as seções do seu analysisPrompt')
+  userParts.push('')
+  userParts.push('2. **insights**: Lista de 3-7 principais insights ESPECÍFICOS DA SUA ESPECIALIDADE')
+  userParts.push('   - Cada insight deve ser único e clinicamente relevante')
+  userParts.push('   - NÃO repita informações que outros especialistas já mencionaram')
+  userParts.push('   - Foque no que APENAS você, como especialista nesta área, pode identificar')
+  userParts.push('')
+  userParts.push('3. **actionItems**: Lista de 3-7 recomendações práticas ESPECÍFICAS DA SUA ÁREA')
+  userParts.push('   - Devem ser acionáveis e implementáveis')
+  userParts.push('   - DIFERENTES das recomendações de outros especialistas')
+  userParts.push('   - Focadas na sua especialidade')
+
+  messages.push({
+    role: 'user',
+    content: userParts.join('\n')
+  })
+
+  const totalInputLength = systemPrompt.length + userParts.join('\n').length
+
+  console.log(`🤖 [AI-STRUCTURED] Generating structured analysis with ${model}...`)
+  console.log(`📊 [AI-STRUCTURED] Config: temp=${temperature}, maxTokens=${optimalMaxTokens}`)
+  console.log(`📏 [AI-STRUCTURED] Input length: ${totalInputLength} chars`)
+  if (enableCaching) {
+    console.log(`⚡ [AI-STRUCTURED] Context caching: ENABLED`)
+  }
+  if (useThinkingMode) {
+    console.log(`🧠 [AI-STRUCTURED] Thinking mode: ENABLED`)
+  }
+
+  const startTime = Date.now()
+
+  const result = await generateObject({
+    model: getGoogleModel(model),
+    messages,
+    schema: structuredAnalysisSchema,
+    temperature,
+    maxTokens: optimalMaxTokens,
+    topP,
+    topK,
+    ...(useThinkingMode && {
+      experimental_providerMetadata: {
+        google: {
+          useThinking: true
+        }
+      }
+    })
+  })
+
+  const endTime = Date.now()
+
+  console.log(`✅ [AI-STRUCTURED] Analysis completed in ${endTime - startTime}ms`)
+  console.log(`📝 [AI-STRUCTURED] Analysis length: ${result.object.analysis.length} chars`)
+  console.log(`💡 [AI-STRUCTURED] Insights: ${result.object.insights.length}`)
+  console.log(`🎯 [AI-STRUCTURED] Action items: ${result.object.actionItems.length}`)
+  console.log(`📊 [AI-STRUCTURED] Tokens used: ${result.usage.totalTokens} (output: ${result.usage.completionTokens})`)
+
+  return {
+    ...result.object,
     model,
     usage: result.usage,
     finishReason: result.finishReason,

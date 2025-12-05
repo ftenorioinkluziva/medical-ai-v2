@@ -10,6 +10,7 @@ import { generateObject } from 'ai'
 import { google } from '@ai-sdk/google'
 import { z } from 'zod'
 import { buildKnowledgeContext } from '@/lib/ai/knowledge'
+import { getKnowledgeConfig } from '@/lib/db/settings'
 
 const recommendationsSchema = z.object({
   examRecommendations: z.array(z.object({
@@ -59,9 +60,13 @@ export async function generateRecommendationsFromAnalysis(
   console.log('🧠 [RECOMMENDATIONS] Searching knowledge base...')
   let knowledgeContext = ''
   try {
+    // Load knowledge base configuration from database
+    const knowledgeConfig = await getKnowledgeConfig()
+    console.log(`⚙️ [RECOMMENDATIONS] Knowledge config: maxChunks=${knowledgeConfig.maxChunks}, threshold=${knowledgeConfig.similarityThreshold}`)
+
     knowledgeContext = await buildKnowledgeContext(analysis.analysis, {
-      maxChunks: 5,
-      maxCharsPerChunk: 1500,
+      maxChunks: knowledgeConfig.maxChunks,
+      maxCharsPerChunk: knowledgeConfig.maxCharsPerChunk,
     })
 
     if (knowledgeContext) {
