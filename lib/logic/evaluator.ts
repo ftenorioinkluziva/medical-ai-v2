@@ -213,9 +213,12 @@ export async function evaluateBiomarkers(
       // Sort by length (longest first) to avoid partial replacements
       const sortedSlugs = [...new Set(slugMatches)].sort((a, b) => b.length - a.length)
 
+      // Track if all required biomarkers are available
+      let allBiomarkersAvailable = true
+
       for (const slug of sortedSlugs) {
-        // Skip logical operators
-        if (['or', 'and'].includes(slug)) continue
+        // Skip logical operators and common JS keywords
+        if (['or', 'and', 'true', 'false', 'null', 'undefined'].includes(slug)) continue
 
         const value = biomarkerMap.get(slug)
         if (value !== undefined) {
@@ -225,7 +228,20 @@ export async function evaluateBiomarkers(
             new RegExp(`(?<![a-z0-9_])${slug.replace(/_/g, '_')}(?![a-z0-9_])`, 'g'),
             value.toString()
           )
+        } else {
+          // Biomarker not available - replace with null to prevent ReferenceError
+          // This will make most conditions evaluate to false (which is correct behavior)
+          condition = condition.replace(
+            new RegExp(`(?<![a-z0-9_])${slug.replace(/_/g, '_')}(?![a-z0-9_])`, 'g'),
+            'null'
+          )
+          allBiomarkersAvailable = false
         }
+      }
+
+      // If not all biomarkers are available, skip this protocol
+      if (!allBiomarkersAvailable) {
+        return false
       }
 
       // Clean up the condition for evaluation
