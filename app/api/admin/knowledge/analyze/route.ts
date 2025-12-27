@@ -5,10 +5,22 @@
 
 import { NextResponse } from 'next/server'
 import { db } from '@/lib/db/client'
-import { sql } from 'drizzle-orm'
+import { appSettings } from '@/lib/db/schema'
+import { sql, eq } from 'drizzle-orm'
 
 export async function GET() {
   try {
+    // Get current maxChunks setting from database
+    const [currentSetting] = await db
+      .select()
+      .from(appSettings)
+      .where(eq(appSettings.key, 'knowledge.maxChunks'))
+      .limit(1)
+
+    const currentMaxChunks = currentSetting
+      ? parseInt(currentSetting.value)
+      : 184 // Default value
+
     // Get total stats
     const totalStats = await db.execute(sql`
       SELECT
@@ -44,8 +56,8 @@ export async function GET() {
       conservative: Math.ceil(avgChunksPerArticle * 2),
       balanced: Math.ceil(avgChunksPerArticle * 5),
       comprehensive: Math.ceil(avgChunksPerArticle * 10),
-      current: 20,
-      estimatedArticlesWithCurrent: Math.floor(20 / avgChunksPerArticle)
+      current: currentMaxChunks,
+      estimatedArticlesWithCurrent: Math.floor(currentMaxChunks / avgChunksPerArticle)
     }
 
     return NextResponse.json({
