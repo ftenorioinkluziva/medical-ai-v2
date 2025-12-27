@@ -96,7 +96,7 @@ export function DocumentViewModal({ document, isOpen, onClose }: DocumentViewMod
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] p-0">
+      <DialogContent className="max-w-5xl max-h-[90vh] p-0 overflow-hidden">
         <DialogHeader className="px-6 pt-6 pb-4">
           <div className="flex items-center gap-3">
             <FileText className="h-6 w-6 text-teal-600" />
@@ -115,9 +115,9 @@ export function DocumentViewModal({ document, isOpen, onClose }: DocumentViewMod
         <Separator />
 
         <ScrollArea className="h-[calc(90vh-180px)]">
-          <div className="px-6 py-4 space-y-6">
+          <div className="px-6 py-4 space-y-6 max-w-full">
             {/* Metadata Section */}
-            <div>
+            <div className="max-w-full">
               <h3 className="text-sm font-semibold text-gray-600 mb-3 flex items-center gap-2">
                 <Database className="h-4 w-4" />
                 INFORMAÇÕES DO DOCUMENTO
@@ -198,7 +198,7 @@ export function DocumentViewModal({ document, isOpen, onClose }: DocumentViewMod
             {document.structuredData && modulesCount > 0 && (
               <>
                 <Separator />
-                <div>
+                <div className="max-w-full">
                   <h3 className="text-sm font-semibold text-gray-600 mb-4 flex items-center gap-2">
                     <Database className="h-4 w-4" />
                     DADOS ESTRUTURADOS

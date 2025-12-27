@@ -14,6 +14,9 @@ export const documents = pgTable('documents', {
   fileSize: integer('file_size').notNull(), // bytes
   documentType: varchar('document_type', { length: 100 }).notNull(), // lab_report, bioimpedance, prescription, etc
 
+  // Document Date (real exam/document date, not upload date)
+  documentDate: timestamp('document_date'), // Data real do exame/documento extraída de structuredData
+
   // Extracted Data
   extractedText: text('extracted_text'),
   structuredData: json('structured_data'),

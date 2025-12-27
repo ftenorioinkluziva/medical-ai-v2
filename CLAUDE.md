@@ -120,18 +120,28 @@ The core architecture is built around specialized health agents that analyze med
 
 **Location:** `lib/ai/providers/`
 
-**Current Providers:**
-- Google AI (Gemini) - Primary provider for analysis (`lib/ai/providers/google.ts`)
-- OpenAI - Used for embeddings and Vision API (`lib/ai/providers/openai.ts`)
+**Primary Provider: Google AI (Gemini)**
+- All AI operations use Google AI by default (`lib/ai/providers/google.ts`)
+- Text generation: Gemini 2.5 Flash
+- Embeddings: `text-embedding-004` (50-60% cheaper than OpenAI)
+- Vision/OCR: Gemini 2.5 Flash multimodal
+- Document structuring: Gemini 2.5 Flash with native structured output
+
+**Legacy Provider: OpenAI (Optional)**
+- Available for backward compatibility (`lib/ai/providers/openai.ts`)
+- Requires `OPENAI_API_KEY` environment variable
+- Can be used by explicitly setting `provider: 'openai'` in function calls
+- Not required for system operation
 
 **Provider Selection:**
-- Analysis: Uses agent's `modelName` (typically Gemini)
-- Embeddings: Uses OpenAI `text-embedding-3-small`
-- Vision: Uses Google Vision API for OCR
+- Analysis: Uses agent's `modelName` (default: `gemini-2.5-flash`)
+- Embeddings: Google `text-embedding-004` (default)
+- Vision: Google Gemini 2.5 Flash multimodal
+- All providers can be overridden via options parameter
 
 **Vercel AI SDK:**
 - All AI calls use Vercel AI SDK (`ai` package)
-- Text generation: `generateText()` from `ai`
+- Text generation: `generateText()` / `generateObject()` from `ai`
 - Embeddings: `embed()` / `embedMany()` from `ai`
 
 ### RAG System
@@ -169,10 +179,14 @@ The core architecture is built around specialized health agents that analyze med
 **Required (.env.local):**
 ```bash
 DATABASE_URL="postgresql://..."
-GOOGLE_AI_API_KEY="..."      # For Gemini models
-OPENAI_API_KEY="..."         # For embeddings and Vision
-NEXTAUTH_SECRET="..."        # Generate with: openssl rand -base64 32
+GOOGLE_GENERATIVE_AI_API_KEY="..."  # For Gemini models (text generation, embeddings, vision)
+NEXTAUTH_SECRET="..."               # Generate with: openssl rand -base64 32
 NEXTAUTH_URL="http://localhost:3000"
+```
+
+**Optional (.env.local):**
+```bash
+OPENAI_API_KEY="..."         # Legacy support only - not required for system operation
 ```
 
 ## TypeScript Configuration

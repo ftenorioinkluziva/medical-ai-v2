@@ -32,7 +32,7 @@ export async function searchSimilarDocuments(
     userId,
     limit = 5,
     threshold = 0.7,
-    provider = 'openai',
+    provider = 'google',  // ✅ Changed from 'openai' to 'google'
   } = options
 
   console.log(`🔍 [VECTOR-SEARCH] Searching for: "${query.substring(0, 50)}..."`)
@@ -87,7 +87,7 @@ export async function searchWithinDocument(
   const {
     limit = 5,
     threshold = 0.7,
-    provider = 'openai',
+    provider = 'google',  // ✅ Changed from 'openai' to 'google'
   } = options
 
   console.log(`🔍 [VECTOR-SEARCH] Searching in document ${documentId}...`)

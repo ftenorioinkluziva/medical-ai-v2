@@ -36,6 +36,10 @@ export const medicalProfiles = pgTable('medical_profiles', {
   exerciseIntensity: varchar('exercise_intensity', { length: 50 }),
   physicalLimitations: text('physical_limitations'),
 
+  // Functional Tests (Biomarcadores Funcionais)
+  handgripStrength: real('handgrip_strength'), // kg - Força de Preensão Manual (dinamômetro)
+  sitToStandTime: real('sit_to_stand_time'), // seconds - Teste Sentar-Levantar 5x
+
   // Nutrition
   currentDiet: text('current_diet'),
   dailyWaterIntake: real('daily_water_intake'), // liters
@@ -55,6 +59,18 @@ export const medicalProfiles = pgTable('medical_profiles', {
   // Goals
   healthObjectives: text('health_objectives'),
   notes: text('notes'),
+
+  // Biomarkers Snapshot (from Logical Brain)
+  latestBiomarkers: json('latest_biomarkers').$type<{
+    [slug: string]: {
+      value: number
+      unit?: string
+      date: string
+      documentId: string
+      status: 'optimal' | 'suboptimal' | 'abnormal'
+    }
+  }>(),
+  biomarkersUpdatedAt: timestamp('biomarkers_updated_at'),
 
   // Timestamps
   createdAt: timestamp('created_at').notNull().defaultNow(),

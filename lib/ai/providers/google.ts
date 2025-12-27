@@ -11,10 +11,23 @@ export const google = createGoogleGenerativeAI({
 
 // Common model configurations
 export const googleModels = {
-  // Gemini 2.5 Flash - Fast, cost-effective (default for most agents)
-  flash: google('gemini-2.5-flash'),
+  // Gemini 3 Series (Latest generation)
+  'gemini-3-pro-preview': google('gemini-3-pro-preview'),
 
-  // Gemini 2.5 Pro - More capable, for complex analyses
+  // Gemini 2.5 Series (Current stable generation)
+  'gemini-2.5-flash': google('gemini-2.5-flash'),
+  'gemini-2.5-flash-lite': google('gemini-2.5-flash-lite'),
+  'gemini-2.5-pro': google('gemini-2.5-pro'),
+
+  // Gemini 2.0 Series (Second generation)
+  'gemini-2.0-flash': google('gemini-2.0-flash'),
+
+  // Gemini 1.5 Series (First generation)
+  'gemini-1.5-flash': google('gemini-1.5-flash'),
+  'gemini-1.5-pro': google('gemini-1.5-pro'),
+
+  // Aliases for convenience
+  flash: google('gemini-2.5-flash'),
   pro: google('gemini-2.5-pro'),
 
   // Embedding model
@@ -31,12 +44,11 @@ export const googleSafetySettings = [
 
 // Helper to get model by name
 export function getGoogleModel(modelName: string) {
-  switch (modelName) {
-    case 'gemini-2.5-flash':
-      return googleModels.flash
-    case 'gemini-2.5-pro':
-      return googleModels.pro
-    default:
-      return googleModels.flash // default to flash
+  // Direct lookup (supports all model names)
+  if (modelName in googleModels) {
+    return (googleModels as any)[modelName]
   }
+
+  // Default fallback
+  return googleModels['gemini-2.5-flash']
 }

@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Separator } from '@/components/ui/separator'
+import { toast } from 'sonner'
 import {
   Loader2,
   Calendar,
@@ -24,6 +25,7 @@ import {
   FileText,
   Clock,
   Target,
+  RefreshCw,
 } from 'lucide-react'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
@@ -45,6 +47,7 @@ export default function WeeklyPlanPage() {
   const [selectedPlan, setSelectedPlan] = useState<WeeklyPlan | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [isGenerating, setIsGenerating] = useState(false)
 
   useEffect(() => {
     loadPlans()
@@ -70,6 +73,45 @@ export default function WeeklyPlanPage() {
       setError(err instanceof Error ? err.message : 'Erro desconhecido')
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  const handleGenerateFromLatestAnalysis = async () => {
+    try {
+      setIsGenerating(true)
+
+      // Get latest analysis
+      const analysisResponse = await fetch('/api/analyses/history')
+      if (!analysisResponse.ok) {
+        throw new Error('Nenhuma análise encontrada')
+      }
+
+      const analysisData = await analysisResponse.json()
+      if (!analysisData.analyses || analysisData.analyses.length === 0) {
+        throw new Error('Nenhuma análise encontrada. Faça uma análise primeiro.')
+      }
+
+      const latestAnalysis = analysisData.analyses[0]
+
+      // Generate weekly plan
+      const response = await fetch('/api/weekly-plan/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ analysisId: latestAnalysis.id }),
+      })
+
+      if (!response.ok) {
+        const data = await response.json()
+        throw new Error(data.error || 'Erro ao gerar plano semanal')
+      }
+
+      toast.success('Plano semanal gerado com sucesso!')
+      await loadPlans() // Reload plans
+    } catch (error) {
+      console.error('Error generating weekly plan:', error)
+      toast.error(error instanceof Error ? error.message : 'Erro ao gerar plano semanal')
+    } finally {
+      setIsGenerating(false)
     }
   }
 
@@ -131,11 +173,30 @@ export default function WeeklyPlanPage() {
             </div>
             <h3 className="text-lg font-semibold text-gray-900 mb-2">Nenhum plano semanal disponível</h3>
             <p className="text-sm text-gray-600 mb-6">
-              Realize uma análise médica para gerar seu primeiro plano semanal personalizado
+              Gere um plano semanal a partir da sua última análise ou realize uma nova análise médica
             </p>
-            <Link href="/analyze">
-              <Button className="bg-teal-600 hover:bg-teal-700">Fazer Análise Médica</Button>
-            </Link>
+            <div className="flex gap-3 justify-center">
+              <Button
+                onClick={handleGenerateFromLatestAnalysis}
+                disabled={isGenerating}
+                className="bg-teal-600 hover:bg-teal-700"
+              >
+                {isGenerating ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Gerando...
+                  </>
+                ) : (
+                  <>
+                    <RefreshCw className="h-4 w-4 mr-2" />
+                    Gerar da Última Análise
+                  </>
+                )}
+              </Button>
+              <Link href="/analyze">
+                <Button variant="outline">Fazer Nova Análise</Button>
+              </Link>
+            </div>
           </CardContent>
         </Card>
       )}

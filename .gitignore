@@ -39,3 +39,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# temporary files and debug outputs
+debug-*.txt
+dev-server.log
+nul
+.playwright-mcp/
+test-analyze-complete.js

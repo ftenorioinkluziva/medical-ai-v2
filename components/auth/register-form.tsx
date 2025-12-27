@@ -109,6 +109,7 @@ export function RegisterForm() {
                 id="password"
                 type={showPassword ? 'text' : 'password'}
                 placeholder="••••••••"
+                autoComplete="new-password"
                 {...register('password')}
                 disabled={isLoading}
                 className="pr-10"
@@ -138,6 +139,7 @@ export function RegisterForm() {
                 id="confirmPassword"
                 type={showConfirmPassword ? 'text' : 'password'}
                 placeholder="••••••••"
+                autoComplete="new-password"
                 {...register('confirmPassword')}
                 disabled={isLoading}
                 className="pr-10"

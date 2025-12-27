@@ -34,6 +34,7 @@ export interface ProcessedDocument {
   processedBy: 'pdf' | 'vision' | 'hybrid'
   confidence?: number
   extractedData?: Record<string, any>
+  structuredData?: any // Structured medical document (from vision or structuring)
 }
 
 export interface DocumentChunk {

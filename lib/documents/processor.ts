@@ -104,16 +104,18 @@ export async function processDocument(
       throw new Error(`Tipo de arquivo não suportado: ${fileName}`)
     }
 
-    const { text } = processedDoc
+    const { text, structuredData: visionStructuredData } = processedDoc
 
     if (!text || text.length < 50) {
       throw new Error('Documento não contém texto suficiente para processamento')
     }
 
     // 3. Structure the medical data with LLM (optional)
-    let structuredData = null
-    if (structureData) {
-      console.log('🧠 [PROCESSOR] Structuring medical data with LLM...')
+    // ✅ OPTIMIZATION: Skip if vision already returned structured data
+    let structuredData = visionStructuredData || null
+
+    if (!structuredData && structureData) {
+      console.log('🧠 [PROCESSOR] Structuring medical data with LLM (fallback)...')
       try {
         const structured = await structureMedicalDocument(text, fileName)
         structuredData = structured
@@ -121,10 +123,24 @@ export async function processDocument(
       } catch (error) {
         console.warn('⚠️ [PROCESSOR] Structuring failed, continuing without structured data:', error)
       }
+    } else if (structuredData) {
+      console.log(`✅ [PROCESSOR] Using structured data from vision (${structuredData.modules?.length || 0} modules)`)
+      console.log('⚡ [PROCESSOR] Skipped second LLM call - optimization successful!')
     }
 
     // 4. Save to database
     console.log('💾 [PROCESSOR] Saving document to database...')
+
+    // ✅ Extract documentDate from structuredData.examDate
+    let documentDate: Date | null = null
+    if (structuredData?.examDate) {
+      try {
+        documentDate = new Date(structuredData.examDate)
+        console.log(`📅 [PROCESSOR] Document date extracted: ${structuredData.examDate}`)
+      } catch (error) {
+        console.warn('⚠️ [PROCESSOR] Invalid examDate format in structuredData:', structuredData.examDate)
+      }
+    }
 
     const [doc] = await db
       .insert(documents)
@@ -134,6 +150,7 @@ export async function processDocument(
         fileSize: metadata.fileSize,
         fileType: metadata.mimeType,
         documentType: structuredData?.documentType || documentType,
+        documentDate, // ✅ Store extracted document date
         extractedText: text,
         structuredData: structuredData, // Store structured JSON
         processingStatus: 'completed', // Immediately mark as completed

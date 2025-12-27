@@ -125,6 +125,8 @@ export default function AnalyzePage() {
             <AnalysisInterface
               selectedAgentId={selectedAgent.id}
               selectedAgentName={selectedAgent.name}
+              selectedAgentColor={selectedAgent.color}
+              selectedAgentKey={selectedAgent.agentKey}
               onAnalysisComplete={handleAnalysisComplete}
             />
           )}

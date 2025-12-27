@@ -96,6 +96,10 @@ export async function POST(request: NextRequest) {
       isActive,
       requiresApproval,
       tags,
+      knowledgeAccessType,
+      allowedCategories,
+      excludedArticleIds,
+      includedArticleIds,
     } = body
 
     // Validate required fields
@@ -125,9 +129,14 @@ export async function POST(request: NextRequest) {
           temperature: 0.7,
           maxOutputTokens: 8000,
         },
+        allowedRoles: ['patient', 'doctor', 'admin'], // Default: all roles
         isActive: isActive !== undefined ? isActive : true,
         requiresApproval: requiresApproval || false,
         tags: tags || [],
+        knowledgeAccessType: knowledgeAccessType || 'full',
+        allowedCategories: allowedCategories || [],
+        excludedArticleIds: excludedArticleIds || [],
+        includedArticleIds: includedArticleIds || [],
       })
       .returning()
 

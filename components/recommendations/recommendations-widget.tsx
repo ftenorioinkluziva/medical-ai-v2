@@ -96,8 +96,15 @@ export function RecommendationsWidget({ patientId }: RecommendationsWidgetProps 
       setGeneratedAt(data.generatedAt)
       setAnalysisDate(data.analysisDate)
     } catch (err) {
-      console.error('Error loading recommendations:', err)
-      setError(err instanceof Error ? err.message : 'Erro desconhecido')
+      const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido'
+
+      // Only log to console if it's an unexpected error (not the "no recommendations" case)
+      if (!errorMessage.includes('Nenhuma recomendação encontrada') &&
+          !errorMessage.includes('Realize uma análise médica primeiro')) {
+        console.error('Error loading recommendations:', err)
+      }
+
+      setError(errorMessage)
     } finally {
       setIsLoading(false)
     }
@@ -141,7 +148,11 @@ export function RecommendationsWidget({ patientId }: RecommendationsWidgetProps 
   }
 
   if (error || !recommendations) {
-    const isNoAnalysis = error && error.includes('Nenhuma análise encontrada')
+    const isNoAnalysis = error && (
+      error.includes('Nenhuma análise encontrada') ||
+      error.includes('Nenhuma recomendação encontrada') ||
+      error.includes('Realize uma análise médica primeiro')
+    )
 
     return (
       <Card className="hover:shadow-md transition-shadow">

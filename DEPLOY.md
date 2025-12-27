@@ -17,8 +17,8 @@ Este guia explica como fazer deploy do Medical AI v2 em um servidor Hetzner usan
 
 3. **Credenciais (mesmas do .env local)**
    - DATABASE_URL (Supabase ou outro PostgreSQL)
-   - GOOGLE_AI_API_KEY (Gemini)
-   - OPENAI_API_KEY
+   - GOOGLE_GENERATIVE_AI_API_KEY (Gemini) - **Obrigatório**
+   - OPENAI_API_KEY - **Opcional** (legacy support)
 
 ## Estrutura de Arquivos
 
@@ -110,7 +110,9 @@ NEXTAUTH_URL=https://seu-dominio.com
 
 # AI APIs (copie EXATAMENTE do seu .env.local - mesmas chaves)
 GOOGLE_GENERATIVE_AI_API_KEY=sua_google_generative_ai_api_key_aqui
-OPENAI_API_KEY=sua_openai_api_key_aqui
+
+# Optional: OpenAI (legacy support only - not required)
+# OPENAI_API_KEY=sua_openai_api_key_aqui
 
 # Application
 NODE_ENV=production

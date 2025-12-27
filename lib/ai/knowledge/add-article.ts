@@ -35,7 +35,7 @@ export async function addKnowledgeArticle(
 ): Promise<{ success: boolean; articleId?: string; error?: string }> {
   const {
     generateEmbeddings = true,
-    embeddingProvider = 'openai',
+    embeddingProvider = 'google',  // ✅ Changed from 'openai' to 'google'
   } = options
 
   console.log(`📚 [KNOWLEDGE] Adding article: ${input.title}`)

@@ -1,11 +1,13 @@
 /**
  * Vision AI Processing
- * Analyzes medical images using GPT-4o Vision
+ * Analyzes medical images using Gemini 2.5 Flash multimodal
+ * Optimized: extract text AND structure data in ONE call with native structured output
  */
 
-import { generateText } from 'ai'
-import { openaiModels } from '@/lib/ai/providers'
+import { generateObject } from 'ai'
+import { googleModels } from '@/lib/ai/providers'
 import type { ProcessedDocument, DocumentMetadata } from './types'
+import { StructuredMedicalDocumentSchema, type StructuredMedicalDocument } from './schemas'
 
 /**
  * Supported image formats
@@ -37,7 +39,8 @@ function getMimeType(filename: string): string {
 }
 
 /**
- * Analyze medical image using GPT-4o Vision
+ * Analyze medical image using Gemini 2.5 Flash multimodal
+ * Optimized: Extracts text AND structures data in a SINGLE call
  */
 export async function analyzeImageWithVision(
   fileBuffer: Buffer,
@@ -45,45 +48,35 @@ export async function analyzeImageWithVision(
 ): Promise<ProcessedDocument> {
   const startTime = Date.now()
 
-  console.log(`🖼️ [VISION-AI] Processing image: ${metadata.fileName}`)
+  console.log(`🖼️ [VISION-AI] Processing image with Gemini 2.5 Flash: ${metadata.fileName}`)
 
   try {
     // Convert buffer to base64
     const base64Image = fileBuffer.toString('base64')
     const mimeType = getMimeType(metadata.fileName)
 
-    // Create data URL
-    const imageUrl = `data:${mimeType};base64,${base64Image}`
-
     // System prompt for medical document analysis
     const systemPrompt = `Você é um especialista em análise de documentos médicos. Analise esta imagem médica e extraia TODOS os dados estruturados visíveis.
 
-IMPORTANTE: Seja extremamente detalhado e preciso. Inclua:
-
-1. **Informações do Paciente**: Nome completo, idade, sexo, data de nascimento, CPF, RG
-2. **Informações do Laboratório/Clínica**: Nome, endereço, médico solicitante
-3. **Data do Exame**: Data de coleta e/ou resultado
-4. **Todos os Parâmetros Médicos**: Nome do exame, valor medido, unidade de medida, valores de referência
-5. **Observações e Comentários**: Qualquer nota ou comentário médico
-6. **Interpretação**: Status (normal, alterado, alto, baixo)
-
-Retorne um texto estruturado e detalhado com TODOS os dados encontrados na imagem.`
+INSTRUÇÕES CRÍTICAS:
+1. Extraia TODOS os dados visíveis do documento médico
+2. Organize em módulos por categoria (Hemograma, Lipidograma, Hormônios, Bioimpedância, etc.)
+3. Para cada parâmetro, inclua: nome, valor, unidade, faixa de referência
+4. Classifique status como: normal, high, low, abnormal, borderline, n/a
+5. Seja extremamente preciso com valores numéricos
+6. Mantenha nomes originais dos exames em português
+7. Se informações não estiverem disponíveis, omita o campo opcional`
 
     const userPrompt = `Analise esta imagem médica (${metadata.fileName}) e extraia todos os dados estruturados visíveis.
 
-Organize as informações de forma clara e estruturada, incluindo:
-- Todos os valores numéricos com suas unidades
-- Nomes completos de todos os parâmetros/exames
-- Valores de referência quando disponíveis
-- Qualquer texto relevante da imagem
+Seja extremamente detalhado e preciso com todos os valores, unidades e faixas de referência.`
 
-Seja extremamente detalhado!`
+    console.log('🤖 [VISION-AI] Calling Gemini 2.5 Flash multimodal with native structured output...')
 
-    console.log('🤖 [VISION-AI] Calling GPT-4o Vision...')
-
-    // Use AI SDK with vision
-    const result = await generateText({
-      model: openaiModels.gpt4o,
+    // ✅ Use generateObject with Zod schema - guaranteed valid JSON!
+    const result = await generateObject({
+      model: googleModels.flash, // Gemini 2.5 Flash
+      schema: StructuredMedicalDocumentSchema,
       messages: [
         {
           role: 'system',
@@ -95,36 +88,38 @@ Seja extremamente detalhado!`
             { type: 'text', text: userPrompt },
             {
               type: 'image',
-              image: imageUrl,
+              image: `data:${mimeType};base64,${base64Image}`,
             },
           ],
         },
       ],
-      maxTokens: 4096,
       temperature: 0.1, // Low temperature for accuracy
     })
 
-    const text = result.text.trim()
+    const structuredData = result.object
 
-    if (!text || text.length < 50) {
-      throw new Error('Vision AI retornou dados insuficientes')
-    }
+    // Create readable text representation for extractedText field
+    const text = JSON.stringify(structuredData, null, 2)
 
     const processingTime = Date.now() - startTime
 
-    console.log(`✅ [VISION-AI] Extracted ${text.length} chars in ${processingTime}ms`)
-    console.log(`📊 [VISION-AI] Usage: ${result.usage.totalTokens} tokens`)
+    console.log(`✅ [VISION-AI] Processed in ${processingTime}ms`)
+    console.log(`📊 [VISION-AI] Tokens: ${result.usage.totalTokens}`)
+    console.log(`📊 [VISION-AI] Model: gemini-2.5-flash (multimodal)`)
+    console.log(`📊 [VISION-AI] Modules extracted: ${structuredData.modules.length}`)
+    console.log(`🎯 [VISION-AI] Schema validation: PASSED (native structured output)`)
 
     return {
       text,
       metadata: {
         ...metadata,
         textLength: text.length,
-        visionModel: 'gpt-4o',
+        visionModel: 'gemini-2.5-flash',
         visionTokens: result.usage.totalTokens,
       },
       processedBy: 'vision',
-      confidence: 0.9,
+      confidence: 0.95, // High confidence with structured output
+      structuredData, // ✅ Return validated structured data
     }
   } catch (error) {
     console.error('❌ [VISION-AI] Error processing image:', error)

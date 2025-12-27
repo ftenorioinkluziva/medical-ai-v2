@@ -1,6 +1,9 @@
 /**
  * Embeddings Functions
  * Using Vercel AI SDK
+ *
+ * Default provider: Google (text-embedding-004) - 50-60% cheaper than OpenAI
+ * Legacy support: OpenAI (requires OPENAI_API_KEY env var)
  */
 
 import { embed, embedMany } from 'ai'
@@ -15,12 +18,13 @@ export interface EmbeddingOptions {
 
 /**
  * Generate embedding for a single text
+ * Default changed to Google for cost savings (50-60% cheaper)
  */
 export async function generateEmbedding(
   text: string,
   options: EmbeddingOptions = {}
 ) {
-  const { provider = 'openai' } = options
+  const { provider = 'google' } = options  // ✅ Changed from 'openai' to 'google'
 
   console.log(`🧠 [EMBEDDINGS] Generating embedding with ${provider}...`)
 
@@ -39,7 +43,7 @@ export async function generateEmbedding(
         usage: result.usage,
       }
     } else {
-      // OpenAI (default)
+      // OpenAI (legacy support - requires OPENAI_API_KEY)
       const result = await embed({
         model: openaiModels.embeddings.small,
         value: text,
@@ -55,25 +59,19 @@ export async function generateEmbedding(
     }
   } catch (error) {
     console.error(`❌ [EMBEDDINGS] Error with ${provider}:`, error)
-
-    // Fallback to alternative provider
-    if (provider === 'google') {
-      console.log('🔄 [EMBEDDINGS] Falling back to OpenAI...')
-      return generateEmbedding(text, { provider: 'openai' })
-    }
-
     throw error
   }
 }
 
 /**
  * Generate embeddings for multiple texts (batch)
+ * Default changed to Google for cost savings (50-60% cheaper)
  */
 export async function generateBatchEmbeddings(
   texts: string[],
   options: EmbeddingOptions = {}
 ) {
-  const { provider = 'openai' } = options
+  const { provider = 'google' } = options  // ✅ Changed from 'openai' to 'google'
 
   console.log(`🧠 [EMBEDDINGS] Generating ${texts.length} embeddings with ${provider}...`)
 

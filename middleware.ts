@@ -19,8 +19,16 @@ export default auth((req) => {
   const isAuthRoute = authRoutes.includes(pathname)
 
   if (isAuthRoute && isAuthenticated) {
-    // Redirect doctors to /doctor, others to /dashboard
-    const redirectUrl = req.auth?.user?.role === 'doctor' ? '/doctor' : '/dashboard'
+    // Redirect based on user role
+    const userRole = req.auth?.user?.role
+    let redirectUrl = '/dashboard'
+
+    if (userRole === 'doctor') {
+      redirectUrl = '/doctor'
+    } else if (userRole === 'admin') {
+      redirectUrl = '/admin'
+    }
+
     return NextResponse.redirect(new URL(redirectUrl, req.url))
   }
 
@@ -39,6 +47,17 @@ export default auth((req) => {
     const userRole = req.auth?.user?.role
     if (userRole !== 'admin') {
       return NextResponse.redirect(new URL('/dashboard', req.url))
+    }
+  }
+
+  // Restrict admin users to /admin only (block access to regular dashboard routes)
+  const userRole = req.auth?.user?.role
+  if (userRole === 'admin') {
+    const regularDashboardRoutes = ['/dashboard', '/agents', '/documents', '/profile', '/history', '/settings', '/recommendations', '/weekly-plan', '/chat', '/doctor']
+    const isRegularRoute = regularDashboardRoutes.some(route => pathname.startsWith(route))
+
+    if (isRegularRoute) {
+      return NextResponse.redirect(new URL('/admin', req.url))
     }
   }
 

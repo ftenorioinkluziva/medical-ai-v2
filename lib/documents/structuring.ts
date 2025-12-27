@@ -1,45 +1,22 @@
 /**
  * Document Structuring
- * Uses LLM to structure medical documents into JSON format
+ * Uses LLM with native structured output (Zod schemas) to structure medical documents
  */
 
-import { generateText } from 'ai'
+import { generateObject } from 'ai'
 import { googleModels } from '@/lib/ai/providers'
+import { StructuredMedicalDocumentSchema } from './schemas'
 
 /**
- * Structured document interface (following doctor_v0 pattern)
+ * Re-export types from schemas
  */
-export interface StructuredMedicalDocument {
-  documentType: 'lab_report' | 'bioimpedance' | 'medical_report' | 'prescription' | 'imaging' | 'other'
-  patientInfo: {
-    name?: string
-    id_rg?: string
-    id_cpf?: string
-    dateOfBirth?: string
-    age?: number
-    sex?: string
-  }
-  providerInfo: {
-    name?: string
-    doctor?: string
-    address?: string
-  }
-  examDate?: string
-  overallSummary: string
-  modules: Array<{
-    moduleName: string // e.g., "Hemograma Completo", "TSH"
-    category: string // e.g., "Hematologia", "Endocrinologia"
-    status: 'normal' | 'abnormal' | 'high' | 'low' | 'borderline' | 'n/a'
-    summary: string
-    parameters: Array<{
-      name: string
-      value: string | number
-      unit?: string
-      referenceRange?: string
-      status?: 'normal' | 'high' | 'low'
-    }>
-  }>
-}
+export type {
+  StructuredMedicalDocument,
+  MedicalModule,
+  MedicalParameter,
+  PatientInfo,
+  ProviderInfo,
+} from './schemas'
 
 /**
  * Classify document type from filename and content
@@ -73,7 +50,8 @@ function classifyDocumentType(filename: string, text: string): StructuredMedical
 }
 
 /**
- * Structure medical document using LLM
+ * Structure medical document using LLM with native structured output
+ * Uses Zod schema for guaranteed valid JSON - no more parsing errors!
  */
 export async function structureMedicalDocument(
   extractedText: string,
@@ -90,7 +68,7 @@ export async function structureMedicalDocument(
 
   const startTime = Date.now()
 
-  console.log(`🧠 [STRUCTURING] Structuring document: ${fileName}`)
+  console.log(`🧠 [STRUCTURING] Structuring document with native structured output: ${fileName}`)
   console.log(`📝 [STRUCTURING] Text length: ${extractedText.length} chars`)
 
   // Classify document type
@@ -98,7 +76,7 @@ export async function structureMedicalDocument(
   console.log(`📋 [STRUCTURING] Detected type: ${documentType}`)
 
   try {
-    const systemPrompt = `Você é um especialista em análise de documentos médicos. Sua tarefa é estruturar dados médicos extraídos em formato JSON preciso e organizado.
+    const systemPrompt = `Você é um especialista em análise de documentos médicos. Sua tarefa é estruturar dados médicos extraídos de forma precisa e organizada.
 
 INSTRUÇÕES CRÍTICAS:
 1. Extraia TODOS os dados visíveis do documento
@@ -107,124 +85,55 @@ INSTRUÇÕES CRÍTICAS:
 4. Classifique status como: normal, high, low, abnormal, borderline, n/a
 5. Seja extremamente preciso com valores numéricos
 6. Mantenha nomes originais dos exames em português
-
-FORMATO DE SAÍDA (JSON):
-{
-  "patientInfo": {
-    "name": "Nome do paciente",
-    "age": número,
-    "sex": "M/F",
-    "id_cpf": "CPF se disponível",
-    "dateOfBirth": "data se disponível"
-  },
-  "providerInfo": {
-    "name": "Nome do laboratório/clínica",
-    "doctor": "Médico solicitante",
-    "address": "Endereço"
-  },
-  "examDate": "YYYY-MM-DD",
-  "overallSummary": "Resumo geral em 2-3 frases",
-  "modules": [
-    {
-      "moduleName": "Nome do módulo (ex: Hemograma Completo)",
-      "category": "Categoria (ex: Hematologia)",
-      "status": "normal|abnormal|high|low|borderline|n/a",
-      "summary": "Resumo dos achados deste módulo",
-      "parameters": [
-        {
-          "name": "Nome do parâmetro",
-          "value": valor numérico ou string,
-          "unit": "unidade (mg/dL, g/dL, etc)",
-          "referenceRange": "faixa de referência",
-          "status": "normal|high|low"
-        }
-      ]
-    }
-  ]
-}
-
-IMPORTANTE: Retorne APENAS o JSON válido, sem texto adicional.`
+7. Se informações não estiverem disponíveis, use null ou omita o campo opcional`
 
     // Gemini 2.5 Flash supports up to 1M tokens (~4M chars)
-    // We can send much larger documents, limiting to 200k chars (~50-60 pages)
+    // Limiting to 200k chars (~50-60 pages)
     const maxChars = 200000
     const documentText = extractedText.length > maxChars
       ? `${extractedText.substring(0, maxChars)}\n\n[DOCUMENTO TRUNCADO - Processadas primeiras ~50 páginas de ${Math.ceil(extractedText.length / 4000)} páginas totais]`
       : extractedText
 
-    const userPrompt = `Analise este documento médico e estruture os dados em JSON:
+    const userPrompt = `Analise este documento médico e extraia os dados estruturados:
 
 DOCUMENTO:
 ${documentText}
 
 NOME DO ARQUIVO: ${fileName}
+TIPO DETECTADO: ${documentType}
 
-Retorne APENAS o JSON estruturado conforme o formato especificado.`
+Extraia todos os dados relevantes seguindo o schema fornecido.`
 
-    console.log(`🤖 [STRUCTURING] Calling ${provider} ${model}...`)
+    console.log(`🤖 [STRUCTURING] Calling ${provider} ${model} with native structured output...`)
 
-    const result = await generateText({
+    // ✅ Use generateObject with Zod schema - guaranteed valid JSON!
+    const result = await generateObject({
       model: googleModels[model] || googleModels.flash,
-      prompt: `${systemPrompt}\n\n${userPrompt}`,
+      schema: StructuredMedicalDocumentSchema,
+      messages: [
+        {
+          role: 'system',
+          content: systemPrompt,
+        },
+        {
+          role: 'user',
+          content: userPrompt,
+        },
+      ],
       temperature: 0.1, // Low for precision
     })
 
-    const responseText = result.text.trim()
+    const structured = result.object
 
-    // Extract JSON from response (sometimes LLM adds markdown code blocks)
-    let jsonText = responseText
-    if (responseText.includes('```json')) {
-      const match = responseText.match(/```json\n([\s\S]*?)\n```/)
-      if (match) {
-        jsonText = match[1]
-      }
-    } else if (responseText.includes('```')) {
-      const match = responseText.match(/```\n([\s\S]*?)\n```/)
-      if (match) {
-        jsonText = match[1]
-      }
-    }
-
-    // Parse JSON
-    let structured: StructuredMedicalDocument
-    try {
-      const parsed = JSON.parse(jsonText)
-
-      // Ensure documentType is set
-      structured = {
-        documentType,
-        patientInfo: parsed.patientInfo || {},
-        providerInfo: parsed.providerInfo || {},
-        examDate: parsed.examDate,
-        overallSummary: parsed.overallSummary || 'Documento médico processado',
-        modules: parsed.modules || [],
-      }
-    } catch (parseError) {
-      console.warn('⚠️ [STRUCTURING] JSON parse failed, using fallback structure')
-
-      // Fallback structure
-      structured = {
-        documentType,
-        patientInfo: {},
-        providerInfo: {},
-        overallSummary: 'Documento médico processado. Estruturação automática parcial.',
-        modules: [
-          {
-            moduleName: 'Dados Gerais',
-            category: 'Geral',
-            status: 'n/a',
-            summary: responseText.substring(0, 500),
-            parameters: [],
-          },
-        ],
-      }
-    }
+    // Override documentType with our detection (more reliable)
+    structured.documentType = documentType
 
     const processingTime = Date.now() - startTime
 
     console.log(`✅ [STRUCTURING] Structured in ${processingTime}ms`)
     console.log(`📊 [STRUCTURING] Modules: ${structured.modules.length}`)
     console.log(`📊 [STRUCTURING] Tokens: ${result.usage?.totalTokens || 'N/A'}`)
+    console.log(`🎯 [STRUCTURING] Schema validation: PASSED (native structured output)`)
 
     return structured
   } catch (error) {

@@ -117,6 +117,17 @@ const authConfig = {
       }
       return session
     },
+
+    async redirect({ url, baseUrl }) {
+      // If a callback URL is provided, use it
+      if (url.startsWith(baseUrl)) {
+        return url
+      }
+
+      // Otherwise redirect to appropriate dashboard based on role
+      // Note: We can't access the session here directly, so the middleware will handle final routing
+      return baseUrl
+    },
   },
 
   debug: process.env.NODE_ENV === 'development',
