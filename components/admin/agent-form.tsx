@@ -20,7 +20,7 @@ import {
 import { Switch } from '@/components/ui/switch'
 import { Checkbox } from '@/components/ui/checkbox'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
-import { Loader2, BookOpen, Lock, Unlock } from 'lucide-react'
+import { Loader2, BookOpen, Lock, Unlock, Sparkles, XCircle, CheckCircle2 } from 'lucide-react'
 
 interface AgentFormProps {
   agent?: any | null
@@ -32,6 +32,16 @@ export function AgentForm({ agent, onSuccess, onCancel }: AgentFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [categories, setCategories] = useState<Array<{ category: string; label: string; count: number }>>([])
   const [isLoadingCategories, setIsLoadingCategories] = useState(false)
+
+  // Prompt Generation States
+  const [isGeneratingSystemPrompt, setIsGeneratingSystemPrompt] = useState(false)
+  const [isGeneratingAnalysisPrompt, setIsGeneratingAnalysisPrompt] = useState(false)
+  const [generateError, setGenerateError] = useState<string | null>(null)
+  const [generateStats, setGenerateStats] = useState<{
+    articlesAnalyzed?: number
+    processingTimeMs?: number
+    categoriesIncluded?: string[]
+  } | null>(null)
   // Model limits configuration (from official Gemini API docs)
   const modelLimits: Record<string, { maxOutputTokens: number; contextWindow: string; description: string }> = {
     // Gemini 3 Series
@@ -144,6 +154,118 @@ export function AgentForm({ agent, onSuccess, onCancel }: AgentFormProps) {
     return categories
       .filter((cat) => formData.allowedCategories.includes(cat.category))
       .reduce((sum, cat) => sum + cat.count, 0)
+  }
+
+  // Generate System Prompt with AI
+  const handleGenerateSystemPrompt = async () => {
+    // Validar campos obrigatórios
+    if (!formData.name || !formData.title || !formData.description) {
+      setGenerateError('Preencha Nome, Título e Descrição antes de gerar o prompt')
+      return
+    }
+
+    // Validar configuração de conhecimento
+    if (
+      formData.knowledgeAccessType === 'restricted' &&
+      formData.allowedCategories.length === 0
+    ) {
+      setGenerateError('Configure pelo menos uma categoria de conhecimento')
+      return
+    }
+
+    setIsGeneratingSystemPrompt(true)
+    setGenerateError(null)
+    setGenerateStats(null)
+
+    try {
+      const response = await fetch('/api/admin/agents/generate-prompt', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          promptType: 'system',
+          agentData: {
+            name: formData.name,
+            title: formData.title,
+            description: formData.description,
+            knowledgeAccessType: formData.knowledgeAccessType,
+            allowedCategories: formData.allowedCategories,
+          },
+        }),
+      })
+
+      const result = await response.json()
+
+      if (result.success) {
+        handleChange('systemPrompt', result.prompt)
+        setGenerateStats(result.stats)
+        // Auto-clear stats after 10 seconds
+        setTimeout(() => setGenerateStats(null), 10000)
+      } else {
+        setGenerateError(result.error || 'Erro ao gerar prompt')
+      }
+    } catch (error) {
+      setGenerateError(
+        error instanceof Error ? error.message : 'Erro ao gerar prompt'
+      )
+    } finally {
+      setIsGeneratingSystemPrompt(false)
+    }
+  }
+
+  // Generate Analysis Prompt with AI
+  const handleGenerateAnalysisPrompt = async () => {
+    // Validar campos obrigatórios
+    if (!formData.name || !formData.title || !formData.description) {
+      setGenerateError('Preencha Nome, Título e Descrição antes de gerar o prompt')
+      return
+    }
+
+    // Validar configuração de conhecimento
+    if (
+      formData.knowledgeAccessType === 'restricted' &&
+      formData.allowedCategories.length === 0
+    ) {
+      setGenerateError('Configure pelo menos uma categoria de conhecimento')
+      return
+    }
+
+    setIsGeneratingAnalysisPrompt(true)
+    setGenerateError(null)
+    setGenerateStats(null)
+
+    try {
+      const response = await fetch('/api/admin/agents/generate-prompt', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          promptType: 'analysis',
+          agentData: {
+            name: formData.name,
+            title: formData.title,
+            description: formData.description,
+            knowledgeAccessType: formData.knowledgeAccessType,
+            allowedCategories: formData.allowedCategories,
+          },
+        }),
+      })
+
+      const result = await response.json()
+
+      if (result.success) {
+        handleChange('analysisPrompt', result.prompt)
+        setGenerateStats(result.stats)
+        // Auto-clear stats after 10 seconds
+        setTimeout(() => setGenerateStats(null), 10000)
+      } else {
+        setGenerateError(result.error || 'Erro ao gerar prompt')
+      }
+    } catch (error) {
+      setGenerateError(
+        error instanceof Error ? error.message : 'Erro ao gerar prompt'
+      )
+    } finally {
+      setIsGeneratingAnalysisPrompt(false)
+    }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -324,6 +446,38 @@ export function AgentForm({ agent, onSuccess, onCancel }: AgentFormProps) {
             rows={6}
             className="font-mono text-sm"
           />
+
+          {/* Generate System Prompt Button */}
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={handleGenerateSystemPrompt}
+            disabled={
+              isGeneratingSystemPrompt ||
+              isGeneratingAnalysisPrompt ||
+              isSubmitting ||
+              !formData.name ||
+              !formData.title ||
+              !formData.description ||
+              (formData.knowledgeAccessType === 'restricted' &&
+                formData.allowedCategories.length === 0)
+            }
+            className="w-full"
+          >
+            {isGeneratingSystemPrompt ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Gerando System Prompt com IA...
+              </>
+            ) : (
+              <>
+                <Sparkles className="mr-2 h-4 w-4" />
+                Gerar System Prompt com IA
+              </>
+            )}
+          </Button>
+
           <p className="text-xs text-muted-foreground">
             Define a personalidade e expertise do agente
           </p>
@@ -340,10 +494,86 @@ export function AgentForm({ agent, onSuccess, onCancel }: AgentFormProps) {
             rows={6}
             className="font-mono text-sm"
           />
+
+          {/* Generate Analysis Prompt Button */}
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={handleGenerateAnalysisPrompt}
+            disabled={
+              isGeneratingSystemPrompt ||
+              isGeneratingAnalysisPrompt ||
+              isSubmitting ||
+              !formData.name ||
+              !formData.title ||
+              !formData.description ||
+              (formData.knowledgeAccessType === 'restricted' &&
+                formData.allowedCategories.length === 0)
+            }
+            className="w-full"
+          >
+            {isGeneratingAnalysisPrompt ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Gerando Analysis Prompt com IA...
+              </>
+            ) : (
+              <>
+                <Sparkles className="mr-2 h-4 w-4" />
+                Gerar Analysis Prompt com IA
+              </>
+            )}
+          </Button>
+
           <p className="text-xs text-muted-foreground">
             Instruções específicas para análise de documentos
           </p>
         </div>
+
+        {/* Generation Feedback */}
+        {(generateError || generateStats) && (
+          <div
+            className={`p-4 rounded-lg border ${
+              generateError
+                ? 'bg-red-50 border-red-200 dark:bg-red-950 dark:border-red-800'
+                : 'bg-green-50 border-green-200 dark:bg-green-950 dark:border-green-800'
+            }`}
+          >
+            {generateError ? (
+              <div className="flex items-start gap-3">
+                <XCircle className="h-5 w-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-sm font-medium text-red-900 dark:text-red-100">
+                    Erro ao gerar prompt
+                  </p>
+                  <p className="text-xs text-red-700 dark:text-red-300 mt-1">
+                    {generateError}
+                  </p>
+                </div>
+              </div>
+            ) : generateStats ? (
+              <div className="flex items-start gap-3">
+                <CheckCircle2 className="h-5 w-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-green-900 dark:text-green-100">
+                    Prompt gerado com sucesso!
+                  </p>
+                  <div className="text-xs text-green-700 dark:text-green-300 mt-1 space-y-0.5">
+                    <p>• {generateStats.articlesAnalyzed} artigos analisados</p>
+                    <p>
+                      • Tempo: {(generateStats.processingTimeMs! / 1000).toFixed(1)}s
+                    </p>
+                    {generateStats.categoriesIncluded &&
+                      generateStats.categoriesIncluded.length > 0 && (
+                        <p>• Categorias: {generateStats.categoriesIncluded.join(', ')}</p>
+                      )}
+                  </div>
+                </div>
+              </div>
+            ) : null}
+          </div>
+        )}
       </div>
 
       {/* Model Configuration */}
