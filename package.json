@@ -11,7 +11,7 @@
     "db:migrate": "node scripts/migrate.mjs",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
-    "db:seed": "tsx --env-file=.env.local scripts/seed-agents.ts",
+    "db:seed": "tsx --env-file=.env.local scripts/seed-agents.ts && tsx --env-file=.env.local scripts/seed-credit-packages.ts",
     "db:setup": "pnpm db:generate && pnpm db:migrate && pnpm db:seed",
     "embeddings:fix": "tsx --env-file=.env.local scripts/fix-embedding-dimensions.ts",
     "embeddings:migrate": "tsx --env-file=.env.local scripts/migrate-embeddings-to-google.ts"
@@ -53,6 +53,7 @@
     "react-markdown": "^10.1.0",
     "recharts": "^3.3.0",
     "sonner": "^2.0.7",
+    "stripe": "^20.1.0",
     "tailwind-merge": "^3.3.1",
     "zod": "^4.1.12"
   },
@@ -63,6 +64,7 @@
     "@types/pg": "^8.15.6",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/stripe": "^8.0.417",
     "babel-plugin-react-compiler": "1.0.0",
     "dotenv": "^17.2.3",
     "dotenv-cli": "^11.0.0",
