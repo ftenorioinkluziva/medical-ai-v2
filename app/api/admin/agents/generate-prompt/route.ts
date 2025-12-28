@@ -5,6 +5,7 @@ import { knowledgeArticles } from '@/lib/db/schema'
 import { and, eq, inArray, desc } from 'drizzle-orm'
 import { generateText } from 'ai'
 import { googleModels } from '@/lib/ai/providers'
+import { generatePromptRequestSchema } from '@/lib/validators/agents'
 
 // Types
 interface GeneratePromptRequest {
@@ -50,42 +51,20 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // 2. Validar Input
-    const body = (await request.json()) as GeneratePromptRequest
+    // 2. Validar Input com Zod
+    const rawBody = await request.json()
+    const parsed = generatePromptRequestSchema.safeParse(rawBody)
 
-    if (!body.promptType || !['system', 'analysis'].includes(body.promptType)) {
-      return NextResponse.json(
-        { success: false, error: 'promptType inválido. Use "system" ou "analysis".' },
-        { status: 400 }
-      )
+    if (!parsed.success) {
+      const zErr = parsed.error
+      const messages = zErr.errors
+        .map((e) => `${e.path.length ? e.path.join('.') : 'body'}: ${e.message}`)
+        .join('; ')
+
+      return NextResponse.json({ success: false, error: messages }, { status: 400 })
     }
 
-    const { promptType, agentData } = body
-
-    if (!agentData.name || !agentData.title || !agentData.description) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: 'Campos obrigatórios faltando: name, title, description',
-        },
-        { status: 400 }
-      )
-    }
-
-    // Validate restricted knowledge access requires categories
-    if (
-      agentData.knowledgeAccessType === 'restricted' &&
-      (!agentData.allowedCategories || agentData.allowedCategories.length === 0)
-    ) {
-      return NextResponse.json(
-        {
-          success: false,
-          error:
-            'Acesso restrito ao conhecimento requer pelo menos uma categoria selecionada',
-        },
-        { status: 400 }
-      )
-    }
+    const { promptType, agentData } = parsed.data
 
     console.log(`🤖 [GENERATE-PROMPT] Iniciando geração de ${promptType} prompt...`)
     console.log(`📋 [GENERATE-PROMPT] Agente: ${agentData.name}`)

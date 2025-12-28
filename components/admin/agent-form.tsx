@@ -562,7 +562,12 @@ export function AgentForm({ agent, onSuccess, onCancel }: AgentFormProps) {
                   <div className="text-xs text-green-700 dark:text-green-300 mt-1 space-y-0.5">
                     <p>• {generateStats.articlesAnalyzed} artigos analisados</p>
                     <p>
-                      • Tempo: {(generateStats.processingTimeMs! / 1000).toFixed(1)}s
+                      • Tempo:{' '}
+                      {typeof generateStats.processingTimeMs === 'number' ? (
+                        `${(generateStats.processingTimeMs / 1000).toFixed(1)}s`
+                      ) : (
+                        'N/A'
+                      )}
                     </p>
                     {generateStats.categoriesIncluded &&
                       generateStats.categoriesIncluded.length > 0 && (
