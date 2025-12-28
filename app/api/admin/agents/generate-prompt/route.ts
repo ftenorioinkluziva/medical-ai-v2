@@ -72,10 +72,34 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Validate restricted knowledge access requires categories
+    if (
+      agentData.knowledgeAccessType === 'restricted' &&
+      (!agentData.allowedCategories || agentData.allowedCategories.length === 0)
+    ) {
+      return NextResponse.json(
+        {
+          success: false,
+          error:
+            'Acesso restrito ao conhecimento requer pelo menos uma categoria selecionada',
+        },
+        { status: 400 }
+      )
+    }
+
     console.log(`🤖 [GENERATE-PROMPT] Iniciando geração de ${promptType} prompt...`)
     console.log(`📋 [GENERATE-PROMPT] Agente: ${agentData.name}`)
+    console.log(
+      `🔒 [GENERATE-PROMPT] Acesso: ${agentData.knowledgeAccessType}${
+        agentData.knowledgeAccessType === 'restricted'
+          ? ` - Categorias: ${agentData.allowedCategories.join(', ')}`
+          : ''
+      }`
+    )
 
     // 3. Buscar Artigos da Knowledge Base
+    // SECURITY: Backend validation above ensures restricted access ALWAYS has categories
+    // This prevents bypassing frontend validation and fetching all articles
     const articlesQuery = db
       .select({
         title: knowledgeArticles.title,
@@ -89,8 +113,7 @@ export async function POST(request: NextRequest) {
       .where(
         and(
           eq(knowledgeArticles.isVerified, 'verified'),
-          agentData.knowledgeAccessType === 'restricted' &&
-            agentData.allowedCategories.length > 0
+          agentData.knowledgeAccessType === 'restricted'
             ? inArray(knowledgeArticles.category, agentData.allowedCategories)
             : undefined
         )
