@@ -4,6 +4,7 @@ import { db } from '@/lib/db/client'
 import { users } from '@/lib/db/schema'
 import { eq } from 'drizzle-orm'
 import { registerBackendSchema } from '@/lib/validators/auth'
+import { initializeUserCredits } from '@/lib/billing/credits'
 
 export async function POST(request: NextRequest) {
   try {
@@ -43,6 +44,9 @@ export async function POST(request: NextRequest) {
         name: users.name,
         email: users.email,
       })
+
+    // Initialize user credits account
+    await initializeUserCredits(newUser.id)
 
     return NextResponse.json(
       {
