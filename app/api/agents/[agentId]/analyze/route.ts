@@ -12,6 +12,8 @@ import { analyzeWithAgent } from '@/lib/ai/agents/analyze'
 import { buildKnowledgeContext } from '@/lib/ai/knowledge'
 import type { StructuredMedicalDocument } from '@/lib/documents/structuring'
 import { getKnowledgeConfig } from '@/lib/db/settings'
+import { getUserCredits, calculateCreditsFromTokens, debitCredits } from '@/lib/billing/credits'
+import { checkHourlyRateLimit, checkDailyRateLimit } from '@/lib/billing/rate-limiting'
 
 export async function POST(
   request: NextRequest,
@@ -51,6 +53,43 @@ export async function POST(
         { status: 403 }
       )
     }
+
+    // ============ CREDIT CHECK ============
+    const ESTIMATED_TOKENS = 100000
+    const estimatedCredits = calculateCreditsFromTokens(ESTIMATED_TOKENS)
+    const userCreditsData = await getUserCredits(session.user.id)
+
+    if (userCreditsData.balance < estimatedCredits) {
+      return NextResponse.json(
+        {
+          error: 'Créditos insuficientes',
+          details: {
+            required: estimatedCredits,
+            current: userCreditsData.balance,
+            shortfall: estimatedCredits - userCreditsData.balance,
+          }
+        },
+        { status: 402 }
+      )
+    }
+
+    // Rate limiting
+    const exceededHourly = await checkHourlyRateLimit(session.user.id)
+    if (exceededHourly) {
+      return NextResponse.json(
+        { error: 'Limite de uso por hora excedido. Tente novamente mais tarde.' },
+        { status: 429 }
+      )
+    }
+
+    const exceededDaily = await checkDailyRateLimit(session.user.id)
+    if (exceededDaily) {
+      return NextResponse.json(
+        { error: 'Limite de uso diário excedido. Tente novamente amanhã.' },
+        { status: 429 }
+      )
+    }
+    // ======================================
 
     // Parse request body
     const body = await request.json()
@@ -320,12 +359,36 @@ ${prevAnalysis.analysis}
       console.error('⚠️ [ANALYSIS-API] Failed to save to history:', saveError)
     }
 
+    // ============ DEBIT CREDITS ============
+    try {
+      const tokensUsed = result.usage?.totalTokens || 0
+
+      if (tokensUsed > 0 && savedAnalysis) {
+        await debitCredits(session.user.id, tokensUsed, {
+          analysisId: savedAnalysis.id,
+          operation: 'agent_analysis',
+          modelName: agent.modelName || 'gemini-2.5-flash',
+          promptTokens: result.usage?.promptTokens || 0,
+          completionTokens: result.usage?.completionTokens || 0,
+          cachedTokens: result.usage?.cachedTokens,
+        })
+        console.log(`💰 [ANALYSIS-API] Debited ${calculateCreditsFromTokens(tokensUsed)} credits for ${tokensUsed} tokens`)
+      }
+    } catch (creditError) {
+      console.error('⚠️ [ANALYSIS-API] Failed to debit credits:', creditError)
+      // Don't fail the analysis, but log for manual review
+    }
+    // =======================================
+
     return NextResponse.json({
       success: true,
       analysis: result.analysis,
       agent: result.agent,
       metadata: result.metadata,
       usage: result.usage,
+      creditsDebited: result.usage?.totalTokens
+        ? calculateCreditsFromTokens(result.usage.totalTokens)
+        : 0,
       timestamp: new Date().toISOString(),
       analysisId: savedAnalysis?.id,
     })
