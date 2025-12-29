@@ -31,7 +31,18 @@
       "Bash(npm run build:*)",
       "WebFetch(domain:ai.google.dev)",
       "WebFetch(domain:www.figma.com)",
-      "WebFetch(domain:v0.app)"
+      "WebFetch(domain:v0.app)",
+      "WebFetch(domain:openrouter.ai)",
+      "Bash(scoop install:*)",
+      "Bash(Get-Process)",
+      "Bash(Where-Object {$_ProcessName -like \"*node*\" -or $_ProcessName -like \"*stripe*\" -or $_ProcessName -like \"*next*\"})",
+      "Bash(Select-Object ProcessName,Id)",
+      "Bash(Format-Table)",
+      "Bash(tasklist:*)",
+      "Bash(findstr:*)",
+      "Bash(taskkill:*)",
+      "Bash(powershell -Command \"Stop-Process -Id 27496 -Force\")",
+      "Bash(powershell:*)"
     ],
     "deny": [],
     "ask": []

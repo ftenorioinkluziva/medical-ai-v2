@@ -163,6 +163,18 @@ export function AnalysisInterface({
       })
 
       const data = await response.json()
+
+      // Handle insufficient credits (402) with helpful message
+      if (response.status === 402 && data.details?.shortfall) {
+        setResult({
+          success: false,
+          error: `${data.error}\n\n💡 Você pode comprar mais créditos em: /dashboard/credits`,
+          insufficientCredits: true,
+          details: data.details
+        })
+        return
+      }
+
       setResult(data)
 
       if (data.success) {

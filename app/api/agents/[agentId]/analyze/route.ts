@@ -60,13 +60,15 @@ export async function POST(
     const userCreditsData = await getUserCredits(session.user.id)
 
     if (userCreditsData.balance < estimatedCredits) {
+      const shortfall = estimatedCredits - userCreditsData.balance
       return NextResponse.json(
         {
-          error: 'Créditos insuficientes',
+          error: `Créditos insuficientes. Você precisa de mais ${shortfall} créditos para realizar esta análise.`,
           details: {
             required: estimatedCredits,
             current: userCreditsData.balance,
-            shortfall: estimatedCredits - userCreditsData.balance,
+            shortfall: shortfall,
+            message: `Saldo atual: ${userCreditsData.balance} créditos | Necessário: ${estimatedCredits} créditos | Faltam: ${shortfall} créditos`
           }
         },
         { status: 402 }

@@ -53,6 +53,23 @@ export function AnalysisViewModal({ analysis, isOpen, onClose }: AnalysisViewMod
 
       if (!response.ok) {
         const data = await response.json()
+
+        // Handle insufficient credits (402)
+        if (response.status === 402) {
+          const shortfall = data.details?.shortfall || 0
+          toast.error(
+            `${data.error}\n\nClique aqui para comprar créditos`,
+            {
+              duration: 8000,
+              action: {
+                label: 'Comprar',
+                onClick: () => window.location.href = '/dashboard/credits'
+              }
+            }
+          )
+          return
+        }
+
         throw new Error(data.error || 'Erro ao gerar recomendações')
       }
 
@@ -76,6 +93,23 @@ export function AnalysisViewModal({ analysis, isOpen, onClose }: AnalysisViewMod
 
       if (!response.ok) {
         const data = await response.json()
+
+        // Handle insufficient credits (402)
+        if (response.status === 402) {
+          const shortfall = data.details?.shortfall || 0
+          toast.error(
+            `${data.error}\n\nClique aqui para comprar créditos`,
+            {
+              duration: 8000,
+              action: {
+                label: 'Comprar',
+                onClick: () => window.location.href = '/dashboard/credits'
+              }
+            }
+          )
+          return
+        }
+
         throw new Error(data.error || 'Erro ao gerar plano semanal')
       }
 

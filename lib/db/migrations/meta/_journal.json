@@ -64,6 +64,20 @@
       "when": 1764664180590,
       "tag": "0008_numerous_zuras",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1766918247066,
+      "tag": "0009_breezy_sway",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1766948177462,
+      "tag": "0010_mean_virginia_dare",
+      "breakpoints": true
     }
   ]
 }

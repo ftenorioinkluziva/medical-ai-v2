@@ -6,7 +6,13 @@ import { Button } from '@/components/ui/button'
 import { Check } from 'lucide-react'
 import { loadStripe } from '@stripe/stripe-js'
 
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
+// Validate Stripe publishable key
+const stripePublishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+if (!stripePublishableKey) {
+  console.error('❌ NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY is not configured in .env.local')
+}
+
+const stripePromise = stripePublishableKey ? loadStripe(stripePublishableKey) : null
 
 interface Package {
   id: string
