@@ -965,8 +965,7 @@ export function AgentForm({ agent, onSuccess, onCancel }: AgentFormProps) {
                         {authors.map((author) => (
                           <div
                             key={author.author}
-                            className="flex items-center space-x-2 p-2 rounded hover:bg-muted cursor-pointer"
-                            onClick={() => handleAuthorToggle(author.author, !formData.allowedAuthors.includes(author.author))}
+                            className="flex items-center space-x-2 p-2 rounded hover:bg-muted"
                           >
                             <Checkbox
                               id={`author-${author.author}`}
@@ -974,7 +973,6 @@ export function AgentForm({ agent, onSuccess, onCancel }: AgentFormProps) {
                               onCheckedChange={(checked) =>
                                 handleAuthorToggle(author.author, checked as boolean)
                               }
-                              onClick={(e) => e.stopPropagation()}
                             />
                             <Label
                               htmlFor={`author-${author.author}`}
@@ -1051,8 +1049,7 @@ export function AgentForm({ agent, onSuccess, onCancel }: AgentFormProps) {
                         {categories.map((cat) => (
                           <div
                             key={cat.category}
-                            className="flex items-center space-x-2 p-2 rounded hover:bg-muted cursor-pointer"
-                            onClick={() => handleCategoryToggle(cat.category, !formData.allowedCategories.includes(cat.category))}
+                            className="flex items-center space-x-2 p-2 rounded hover:bg-muted"
                           >
                             <Checkbox
                               id={`cat-${cat.category}`}
@@ -1060,7 +1057,6 @@ export function AgentForm({ agent, onSuccess, onCancel }: AgentFormProps) {
                               onCheckedChange={(checked) =>
                                 handleCategoryToggle(cat.category, checked as boolean)
                               }
-                              onClick={(e) => e.stopPropagation()}
                             />
                             <Label
                               htmlFor={`cat-${cat.category}`}
@@ -1140,8 +1136,7 @@ export function AgentForm({ agent, onSuccess, onCancel }: AgentFormProps) {
                         {subcategories.map((sub) => (
                           <div
                             key={sub.subcategory}
-                            className="flex items-center space-x-2 p-2 rounded hover:bg-muted cursor-pointer"
-                            onClick={() => handleSubcategoryToggle(sub.subcategory, !formData.allowedSubcategories.includes(sub.subcategory))}
+                            className="flex items-center space-x-2 p-2 rounded hover:bg-muted"
                           >
                             <Checkbox
                               id={`sub-${sub.subcategory}`}
@@ -1149,7 +1144,6 @@ export function AgentForm({ agent, onSuccess, onCancel }: AgentFormProps) {
                               onCheckedChange={(checked) =>
                                 handleSubcategoryToggle(sub.subcategory, checked as boolean)
                               }
-                              onClick={(e) => e.stopPropagation()}
                             />
                             <Label
                               htmlFor={`sub-${sub.subcategory}`}
