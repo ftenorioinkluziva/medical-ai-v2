@@ -122,9 +122,10 @@ export async function generateSupplementationStrategy(analysisText: string) {
     { maxChunks: 3, maxCharsPerChunk: 1200 }
   )
 
-  const { object } = await generateObject({
+  const result = await generateObject({
     model: google('gemini-2.5-flash'),
     schema: supplementationSchema,
+    maxTokens: 3000, // Limit output to prevent infinite generation
     prompt: `Você é um médico especialista em medicina integrativa e nutrição funcional.
 
 Baseado na análise médica abaixo, elabore uma estratégia completa de suplementação e reposição hormonal para a próxima semana/mês até o próximo exame.
@@ -146,7 +147,8 @@ IMPORTANTE: Esta é uma orientação educacional. O paciente deve consultar um m
   })
 
   console.log('✅ [WEEKLY-PLAN] Supplementation strategy generated')
-  return object
+  console.log(`📊 [WEEKLY-PLAN] Supplementation tokens: ${result.usage?.totalTokens || 0}`)
+  return { object: result.object, usage: result.usage }
 }
 
 /**
@@ -155,9 +157,10 @@ IMPORTANTE: Esta é uma orientação educacional. O paciente deve consultar um m
 export async function generateShoppingList(analysisText: string) {
   console.log('🛒 [WEEKLY-PLAN] Generating shopping list...')
 
-  const { object } = await generateObject({
+  const result = await generateObject({
     model: google('gemini-2.5-flash'),
     schema: shoppingListSchema,
+    maxTokens: 2000, // Limit output to prevent infinite generation
     prompt: `Você é um nutricionista brasileiro especializado em alimentação funcional.
 
 Baseado na análise médica abaixo, elabore uma lista de compras semanal completa com alimentos BRASILEIROS facilmente encontrados em supermercados como Carrefour, Pão de Açúcar, Extra, ou mercados locais.
@@ -185,7 +188,8 @@ Crie uma lista REALISTA para o contexto brasileiro.`,
   })
 
   console.log('✅ [WEEKLY-PLAN] Shopping list generated')
-  return object
+  console.log(`📊 [WEEKLY-PLAN] Shopping list tokens: ${result.usage?.totalTokens || 0}`)
+  return { object: result.object, usage: result.usage }
 }
 
 /**
@@ -199,9 +203,10 @@ export async function generateMealPlan(analysisText: string) {
     { maxChunks: 3, maxCharsPerChunk: 1200 }
   )
 
-  const { object } = await generateObject({
+  const result = await generateObject({
     model: google('gemini-2.5-flash'),
     schema: mealPlanSchema,
+    maxTokens: 4000, // Limit output to prevent infinite generation
     prompt: `Você é um nutricionista brasileiro especializado em medicina funcional e culinária brasileira.
 
 Baseado na análise médica abaixo, crie um plano alimentar completo para a semana (7 dias) com café da manhã, almoço, jantar e lanches, usando PRATOS E INGREDIENTES DA CULINÁRIA BRASILEIRA.
@@ -233,7 +238,8 @@ Crie um cardápio SABOROSO, PRÁTICO e REALISTA para o brasileiro preparar em ca
   })
 
   console.log('✅ [WEEKLY-PLAN] Meal plan generated')
-  return object
+  console.log(`📊 [WEEKLY-PLAN] Meal plan tokens: ${result.usage?.totalTokens || 0}`)
+  return { object: result.object, usage: result.usage }
 }
 
 /**
@@ -247,9 +253,10 @@ export async function generateWorkoutPlan(analysisText: string) {
     { maxChunks: 3, maxCharsPerChunk: 1200 }
   )
 
-  const { object } = await generateObject({
+  const result = await generateObject({
     model: google('gemini-2.5-flash'),
     schema: workoutPlanSchema,
+    maxTokens: 4000, // Limit output to prevent infinite generation
     prompt: `Você é um fisiologista do exercício e personal trainer especializado em saúde integrativa.
 
 Baseado na análise médica abaixo, crie um plano de treinamento semanal personalizado.
@@ -259,19 +266,27 @@ ${analysisText}
 
 ${knowledgeContext ? `\nBASE DE CONHECIMENTO:\n${knowledgeContext}` : ''}
 
-INSTRUÇÕES:
+INSTRUÇÕES IMPORTANTES:
 1. Crie treinos para 3-5 dias da semana (considere nível de condicionamento)
 2. Inclua variedade: cardio, força, flexibilidade
-3. Especifique exercícios, séries, repetições, duração
+3. Especifique exercícios, séries, repetições, duração de forma CONCISA
 4. Adapte à condição física e objetivos do paciente
 5. Inclua aquecimento e alongamento
 6. Respeite limitações e contraindicações mencionadas
-7. Adicione dicas de progressão
+7. Adicione dicas de progressão BREVES (1-2 frases por exercício)
 8. Defina dias de descanso adequados
 
-Crie um plano SEGURO, PROGRESSIVO e MOTIVADOR.`,
+REGRAS DE FORMATAÇÃO:
+- Seja CONCISO e OBJETIVO
+- Máximo 100 palavras por descrição de exercício
+- Use frases curtas e diretas
+- NÃO repita instruções
+- NÃO adicione texto motivacional excessivo
+
+Crie um plano SEGURO, PROGRESSIVO e PRÁTICO.`,
   })
 
   console.log('✅ [WEEKLY-PLAN] Workout plan generated')
-  return object
+  console.log(`📊 [WEEKLY-PLAN] Workout plan tokens: ${result.usage?.totalTokens || 0}`)
+  return { object: result.object, usage: result.usage }
 }

@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button'
 import { Menu, Heart, LogOut, User } from 'lucide-react'
 import { handleSignOut } from '@/app/actions/auth'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
+import { CreditBadge } from '@/components/credits/credit-badge'
 import {
   Sheet,
   SheetContent,
@@ -31,7 +32,10 @@ export function DashboardNav({ userName, userRole }: DashboardNavProps) {
 
   // Admin users only see Admin link, others see regular dashboard links
   const navLinks = userRole === 'admin'
-    ? [{ href: '/admin', label: 'Admin' }]
+    ? [
+        { href: '/admin', label: 'Admin' },
+        { href: '/admin/credits', label: 'Créditos' },
+      ]
     : [
         { href: '/dashboard', label: 'Dashboard' },
         { href: '/analyze', label: 'Análise' },
@@ -40,6 +44,7 @@ export function DashboardNav({ userName, userRole }: DashboardNavProps) {
         { href: '/weekly-plan', label: 'Plano Semanal' },
         { href: '/compare', label: 'Comparar' },
         { href: '/documents', label: 'Documentos' },
+        { href: '/dashboard/credits', label: 'Créditos' },
         { href: '/profile', label: 'Perfil' },
       ]
 
@@ -77,6 +82,13 @@ export function DashboardNav({ userName, userRole }: DashboardNavProps) {
 
         {/* Right Side - User & Actions */}
         <div className="flex items-center gap-3">
+          {/* Credits Badge */}
+          {userRole !== 'admin' && (
+            <div className="hidden sm:block">
+              <CreditBadge />
+            </div>
+          )}
+
           {/* User Info */}
           <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-muted">
             <User className="h-4 w-4 text-muted-foreground" />
@@ -121,8 +133,13 @@ export function DashboardNav({ userName, userRole }: DashboardNavProps) {
               <div className="mt-6 flex flex-col gap-4">
                 {/* User Info Card */}
                 <div className="p-3 rounded-lg bg-accent border border-border">
-                  <p className="text-sm font-semibold text-foreground">{userName}</p>
-                  <p className="text-xs text-muted-foreground capitalize mt-0.5">{userRole}</p>
+                  <div className="flex items-center justify-between mb-2">
+                    <div>
+                      <p className="text-sm font-semibold text-foreground">{userName}</p>
+                      <p className="text-xs text-muted-foreground capitalize mt-0.5">{userRole}</p>
+                    </div>
+                    {userRole !== 'admin' && <CreditBadge />}
+                  </div>
                 </div>
 
                 {/* Mobile Navigation Links */}

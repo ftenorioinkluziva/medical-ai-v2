@@ -9,6 +9,7 @@ import { generateRecommendationsFromAnalysis } from '@/lib/ai/recommendations/ge
 import { db } from '@/lib/db/client'
 import { analyses } from '@/lib/db/schema'
 import { eq } from 'drizzle-orm'
+import { getUserCredits, calculateCreditsFromTokens, debitCredits } from '@/lib/billing/credits'
 
 export async function POST(request: NextRequest) {
   try {
@@ -58,6 +59,31 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // ============ CREDIT CHECK ============
+    const ESTIMATED_TOKENS = 100000 // Estimate for recommendations generation
+    const estimatedCredits = calculateCreditsFromTokens(ESTIMATED_TOKENS)
+    const userCreditsData = await getUserCredits(session.user.id)
+
+    console.log(`💰 [RECOMMENDATIONS-API] Credit check: required=${estimatedCredits}, current=${userCreditsData.balance}`)
+
+    if (userCreditsData.balance < estimatedCredits) {
+      const shortfall = estimatedCredits - userCreditsData.balance
+      return NextResponse.json(
+        {
+          success: false,
+          error: `Créditos insuficientes. Você precisa de mais ${shortfall} créditos para gerar recomendações.`,
+          details: {
+            required: estimatedCredits,
+            current: userCreditsData.balance,
+            shortfall: shortfall,
+            message: `Saldo atual: ${userCreditsData.balance} créditos | Necessário: ${estimatedCredits} créditos | Faltam: ${shortfall} créditos`
+          },
+        },
+        { status: 402 }
+      )
+    }
+    // ======================================
+
     // Generate recommendations
     const recommendation = await generateRecommendationsFromAnalysis(
       analysisId,
@@ -65,6 +91,28 @@ export async function POST(request: NextRequest) {
     )
 
     console.log(`✅ [RECOMMENDATIONS-API] Recommendations generated: ${recommendation.id}`)
+
+    // ============ DEBIT CREDITS ============
+    try {
+      const tokensUsed = recommendation.usage?.totalTokens || 0
+
+      if (tokensUsed > 0) {
+        await debitCredits(session.user.id, tokensUsed, {
+          recommendationId: recommendation.id,
+          analysisId,
+          operation: 'generate_recommendations',
+          modelName: 'gemini-2.5-flash',
+          promptTokens: recommendation.usage?.promptTokens || 0,
+          completionTokens: recommendation.usage?.completionTokens || 0,
+          cachedTokens: recommendation.usage?.cachedTokens,
+        })
+        console.log(`💰 [RECOMMENDATIONS-API] Debited ${calculateCreditsFromTokens(tokensUsed)} credits for ${tokensUsed} tokens`)
+      }
+    } catch (creditError) {
+      console.error('⚠️ [RECOMMENDATIONS-API] Failed to debit credits:', creditError)
+      // Don't fail the operation, log for manual review
+    }
+    // =======================================
 
     return NextResponse.json({
       success: true,
@@ -77,6 +125,9 @@ export async function POST(request: NextRequest) {
         alerts: recommendation.alerts,
         createdAt: recommendation.createdAt,
       },
+      creditsDebited: recommendation.usage?.totalTokens
+        ? calculateCreditsFromTokens(recommendation.usage.totalTokens)
+        : 0,
       message: 'Recomendações geradas com sucesso!',
     })
   } catch (error) {

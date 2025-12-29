@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, uuid, jsonb } from 'drizzle-orm/pg-core'
+import { pgTable, text, timestamp, uuid, jsonb, integer } from 'drizzle-orm/pg-core'
 import { users } from './users'
 import { analyses } from './analyses'
 
@@ -14,6 +14,13 @@ export const recommendations = pgTable('recommendations', {
   lifestyleRecommendations: jsonb('lifestyle_recommendations').notNull(),
   healthGoals: jsonb('health_goals').notNull(),
   alerts: jsonb('alerts').notNull(),
+
+  // AI generation metadata
+  tokensUsed: integer('tokens_used'),
+  processingTimeMs: integer('processing_time_ms'),
+  modelUsed: text('model_used'),
+  prompt: text('prompt'),
+
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 })

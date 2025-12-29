@@ -14,6 +14,7 @@ import {
   generateMealPlan,
   generateWorkoutPlan,
 } from '@/lib/ai/weekly-plans/generators'
+import { getUserCredits, calculateCreditsFromTokens, debitCredits } from '@/lib/billing/credits'
 
 export async function POST(request: NextRequest) {
   try {
@@ -60,17 +61,67 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // ============ CREDIT CHECK ============
+    // Estimate: 4 parallel generations (~20k tokens each = 80k total)
+    const ESTIMATED_TOKENS = 80000
+    const estimatedCredits = calculateCreditsFromTokens(ESTIMATED_TOKENS)
+    const userCreditsData = await getUserCredits(session.user.id)
+
+    console.log(`💰 [WEEKLY-PLAN] Credit check: required=${estimatedCredits}, current=${userCreditsData.balance}`)
+
+    if (userCreditsData.balance < estimatedCredits) {
+      const shortfall = estimatedCredits - userCreditsData.balance
+      return NextResponse.json(
+        {
+          success: false,
+          error: `Créditos insuficientes. Você precisa de mais ${shortfall} créditos para gerar o plano semanal.`,
+          details: {
+            required: estimatedCredits,
+            current: userCreditsData.balance,
+            shortfall: shortfall,
+            message: `Saldo atual: ${userCreditsData.balance} créditos | Necessário: ${estimatedCredits} créditos | Faltam: ${shortfall} créditos`
+          },
+        },
+        { status: 402 }
+      )
+    }
+    // ======================================
+
     console.log(`🤖 [WEEKLY-PLAN] Generating all plans in parallel...`)
 
+    const startTime = Date.now()
+
     // Generate all plans in parallel for speed
-    const [supplementation, shopping, meals, workout] = await Promise.all([
+    const [suppResult, shopResult, mealResult, workoutResult] = await Promise.all([
       generateSupplementationStrategy(analysis.analysis),
       generateShoppingList(analysis.analysis),
       generateMealPlan(analysis.analysis),
       generateWorkoutPlan(analysis.analysis),
     ])
 
+    const processingTimeMs = Date.now() - startTime
+
+    // Extract objects and usage
+    const supplementation = suppResult.object
+    const shopping = shopResult.object
+    const meals = mealResult.object
+    const workout = workoutResult.object
+
+    // Calculate total tokens from all 4 generations
+    const suppTokens = suppResult.usage?.totalTokens || 0
+    const shopTokens = shopResult.usage?.totalTokens || 0
+    const mealTokens = mealResult.usage?.totalTokens || 0
+    const workoutTokens = workoutResult.usage?.totalTokens || 0
+    const totalTokens = suppTokens + shopTokens + mealTokens + workoutTokens
+
     console.log(`✅ [WEEKLY-PLAN] All plans generated successfully`)
+    console.log(`📊 [WEEKLY-PLAN] Token breakdown:`)
+    console.log(`   - Supplementation: ${suppTokens} tokens`)
+    console.log(`   - Shopping List: ${shopTokens} tokens`)
+    console.log(`   - Meal Plan: ${mealTokens} tokens`)
+    console.log(`   - Workout Plan: ${workoutTokens} tokens`)
+    console.log(`   - TOTAL: ${totalTokens} tokens`)
+    console.log(`⏱️ [WEEKLY-PLAN] Processing time: ${processingTimeMs}ms`)
 
     // Calculate week start date (next Monday)
     const today = new Date()
@@ -82,7 +133,7 @@ export async function POST(request: NextRequest) {
 
     console.log(`💾 [WEEKLY-PLAN] Saving to database...`)
 
-    // Save to database
+    // Save to database with metadata
     const [savedPlan] = await db
       .insert(weeklyPlans)
       .values({
@@ -93,10 +144,40 @@ export async function POST(request: NextRequest) {
         shoppingList: shopping as any,
         mealPlan: meals as any,
         workoutPlan: workout as any,
+        // Metadata
+        tokensUsed: totalTokens,
+        processingTimeMs,
+        modelUsed: 'gemini-2.5-flash',
+        prompt: `Weekly plan generation: Supplementation (${suppTokens}t), Shopping (${shopTokens}t), Meals (${mealTokens}t), Workout (${workoutTokens}t)`,
       })
       .returning()
 
     console.log(`✅ [WEEKLY-PLAN] Plan saved: ${savedPlan.id}`)
+
+    // ============ DEBIT CREDITS ============
+    // Debit actual tokens from all 4 generations
+    try {
+      if (totalTokens > 0) {
+        await debitCredits(session.user.id, totalTokens, {
+          weeklyPlanId: savedPlan.id,
+          analysisId: analysis.id,
+          operation: 'generate_weekly_plan',
+          modelName: 'gemini-2.5-flash',
+          promptTokens: (suppResult.usage?.promptTokens || 0) + (shopResult.usage?.promptTokens || 0) + (mealResult.usage?.promptTokens || 0) + (workoutResult.usage?.promptTokens || 0),
+          completionTokens: (suppResult.usage?.completionTokens || 0) + (shopResult.usage?.completionTokens || 0) + (mealResult.usage?.completionTokens || 0) + (workoutResult.usage?.completionTokens || 0),
+          description: `Weekly plan: Supp(${suppTokens}), Shop(${shopTokens}), Meal(${mealTokens}), Workout(${workoutTokens})`,
+        })
+
+        const actualCreditsDebited = calculateCreditsFromTokens(totalTokens)
+        console.log(`💰 [WEEKLY-PLAN] Debited ${actualCreditsDebited} credits for ${totalTokens} real tokens`)
+      } else {
+        console.log(`⚠️ [WEEKLY-PLAN] No tokens used, skipping debit`)
+      }
+    } catch (creditError) {
+      console.error('⚠️ [WEEKLY-PLAN] Failed to debit credits:', creditError)
+      // Don't fail the operation, log for manual review
+    }
+    // =======================================
 
     return NextResponse.json({
       success: true,
@@ -109,6 +190,14 @@ export async function POST(request: NextRequest) {
         workoutPlan: savedPlan.workoutPlan,
         createdAt: savedPlan.createdAt,
       },
+      usage: {
+        totalTokens,
+        supplementation: suppTokens,
+        shopping: shopTokens,
+        meals: mealTokens,
+        workout: workoutTokens,
+      },
+      creditsDebited: calculateCreditsFromTokens(totalTokens),
       message: 'Plano semanal gerado com sucesso!',
     })
   } catch (error) {

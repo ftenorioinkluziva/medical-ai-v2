@@ -12,6 +12,7 @@ import { streamText, convertToModelMessages } from 'ai'
 import type { UIMessage } from 'ai'
 import { googleModels } from '@/lib/ai/providers'
 import { buildKnowledgeContext } from '@/lib/ai/knowledge'
+import { getUserCredits, calculateCreditsFromTokens, debitCredits } from '@/lib/billing/credits'
 
 const MAX_MESSAGES_PER_CHAT = 50
 
@@ -113,6 +114,31 @@ export async function POST(
     if (chatHistory.length >= MAX_MESSAGES_PER_CHAT) {
       return new Response('Message limit reached (50 messages per chat)', { status: 429 })
     }
+
+    // ============ CREDIT CHECK ============
+    // Estimate credits needed for chat (typically 20-80 credits depending on context)
+    const ESTIMATED_CHAT_CREDITS = 50
+    const userCreditsData = await getUserCredits(session.user.id)
+
+    if (userCreditsData.balance < ESTIMATED_CHAT_CREDITS) {
+      console.log(`❌ [CHAT-API] Insufficient credits: ${userCreditsData.balance} < ${ESTIMATED_CHAT_CREDITS}`)
+      return new Response(
+        JSON.stringify({
+          error: 'Créditos insuficientes',
+          details: {
+            required: ESTIMATED_CHAT_CREDITS,
+            current: userCreditsData.balance,
+            shortfall: ESTIMATED_CHAT_CREDITS - userCreditsData.balance,
+          },
+        }),
+        {
+          status: 402,
+          headers: { 'Content-Type': 'application/json' },
+        }
+      )
+    }
+    console.log(`✅ [CHAT-API] Credit check passed: ${userCreditsData.balance} credits available`)
+    // ======================================
 
     // Reverse to get chronological order
     chatHistory.reverse()
@@ -258,7 +284,14 @@ IMPORTANTE: Esta é uma conversa de follow-up. O paciente já leu sua análise e
       messages: modelMessages,
       temperature: agent.modelConfig.temperature || 0.3,
       maxTokens: 1000, // Limit response length
-      async onFinish({ text }) {
+      async onFinish({ text, usage }) {
+        // Extract token usage
+        const tokensUsed = usage?.totalTokens || 0
+        const promptTokens = usage?.promptTokens || 0
+        const completionTokens = usage?.completionTokens || 0
+
+        console.log(`📊 [CHAT-API] Token usage: ${tokensUsed} total (${promptTokens} prompt + ${completionTokens} completion)`)
+
         // Save assistant message to database after streaming completes
         await db.insert(chatMessages).values({
           userId: session.user.id,
@@ -267,8 +300,28 @@ IMPORTANTE: Esta é uma conversa de follow-up. O paciente já leu sua análise e
           role: 'assistant',
           content: text,
           modelUsed: agent.modelName,
-          tokensUsed: null, // Could track this with result.usage if needed
+          tokensUsed,
         })
+
+        // ============ DEBIT CREDITS ============
+        if (tokensUsed > 0) {
+          try {
+            const creditsDebited = calculateCreditsFromTokens(tokensUsed)
+            await debitCredits(session.user.id, tokensUsed, {
+              analysisId,
+              operation: 'chat_message',
+              modelName: agent.modelName,
+              promptTokens,
+              completionTokens,
+              messagePreview: messageText.substring(0, 100),
+            })
+            console.log(`💳 [CHAT-API] Debited ${creditsDebited} credits (${tokensUsed} tokens)`)
+          } catch (creditError) {
+            console.error('❌ [CHAT-API] Failed to debit credits:', creditError)
+            // Don't fail the chat, just log the error for manual review
+          }
+        }
+        // =======================================
 
         console.log(`✅ [CHAT-API] Response completed and saved`)
       },

@@ -88,9 +88,14 @@ export async function generateRecommendationsFromAnalysis(
 
   console.log(`🤖 [RECOMMENDATIONS] Generating AI recommendations...`)
 
+  const startTime = Date.now()
+
   // Generate recommendations
-  const { object: recommendations } = await generateObject({
-    model: google('gemini-2.5-flash'),
+  const modelUsed = 'gemini-2.5-flash'
+  const promptSummary = 'Generating personalized health recommendations based on medical analysis'
+
+  const result = await generateObject({
+    model: google(modelUsed),
     schema: recommendationsSchema,
     prompt: `Você é um assistente médico especializado em medicina preventiva e integrativa.
 
@@ -137,9 +142,14 @@ DIRETRIZES IMPORTANTES:
 - SEMPRE mantenha postura educacional - não substitui consulta médica`,
   })
 
-  console.log(`✅ [RECOMMENDATIONS] Generated ${recommendations.examRecommendations.length} exam recommendations`)
+  const recommendations = result.object
+  const processingTimeMs = Date.now() - startTime
 
-  // Save to database
+  console.log(`✅ [RECOMMENDATIONS] Generated ${recommendations.examRecommendations.length} exam recommendations`)
+  console.log(`📊 [RECOMMENDATIONS] Token usage: ${result.usage?.totalTokens || 0} tokens`)
+  console.log(`⏱️ [RECOMMENDATIONS] Processing time: ${processingTimeMs}ms`)
+
+  // Save to database with metadata
   const [savedRec] = await db
     .insert(recommendationsTable)
     .values({
@@ -149,6 +159,11 @@ DIRETRIZES IMPORTANTES:
       lifestyleRecommendations: recommendations.lifestyleRecommendations as any,
       healthGoals: recommendations.healthGoals as any,
       alerts: recommendations.alerts as any,
+      // Metadata
+      tokensUsed: result.usage?.totalTokens || null,
+      processingTimeMs,
+      modelUsed,
+      prompt: promptSummary,
     })
     .returning()
 
@@ -159,5 +174,6 @@ DIRETRIZES IMPORTANTES:
     recommendations,
     analysisId,
     createdAt: savedRec.createdAt,
+    usage: result.usage, // Return usage for credit debit
   }
 }
