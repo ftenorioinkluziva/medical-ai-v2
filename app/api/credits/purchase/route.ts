@@ -17,10 +17,16 @@ export async function POST(request: Request) {
 
   try {
     const body = await request.json()
+    console.log('[PURCHASE] Request body:', body)
+
     const { packageId } = purchaseSchema.parse(body)
+    console.log('[PURCHASE] Package ID:', packageId)
+    console.log('[PURCHASE] User ID:', session.user.id)
 
     // Check system limits before allowing purchase
     const systemCheck = await checkSystemApiLimit()
+    console.log('[PURCHASE] System check:', systemCheck)
+
     if (systemCheck.shouldPauseSales) {
       return NextResponse.json(
         {
@@ -33,14 +39,21 @@ export async function POST(request: Request) {
       )
     }
 
+    console.log('[PURCHASE] Creating checkout session...')
     const checkoutSession = await createCheckoutSession(session.user.id, packageId)
+    console.log('[PURCHASE] Checkout session created:', checkoutSession.id)
 
     return NextResponse.json({
       sessionId: checkoutSession.id,
       url: checkoutSession.url,
     })
   } catch (error) {
-    console.error('Error creating checkout session:', error)
+    console.error('[PURCHASE] Error creating checkout session:', error)
+    console.error('[PURCHASE] Error details:', {
+      message: error instanceof Error ? error.message : 'Unknown',
+      stack: error instanceof Error ? error.stack : undefined,
+      raw: error,
+    })
 
     if (error instanceof z.ZodError) {
       return NextResponse.json({ error: 'Invalid request data' }, { status: 400 })
