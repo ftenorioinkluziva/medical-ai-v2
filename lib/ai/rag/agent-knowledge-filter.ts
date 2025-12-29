@@ -9,7 +9,9 @@ import { eq, inArray, and, or } from 'drizzle-orm'
 
 export interface AgentKnowledgeConfig {
   knowledgeAccessType: 'full' | 'restricted'
+  allowedAuthors: string[]
   allowedCategories: string[]
+  allowedSubcategories: string[]
   excludedArticleIds: string[]
   includedArticleIds: string[]
 }
@@ -23,7 +25,9 @@ export async function getAgentKnowledgeConfig(
   const agent = await db
     .select({
       knowledgeAccessType: healthAgents.knowledgeAccessType,
+      allowedAuthors: healthAgents.allowedAuthors,
       allowedCategories: healthAgents.allowedCategories,
+      allowedSubcategories: healthAgents.allowedSubcategories,
       excludedArticleIds: healthAgents.excludedArticleIds,
       includedArticleIds: healthAgents.includedArticleIds,
     })
@@ -35,7 +39,9 @@ export async function getAgentKnowledgeConfig(
     // Default: full access if agent not found
     return {
       knowledgeAccessType: 'full',
+      allowedAuthors: [],
       allowedCategories: [],
+      allowedSubcategories: [],
       excludedArticleIds: [],
       includedArticleIds: [],
     }
@@ -43,7 +49,9 @@ export async function getAgentKnowledgeConfig(
 
   return {
     knowledgeAccessType: (agent[0].knowledgeAccessType as 'full' | 'restricted') || 'full',
+    allowedAuthors: (agent[0].allowedAuthors as string[]) || [],
     allowedCategories: (agent[0].allowedCategories as string[]) || [],
+    allowedSubcategories: (agent[0].allowedSubcategories as string[]) || [],
     excludedArticleIds: (agent[0].excludedArticleIds as string[]) || [],
     includedArticleIds: (agent[0].includedArticleIds as string[]) || [],
   }
@@ -62,21 +70,32 @@ export async function getAllowedArticleIds(
     return null
   }
 
-  // Start with articles from allowed categories
-  let allowedArticles: string[] = []
+  // Build filter conditions
+  const conditions: any[] = [eq(knowledgeArticles.isVerified, 'verified')]
+
+  // Apply cascading filters
+  if (config.allowedAuthors.length > 0) {
+    conditions.push(inArray(knowledgeArticles.author, config.allowedAuthors))
+  }
 
   if (config.allowedCategories.length > 0) {
-    const categoryArticles = await db
+    conditions.push(inArray(knowledgeArticles.category, config.allowedCategories))
+  }
+
+  if (config.allowedSubcategories.length > 0) {
+    conditions.push(inArray(knowledgeArticles.subcategory, config.allowedSubcategories))
+  }
+
+  // Fetch filtered articles
+  let allowedArticles: string[] = []
+
+  if (conditions.length > 1) {
+    const filteredArticles = await db
       .select({ id: knowledgeArticles.id })
       .from(knowledgeArticles)
-      .where(
-        and(
-          inArray(knowledgeArticles.category, config.allowedCategories),
-          eq(knowledgeArticles.isVerified, 'verified')
-        )
-      )
+      .where(and(...conditions))
 
-    allowedArticles = categoryArticles.map((a) => a.id)
+    allowedArticles = filteredArticles.map((a) => a.id)
   }
 
   // Add explicitly included articles
@@ -120,7 +139,9 @@ export async function getAgentKnowledgeStats(agentId: string) {
   return {
     accessType: 'restricted' as const,
     totalArticles: allowedIds?.length || 0,
+    authorsCount: config.allowedAuthors.length,
     categoriesCount: config.allowedCategories.length,
+    subcategoriesCount: config.allowedSubcategories.length,
     excludedCount: config.excludedArticleIds.length,
     includedCount: config.includedArticleIds.length,
   }
@@ -163,4 +184,60 @@ export async function getKnowledgeCategories() {
       count,
     }))
     .sort((a, b) => a.label.localeCompare(b.label))
+}
+
+/**
+ * Get available knowledge authors with article counts
+ */
+export async function getKnowledgeAuthors() {
+  const articles = await db
+    .select({
+      author: knowledgeArticles.author,
+    })
+    .from(knowledgeArticles)
+    .where(eq(knowledgeArticles.isVerified, 'verified'))
+
+  // Count articles per author
+  const authorCounts: Record<string, number> = {}
+  articles.forEach((article) => {
+    const author = article.author?.trim() || ''
+    if (author) {
+      authorCounts[author] = (authorCounts[author] || 0) + 1
+    }
+  })
+
+  return Object.entries(authorCounts)
+    .map(([author, count]) => ({
+      author,
+      count,
+    }))
+    .sort((a, b) => a.author.localeCompare(b.author))
+}
+
+/**
+ * Get available knowledge subcategories with article counts
+ */
+export async function getKnowledgeSubcategories() {
+  const articles = await db
+    .select({
+      subcategory: knowledgeArticles.subcategory,
+    })
+    .from(knowledgeArticles)
+    .where(eq(knowledgeArticles.isVerified, 'verified'))
+
+  // Count articles per subcategory
+  const subcategoryCounts: Record<string, number> = {}
+  articles.forEach((article) => {
+    const subcategory = article.subcategory?.trim() || ''
+    if (subcategory) {
+      subcategoryCounts[subcategory] = (subcategoryCounts[subcategory] || 0) + 1
+    }
+  })
+
+  return Object.entries(subcategoryCounts)
+    .map(([subcategory, count]) => ({
+      subcategory,
+      count,
+    }))
+    .sort((a, b) => a.subcategory.localeCompare(b.subcategory))
 }

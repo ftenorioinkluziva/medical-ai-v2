@@ -30,8 +30,10 @@ interface AgentFormProps {
 
 export function AgentForm({ agent, onSuccess, onCancel }: AgentFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [authors, setAuthors] = useState<Array<{ author: string; count: number }>>([])
   const [categories, setCategories] = useState<Array<{ category: string; label: string; count: number }>>([])
-  const [isLoadingCategories, setIsLoadingCategories] = useState(false)
+  const [subcategories, setSubcategories] = useState<Array<{ subcategory: string; count: number }>>([])
+  const [isLoadingFilters, setIsLoadingFilters] = useState(false)
 
   // Prompt Generation States
   const [isGeneratingSystemPrompt, setIsGeneratingSystemPrompt] = useState(false)
@@ -80,29 +82,48 @@ export function AgentForm({ agent, onSuccess, onCancel }: AgentFormProps) {
     requiresApproval: false,
     tags: '',
     knowledgeAccessType: 'full' as 'full' | 'restricted',
+    allowedAuthors: [] as string[],
     allowedCategories: [] as string[],
+    allowedSubcategories: [] as string[],
     excludedArticleIds: [] as string[],
     includedArticleIds: [] as string[],
   })
 
-  // Load categories on mount
+  // Load filters (authors, categories, subcategories) on mount
   useEffect(() => {
-    const loadCategories = async () => {
+    const loadFilters = async () => {
       try {
-        setIsLoadingCategories(true)
-        const response = await fetch('/api/admin/knowledge/categories')
-        if (response.ok) {
-          const data = await response.json()
+        setIsLoadingFilters(true)
+
+        // Load all filters in parallel
+        const [authorsRes, categoriesRes, subcategoriesRes] = await Promise.all([
+          fetch('/api/admin/knowledge/authors'),
+          fetch('/api/admin/knowledge/categories'),
+          fetch('/api/admin/knowledge/subcategories'),
+        ])
+
+        if (authorsRes.ok) {
+          const data = await authorsRes.json()
+          setAuthors(data.authors || [])
+        }
+
+        if (categoriesRes.ok) {
+          const data = await categoriesRes.json()
           setCategories(data.categories || [])
         }
+
+        if (subcategoriesRes.ok) {
+          const data = await subcategoriesRes.json()
+          setSubcategories(data.subcategories || [])
+        }
       } catch (error) {
-        console.error('Error loading categories:', error)
+        console.error('Error loading filters:', error)
       } finally {
-        setIsLoadingCategories(false)
+        setIsLoadingFilters(false)
       }
     }
 
-    loadCategories()
+    loadFilters()
   }, [])
 
   useEffect(() => {
@@ -127,7 +148,9 @@ export function AgentForm({ agent, onSuccess, onCancel }: AgentFormProps) {
         requiresApproval: agent.requiresApproval || false,
         tags: agent.tags ? agent.tags.join(', ') : '',
         knowledgeAccessType: agent.knowledgeAccessType || 'full',
+        allowedAuthors: agent.allowedAuthors || [],
         allowedCategories: agent.allowedCategories || [],
+        allowedSubcategories: agent.allowedSubcategories || [],
         excludedArticleIds: agent.excludedArticleIds || [],
         includedArticleIds: agent.includedArticleIds || [],
       })
@@ -136,6 +159,15 @@ export function AgentForm({ agent, onSuccess, onCancel }: AgentFormProps) {
 
   const handleChange = (field: string, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
+  }
+
+  const handleAuthorToggle = (author: string, checked: boolean) => {
+    setFormData((prev) => ({
+      ...prev,
+      allowedAuthors: checked
+        ? [...prev.allowedAuthors, author]
+        : prev.allowedAuthors.filter((a) => a !== author),
+    }))
   }
 
   const handleCategoryToggle = (category: string, checked: boolean) => {
@@ -147,13 +179,13 @@ export function AgentForm({ agent, onSuccess, onCancel }: AgentFormProps) {
     }))
   }
 
-  const getTotalArticles = () => {
-    if (formData.knowledgeAccessType === 'full') {
-      return categories.reduce((sum, cat) => sum + cat.count, 0)
-    }
-    return categories
-      .filter((cat) => formData.allowedCategories.includes(cat.category))
-      .reduce((sum, cat) => sum + cat.count, 0)
+  const handleSubcategoryToggle = (subcategory: string, checked: boolean) => {
+    setFormData((prev) => ({
+      ...prev,
+      allowedSubcategories: checked
+        ? [...prev.allowedSubcategories, subcategory]
+        : prev.allowedSubcategories.filter((s) => s !== subcategory),
+    }))
   }
 
   // Generate System Prompt with AI
@@ -167,9 +199,11 @@ export function AgentForm({ agent, onSuccess, onCancel }: AgentFormProps) {
     // Validar configuração de conhecimento
     if (
       formData.knowledgeAccessType === 'restricted' &&
-      formData.allowedCategories.length === 0
+      formData.allowedAuthors.length === 0 &&
+      formData.allowedCategories.length === 0 &&
+      formData.allowedSubcategories.length === 0
     ) {
-      setGenerateError('Configure pelo menos uma categoria de conhecimento')
+      setGenerateError('Configure pelo menos um filtro de conhecimento (autor, categoria ou subcategoria)')
       return
     }
 
@@ -188,7 +222,9 @@ export function AgentForm({ agent, onSuccess, onCancel }: AgentFormProps) {
             title: formData.title,
             description: formData.description,
             knowledgeAccessType: formData.knowledgeAccessType,
+            allowedAuthors: formData.allowedAuthors,
             allowedCategories: formData.allowedCategories,
+            allowedSubcategories: formData.allowedSubcategories,
           },
         }),
       })
@@ -223,9 +259,11 @@ export function AgentForm({ agent, onSuccess, onCancel }: AgentFormProps) {
     // Validar configuração de conhecimento
     if (
       formData.knowledgeAccessType === 'restricted' &&
-      formData.allowedCategories.length === 0
+      formData.allowedAuthors.length === 0 &&
+      formData.allowedCategories.length === 0 &&
+      formData.allowedSubcategories.length === 0
     ) {
-      setGenerateError('Configure pelo menos uma categoria de conhecimento')
+      setGenerateError('Configure pelo menos um filtro de conhecimento (autor, categoria ou subcategoria)')
       return
     }
 
@@ -244,7 +282,9 @@ export function AgentForm({ agent, onSuccess, onCancel }: AgentFormProps) {
             title: formData.title,
             description: formData.description,
             knowledgeAccessType: formData.knowledgeAccessType,
+            allowedAuthors: formData.allowedAuthors,
             allowedCategories: formData.allowedCategories,
+            allowedSubcategories: formData.allowedSubcategories,
           },
         }),
       })
@@ -298,7 +338,9 @@ export function AgentForm({ agent, onSuccess, onCancel }: AgentFormProps) {
           .map((t) => t.trim())
           .filter((t) => t.length > 0),
         knowledgeAccessType: formData.knowledgeAccessType,
+        allowedAuthors: formData.allowedAuthors,
         allowedCategories: formData.allowedCategories,
+        allowedSubcategories: formData.allowedSubcategories,
         excludedArticleIds: formData.excludedArticleIds,
         includedArticleIds: formData.includedArticleIds,
       }
@@ -461,7 +503,9 @@ export function AgentForm({ agent, onSuccess, onCancel }: AgentFormProps) {
               !formData.title ||
               !formData.description ||
               (formData.knowledgeAccessType === 'restricted' &&
-                formData.allowedCategories.length === 0)
+                formData.allowedAuthors.length === 0 &&
+                formData.allowedCategories.length === 0 &&
+                formData.allowedSubcategories.length === 0)
             }
             className="w-full"
           >
@@ -509,7 +553,9 @@ export function AgentForm({ agent, onSuccess, onCancel }: AgentFormProps) {
               !formData.title ||
               !formData.description ||
               (formData.knowledgeAccessType === 'restricted' &&
-                formData.allowedCategories.length === 0)
+                formData.allowedAuthors.length === 0 &&
+                formData.allowedCategories.length === 0 &&
+                formData.allowedSubcategories.length === 0)
             }
             className="w-full"
           >
@@ -858,63 +904,169 @@ export function AgentForm({ agent, onSuccess, onCancel }: AgentFormProps) {
                 <span className="font-medium">Acesso Restrito</span>
               </div>
               <p className="text-sm text-muted-foreground mt-1">
-                Agente acessa apenas categorias selecionadas
+                Agente acessa apenas filtros selecionados (autor, categoria, subcategoria)
               </p>
             </Label>
           </div>
         </RadioGroup>
 
-        {/* Categories Selection (only show if restricted) */}
+        {/* Filters Selection (only show if restricted) */}
         {formData.knowledgeAccessType === 'restricted' && (
-          <div className="space-y-3 p-4 border rounded-lg bg-muted/30">
-            <div className="flex items-center justify-between">
-              <Label className="text-base">Categorias Permitidas</Label>
-              <span className="text-sm text-muted-foreground">
-                {getTotalArticles()} artigos selecionados
-              </span>
-            </div>
+          <div className="space-y-4 p-4 border rounded-lg bg-muted/30">
+            <p className="text-sm text-muted-foreground">
+              Selecione um ou mais filtros em cascata para definir quais artigos o agente pode acessar.
+              Quanto mais filtros selecionados, mais restrito será o conhecimento do agente.
+            </p>
 
-            {isLoadingCategories ? (
+            {isLoadingFilters ? (
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Loader2 className="h-4 w-4 animate-spin" />
-                Carregando categorias...
+                Carregando filtros...
               </div>
-            ) : categories.length === 0 ? (
-              <p className="text-sm text-muted-foreground">
-                Nenhuma categoria disponível. Adicione artigos à base de conhecimento primeiro.
-              </p>
             ) : (
-              <div className="grid gap-3 md:grid-cols-2">
-                {categories.map((cat) => (
-                  <div
-                    key={cat.category}
-                    className="flex items-center space-x-2 p-3 border rounded-md hover:bg-background"
-                  >
-                    <Checkbox
-                      id={`cat-${cat.category}`}
-                      checked={formData.allowedCategories.includes(cat.category)}
-                      onCheckedChange={(checked) =>
-                        handleCategoryToggle(cat.category, checked as boolean)
-                      }
-                    />
-                    <Label
-                      htmlFor={`cat-${cat.category}`}
-                      className="flex-1 cursor-pointer"
-                    >
-                      <div className="font-medium">{cat.label}</div>
-                      <div className="text-xs text-muted-foreground">
-                        {cat.count} {cat.count === 1 ? 'artigo' : 'artigos'}
-                      </div>
-                    </Label>
+              <div className="space-y-6">
+                {/* Authors Filter */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-base">1. Autores ({formData.allowedAuthors.length} selecionados)</Label>
+                    {authors.length > 0 && (
+                      <span className="text-xs text-muted-foreground">
+                        {authors.length} autores disponíveis
+                      </span>
+                    )}
                   </div>
-                ))}
-              </div>
-            )}
 
-            {formData.allowedCategories.length === 0 && !isLoadingCategories && categories.length > 0 && (
-              <p className="text-sm text-orange-600 bg-orange-50 p-3 rounded-md">
-                ⚠️ Atenção: Nenhuma categoria selecionada. O agente não terá acesso a nenhum conhecimento.
-              </p>
+                  {authors.length === 0 ? (
+                    <p className="text-sm text-muted-foreground">
+                      Nenhum autor disponível. Adicione artigos com autores à base de conhecimento.
+                    </p>
+                  ) : (
+                    <div className="grid gap-2 md:grid-cols-3">
+                      {authors.map((author) => (
+                        <div
+                          key={author.author}
+                          className="flex items-center space-x-2 p-2 border rounded-md hover:bg-background text-sm"
+                        >
+                          <Checkbox
+                            id={`author-${author.author}`}
+                            checked={formData.allowedAuthors.includes(author.author)}
+                            onCheckedChange={(checked) =>
+                              handleAuthorToggle(author.author, checked as boolean)
+                            }
+                          />
+                          <Label
+                            htmlFor={`author-${author.author}`}
+                            className="flex-1 cursor-pointer"
+                          >
+                            <div className="font-medium truncate">{author.author}</div>
+                            <div className="text-xs text-muted-foreground">
+                              {author.count} {author.count === 1 ? 'artigo' : 'artigos'}
+                            </div>
+                          </Label>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Categories Filter */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-base">2. Categorias ({formData.allowedCategories.length} selecionadas)</Label>
+                    {categories.length > 0 && (
+                      <span className="text-xs text-muted-foreground">
+                        {categories.length} categorias disponíveis
+                      </span>
+                    )}
+                  </div>
+
+                  {categories.length === 0 ? (
+                    <p className="text-sm text-muted-foreground">
+                      Nenhuma categoria disponível. Adicione artigos à base de conhecimento.
+                    </p>
+                  ) : (
+                    <div className="grid gap-2 md:grid-cols-3">
+                      {categories.map((cat) => (
+                        <div
+                          key={cat.category}
+                          className="flex items-center space-x-2 p-2 border rounded-md hover:bg-background text-sm"
+                        >
+                          <Checkbox
+                            id={`cat-${cat.category}`}
+                            checked={formData.allowedCategories.includes(cat.category)}
+                            onCheckedChange={(checked) =>
+                              handleCategoryToggle(cat.category, checked as boolean)
+                            }
+                          />
+                          <Label
+                            htmlFor={`cat-${cat.category}`}
+                            className="flex-1 cursor-pointer"
+                          >
+                            <div className="font-medium">{cat.label}</div>
+                            <div className="text-xs text-muted-foreground">
+                              {cat.count} {cat.count === 1 ? 'artigo' : 'artigos'}
+                            </div>
+                          </Label>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Subcategories Filter */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-base">3. Subcategorias ({formData.allowedSubcategories.length} selecionadas)</Label>
+                    {subcategories.length > 0 && (
+                      <span className="text-xs text-muted-foreground">
+                        {subcategories.length} subcategorias disponíveis
+                      </span>
+                    )}
+                  </div>
+
+                  {subcategories.length === 0 ? (
+                    <p className="text-sm text-muted-foreground">
+                      Nenhuma subcategoria disponível. Adicione artigos com subcategorias à base de conhecimento.
+                    </p>
+                  ) : (
+                    <div className="grid gap-2 md:grid-cols-3">
+                      {subcategories.map((sub) => (
+                        <div
+                          key={sub.subcategory}
+                          className="flex items-center space-x-2 p-2 border rounded-md hover:bg-background text-sm"
+                        >
+                          <Checkbox
+                            id={`sub-${sub.subcategory}`}
+                            checked={formData.allowedSubcategories.includes(sub.subcategory)}
+                            onCheckedChange={(checked) =>
+                              handleSubcategoryToggle(sub.subcategory, checked as boolean)
+                            }
+                          />
+                          <Label
+                            htmlFor={`sub-${sub.subcategory}`}
+                            className="flex-1 cursor-pointer"
+                          >
+                            <div className="font-medium truncate">{sub.subcategory}</div>
+                            <div className="text-xs text-muted-foreground">
+                              {sub.count} {sub.count === 1 ? 'artigo' : 'artigos'}
+                            </div>
+                          </Label>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Warning if no filters selected */}
+                {formData.allowedAuthors.length === 0 &&
+                  formData.allowedCategories.length === 0 &&
+                  formData.allowedSubcategories.length === 0 &&
+                  !isLoadingFilters && (
+                    <p className="text-sm text-orange-600 bg-orange-50 dark:bg-orange-950 dark:text-orange-400 p-3 rounded-md">
+                      ⚠️ Atenção: Nenhum filtro selecionado. O agente não terá acesso a nenhum conhecimento.
+                    </p>
+                  )}
+              </div>
             )}
           </div>
         )}

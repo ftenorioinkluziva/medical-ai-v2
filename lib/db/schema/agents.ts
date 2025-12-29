@@ -41,7 +41,9 @@ export const healthAgents = pgTable('health_agents', {
 
   // Knowledge Base Configuration
   knowledgeAccessType: varchar('knowledge_access_type', { length: 20 }).notNull().default('full'), // 'full' | 'restricted'
+  allowedAuthors: json('allowed_authors').$type<string[]>().default([]), // Authors the agent can access
   allowedCategories: json('allowed_categories').$type<string[]>().default([]), // Categories the agent can access
+  allowedSubcategories: json('allowed_subcategories').$type<string[]>().default([]), // Subcategories the agent can access
   excludedArticleIds: json('excluded_article_ids').$type<string[]>().default([]), // Specific articles to exclude
   includedArticleIds: json('included_article_ids').$type<string[]>().default([]), // Specific articles to include
 
