@@ -89,14 +89,19 @@ INSTRUÇÕES:
 1. Analise o conteúdo do documento
 2. Gere um título conciso e descritivo (máximo 100 caracteres)
 3. Escolha a categoria mais adequada (apenas UMA das listadas acima)
-4. Identifique a fonte/autor (se mencionado no texto)
-5. Crie um resumo objetivo de 2-4 frases
-6. Extraia 3-6 tags relevantes (palavras-chave médicas)
+4. Identifique uma subcategoria específica se aplicável (ex: para endocrinology pode ser "Diabetes", "Tireoide", etc.)
+5. Identifique a fonte (journal, organização, website, etc.) se mencionada
+6. Identifique a URL da fonte se mencionada no texto
+7. Identifique o(s) autor(es) se mencionado(s) no texto
+8. Crie um resumo objetivo de 2-4 frases
+9. Extraia 3-6 tags relevantes (palavras-chave médicas)
 
 IMPORTANTE:
 - Seja preciso e objetivo
 - Use terminologia médica apropriada
 - O título deve ser claro e informativo
+- A subcategoria deve ser específica e relacionada à categoria principal
+- Se não encontrar autor, fonte ou URL no texto, deixe vazio
 - As tags devem ser palavras-chave únicas e relevantes
 - O resumo deve destacar os pontos principais do documento
 
@@ -104,7 +109,10 @@ FORMATO DE SAÍDA (JSON):
 {
   "title": "Título do documento",
   "category": "categoria",
-  "source": "Fonte/Autor (ou vazio se não identificado)",
+  "subcategory": "Subcategoria específica (ou vazio se não aplicável)",
+  "source": "Nome da fonte (ou vazio se não identificado)",
+  "sourceUrl": "URL da fonte (ou vazio se não identificado)",
+  "author": "Nome do(s) autor(es) (ou vazio se não identificado)",
   "summary": "Resumo objetivo do conteúdo...",
   "tags": "tag1, tag2, tag3, tag4"
 }
@@ -180,6 +188,9 @@ Retorne APENAS o JSON com os metadados.`
     console.log(`✅ [METADATA-GEN] Metadata generated in ${processingTime}ms`)
     console.log(`   - Title: ${metadata.title}`)
     console.log(`   - Category: ${metadata.category}`)
+    console.log(`   - Subcategory: ${metadata.subcategory || 'N/A'}`)
+    console.log(`   - Source: ${metadata.source || 'N/A'}`)
+    console.log(`   - Author: ${metadata.author || 'N/A'}`)
     console.log(`   - Tags: ${metadata.tags}`)
     console.log(`   - Tokens: ${result.usage?.totalTokens || 'N/A'}`)
 
@@ -188,7 +199,10 @@ Retorne APENAS o JSON com os metadados.`
       metadata: {
         title: metadata.title || '',
         category: metadata.category || 'general',
+        subcategory: metadata.subcategory || '',
         source: metadata.source || '',
+        sourceUrl: metadata.sourceUrl || '',
+        author: metadata.author || '',
         summary: metadata.summary || '',
         tags: metadata.tags || '',
       },
