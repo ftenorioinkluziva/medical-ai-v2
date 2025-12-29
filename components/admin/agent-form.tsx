@@ -929,11 +929,30 @@ export function AgentForm({ agent, onSuccess, onCancel }: AgentFormProps) {
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <Label className="text-base">1. Autores ({formData.allowedAuthors.length} selecionados)</Label>
-                    {authors.length > 0 && (
-                      <span className="text-xs text-muted-foreground">
-                        {authors.length} autores disponíveis
-                      </span>
-                    )}
+                    <div className="flex gap-2">
+                      {authors.length > 0 && (
+                        <>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleChange('allowedAuthors', authors.map(a => a.author))}
+                            className="h-7 text-xs"
+                          >
+                            Selecionar todos
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleChange('allowedAuthors', [])}
+                            className="h-7 text-xs"
+                          >
+                            Limpar
+                          </Button>
+                        </>
+                      )}
+                    </div>
                   </div>
 
                   {authors.length === 0 ? (
@@ -941,31 +960,54 @@ export function AgentForm({ agent, onSuccess, onCancel }: AgentFormProps) {
                       Nenhum autor disponível. Adicione artigos com autores à base de conhecimento.
                     </p>
                   ) : (
-                    <div className="grid gap-2 md:grid-cols-3">
-                      {authors.map((author) => (
-                        <div
-                          key={author.author}
-                          className="flex items-center space-x-2 p-2 border rounded-md hover:bg-background text-sm"
-                        >
-                          <Checkbox
-                            id={`author-${author.author}`}
-                            checked={formData.allowedAuthors.includes(author.author)}
-                            onCheckedChange={(checked) =>
-                              handleAuthorToggle(author.author, checked as boolean)
-                            }
-                          />
-                          <Label
-                            htmlFor={`author-${author.author}`}
-                            className="flex-1 cursor-pointer"
+                    <>
+                      <div className="max-h-60 overflow-y-auto border rounded-md p-3 space-y-1">
+                        {authors.map((author) => (
+                          <div
+                            key={author.author}
+                            className="flex items-center space-x-2 p-2 rounded hover:bg-muted cursor-pointer"
+                            onClick={() => handleAuthorToggle(author.author, !formData.allowedAuthors.includes(author.author))}
                           >
-                            <div className="font-medium truncate">{author.author}</div>
-                            <div className="text-xs text-muted-foreground">
-                              {author.count} {author.count === 1 ? 'artigo' : 'artigos'}
-                            </div>
-                          </Label>
+                            <Checkbox
+                              id={`author-${author.author}`}
+                              checked={formData.allowedAuthors.includes(author.author)}
+                              onCheckedChange={(checked) =>
+                                handleAuthorToggle(author.author, checked as boolean)
+                              }
+                              onClick={(e) => e.stopPropagation()}
+                            />
+                            <Label
+                              htmlFor={`author-${author.author}`}
+                              className="flex-1 cursor-pointer flex items-center justify-between"
+                            >
+                              <span className="font-medium">{author.author}</span>
+                              <span className="text-xs text-muted-foreground">
+                                {author.count} {author.count === 1 ? 'artigo' : 'artigos'}
+                              </span>
+                            </Label>
+                          </div>
+                        ))}
+                      </div>
+                      {formData.allowedAuthors.length > 0 && (
+                        <div className="flex flex-wrap gap-1 p-2 bg-muted/50 rounded-md">
+                          {formData.allowedAuthors.map((author) => (
+                            <span
+                              key={author}
+                              className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary rounded text-xs"
+                            >
+                              {author}
+                              <button
+                                type="button"
+                                onClick={() => handleAuthorToggle(author, false)}
+                                className="hover:bg-primary/20 rounded-full p-0.5"
+                              >
+                                <XCircle className="h-3 w-3" />
+                              </button>
+                            </span>
+                          ))}
                         </div>
-                      ))}
-                    </div>
+                      )}
+                    </>
                   )}
                 </div>
 
@@ -973,11 +1015,30 @@ export function AgentForm({ agent, onSuccess, onCancel }: AgentFormProps) {
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <Label className="text-base">2. Categorias ({formData.allowedCategories.length} selecionadas)</Label>
-                    {categories.length > 0 && (
-                      <span className="text-xs text-muted-foreground">
-                        {categories.length} categorias disponíveis
-                      </span>
-                    )}
+                    <div className="flex gap-2">
+                      {categories.length > 0 && (
+                        <>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleChange('allowedCategories', categories.map(c => c.category))}
+                            className="h-7 text-xs"
+                          >
+                            Selecionar todas
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleChange('allowedCategories', [])}
+                            className="h-7 text-xs"
+                          >
+                            Limpar
+                          </Button>
+                        </>
+                      )}
+                    </div>
                   </div>
 
                   {categories.length === 0 ? (
@@ -985,31 +1046,57 @@ export function AgentForm({ agent, onSuccess, onCancel }: AgentFormProps) {
                       Nenhuma categoria disponível. Adicione artigos à base de conhecimento.
                     </p>
                   ) : (
-                    <div className="grid gap-2 md:grid-cols-3">
-                      {categories.map((cat) => (
-                        <div
-                          key={cat.category}
-                          className="flex items-center space-x-2 p-2 border rounded-md hover:bg-background text-sm"
-                        >
-                          <Checkbox
-                            id={`cat-${cat.category}`}
-                            checked={formData.allowedCategories.includes(cat.category)}
-                            onCheckedChange={(checked) =>
-                              handleCategoryToggle(cat.category, checked as boolean)
-                            }
-                          />
-                          <Label
-                            htmlFor={`cat-${cat.category}`}
-                            className="flex-1 cursor-pointer"
+                    <>
+                      <div className="max-h-60 overflow-y-auto border rounded-md p-3 space-y-1">
+                        {categories.map((cat) => (
+                          <div
+                            key={cat.category}
+                            className="flex items-center space-x-2 p-2 rounded hover:bg-muted cursor-pointer"
+                            onClick={() => handleCategoryToggle(cat.category, !formData.allowedCategories.includes(cat.category))}
                           >
-                            <div className="font-medium">{cat.label}</div>
-                            <div className="text-xs text-muted-foreground">
-                              {cat.count} {cat.count === 1 ? 'artigo' : 'artigos'}
-                            </div>
-                          </Label>
+                            <Checkbox
+                              id={`cat-${cat.category}`}
+                              checked={formData.allowedCategories.includes(cat.category)}
+                              onCheckedChange={(checked) =>
+                                handleCategoryToggle(cat.category, checked as boolean)
+                              }
+                              onClick={(e) => e.stopPropagation()}
+                            />
+                            <Label
+                              htmlFor={`cat-${cat.category}`}
+                              className="flex-1 cursor-pointer flex items-center justify-between"
+                            >
+                              <span className="font-medium">{cat.label}</span>
+                              <span className="text-xs text-muted-foreground">
+                                {cat.count} {cat.count === 1 ? 'artigo' : 'artigos'}
+                              </span>
+                            </Label>
+                          </div>
+                        ))}
+                      </div>
+                      {formData.allowedCategories.length > 0 && (
+                        <div className="flex flex-wrap gap-1 p-2 bg-muted/50 rounded-md">
+                          {formData.allowedCategories.map((category) => {
+                            const cat = categories.find(c => c.category === category)
+                            return (
+                              <span
+                                key={category}
+                                className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary rounded text-xs"
+                              >
+                                {cat?.label || category}
+                                <button
+                                  type="button"
+                                  onClick={() => handleCategoryToggle(category, false)}
+                                  className="hover:bg-primary/20 rounded-full p-0.5"
+                                >
+                                  <XCircle className="h-3 w-3" />
+                                </button>
+                              </span>
+                            )
+                          })}
                         </div>
-                      ))}
-                    </div>
+                      )}
+                    </>
                   )}
                 </div>
 
@@ -1017,11 +1104,30 @@ export function AgentForm({ agent, onSuccess, onCancel }: AgentFormProps) {
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <Label className="text-base">3. Subcategorias ({formData.allowedSubcategories.length} selecionadas)</Label>
-                    {subcategories.length > 0 && (
-                      <span className="text-xs text-muted-foreground">
-                        {subcategories.length} subcategorias disponíveis
-                      </span>
-                    )}
+                    <div className="flex gap-2">
+                      {subcategories.length > 0 && (
+                        <>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleChange('allowedSubcategories', subcategories.map(s => s.subcategory))}
+                            className="h-7 text-xs"
+                          >
+                            Selecionar todas
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleChange('allowedSubcategories', [])}
+                            className="h-7 text-xs"
+                          >
+                            Limpar
+                          </Button>
+                        </>
+                      )}
+                    </div>
                   </div>
 
                   {subcategories.length === 0 ? (
@@ -1029,31 +1135,54 @@ export function AgentForm({ agent, onSuccess, onCancel }: AgentFormProps) {
                       Nenhuma subcategoria disponível. Adicione artigos com subcategorias à base de conhecimento.
                     </p>
                   ) : (
-                    <div className="grid gap-2 md:grid-cols-3">
-                      {subcategories.map((sub) => (
-                        <div
-                          key={sub.subcategory}
-                          className="flex items-center space-x-2 p-2 border rounded-md hover:bg-background text-sm"
-                        >
-                          <Checkbox
-                            id={`sub-${sub.subcategory}`}
-                            checked={formData.allowedSubcategories.includes(sub.subcategory)}
-                            onCheckedChange={(checked) =>
-                              handleSubcategoryToggle(sub.subcategory, checked as boolean)
-                            }
-                          />
-                          <Label
-                            htmlFor={`sub-${sub.subcategory}`}
-                            className="flex-1 cursor-pointer"
+                    <>
+                      <div className="max-h-60 overflow-y-auto border rounded-md p-3 space-y-1">
+                        {subcategories.map((sub) => (
+                          <div
+                            key={sub.subcategory}
+                            className="flex items-center space-x-2 p-2 rounded hover:bg-muted cursor-pointer"
+                            onClick={() => handleSubcategoryToggle(sub.subcategory, !formData.allowedSubcategories.includes(sub.subcategory))}
                           >
-                            <div className="font-medium truncate">{sub.subcategory}</div>
-                            <div className="text-xs text-muted-foreground">
-                              {sub.count} {sub.count === 1 ? 'artigo' : 'artigos'}
-                            </div>
-                          </Label>
+                            <Checkbox
+                              id={`sub-${sub.subcategory}`}
+                              checked={formData.allowedSubcategories.includes(sub.subcategory)}
+                              onCheckedChange={(checked) =>
+                                handleSubcategoryToggle(sub.subcategory, checked as boolean)
+                              }
+                              onClick={(e) => e.stopPropagation()}
+                            />
+                            <Label
+                              htmlFor={`sub-${sub.subcategory}`}
+                              className="flex-1 cursor-pointer flex items-center justify-between"
+                            >
+                              <span className="font-medium">{sub.subcategory}</span>
+                              <span className="text-xs text-muted-foreground">
+                                {sub.count} {sub.count === 1 ? 'artigo' : 'artigos'}
+                              </span>
+                            </Label>
+                          </div>
+                        ))}
+                      </div>
+                      {formData.allowedSubcategories.length > 0 && (
+                        <div className="flex flex-wrap gap-1 p-2 bg-muted/50 rounded-md">
+                          {formData.allowedSubcategories.map((subcategory) => (
+                            <span
+                              key={subcategory}
+                              className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary rounded text-xs"
+                            >
+                              {subcategory}
+                              <button
+                                type="button"
+                                onClick={() => handleSubcategoryToggle(subcategory, false)}
+                                className="hover:bg-primary/20 rounded-full p-0.5"
+                              >
+                                <XCircle className="h-3 w-3" />
+                              </button>
+                            </span>
+                          ))}
                         </div>
-                      ))}
-                    </div>
+                      )}
+                    </>
                   )}
                 </div>
 

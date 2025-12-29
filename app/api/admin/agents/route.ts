@@ -97,7 +97,9 @@ export async function POST(request: NextRequest) {
       requiresApproval,
       tags,
       knowledgeAccessType,
+      allowedAuthors,
       allowedCategories,
+      allowedSubcategories,
       excludedArticleIds,
       includedArticleIds,
     } = body
@@ -134,7 +136,9 @@ export async function POST(request: NextRequest) {
         requiresApproval: requiresApproval || false,
         tags: tags || [],
         knowledgeAccessType: knowledgeAccessType || 'full',
+        allowedAuthors: allowedAuthors || [],
         allowedCategories: allowedCategories || [],
+        allowedSubcategories: allowedSubcategories || [],
         excludedArticleIds: excludedArticleIds || [],
         includedArticleIds: includedArticleIds || [],
       })
