@@ -78,9 +78,10 @@ export async function GET(request: NextRequest) {
 
     if (!latestRec) {
       return NextResponse.json({
-        success: false,
-        error: 'Nenhuma recomendação encontrada. Realize uma análise médica primeiro.',
-      }, { status: 404 })
+        success: true,
+        recommendations: null,
+        message: 'Nenhuma recomendação encontrada. Realize uma análise médica primeiro.',
+      })
     }
 
     console.log(`✅ [RECOMMENDATIONS-API] Returning latest recommendation from ${latestRec.createdAt}`)
@@ -101,12 +102,11 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('❌ [RECOMMENDATIONS-API] Error:', error)
 
-    return NextResponse.json(
-      {
-        success: false,
-        error: error instanceof Error ? error.message : 'Erro desconhecido',
-      },
-      { status: 500 }
-    )
+    // Return null instead of error for better UX
+    return NextResponse.json({
+      success: true,
+      recommendations: null,
+      message: 'Ocorreu um erro ao carregar as recomendações. Por favor, tente novamente.',
+    })
   }
 }

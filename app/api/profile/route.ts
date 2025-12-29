@@ -49,15 +49,14 @@ export async function GET(request: NextRequest) {
       profile,
     })
   } catch (error) {
-    console.error('❌ [PROFILE-API] Error:', error)
+    console.error('❌ [PROFILE-API-GET] Error:', error)
 
-    return NextResponse.json(
-      {
-        success: false,
-        error: error instanceof Error ? error.message : 'Erro desconhecido',
-      },
-      { status: 500 }
-    )
+    // Return null profile instead of error for better UX
+    return NextResponse.json({
+      success: true,
+      profile: null,
+      warning: 'Ocorreu um erro ao carregar o perfil. Por favor, tente novamente.',
+    })
   }
 }
 
@@ -220,12 +219,17 @@ export async function POST(request: NextRequest) {
       profile: savedProfile,
     })
   } catch (error) {
-    console.error('❌ [PROFILE-API] Error:', error)
+    console.error('❌ [PROFILE-API-POST] Error:', error)
+    console.error('❌ [PROFILE-API-POST] Error details:', {
+      message: error instanceof Error ? error.message : 'Unknown',
+      stack: error instanceof Error ? error.stack : undefined,
+    })
 
     return NextResponse.json(
       {
         success: false,
-        error: error instanceof Error ? error.message : 'Erro desconhecido',
+        error: 'Erro ao salvar perfil. Verifique os dados e tente novamente.',
+        details: error instanceof Error ? error.message : 'Erro desconhecido',
       },
       { status: 500 }
     )

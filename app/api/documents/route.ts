@@ -67,12 +67,13 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('❌ [DOCUMENTS-API] Error:', error)
 
-    return NextResponse.json(
-      {
-        success: false,
-        error: error instanceof Error ? error.message : 'Erro desconhecido',
-      },
-      { status: 500 }
-    )
+    // Return empty array instead of error for better UX
+    return NextResponse.json({
+      success: true,
+      documents: [],
+      count: 0,
+      timestamp: new Date().toISOString(),
+      warning: 'Ocorreu um erro ao carregar os documentos. Por favor, tente novamente.',
+    })
   }
 }
