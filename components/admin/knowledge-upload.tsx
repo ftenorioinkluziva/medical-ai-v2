@@ -5,31 +5,13 @@
  * Upload medical knowledge articles (PDF, TXT, MD)
  */
 
-import { useState, useEffect } from 'react'
-import { Upload, FileText, Loader2, CheckCircle2, XCircle, Sparkles, Plus, X } from 'lucide-react'
+import { useState } from 'react'
+import { Upload, Loader2, CheckCircle2, XCircle, Sparkles } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-
-const DEFAULT_CATEGORIES = [
-  { value: 'hematology', label: 'Hematologia' },
-  { value: 'endocrinology', label: 'Endocrinologia' },
-  { value: 'nutrition', label: 'Nutrição' },
-  { value: 'metabolism', label: 'Metabolismo' },
-  { value: 'cardiology', label: 'Cardiologia' },
-  { value: 'immunology', label: 'Imunologia' },
-  { value: 'integrative', label: 'Medicina Integrativa' },
-  { value: 'general', label: 'Geral' },
-]
 
 interface UploadResult {
   success: boolean
@@ -44,7 +26,7 @@ interface UploadResult {
 export function KnowledgeUpload({ onUploadComplete }: { onUploadComplete?: () => void }) {
   const [file, setFile] = useState<File | null>(null)
   const [title, setTitle] = useState('')
-  const [category, setCategory] = useState('general')
+  const [category, setCategory] = useState('')
   const [subcategory, setSubcategory] = useState('')
   const [source, setSource] = useState('')
   const [sourceUrl, setSourceUrl] = useState('')
@@ -56,24 +38,6 @@ export function KnowledgeUpload({ onUploadComplete }: { onUploadComplete?: () =>
   const [isUploading, setIsUploading] = useState(false)
   const [uploadResult, setUploadResult] = useState<UploadResult | null>(null)
   const [isGenerating, setIsGenerating] = useState(false)
-
-  // Category management
-  const [categories, setCategories] = useState(DEFAULT_CATEGORIES)
-  const [isAddingCategory, setIsAddingCategory] = useState(false)
-  const [newCategoryName, setNewCategoryName] = useState('')
-
-  // Load custom categories from localStorage
-  useEffect(() => {
-    const saved = localStorage.getItem('customCategories')
-    if (saved) {
-      try {
-        const customCategories = JSON.parse(saved)
-        setCategories([...DEFAULT_CATEGORIES, ...customCategories])
-      } catch (error) {
-        console.error('Error loading custom categories:', error)
-      }
-    }
-  }, [])
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0]
@@ -110,31 +74,6 @@ export function KnowledgeUpload({ onUploadComplete }: { onUploadComplete?: () =>
 
       setUploadResult(null)
     }
-  }
-
-  const handleAddCategory = () => {
-    if (!newCategoryName.trim()) {
-      alert('Digite o nome da categoria')
-      return
-    }
-
-    const categoryValue = newCategoryName.toLowerCase().replace(/\s+/g, '-')
-    const newCategory = { value: categoryValue, label: newCategoryName }
-
-    // Add to categories list
-    const updatedCategories = [...categories, newCategory]
-    setCategories(updatedCategories)
-
-    // Save to localStorage (only custom ones)
-    const customCategories = updatedCategories.filter(
-      cat => !DEFAULT_CATEGORIES.find(dc => dc.value === cat.value)
-    )
-    localStorage.setItem('customCategories', JSON.stringify(customCategories))
-
-    // Select the new category
-    setCategory(categoryValue)
-    setNewCategoryName('')
-    setIsAddingCategory(false)
   }
 
   const handleUpload = async () => {
@@ -178,7 +117,7 @@ export function KnowledgeUpload({ onUploadComplete }: { onUploadComplete?: () =>
         setTags('')
         setSummary('')
         setSubcategory('')
-        setCategory('general')
+        setCategory('')
 
         onUploadComplete?.()
       }
@@ -214,7 +153,7 @@ export function KnowledgeUpload({ onUploadComplete }: { onUploadComplete?: () =>
       if (result.success && result.metadata) {
         // Fill form fields with generated metadata
         setTitle(result.metadata.title || '')
-        setCategory(result.metadata.category || 'general')
+        setCategory(result.metadata.category || '')
         setSubcategory(result.metadata.subcategory || '')
         setSource(result.metadata.source || '')
         setSourceUrl(result.metadata.sourceUrl || '')
@@ -253,7 +192,7 @@ export function KnowledgeUpload({ onUploadComplete }: { onUploadComplete?: () =>
     setTags('')
     setSummary('')
     setSubcategory('')
-    setCategory('general')
+    setCategory('')
     setUploadResult(null)
   }
 
@@ -313,58 +252,14 @@ export function KnowledgeUpload({ onUploadComplete }: { onUploadComplete?: () =>
 
         {/* Category */}
         <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <Label htmlFor="category">Categoria *</Label>
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsAddingCategory(!isAddingCategory)}
-              disabled={isUploading || isGenerating}
-              className="h-6 px-2 text-xs"
-            >
-              {isAddingCategory ? <X className="h-3 w-3 mr-1" /> : <Plus className="h-3 w-3 mr-1" />}
-              {isAddingCategory ? 'Cancelar' : 'Nova categoria'}
-            </Button>
-          </div>
-
-          {isAddingCategory ? (
-            <div className="flex gap-2">
-              <Input
-                value={newCategoryName}
-                onChange={(e) => setNewCategoryName(e.target.value)}
-                placeholder="Nome da nova categoria"
-                disabled={isUploading || isGenerating}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault()
-                    handleAddCategory()
-                  }
-                }}
-              />
-              <Button
-                type="button"
-                size="sm"
-                onClick={handleAddCategory}
-                disabled={!newCategoryName.trim() || isUploading || isGenerating}
-              >
-                Adicionar
-              </Button>
-            </div>
-          ) : (
-            <Select value={category} onValueChange={setCategory} disabled={isUploading || isGenerating}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {categories.map((cat) => (
-                  <SelectItem key={cat.value} value={cat.value}>
-                    {cat.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          )}
+          <Label htmlFor="category">Categoria *</Label>
+          <Input
+            id="category"
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            placeholder="Ex: Hematologia, Endocrinologia, Nutrição"
+            disabled={isUploading || isGenerating}
+          />
         </div>
 
         {/* Subcategory */}

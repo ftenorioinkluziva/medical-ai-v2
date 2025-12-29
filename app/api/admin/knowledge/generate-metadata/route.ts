@@ -9,17 +9,6 @@ import { generateText } from 'ai'
 import { googleModels } from '@/lib/ai/providers'
 import pdf from 'pdf-parse/lib/pdf-parse'
 
-const CATEGORIES = [
-  'hematology',
-  'endocrinology',
-  'nutrition',
-  'metabolism',
-  'cardiology',
-  'immunology',
-  'integrative',
-  'general',
-]
-
 export async function POST(request: NextRequest) {
   try {
     // Authenticate
@@ -75,21 +64,11 @@ export async function POST(request: NextRequest) {
 
     const systemPrompt = `Você é um especialista em análise de documentos médicos e científicos. Sua tarefa é analisar o conteúdo fornecido e gerar metadados estruturados.
 
-CATEGORIAS DISPONÍVEIS:
-- hematology: Hematologia
-- endocrinology: Endocrinologia
-- nutrition: Nutrição
-- metabolism: Metabolismo
-- cardiology: Cardiologia
-- immunology: Imunologia
-- integrative: Medicina Integrativa
-- general: Geral
-
 INSTRUÇÕES:
 1. Analise o conteúdo do documento
 2. Gere um título conciso e descritivo (máximo 100 caracteres)
-3. Escolha a categoria mais adequada (apenas UMA das listadas acima)
-4. Identifique uma subcategoria específica se aplicável (ex: para endocrinology pode ser "Diabetes", "Tireoide", etc.)
+3. Identifique a categoria médica mais adequada (ex: Hematologia, Endocrinologia, Nutrição, Cardiologia, etc.)
+4. Identifique uma subcategoria específica se aplicável (ex: para Endocrinologia pode ser "Diabetes", "Tireoide", etc.)
 5. Identifique a fonte (journal, organização, website, etc.) se mencionada
 6. Identifique a URL da fonte se mencionada no texto
 7. Identifique o(s) autor(es) se mencionado(s) no texto
@@ -168,11 +147,6 @@ Retorne APENAS o JSON com os metadados.`
       )
     }
 
-    // Validate category
-    if (!CATEGORIES.includes(metadata.category)) {
-      metadata.category = 'general'
-    }
-
     // Clean up tags (remove duplicates, trim)
     if (metadata.tags) {
       const tagsArray = metadata.tags
@@ -198,7 +172,7 @@ Retorne APENAS o JSON com os metadados.`
       success: true,
       metadata: {
         title: metadata.title || '',
-        category: metadata.category || 'general',
+        category: metadata.category || '',
         subcategory: metadata.subcategory || '',
         source: metadata.source || '',
         sourceUrl: metadata.sourceUrl || '',
