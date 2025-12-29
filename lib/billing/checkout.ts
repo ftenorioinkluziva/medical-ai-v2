@@ -4,25 +4,17 @@ import { creditPackages } from '@/lib/db/schema'
 import { eq } from 'drizzle-orm'
 
 export async function createCheckoutSession(userId: string, packageId: string) {
-  console.log('[CHECKOUT] Finding package:', packageId)
-
   const pkg = await db.query.creditPackages.findFirst({
     where: eq(creditPackages.id, packageId),
   })
 
-  console.log('[CHECKOUT] Package found:', pkg)
-
   if (!pkg || !pkg.isActive) {
-    console.error('[CHECKOUT] Invalid package or inactive:', { pkg })
     throw new Error('Invalid package')
   }
 
   if (!pkg.stripePriceId) {
-    console.error('[CHECKOUT] Package missing Stripe Price ID:', pkg)
     throw new Error('Package not synced with Stripe')
   }
-
-  console.log('[CHECKOUT] Creating Stripe session with Price ID:', pkg.stripePriceId)
 
   const session = await stripe.checkout.sessions.create({
     mode: 'payment',

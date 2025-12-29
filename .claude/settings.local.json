@@ -42,7 +42,18 @@
       "Bash(findstr:*)",
       "Bash(taskkill:*)",
       "Bash(powershell -Command \"Stop-Process -Id 27496 -Force\")",
-      "Bash(powershell:*)"
+      "Bash(powershell:*)",
+      "Bash(pnpm drizzle-kit push:*)",
+      "Bash(pnpm db:studio:*)",
+      "Bash(node -e:*)",
+      "Bash(node check-migrations.js:*)",
+      "Bash(node scripts/push.mjs:*)",
+      "Bash(pnpm db:seed:*)",
+      "Bash(tsx:*)",
+      "Bash(pnpm exec tsx:*)",
+      "Bash(node apply-migration.js:*)",
+      "Bash(git push)",
+      "Bash(node check-packages.js:*)"
     ],
     "deny": [],
     "ask": []
