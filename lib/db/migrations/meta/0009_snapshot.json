@@ -1,6 +1,6 @@
 {
-  "id": "2ef725a1-4490-49e9-873a-b4124d880ddb",
-  "prevId": "e994a696-b38c-4116-aada-bda40b5b0371",
+  "id": "4c434835-fe8f-43b9-8b3c-bc9d8393b367",
+  "prevId": "095b8919-81d0-43f0-a20e-07f97cff19d6",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -1386,6 +1386,30 @@
           "primaryKey": false,
           "notNull": true
         },
+        "tokens_used": {
+          "name": "tokens_used",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "processing_time_ms": {
+          "name": "processing_time_ms",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "model_used": {
+          "name": "model_used",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "prompt": {
+          "name": "prompt",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
         "created_at": {
           "name": "created_at",
           "type": "timestamp",
@@ -1488,6 +1512,30 @@
           "type": "jsonb",
           "primaryKey": false,
           "notNull": true
+        },
+        "tokens_used": {
+          "name": "tokens_used",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "processing_time_ms": {
+          "name": "processing_time_ms",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "model_used": {
+          "name": "model_used",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "prompt": {
+          "name": "prompt",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
         },
         "created_at": {
           "name": "created_at",

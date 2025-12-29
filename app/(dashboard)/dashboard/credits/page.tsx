@@ -218,7 +218,7 @@ export default function CreditsPage() {
         <CardContent>
           <div className="grid gap-4 md:grid-cols-3">
             <div className="flex gap-3">
-              <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+              <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
                 <Sparkles className="h-4 w-4 text-primary" />
               </div>
               <div>
@@ -229,7 +229,7 @@ export default function CreditsPage() {
               </div>
             </div>
             <div className="flex gap-3">
-              <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+              <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
                 <CreditCard className="h-4 w-4 text-primary" />
               </div>
               <div>
@@ -240,7 +240,7 @@ export default function CreditsPage() {
               </div>
             </div>
             <div className="flex gap-3">
-              <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+              <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
                 <Check className="h-4 w-4 text-primary" />
               </div>
               <div>
@@ -290,21 +290,21 @@ export default function CreditsPage() {
                   </div>
                   <ul className="space-y-2 text-sm">
                     <li className="flex items-center gap-2">
-                      <Check className="h-4 w-4 text-green-600 flex-shrink-0" />
+                      <Check className="h-4 w-4 text-green-600 shrink-0" />
                       <span>{pkg.credits.toLocaleString('pt-BR')} créditos</span>
                     </li>
                     <li className="flex items-center gap-2">
-                      <Check className="h-4 w-4 text-green-600 flex-shrink-0" />
+                      <Check className="h-4 w-4 text-green-600 shrink-0" />
                       <span>Créditos não expiram</span>
                     </li>
                     <li className="flex items-center gap-2">
-                      <Check className="h-4 w-4 text-green-600 flex-shrink-0" />
+                      <Check className="h-4 w-4 text-green-600 shrink-0" />
                       <span>
                         ~{Math.floor(pkg.credits / 75)} análises completas
                       </span>
                     </li>
                     <li className="flex items-center gap-2">
-                      <Check className="h-4 w-4 text-green-600 flex-shrink-0" />
+                      <Check className="h-4 w-4 text-green-600 shrink-0" />
                       <span>Suporte prioritário</span>
                     </li>
                   </ul>

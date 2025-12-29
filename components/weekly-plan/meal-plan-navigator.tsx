@@ -169,7 +169,7 @@ export function MealPlanNavigator({ mealPlan }: MealPlanNavigatorProps) {
         </div>
 
         {/* Selected Day Content */}
-        <div className="border-2 border-orange-200 rounded-lg p-6 bg-gradient-to-br from-white to-orange-50/30">
+        <div className="border-2 border-orange-200 rounded-lg p-6 bg-linear-to-br from-white to-orange-50/30">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-xl font-bold text-gray-900">{selectedDay.day}</h3>
             <Badge className="bg-orange-600 text-white text-sm">

@@ -1,3 +1,19 @@
+CREATE TABLE "complete_analyses" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"user_id" uuid NOT NULL,
+	"document_ids" jsonb NOT NULL,
+	"integrative_analysis_id" uuid,
+	"nutrition_analysis_id" uuid,
+	"exercise_analysis_id" uuid,
+	"synthesis" jsonb,
+	"recommendations_id" uuid,
+	"weekly_plan_id" uuid,
+	"status" text DEFAULT 'pending' NOT NULL,
+	"error_message" text,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"completed_at" timestamp
+);
+--> statement-breakpoint
 CREATE TABLE "billing_config" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"key" varchar(100) NOT NULL,
@@ -73,6 +89,8 @@ CREATE TABLE "user_credits" (
 	CONSTRAINT "user_credits_user_id_unique" UNIQUE("user_id")
 );
 --> statement-breakpoint
+ALTER TABLE "analyses" ADD COLUMN "insights" json;--> statement-breakpoint
+ALTER TABLE "analyses" ADD COLUMN "action_items" json;--> statement-breakpoint
 ALTER TABLE "recommendations" ADD COLUMN "tokens_used" integer;--> statement-breakpoint
 ALTER TABLE "recommendations" ADD COLUMN "processing_time_ms" integer;--> statement-breakpoint
 ALTER TABLE "recommendations" ADD COLUMN "model_used" text;--> statement-breakpoint
@@ -81,6 +99,12 @@ ALTER TABLE "weekly_plans" ADD COLUMN "tokens_used" integer;--> statement-breakp
 ALTER TABLE "weekly_plans" ADD COLUMN "processing_time_ms" integer;--> statement-breakpoint
 ALTER TABLE "weekly_plans" ADD COLUMN "model_used" text;--> statement-breakpoint
 ALTER TABLE "weekly_plans" ADD COLUMN "prompt" text;--> statement-breakpoint
+ALTER TABLE "complete_analyses" ADD CONSTRAINT "complete_analyses_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "complete_analyses" ADD CONSTRAINT "complete_analyses_integrative_analysis_id_analyses_id_fk" FOREIGN KEY ("integrative_analysis_id") REFERENCES "public"."analyses"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "complete_analyses" ADD CONSTRAINT "complete_analyses_nutrition_analysis_id_analyses_id_fk" FOREIGN KEY ("nutrition_analysis_id") REFERENCES "public"."analyses"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "complete_analyses" ADD CONSTRAINT "complete_analyses_exercise_analysis_id_analyses_id_fk" FOREIGN KEY ("exercise_analysis_id") REFERENCES "public"."analyses"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "complete_analyses" ADD CONSTRAINT "complete_analyses_recommendations_id_recommendations_id_fk" FOREIGN KEY ("recommendations_id") REFERENCES "public"."recommendations"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "complete_analyses" ADD CONSTRAINT "complete_analyses_weekly_plan_id_weekly_plans_id_fk" FOREIGN KEY ("weekly_plan_id") REFERENCES "public"."weekly_plans"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "credit_transactions" ADD CONSTRAINT "credit_transactions_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "stripe_payments" ADD CONSTRAINT "stripe_payments_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "stripe_payments" ADD CONSTRAINT "stripe_payments_package_id_credit_packages_id_fk" FOREIGN KEY ("package_id") REFERENCES "public"."credit_packages"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
