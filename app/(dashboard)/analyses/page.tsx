@@ -43,22 +43,23 @@ export default function AnalysesPage() {
   }
 
   return (
-    <div className="container mx-auto py-8 space-y-8">
+    <div className="container mx-auto px-4 py-4 sm:px-6 sm:py-6 space-y-4 sm:space-y-6">
       {/* Header */}
-      <div className="flex items-start justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight flex items-center gap-3">
-            <History className="h-8 w-8" />
+          <h1 className="text-xl sm:text-2xl font-semibold tracking-tight flex items-center gap-3">
+            <History className="h-6 w-6 sm:h-8 sm:w-8" />
             Histórico de Análises
           </h1>
-          <p className="text-muted-foreground mt-2">
+          <p className="text-sm sm:text-base text-muted-foreground mt-1">
             Visualize e revise todas as suas análises anteriores
           </p>
         </div>
         <Link href="/analyses/compare">
           <Button className="gap-2">
             <TrendingUp className="h-4 w-4" />
-            Comparar Análises
+            <span className="hidden sm:inline">Comparar Análises</span>
+            <span className="sm:hidden">Comparar</span>
           </Button>
         </Link>
       </div>

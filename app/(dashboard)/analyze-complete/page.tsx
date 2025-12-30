@@ -23,12 +23,12 @@ export default async function CompleteAnalysisPage() {
   }
 
   return (
-    <div className="container mx-auto py-8 px-4">
-      <div className="max-w-6xl mx-auto space-y-8">
+    <div className="container mx-auto px-4 py-4 sm:px-6 sm:py-6">
+      <div className="max-w-6xl mx-auto space-y-4 sm:space-y-6">
         {/* Header */}
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Análise Completa</h1>
-          <p className="text-muted-foreground mt-2">
+          <h1 className="text-xl sm:text-2xl font-semibold tracking-tight">Análise Completa</h1>
+          <p className="text-sm sm:text-base text-muted-foreground mt-1">
             Análise médica integrada por múltiplos especialistas
           </p>
         </div>
