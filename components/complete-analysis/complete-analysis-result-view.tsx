@@ -83,18 +83,19 @@ export function CompleteAnalysisResultView({ analysis }: CompleteAnalysisResultV
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex flex-col gap-4">
         <div>
           <Link href="/analyze-complete?tab=history">
             <Button variant="ghost" className="gap-2 mb-2 -ml-4">
               <ArrowLeft className="h-4 w-4" />
-              Voltar para o Histórico
+              <span className="hidden sm:inline">Voltar para o Histórico</span>
+              <span className="sm:hidden">Voltar</span>
             </Button>
           </Link>
-          <h1 className="text-2xl font-bold tracking-tight">Resultados da Análise Completa</h1>
-          <p className="text-muted-foreground mt-1">
+          <h1 className="text-xl sm:text-2xl font-semibold tracking-tight">Resultados da Análise Completa</h1>
+          <p className="text-sm sm:text-base text-muted-foreground mt-1">
             Análise gerada em {formatDate(analysis.createdAt)}
           </p>
         </div>
@@ -129,11 +130,15 @@ export function CompleteAnalysisResultView({ analysis }: CompleteAnalysisResultV
       {/* Main Content Tabs */}
       <Tabs defaultValue="recommendations" className="w-full">
         <TabsList className="grid w-full grid-cols-2 bg-muted">
-          <TabsTrigger value="recommendations" className="data-[state=active]:!bg-teal-600 dark:data-[state=active]:!bg-teal-500 data-[state=active]:!text-white">
-            Recomendações e Metas
+          <TabsTrigger value="recommendations" className="gap-1.5 sm:gap-2 data-[state=active]:!bg-teal-600 dark:data-[state=active]:!bg-teal-500 data-[state=active]:!text-white">
+            <Target className="h-4 w-4" />
+            <span className="hidden sm:inline">Recomendações e Metas</span>
+            <span className="sm:hidden">Metas</span>
           </TabsTrigger>
-          <TabsTrigger value="weekly-plan" className="data-[state=active]:!bg-teal-600 dark:data-[state=active]:!bg-teal-500 data-[state=active]:!text-white">
-            Plano Semanal
+          <TabsTrigger value="weekly-plan" className="gap-1.5 sm:gap-2 data-[state=active]:!bg-teal-600 dark:data-[state=active]:!bg-teal-500 data-[state=active]:!text-white">
+            <Calendar className="h-4 w-4" />
+            <span className="hidden sm:inline">Plano Semanal</span>
+            <span className="sm:hidden">Plano</span>
           </TabsTrigger>
         </TabsList>
 
@@ -143,17 +148,29 @@ export function CompleteAnalysisResultView({ analysis }: CompleteAnalysisResultV
             <CardContent className="p-0">
               <Tabs defaultValue="exams" className="w-full">
                 <TabsList className="grid w-full grid-cols-4 rounded-t-lg rounded-b-none bg-muted-foreground/10">
-                  <TabsTrigger value="exams" className="data-[state=active]:!bg-sky-600 dark:data-[state=active]:!bg-sky-500 data-[state=active]:!text-white">
-                    Exames ({recommendations.examRecommendations.length})
+                  <TabsTrigger value="exams" className="gap-1.5 sm:gap-2 data-[state=active]:!bg-sky-600 dark:data-[state=active]:!bg-sky-500 data-[state=active]:!text-white">
+                    <ClipboardList className="h-4 w-4" />
+                    <span className="hidden sm:inline">Exames</span>
+                    <span className="sm:hidden">({recommendations.examRecommendations.length})</span>
+                    <span className="hidden sm:inline">({recommendations.examRecommendations.length})</span>
                   </TabsTrigger>
-                  <TabsTrigger value="lifestyle" className="data-[state=active]:!bg-teal-600 dark:data-[state=active]:!bg-teal-500 data-[state=active]:!text-white">
-                    Lifestyle ({recommendations.lifestyleRecommendations.length})
+                  <TabsTrigger value="lifestyle" className="gap-1.5 sm:gap-2 data-[state=active]:!bg-teal-600 dark:data-[state=active]:!bg-teal-500 data-[state=active]:!text-white">
+                    <Activity className="h-4 w-4" />
+                    <span className="hidden sm:inline">Lifestyle</span>
+                    <span className="sm:hidden">({recommendations.lifestyleRecommendations.length})</span>
+                    <span className="hidden sm:inline">({recommendations.lifestyleRecommendations.length})</span>
                   </TabsTrigger>
-                  <TabsTrigger value="goals" className="data-[state=active]:!bg-purple-600 dark:data-[state=active]:!bg-purple-500 data-[state=active]:!text-white">
-                    Metas ({recommendations.healthGoals.length})
+                  <TabsTrigger value="goals" className="gap-1.5 sm:gap-2 data-[state=active]:!bg-purple-600 dark:data-[state=active]:!bg-purple-500 data-[state=active]:!text-white">
+                    <Target className="h-4 w-4" />
+                    <span className="hidden sm:inline">Metas</span>
+                    <span className="sm:hidden">({recommendations.healthGoals.length})</span>
+                    <span className="hidden sm:inline">({recommendations.healthGoals.length})</span>
                   </TabsTrigger>
-                  <TabsTrigger value="alerts" className="data-[state=active]:!bg-amber-600 dark:data-[state=active]:!bg-amber-500 data-[state=active]:!text-white">
-                    Alertas ({recommendations.alerts.length})
+                  <TabsTrigger value="alerts" className="gap-1.5 sm:gap-2 data-[state=active]:!bg-amber-600 dark:data-[state=active]:!bg-amber-500 data-[state=active]:!text-white">
+                    <AlertCircle className="h-4 w-4" />
+                    <span className="hidden sm:inline">Alertas</span>
+                    <span className="sm:hidden">({recommendations.alerts.length})</span>
+                    <span className="hidden sm:inline">({recommendations.alerts.length})</span>
                   </TabsTrigger>
                 </TabsList>
 
@@ -254,17 +271,21 @@ export function CompleteAnalysisResultView({ analysis }: CompleteAnalysisResultV
             <CardContent>
               <Tabs defaultValue="supplements" className="w-full">
                 <TabsList className="grid w-full grid-cols-4 bg-muted">
-                  <TabsTrigger value="supplements" className="data-[state=active]:!bg-purple-600 dark:data-[state=active]:!bg-purple-500 data-[state=active]:!text-white">
-                    <Pill className="h-4 w-4 mr-2" /> Suplementação
+                  <TabsTrigger value="supplements" className="gap-1.5 sm:gap-2 data-[state=active]:!bg-purple-600 dark:data-[state=active]:!bg-purple-500 data-[state=active]:!text-white">
+                    <Pill className="h-4 w-4" />
+                    <span className="hidden sm:inline">Suplementação</span>
                   </TabsTrigger>
-                  <TabsTrigger value="shopping" className="data-[state=active]:!bg-emerald-600 dark:data-[state=active]:!bg-emerald-500 data-[state=active]:!text-white">
-                    <ShoppingCart className="h-4 w-4 mr-2" /> Compras
+                  <TabsTrigger value="shopping" className="gap-1.5 sm:gap-2 data-[state=active]:!bg-emerald-600 dark:data-[state=active]:!bg-emerald-500 data-[state=active]:!text-white">
+                    <ShoppingCart className="h-4 w-4" />
+                    <span className="hidden sm:inline">Compras</span>
                   </TabsTrigger>
-                  <TabsTrigger value="meals" className="data-[state=active]:!bg-orange-600 dark:data-[state=active]:!bg-orange-500 data-[state=active]:!text-white">
-                    <UtensilsCrossed className="h-4 w-4 mr-2" /> Refeições
+                  <TabsTrigger value="meals" className="gap-1.5 sm:gap-2 data-[state=active]:!bg-orange-600 dark:data-[state=active]:!bg-orange-500 data-[state=active]:!text-white">
+                    <UtensilsCrossed className="h-4 w-4" />
+                    <span className="hidden sm:inline">Refeições</span>
                   </TabsTrigger>
-                  <TabsTrigger value="workouts" className="data-[state=active]:!bg-sky-600 dark:data-[state=active]:!bg-sky-500 data-[state=active]:!text-white">
-                    <Dumbbell className="h-4 w-4 mr-2" /> Treinos
+                  <TabsTrigger value="workouts" className="gap-1.5 sm:gap-2 data-[state=active]:!bg-sky-600 dark:data-[state=active]:!bg-sky-500 data-[state=active]:!text-white">
+                    <Dumbbell className="h-4 w-4" />
+                    <span className="hidden sm:inline">Treinos</span>
                   </TabsTrigger>
                 </TabsList>
 
