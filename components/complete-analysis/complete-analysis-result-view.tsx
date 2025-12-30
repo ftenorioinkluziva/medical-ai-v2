@@ -31,6 +31,8 @@ import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import Link from 'next/link'
 import { Button } from '../ui/button'
+import { MealPlanNavigator } from '@/components/weekly-plan/meal-plan-navigator'
+import { WorkoutPlanNavigator } from '@/components/weekly-plan/workout-plan-navigator'
 
 interface CompleteAnalysis {
   id: string
@@ -509,25 +511,13 @@ export function CompleteAnalysisResultView({ analysis }: CompleteAnalysisResultV
                   </TabsContent>
 
                   {/* Meals */}
-                  <TabsContent value="meals" className="mt-0 space-y-4">
-                    <p className="text-sm text-muted-foreground mb-4">{weeklyPlan.mealPlan.overview}</p>
-                    {weeklyPlan.mealPlan.meals.map((day: any, index: number) => (
-                      <div key={index} className="border rounded-lg p-4 hover:border-orange-300 hover:bg-orange-50/20 dark:hover:bg-orange-950/20 transition-all">
-                        <h4 className="font-semibold text-foreground mb-2">{day.day}</h4>
-                        {/* O conteúdo detalhado das refeições iria aqui */}
-                      </div>
-                    ))}
+                  <TabsContent value="meals" className="mt-0">
+                    <MealPlanNavigator mealPlan={weeklyPlan.mealPlan} />
                   </TabsContent>
 
                   {/* Workouts */}
-                  <TabsContent value="workouts" className="mt-0 space-y-4">
-                    <p className="text-sm text-muted-foreground mb-4">{weeklyPlan.workoutPlan.overview}</p>
-                    {weeklyPlan.workoutPlan.workouts.map((workout: any, index: number) => (
-                      <div key={index} className="border rounded-lg p-4 hover:border-sky-300 hover:bg-sky-50/20 dark:hover:bg-sky-950/20 transition-all">
-                        <h4 className="font-semibold text-foreground">{workout.day} - {workout.type}</h4>
-                        {/* O conteúdo detalhado dos treinos iria aqui */}
-                      </div>
-                    ))}
+                  <TabsContent value="workouts" className="mt-0">
+                    <WorkoutPlanNavigator workoutPlan={weeklyPlan.workoutPlan} />
                   </TabsContent>
                 </div>
               </Tabs>
