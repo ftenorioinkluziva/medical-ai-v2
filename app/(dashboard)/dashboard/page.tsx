@@ -128,15 +128,15 @@ export default function DashboardPage() {
       <div className="lg:hidden">
         <Tabs defaultValue="upload" className="w-full">
           <TabsList className="grid w-full grid-cols-3 bg-muted">
-            <TabsTrigger value="upload" className="gap-1.5">
+            <TabsTrigger value="upload" className="gap-1.5 data-[state=active]:!bg-teal-600 dark:data-[state=active]:!bg-teal-500 data-[state=active]:!text-white">
               <Upload className="h-4 w-4" />
               <span className="hidden sm:inline">Upload</span>
             </TabsTrigger>
-            <TabsTrigger value="documents" className="gap-1.5">
+            <TabsTrigger value="documents" className="gap-1.5 data-[state=active]:!bg-sky-600 dark:data-[state=active]:!bg-sky-500 data-[state=active]:!text-white">
               <FileText className="h-4 w-4" />
               <span className="hidden sm:inline">Documentos</span>
             </TabsTrigger>
-            <TabsTrigger value="analyses" className="gap-1.5">
+            <TabsTrigger value="analyses" className="gap-1.5 data-[state=active]:!bg-purple-600 dark:data-[state=active]:!bg-purple-500 data-[state=active]:!text-white">
               <Brain className="h-4 w-4" />
               <span className="hidden sm:inline">Análises</span>
             </TabsTrigger>
@@ -157,11 +157,11 @@ export default function DashboardPage() {
 
         <Tabs defaultValue="recommendations" className="w-full mt-4">
           <TabsList className="grid w-full grid-cols-2 bg-muted">
-            <TabsTrigger value="recommendations" className="gap-1.5">
+            <TabsTrigger value="recommendations" className="gap-1.5 data-[state=active]:!bg-amber-600 dark:data-[state=active]:!bg-amber-500 data-[state=active]:!text-white">
               <Lightbulb className="h-4 w-4" />
               <span className="hidden sm:inline">Recomendações</span>
             </TabsTrigger>
-            <TabsTrigger value="weekly-plan" className="gap-1.5">
+            <TabsTrigger value="weekly-plan" className="gap-1.5 data-[state=active]:!bg-teal-600 dark:data-[state=active]:!bg-teal-500 data-[state=active]:!text-white">
               <Calendar className="h-4 w-4" />
               <span className="hidden sm:inline">Plano Semanal</span>
             </TabsTrigger>
