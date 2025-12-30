@@ -113,7 +113,7 @@ export function RecentAnalysesWidget({ limit = 5, onAnalysesLoad, patientId }: R
             Histórico de análises realizadas
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="overflow-hidden">
           {isLoading ? (
             <div className="flex items-center justify-center py-8">
               <div className="text-center space-y-2">
@@ -150,7 +150,7 @@ export function RecentAnalysesWidget({ limit = 5, onAnalysesLoad, patientId }: R
               {analyses.map((analysis) => (
                 <div
                   key={analysis.id}
-                  className="p-2.5 sm:p-3 rounded-lg border border-gray-200 hover:border-teal-300 hover:bg-teal-50/50 transition-colors dark:border-gray-700 dark:hover:bg-teal-900/30 cursor-pointer"
+                  className="p-2.5 sm:p-3 rounded-lg border border-gray-200 hover:border-teal-300 hover:bg-teal-50/50 transition-colors dark:border-gray-700 dark:hover:bg-teal-900/30 cursor-pointer overflow-hidden"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex items-start gap-3 flex-1 min-w-0">

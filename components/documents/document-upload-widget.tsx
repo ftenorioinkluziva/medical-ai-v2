@@ -185,9 +185,10 @@ export function DocumentUploadWidget({ onUploadComplete, patientId }: DocumentUp
           {!file ? (
             <div className="space-y-3">
               <Upload className="mx-auto h-8 w-8 sm:h-10 sm:w-10 text-muted-foreground" />
-              <div>
+              <div className="px-2">
                 <p className="text-sm font-medium text-foreground">
-                  Arraste e solte seu arquivo aqui
+                  <span className="hidden sm:inline">Arraste e solte seu arquivo aqui</span>
+                  <span className="sm:hidden">Arraste arquivo aqui</span>
                 </p>
                 <p className="text-xs text-muted-foreground mt-1">
                   PDF ou Imagens • Máx 10MB
