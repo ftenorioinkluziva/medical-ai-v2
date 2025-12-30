@@ -82,35 +82,12 @@ export function DashboardNav({ userName, userRole }: DashboardNavProps) {
     <header className="border-b bg-card/95 backdrop-blur-sm sticky top-0 z-50 shadow-sm">
       <div className="container mx-auto flex h-16 items-center justify-between px-6">
         {/* Logo */}
-        <div className="flex items-center gap-6">
-          <Link href={userRole === 'admin' ? '/admin' : '/dashboard'} className="flex items-center gap-2 group">
-            <div className="h-9 w-9 rounded-lg bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-sm">
-              <Heart className="h-5 w-5 text-white" />
-            </div>
-            <span className="text-lg font-semibold text-foreground">Medical AI</span>
-          </Link>
-
-          {/* Desktop Navigation */}
-          <nav className="hidden lg:flex gap-2">
-            {desktopNavLinks.map((link) => {
-              const Icon = link.icon
-              return (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                    isActive(link.href)
-                      ? 'bg-primary text-primary-foreground shadow-sm'
-                      : 'text-muted-foreground hover:text-foreground hover:bg-accent'
-                  }`}
-                >
-                  <Icon className="h-4 w-4" />
-                  {link.label}
-                </Link>
-              )
-            })}
-          </nav>
-        </div>
+        <Link href={userRole === 'admin' ? '/admin' : '/dashboard'} className="flex items-center gap-2 group">
+          <div className="h-9 w-9 rounded-lg bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-sm">
+            <Heart className="h-5 w-5 text-white" />
+          </div>
+          <span className="text-lg font-semibold text-foreground">Medical AI</span>
+        </Link>
 
         {/* Right Side - User & Actions */}
         <div className="flex items-center gap-4">

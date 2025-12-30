@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { signOut } from '@/lib/auth/config'
 import { DashboardNav } from '@/components/dashboard/dashboard-nav'
+import { SidebarNav } from '@/components/dashboard/sidebar-nav'
 import { BottomNav } from '@/components/dashboard/bottom-nav'
 
 export default async function DashboardLayout({
@@ -18,7 +19,8 @@ export default async function DashboardLayout({
         userName={session.user?.name || ''}
         userRole={session.user?.role || 'patient'}
       />
-      <main className="pb-16 lg:pb-0">{children}</main>
+      <SidebarNav userRole={session.user?.role || 'patient'} />
+      <main className="pb-16 lg:pb-0 lg:pl-64 pt-16">{children}</main>
       <BottomNav userRole={session.user?.role || 'patient'} />
     </div>
   )
