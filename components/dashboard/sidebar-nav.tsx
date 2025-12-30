@@ -64,19 +64,24 @@ export function SidebarNav({ userRole }: SidebarNavProps) {
         isCollapsed ? 'w-20' : 'w-64'
       )}
     >
-      {/* Collapse Toggle */}
-      <Button
-        variant="ghost"
-        size="icon"
-        className="absolute -right-3 top-4 h-6 w-6 rounded-full border bg-card shadow-md hover:shadow-lg transition-shadow"
-        onClick={() => setIsCollapsed(!isCollapsed)}
-      >
-        {isCollapsed ? (
-          <ChevronRight className="h-3.5 w-3.5" />
-        ) : (
-          <ChevronLeft className="h-3.5 w-3.5" />
+      {/* Collapse Toggle - Integrated */}
+      <div className={cn('flex items-center justify-between p-4 border-b', isCollapsed && 'justify-center')}>
+        {!isCollapsed && (
+          <span className="text-sm font-semibold text-foreground">Menu</span>
         )}
-      </Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8 hover:bg-accent"
+          onClick={() => setIsCollapsed(!isCollapsed)}
+        >
+          {isCollapsed ? (
+            <ChevronRight className="h-4 w-4" />
+          ) : (
+            <ChevronLeft className="h-4 w-4" />
+          )}
+        </Button>
+      </div>
 
       <ScrollArea className="flex-1">
         <div className="py-4 space-y-6">
