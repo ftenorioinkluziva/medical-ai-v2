@@ -72,12 +72,12 @@ export function CompleteAnalysisView({ userId }: CompleteAnalysisViewProps) {
 
   return (
     <Tabs defaultValue="new" className="w-full">
-      <TabsList className="grid w-full grid-cols-2">
-        <TabsTrigger value="new" className="gap-2">
+      <TabsList className="grid w-full grid-cols-2 bg-muted">
+        <TabsTrigger value="new" className="gap-2 data-[state=active]:!bg-teal-600 dark:data-[state=active]:!bg-teal-500 data-[state=active]:!text-white">
           <Sparkles className="h-4 w-4" />
           Nova Análise
         </TabsTrigger>
-        <TabsTrigger value="history" className="gap-2">
+        <TabsTrigger value="history" className="gap-2 data-[state=active]:!bg-teal-600 dark:data-[state=active]:!bg-teal-500 data-[state=active]:!text-white">
           <History className="h-4 w-4" />
           Histórico
         </TabsTrigger>
@@ -98,29 +98,29 @@ export function CompleteAnalysisView({ userId }: CompleteAnalysisViewProps) {
           </CardHeader>
           <CardContent>
             <div className="grid gap-4 md:grid-cols-3">
-              <div className="p-4 border border-green-200 rounded-lg bg-green-50/50">
-                <h3 className="font-semibold text-green-900 mb-2">1. Medicina Integrativa</h3>
-                <p className="text-sm text-green-700">
+              <div className="p-4 border border-green-200 dark:border-green-800 rounded-lg bg-green-50/50 dark:bg-green-950/20">
+                <h3 className="font-semibold text-green-900 dark:text-green-200 mb-2">1. Medicina Integrativa</h3>
+                <p className="text-sm text-green-700 dark:text-green-400">
                   Análise holística e fundacional de toda a saúde do paciente
                 </p>
               </div>
-              <div className="p-4 border border-orange-200 rounded-lg bg-orange-50/50">
-                <h3 className="font-semibold text-orange-900 mb-2">2. Nutrição</h3>
-                <p className="text-sm text-orange-700">
+              <div className="p-4 border border-orange-200 dark:border-orange-800 rounded-lg bg-orange-50/50 dark:bg-orange-950/20">
+                <h3 className="font-semibold text-orange-900 dark:text-orange-200 mb-2">2. Nutrição</h3>
+                <p className="text-sm text-orange-700 dark:text-orange-400">
                   Insights complementares sobre metabolismo e nutrição
                 </p>
               </div>
-              <div className="p-4 border border-blue-200 rounded-lg bg-blue-50/50">
-                <h3 className="font-semibold text-blue-900 mb-2">3. Fisiologia do Exercício</h3>
-                <p className="text-sm text-blue-700">
+              <div className="p-4 border border-blue-200 dark:border-blue-800 rounded-lg bg-blue-50/50 dark:bg-blue-950/20">
+                <h3 className="font-semibold text-blue-900 dark:text-blue-200 mb-2">3. Fisiologia do Exercício</h3>
+                <p className="text-sm text-blue-700 dark:text-blue-400">
                   Análise específica de performance e capacidade física
                 </p>
               </div>
             </div>
 
-            <div className="mt-4 p-4 border border-purple-200 rounded-lg bg-purple-50/50">
-              <h3 className="font-semibold text-purple-900 mb-2">✨ Resultados Integrados</h3>
-              <ul className="text-sm text-purple-700 space-y-1">
+            <div className="mt-4 p-4 border border-purple-200 dark:border-purple-800 rounded-lg bg-purple-50/50 dark:bg-purple-950/20">
+              <h3 className="font-semibold text-purple-900 dark:text-purple-200 mb-2">✨ Resultados Integrados</h3>
+              <ul className="text-sm text-purple-700 dark:text-purple-400 space-y-1">
                 <li>• Síntese consolidada das 3 análises</li>
                 <li>• Recomendações integradas sem repetição</li>
                 <li>• Plano semanal consistente e acionável</li>

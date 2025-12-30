@@ -123,15 +123,15 @@ export default function DashboardPage() {
         </CardContent>
       </Card>
 
-      {/* Documents and Analyses Section - 3 Column Grid */}
-      <div className="grid gap-6 lg:grid-cols-3">
+      {/* Documents and Analyses Section - 3 Column Grid*/}
+      <div className="grid gap-4 lg:grid-cols-3 sm:grid-cols-1">
         <DocumentUploadWidget onUploadComplete={handleUploadComplete} />
         <RecentDocumentsWidget key={refreshKey} limit={5} />
         <RecentAnalysesWidget limit={5} />
       </div>
 
       {/* Recommendations and Weekly Plan Section - 2 Column Grid */}
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid gap-6 lg:grid-cols-2 sm:grid-cols-1">
         <RecommendationsWidget />
         <WeeklyPlanWidget />
       </div>

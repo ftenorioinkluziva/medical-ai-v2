@@ -43,6 +43,7 @@ interface AnalysisHistoryProps {
 }
 
 export function AnalysisHistory({ onViewAnalysis }: AnalysisHistoryProps) {
+  const [allAnalyses, setAllAnalyses] = useState<Analysis[]>([])
   const [analyses, setAnalyses] = useState<Analysis[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -51,25 +52,22 @@ export function AnalysisHistory({ onViewAnalysis }: AnalysisHistoryProps) {
 
   useEffect(() => {
     loadHistory()
-  }, [selectedAgent])
+  }, [])
 
   const loadHistory = async () => {
     try {
       setIsLoading(true)
       setError(null)
 
-      const params = new URLSearchParams()
-      if (selectedAgent) {
-        params.set('agentId', selectedAgent)
-      }
-
-      const response = await fetch(`/api/analyses/history?${params}`)
+      const response = await fetch(`/api/analyses/history`)
       if (!response.ok) {
         throw new Error('Erro ao carregar histórico')
       }
 
       const data = await response.json()
-      setAnalyses(data.analyses || [])
+      const loadedAnalyses = data.analyses || []
+      setAllAnalyses(loadedAnalyses)
+      setAnalyses(loadedAnalyses)
     } catch (err) {
       console.error('Error loading history:', err)
       setError(err instanceof Error ? err.message : 'Erro desconhecido')
@@ -78,19 +76,28 @@ export function AnalysisHistory({ onViewAnalysis }: AnalysisHistoryProps) {
     }
   }
 
-  // Filter analyses by search term
-  const filteredAnalyses = analyses.filter(analysis => {
-    const searchLower = searchTerm.toLowerCase()
-    return (
-      analysis.prompt?.toLowerCase().includes(searchLower) ||
-      analysis.agentName?.toLowerCase().includes(searchLower) ||
-      analysis.analysis?.toLowerCase().includes(searchLower)
-    )
-  })
+  // Filtra as análises no lado do cliente
+  useEffect(() => {
+    let results = allAnalyses
+
+    if (selectedAgent) {
+      results = results.filter(analysis => analysis.agentId === selectedAgent)
+    }
+
+    if (searchTerm) {
+      const searchLower = searchTerm.toLowerCase()
+      results = results.filter(analysis =>
+        analysis.prompt?.toLowerCase().includes(searchLower) ||
+        analysis.agentName?.toLowerCase().includes(searchLower) ||
+        analysis.analysis?.toLowerCase().includes(searchLower)
+      )
+    }
+    setAnalyses(results)
+  }, [searchTerm, selectedAgent, allAnalyses])
 
   // Get unique agents for filtering
   const uniqueAgents = Array.from(
-    new Set(analyses.map(a => JSON.stringify({ id: a.agentId, name: a.agentName })))
+    new Set(allAnalyses.map(a => JSON.stringify({ id: a.agentId, name: a.agentName })))
   ).map(str => JSON.parse(str))
 
   if (isLoading) {
@@ -119,7 +126,7 @@ export function AnalysisHistory({ onViewAnalysis }: AnalysisHistoryProps) {
     )
   }
 
-  if (analyses.length === 0) {
+  if (allAnalyses.length === 0) {
     return (
       <Card className="p-12">
         <div className="flex flex-col items-center gap-3 text-muted-foreground">
@@ -134,8 +141,9 @@ export function AnalysisHistory({ onViewAnalysis }: AnalysisHistoryProps) {
   return (
     <div className="space-y-4">
       {/* Filters */}
-      <Card className="p-4">
-        <div className="flex gap-4">
+      <Card>
+        <CardContent className="p-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
           <div className="flex-1">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -149,11 +157,14 @@ export function AnalysisHistory({ onViewAnalysis }: AnalysisHistoryProps) {
           </div>
 
           {uniqueAgents.length > 1 && (
-            <div className="flex gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
+              <Filter className="h-4 w-4 text-muted-foreground" />
+              <span className="text-sm font-medium text-muted-foreground">Agente:</span>
               <Button
                 variant={selectedAgent === null ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => setSelectedAgent(null)}
+                className="h-8"
               >
                 Todos
               </Button>
@@ -163,33 +174,39 @@ export function AnalysisHistory({ onViewAnalysis }: AnalysisHistoryProps) {
                   variant={selectedAgent === agent.id ? 'default' : 'outline'}
                   size="sm"
                   onClick={() => setSelectedAgent(agent.id)}
+                  className="h-8"
                 >
                   {agent.name}
                 </Button>
               ))}
             </div>
           )}
-        </div>
+          </div>
+        </CardContent>
       </Card>
 
       {/* Results Count */}
       <div className="text-sm text-muted-foreground">
-        {filteredAnalyses.length === analyses.length
-          ? `${analyses.length} análise${analyses.length !== 1 ? 's' : ''} encontrada${analyses.length !== 1 ? 's' : ''}`
-          : `${filteredAnalyses.length} de ${analyses.length} análises`}
+        {analyses.length === allAnalyses.length
+          ? `${allAnalyses.length} análise${allAnalyses.length !== 1 ? 's' : ''} encontrada${allAnalyses.length !== 1 ? 's' : ''}`
+          : `Mostrando ${analyses.length} de ${allAnalyses.length} análises`}
       </div>
 
       {/* Analyses List */}
       <ScrollArea className="h-[600px]">
         <div className="space-y-4 pr-4">
-          {filteredAnalyses.map((analysis) => (
-            <Card key={analysis.id} className="hover:shadow-md transition-shadow">
+          {analyses.map((analysis) => (
+            <Card
+              key={analysis.id}
+              className="hover:shadow-md transition-all cursor-pointer hover:bg-accent"
+              onClick={() => onViewAnalysis?.(analysis)}
+            >
               <CardHeader className="pb-3">
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Brain className="h-4 w-4 text-primary" />
-                      <CardTitle className="text-base">{analysis.agentName}</CardTitle>
+                    <div className="flex items-center gap-2 mb-2 min-w-0">
+                      <Brain className="h-4 w-4 text-primary flex-shrink-0" />
+                      <CardTitle className="text-base truncate" title={analysis.agentName}>{analysis.agentName}</CardTitle>
                       {analysis.ragUsed && (
                         <Badge variant="secondary" className="text-xs">
                           RAG
@@ -200,16 +217,6 @@ export function AnalysisHistory({ onViewAnalysis }: AnalysisHistoryProps) {
                       {analysis.prompt}
                     </CardDescription>
                   </div>
-
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => onViewAnalysis?.(analysis)}
-                    className="shrink-0"
-                  >
-                    <Eye className="h-4 w-4 mr-1" />
-                    Ver
-                  </Button>
                 </div>
               </CardHeader>
 

@@ -10,6 +10,7 @@ import Link from 'next/link'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Separator } from '@/components/ui/separator'
 import { toast } from 'sonner'
@@ -269,47 +270,34 @@ export default function RecommendationsHistoryPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left sidebar - List of recommendations */}
-        <div className="lg:col-span-1 space-y-3">
-          <h2 className="font-semibold text-sm text-muted-foreground px-2">
-            Selecione uma recomendação
+        <div className="lg:col-span-1 space-y-2">
+          <h2 className="font-semibold text-sm text-muted-foreground">
+            Histórico de Recomendações
           </h2>
-          <div className="space-y-2">
-            {recommendations.map((rec) => (
-              <Card
-                key={rec.id}
-                className={`cursor-pointer transition-colors hover:bg-muted/50 ${
-                  selectedRec?.id === rec.id ? 'border-primary bg-primary/5' : ''
-                }`}
-                onClick={() => setSelectedRec(rec)}
-              >
-                <CardHeader className="p-4">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <Stethoscope className="h-4 w-4 flex-shrink-0" style={{ color: rec.agentColor }} />
-                        <p className="text-sm font-medium truncate">{rec.agentName}</p>
-                      </div>
-                      <p className="text-xs text-muted-foreground flex items-center gap-1">
-                        <Calendar className="h-3 w-3" />
-                        {formatDate(rec.analysisDate)}
-                      </p>
+          <Select
+            value={selectedRec?.id}
+            onValueChange={(id) => {
+              const rec = recommendations.find((r) => r.id === id)
+              if (rec) setSelectedRec(rec)
+            }}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Selecione uma recomendação..." />
+            </SelectTrigger>
+            <SelectContent>
+              {recommendations.map((rec) => (
+                <SelectItem key={rec.id} value={rec.id}>
+                  <div className="flex items-center gap-3 py-1">
+                    <Stethoscope className="h-4 w-4 flex-shrink-0" style={{ color: rec.agentColor }} />
+                    <div className="flex flex-col">
+                      <span className="font-medium">{rec.agentName}</span>
+                      <span className="text-xs text-muted-foreground">{formatDate(rec.analysisDate)}</span>
                     </div>
-                    {selectedRec?.id === rec.id && (
-                      <CheckCircle2 className="h-5 w-5 text-primary flex-shrink-0" />
-                    )}
                   </div>
-                  <div className="flex gap-2 mt-2">
-                    <Badge variant="outline" className="text-xs">
-                      {rec.examRecommendations.length} exames
-                    </Badge>
-                    <Badge variant="outline" className="text-xs">
-                      {rec.lifestyleRecommendations.length} lifestyle
-                    </Badge>
-                  </div>
-                </CardHeader>
-              </Card>
-            ))}
-          </div>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
         {/* Right content - Selected recommendation details */}
@@ -341,30 +329,33 @@ export default function RecommendationsHistoryPage() {
               </CardHeader>
               <CardContent>
                 <Tabs defaultValue="exams" className="w-full">
-                  <TabsList className="grid w-full grid-cols-4">
-                    <TabsTrigger value="exams">
+                  <TabsList className="grid w-full grid-cols-4 bg-muted">
+                    <TabsTrigger value="exams" className="data-[state=active]:!bg-sky-600 dark:data-[state=active]:!bg-sky-500 data-[state=active]:!text-white">
                       Exames ({selectedRec.examRecommendations.length})
                     </TabsTrigger>
-                    <TabsTrigger value="lifestyle">
+                    <TabsTrigger value="lifestyle" className="data-[state=active]:!bg-teal-600 dark:data-[state=active]:!bg-teal-500 data-[state=active]:!text-white">
                       Lifestyle ({selectedRec.lifestyleRecommendations.length})
                     </TabsTrigger>
-                    <TabsTrigger value="goals">
+                    <TabsTrigger value="goals" className="data-[state=active]:!bg-purple-600 dark:data-[state=active]:!bg-purple-500 data-[state=active]:!text-white">
                       Metas ({selectedRec.healthGoals.length})
                     </TabsTrigger>
-                    <TabsTrigger value="alerts">
+                    <TabsTrigger value="alerts" className="data-[state=active]:!bg-amber-600 dark:data-[state=active]:!bg-amber-500 data-[state=active]:!text-white">
                       Alertas ({selectedRec.alerts.length})
                     </TabsTrigger>
                   </TabsList>
 
                   {/* Exams Tab */}
-                  <TabsContent value="exams" className="space-y-4 mt-4">
+                  <TabsContent value="exams" className="mt-6 space-y-3">
                     {selectedRec.examRecommendations.length === 0 ? (
                       <p className="text-sm text-muted-foreground text-center py-8">
                         Nenhum exame recomendado
                       </p>
                     ) : (
                       selectedRec.examRecommendations.map((exam: any, index: number) => (
-                        <div key={index} className="border rounded-lg p-4 space-y-2">
+                        <div
+                          key={index}
+                          className="border rounded-lg p-4 space-y-2 transition-colors hover:border-sky-300 hover:bg-sky-50/30 dark:hover:border-sky-700 dark:hover:bg-sky-900/30"
+                        >
                           <div className="flex items-start justify-between gap-2">
                             <h4 className="font-medium">{exam.exam}</h4>
                             <Badge variant={getUrgencyColor(exam.urgency)}>
@@ -372,7 +363,7 @@ export default function RecommendationsHistoryPage() {
                             </Badge>
                           </div>
                           <p className="text-sm text-muted-foreground">{exam.reason}</p>
-                          <div className="text-xs text-muted-foreground pt-2 border-t">
+                          <div className="text-xs text-muted-foreground pt-2 border-t mt-2">
                             Prazo sugerido: {exam.suggestedTimeframe}
                           </div>
                         </div>
@@ -381,14 +372,17 @@ export default function RecommendationsHistoryPage() {
                   </TabsContent>
 
                   {/* Lifestyle Tab */}
-                  <TabsContent value="lifestyle" className="space-y-4 mt-4">
+                  <TabsContent value="lifestyle" className="mt-6 space-y-3">
                     {selectedRec.lifestyleRecommendations.length === 0 ? (
                       <p className="text-sm text-muted-foreground text-center py-8">
                         Nenhuma recomendação de lifestyle
                       </p>
                     ) : (
                       selectedRec.lifestyleRecommendations.map((lifestyle: any, index: number) => (
-                        <div key={index} className="border rounded-lg p-4 space-y-2">
+                        <div
+                          key={index}
+                          className="border rounded-lg p-4 space-y-2 transition-colors hover:border-teal-300 hover:bg-teal-50/30 dark:hover:border-teal-700 dark:hover:bg-teal-900/30"
+                        >
                           <div className="flex items-start justify-between gap-2">
                             <div className="flex items-center gap-2">
                               {getCategoryIcon(lifestyle.category)}
@@ -399,7 +393,7 @@ export default function RecommendationsHistoryPage() {
                             </Badge>
                           </div>
                           <p className="text-sm">{lifestyle.recommendation}</p>
-                          <div className="text-xs text-muted-foreground pt-2 border-t">
+                          <div className="text-xs text-muted-foreground pt-2 border-t mt-2">
                             <strong>Benefício esperado:</strong> {lifestyle.expectedBenefit}
                           </div>
                         </div>
@@ -408,14 +402,17 @@ export default function RecommendationsHistoryPage() {
                   </TabsContent>
 
                   {/* Goals Tab */}
-                  <TabsContent value="goals" className="space-y-4 mt-4">
+                  <TabsContent value="goals" className="mt-6 space-y-3">
                     {selectedRec.healthGoals.length === 0 ? (
                       <p className="text-sm text-muted-foreground text-center py-8">
                         Nenhuma meta de saúde definida
                       </p>
                     ) : (
                       selectedRec.healthGoals.map((goal: any, index: number) => (
-                        <div key={index} className="border rounded-lg p-4 space-y-3">
+                        <div
+                          key={index}
+                          className="border rounded-lg p-4 space-y-3 transition-colors hover:border-purple-300 hover:bg-purple-50/30 dark:hover:border-purple-700 dark:hover:bg-purple-900/30"
+                        >
                           <h4 className="font-medium">{goal.goal}</h4>
                           <div className="grid grid-cols-2 gap-4 text-sm">
                             <div>
@@ -448,47 +445,56 @@ export default function RecommendationsHistoryPage() {
                   </TabsContent>
 
                   {/* Alerts Tab */}
-                  <TabsContent value="alerts" className="space-y-4 mt-4">
+                  <TabsContent value="alerts" className="mt-6 space-y-3">
                     {selectedRec.alerts.length === 0 ? (
                       <p className="text-sm text-muted-foreground text-center py-8">
                         Nenhum alerta
                       </p>
                     ) : (
-                      selectedRec.alerts.map((alert: any, index: number) => (
-                        <div
-                          key={index}
-                          className={`border rounded-lg p-4 space-y-2 ${
-                            alert.type === 'urgent'
-                              ? 'bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-800'
-                              : alert.type === 'warning'
-                              ? 'bg-yellow-50 dark:bg-yellow-950/20 border-yellow-200 dark:border-yellow-800'
-                              : 'bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800'
-                          }`}
-                        >
-                          <div className="flex items-start gap-2">
-                            <AlertCircle
-                              className={`h-5 w-5 flex-shrink-0 ${
-                                alert.type === 'urgent'
-                                  ? 'text-red-600 dark:text-red-400'
-                                  : alert.type === 'warning'
-                                  ? 'text-yellow-600 dark:text-yellow-400'
-                                  : 'text-blue-600 dark:text-blue-400'
-                              }`}
-                            />
-                            <div className="flex-1">
-                              <div className="flex items-start justify-between gap-2 mb-2">
-                                <p className="font-medium text-sm">{alert.message}</p>
-                                <Badge variant={getAlertColor(alert.type)}>
-                                  {alert.type === 'urgent' ? 'Urgente' : alert.type === 'warning' ? 'Atenção' : 'Info'}
-                                </Badge>
+                      selectedRec.alerts.map((alert: any, index: number) => {
+                        const alertConfig = {
+                          urgent: {
+                            bg: 'bg-red-50 dark:bg-red-950/20',
+                            border: 'border-red-200 dark:border-red-800',
+                            iconColor: 'text-red-600 dark:text-red-400',
+                            hover: 'hover:border-red-300 hover:bg-red-50/30 dark:hover:border-red-700 dark:hover:bg-red-900/30',
+                          },
+                          warning: {
+                            bg: 'bg-yellow-50 dark:bg-yellow-950/20',
+                            border: 'border-yellow-200 dark:border-yellow-800',
+                            iconColor: 'text-yellow-600 dark:text-yellow-400',
+                            hover: 'hover:border-yellow-300 hover:bg-yellow-50/30 dark:hover:border-yellow-700 dark:hover:bg-yellow-900/30',
+                          },
+                          info: {
+                            bg: 'bg-blue-50 dark:bg-blue-950/20',
+                            border: 'border-blue-200 dark:border-blue-800',
+                            iconColor: 'text-blue-600 dark:text-blue-400',
+                            hover: 'hover:border-blue-300 hover:bg-blue-50/30 dark:hover:border-blue-700 dark:hover:bg-blue-900/30',
+                          },
+                        }[alert.type]
+
+                        return (
+                          <div
+                            key={index}
+                            className={`border rounded-lg p-4 space-y-2 transition-colors ${alertConfig.bg} ${alertConfig.border} ${alertConfig.hover}`}
+                          >
+                            <div className="flex items-start gap-2">
+                              <AlertCircle className={`h-5 w-5 flex-shrink-0 ${alertConfig.iconColor}`} />
+                              <div className="flex-1">
+                                <div className="flex items-start justify-between gap-2 mb-2">
+                                  <p className="font-medium text-sm">{alert.message}</p>
+                                  <Badge variant={getAlertColor(alert.type)}>
+                                    {alert.type === 'urgent' ? 'Urgente' : alert.type === 'warning' ? 'Atenção' : 'Info'}
+                                  </Badge>
+                                </div>
+                                <p className="text-sm text-muted-foreground">
+                                  <strong>Ação recomendada:</strong> {alert.action}
+                                </p>
                               </div>
-                              <p className="text-sm text-muted-foreground">
-                                <strong>Ação recomendada:</strong> {alert.action}
-                              </p>
                             </div>
                           </div>
-                        </div>
-                      ))
+                        )
+                      })
                     )}
                   </TabsContent>
                 </Tabs>

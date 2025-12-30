@@ -100,13 +100,13 @@ export function WorkoutPlanNavigator({ workoutPlan }: WorkoutPlanNavigatorProps)
   const getIntensityColor = (intensity?: string) => {
     switch (intensity) {
       case 'high':
-        return 'bg-red-100 text-red-700 border-red-200'
+        return 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 border-red-200 dark:border-red-700'
       case 'medium':
-        return 'bg-amber-100 text-amber-700 border-amber-200'
+        return 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-700'
       case 'low':
-        return 'bg-gray-100 text-foreground border-border'
+        return 'bg-muted text-foreground border-border'
       default:
-        return 'bg-emerald-100 text-emerald-700 border-emerald-200'
+        return 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-700'
     }
   }
 
@@ -134,8 +134,8 @@ export function WorkoutPlanNavigator({ workoutPlan }: WorkoutPlanNavigatorProps)
           {workoutPlan.overview}
         </CardDescription>
         {workoutPlan.weeklyGoal && (
-          <div className="mt-3 p-3 bg-emerald-50 border border-emerald-200 rounded-lg">
-            <p className="text-sm text-emerald-900 font-medium">
+          <div className="mt-3 p-3 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800 rounded-lg">
+            <p className="text-sm text-emerald-900 dark:text-emerald-100 font-medium">
               Meta: {workoutPlan.weeklyGoal}
             </p>
           </div>
@@ -203,7 +203,7 @@ export function WorkoutPlanNavigator({ workoutPlan }: WorkoutPlanNavigatorProps)
               </Badge>
               {selectedWorkout && (
                 <>
-                  <Badge className="bg-emerald-100 text-emerald-700 border-emerald-200 text-sm flex items-center gap-1">
+                  <Badge className="bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-700 text-sm flex items-center gap-1">
                     <Clock className="h-3 w-3" />
                     {selectedWorkout.duration}
                   </Badge>
@@ -220,10 +220,10 @@ export function WorkoutPlanNavigator({ workoutPlan }: WorkoutPlanNavigatorProps)
 
           {/* Rest Day Message */}
           {selectedIsRestDay && !selectedWorkout && (
-            <Card className="border-2 border-sky-200 bg-card">
+            <Card className="border-2 border-sky-200 dark:border-sky-800 bg-card">
               <CardContent className="p-8 text-center">
                 <div className="bg-sky-50 dark:bg-sky-950/20 rounded-lg p-4 mb-4 inline-block">
-                  <Coffee className="h-12 w-12 text-sky-600" />
+                  <Coffee className="h-12 w-12 text-sky-600 dark:text-sky-400" />
                 </div>
                 <h4 className="text-lg font-semibold text-foreground mb-2">Dia de Descanso</h4>
                 <p className="text-sm text-muted-foreground leading-relaxed">
@@ -238,7 +238,7 @@ export function WorkoutPlanNavigator({ workoutPlan }: WorkoutPlanNavigatorProps)
             <Card className="border-2 border-border bg-card">
               <CardContent className="p-8 text-center">
                 <div className="bg-muted rounded-lg p-4 mb-4 inline-block">
-                  <CalendarX className="h-12 w-12 text-gray-400" />
+                  <CalendarX className="h-12 w-12 text-muted-foreground" />
                 </div>
                 <h4 className="text-lg font-semibold text-foreground mb-2">Sem treino programado</h4>
                 <p className="text-sm text-muted-foreground leading-relaxed">

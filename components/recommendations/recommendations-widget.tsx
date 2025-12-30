@@ -255,7 +255,7 @@ export function RecommendationsWidget({ patientId }: RecommendationsWidgetProps 
               recommendations.examRecommendations.map((exam, index) => (
                 <div
                   key={index}
-                  className="p-4 rounded-lg border border-border bg-card hover:border-sky-300 hover:bg-sky-50/30 transition-all"
+                  className="p-4 rounded-lg border border-border bg-card hover:border-sky-300 hover:bg-sky-50/30 transition-all dark:border-gray-700 dark:hover:bg-sky-900/30 dark:hover:border-sky-700"
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex items-start gap-3 flex-1">
@@ -290,7 +290,7 @@ export function RecommendationsWidget({ patientId }: RecommendationsWidgetProps 
               recommendations.lifestyleRecommendations.map((lifestyle, index) => (
                 <div
                   key={index}
-                  className="p-4 rounded-lg border border-border bg-card hover:border-teal-300 hover:bg-teal-50/30 transition-all"
+                  className="p-4 rounded-lg border border-border bg-card hover:border-teal-300 hover:bg-teal-50/30 transition-all dark:border-gray-700 dark:hover:bg-teal-900/30 dark:hover:border-teal-700"
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex items-start gap-3 flex-1">
@@ -327,7 +327,7 @@ export function RecommendationsWidget({ patientId }: RecommendationsWidgetProps 
               recommendations.healthGoals.map((goal, index) => (
                 <div
                   key={index}
-                  className="p-4 rounded-lg border border-border bg-card hover:border-purple-300 hover:bg-purple-50/30 transition-all"
+                  className="p-4 rounded-lg border border-border bg-card hover:border-purple-300 hover:bg-purple-50/30 transition-all dark:border-gray-700 dark:hover:bg-purple-900/30 dark:hover:border-purple-700"
                 >
                   <div className="flex items-start gap-3">
                     <div className="bg-purple-100 p-2 rounded-lg shrink-0">
@@ -383,15 +383,33 @@ export function RecommendationsWidget({ patientId }: RecommendationsWidgetProps 
             ) : (
               recommendations.alerts.map((alert, index) => {
                 const alertConfig = {
-                  urgent: { bg: 'bg-red-50 dark:bg-red-950/20', border: 'border-red-200 dark:border-red-800', iconBg: 'bg-red-100 dark:bg-red-900/30', color: 'text-red-600 dark:text-red-400' },
-                  warning: { bg: 'bg-orange-50 dark:bg-orange-950/20', border: 'border-orange-200 dark:border-orange-800', iconBg: 'bg-orange-100 dark:bg-orange-900/30', color: 'text-orange-600 dark:text-orange-400' },
-                  info: { bg: 'bg-sky-50 dark:bg-sky-950/20', border: 'border-sky-200 dark:border-sky-800', iconBg: 'bg-sky-100 dark:bg-sky-900/30', color: 'text-sky-600 dark:text-sky-400' },
+                  urgent: {
+                    bg: 'bg-red-50 dark:bg-red-950/20',
+                    border: 'border-red-200 dark:border-red-800',
+                    iconBg: 'bg-red-100 dark:bg-red-900/30',
+                    color: 'text-red-600 dark:text-red-400',
+                    hover: 'hover:border-red-300 hover:bg-red-50/30 dark:hover:border-red-700 dark:hover:bg-red-900/30',
+                  },
+                  warning: {
+                    bg: 'bg-orange-50 dark:bg-orange-950/20',
+                    border: 'border-orange-200 dark:border-orange-800',
+                    iconBg: 'bg-orange-100 dark:bg-orange-900/30',
+                    color: 'text-orange-600 dark:text-orange-400',
+                    hover: 'hover:border-orange-300 hover:bg-orange-50/30 dark:hover:border-orange-700 dark:hover:bg-orange-900/30',
+                  },
+                  info: {
+                    bg: 'bg-sky-50 dark:bg-sky-950/20',
+                    border: 'border-sky-200 dark:border-sky-800',
+                    iconBg: 'bg-sky-100 dark:bg-sky-900/30',
+                    color: 'text-sky-600 dark:text-sky-400',
+                    hover: 'hover:border-sky-300 hover:bg-sky-50/30 dark:hover:border-sky-700 dark:hover:bg-sky-900/30',
+                  },
                 }[alert.type]
 
                 return (
                   <div
                     key={index}
-                    className={`p-4 rounded-lg border ${alertConfig.bg} ${alertConfig.border}`}
+                    className={`p-4 rounded-lg border ${alertConfig.bg} ${alertConfig.border} ${alertConfig.hover} transition-all`}
                   >
                     <div className="flex items-start gap-3">
                       <div className={`p-2 rounded-lg shrink-0 ${alertConfig.iconBg}`}>

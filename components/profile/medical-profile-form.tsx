@@ -365,9 +365,9 @@ export function MedicalProfileForm({ userId, onProfileSaved }: MedicalProfileFor
                 />
               </div>
             </div>
-
-            <div className="bg-green-50 border border-green-200 rounded-md p-3 text-sm space-y-1">
-              <p className="font-medium text-green-900">📊 Valores de Referência:</p>
+            {/* Ajustar o dark mode */}
+            <div className="bg-green-50 border border-green-200 rounded-md p-3 text-sm space-y-1 dark:bg-green-900/10 dark:border-green-900/20">
+              <p className="font-medium text-green-900  dark:text-green-600">📊 Valores de Referência:</p>
               <p className="text-green-800">
                 <strong>Pressão Arterial:</strong> Ideal &lt; 120/80 mmHg | Normal &lt; 130/85 mmHg
               </p>
@@ -580,12 +580,12 @@ export function MedicalProfileForm({ userId, onProfileSaved }: MedicalProfileFor
               />
             </div>
 
-            <div className="bg-indigo-50 border border-indigo-200 rounded-md p-3 text-sm space-y-1">
-              <p className="font-medium text-indigo-900">💤 Recomendações:</p>
-              <p className="text-indigo-800">
+            <div className="bg-indigo-50 border border-indigo-200 rounded-md p-3 text-sm space-y-1 dark:bg-indigo-900/10 dark:border-indigo-900/20">
+              <p className="font-medium text-indigo-900 dark:text-indigo-400">💤 Recomendações:</p>
+              <p className="text-indigo-800 dark:text-indigo-600">
                 <strong>Duração:</strong> Adultos precisam de 7-9 horas por noite. Qualidade é mais importante que quantidade.
               </p>
-              <p className="text-indigo-800">
+              <p className="text-indigo-800 dark:text-indigo-600">
                 <strong>Impacto:</strong> Sono inadequado está associado a obesidade, diabetes, doenças cardiovasculares e declínio cognitivo.
               </p>
             </div>
@@ -636,12 +636,12 @@ export function MedicalProfileForm({ userId, onProfileSaved }: MedicalProfileFor
               </div>
             </div>
 
-            <div className="bg-purple-50 border border-purple-200 rounded-md p-3 text-sm space-y-1">
-              <p className="font-medium text-purple-900">🧠 Impacto na Saúde:</p>
-              <p className="text-purple-800">
+            <div className="bg-purple-50 border border-purple-200 rounded-md p-3 text-sm space-y-1 dark:bg-purple-900/10 dark:border-purple-900/20">
+              <p className="font-medium text-purple-900 dark:text-purple-400">🧠 Impacto na Saúde:</p>
+              <p className="text-purple-800 dark:text-purple-600">
                 <strong>Estresse crônico:</strong> Aumenta cortisol, prejudica sono, eleva pressão arterial e enfraquece o sistema imunológico.
               </p>
-              <p className="text-purple-800">
+              <p className="text-purple-800 dark:text-purple-600">
                 <strong>Gestão:</strong> Práticas como mindfulness, exercício regular e sono adequado são essenciais para redução do estresse.
               </p>
             </div>
@@ -738,12 +738,12 @@ export function MedicalProfileForm({ userId, onProfileSaved }: MedicalProfileFor
               />
             </div>
 
-            <div className="bg-teal-50 border border-teal-200 rounded-md p-3 text-sm space-y-1">
-              <p className="font-medium text-teal-900">🏃 Diretrizes OMS:</p>
-              <p className="text-teal-800">
+            <div className="bg-teal-50 border border-teal-200 rounded-md p-3 text-sm space-y-1 dark:bg-teal-900/10 dark:border-teal-900/20">
+              <p className="font-medium text-teal-900 dark:text-teal-400">🏃 Diretrizes OMS:</p>
+              <p className="text-teal-800 dark:text-teal-600">
                 <strong>Adultos:</strong> Mínimo de 150 minutos/semana de atividade moderada OU 75 minutos de atividade intensa.
               </p>
-              <p className="text-teal-800">
+              <p className="text-teal-800 dark:text-teal-600">
                 <strong>Benefícios:</strong> Reduz risco de doenças cardiovasculares, diabetes, câncer, ansiedade e depressão.
               </p>
             </div>
@@ -777,14 +777,14 @@ export function MedicalProfileForm({ userId, onProfileSaved }: MedicalProfileFor
                   onChange={(e) => handleInputChange('handgripStrength', parseFloat(e.target.value) || null)}
                   placeholder="Ex: 35.5"
                 />
-                <div className="bg-blue-50 border border-blue-200 rounded-md p-3 text-sm space-y-2">
-                  <p className="font-medium text-blue-900">📊 Sobre este teste:</p>
-                  <p className="text-blue-800">
+                <div className="bg-blue-50 border border-blue-200 rounded-md p-3 text-sm space-y-2 dark:bg-blue-900/10 dark:border-blue-900/20">
+                  <p className="font-medium text-blue-900 dark:text-blue-400">📊 Sobre este teste:</p>
+                  <p className="text-blue-800 dark:text-blue-600">
                     Biomarcador funcional que reflete a integridade do sistema neuromuscular geral.
                     Estudos mostram que baixa força de preensão é um preditor de mortalidade mais forte
                     que a massa muscular isoladamente.
                   </p>
-                  <p className="text-blue-800">
+                  <p className="text-blue-800 dark:text-blue-600">
                     <strong>Como fazer:</strong> Use um dinamômetro manual. Compare seus resultados
                     com valores normativos para sua idade e sexo. Quedas anuais são um sinal de alerta.
                   </p>
@@ -804,14 +804,14 @@ export function MedicalProfileForm({ userId, onProfileSaved }: MedicalProfileFor
                   onChange={(e) => handleInputChange('sitToStandTime', parseFloat(e.target.value) || null)}
                   placeholder="Ex: 12.5"
                 />
-                <div className="bg-orange-50 border border-orange-200 rounded-md p-3 text-sm space-y-2">
-                  <p className="font-medium text-orange-900">📊 Sobre este teste:</p>
-                  <p className="text-orange-800">
+                <div className="bg-orange-50 border border-orange-200 rounded-md p-3 text-sm space-y-2 dark:bg-orange-900/10 dark:border-orange-900/20">
+                  <p className="font-medium text-orange-900 dark:text-orange-400">📊 Sobre este teste:</p>
+                  <p className="text-orange-800 dark:text-orange-600">
                     Mede a potência dos membros inferiores (Força x Velocidade). A perda de potência é
                     uma das primeiras manifestações de sarcopenia, ligada ao risco de quedas e perda de
                     independência.
                   </p>
-                  <p className="text-orange-800">
+                  <p className="text-orange-800 dark:text-orange-600">
                     <strong>Como fazer:</strong> Sente em uma cadeira (joelhos a 90°), braços cruzados
                     no peito. Levante e sente 5 vezes o mais rápido possível.
                     <strong> Alerta:</strong> Tempo &gt; 15s indica alto risco de sarcopenia.
@@ -845,12 +845,12 @@ export function MedicalProfileForm({ userId, onProfileSaved }: MedicalProfileFor
               />
             </div>
 
-            <div className="bg-yellow-50 border border-yellow-200 rounded-md p-3 text-sm space-y-1">
-              <p className="font-medium text-yellow-900">🥗 Nutrição de Qualidade:</p>
-              <p className="text-yellow-800">
+            <div className="bg-yellow-50 border border-yellow-200 rounded-md p-3 text-sm space-y-1 dark:bg-yellow-900/10 dark:border-yellow-900/20">
+              <p className="font-medium text-yellow-900 dark:text-yellow-600">🥗 Nutrição de Qualidade:</p>
+              <p className="text-yellow-800 dark:text-yellow-400">
                 <strong>Fundamentos:</strong> Priorize alimentos integrais, vegetais variados, proteínas de qualidade e gorduras saudáveis.
               </p>
-              <p className="text-yellow-800">
+              <p className="text-yellow-800 dark:text-yellow-400">
                 <strong>Evite:</strong> Alimentos ultraprocessados, excesso de açúcar e gorduras trans estão associados a inflamação crônica e doenças metabólicas.
               </p>
             </div>

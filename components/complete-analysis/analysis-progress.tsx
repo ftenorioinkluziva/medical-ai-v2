@@ -129,19 +129,19 @@ export function AnalysisProgress({ analysisId }: AnalysisProgressProps) {
 
         {/* Error Message */}
         {error && status === 'failed' && (
-          <div className="p-4 border border-red-200 rounded-lg bg-red-50">
-            <p className="text-sm text-red-900 font-medium">Erro:</p>
-            <p className="text-sm text-red-700 mt-1">{error}</p>
+          <div className="p-4 border border-red-200 dark:border-red-800 rounded-lg bg-red-50 dark:bg-red-950/20">
+            <p className="text-sm text-red-900 dark:text-red-200 font-medium">Erro:</p>
+            <p className="text-sm text-red-700 dark:text-red-400 mt-1">{error}</p>
           </div>
         )}
 
         {/* Success Message */}
         {status === 'completed' && (
-          <div className="p-4 border border-green-200 rounded-lg bg-green-50">
-            <p className="text-sm text-green-900 font-medium">
+          <div className="p-4 border border-green-200 dark:border-green-800 rounded-lg bg-green-50 dark:bg-green-950/20">
+            <p className="text-sm text-green-900 dark:text-green-200 font-medium">
               ✅ Análise concluída com sucesso!
             </p>
-            <p className="text-sm text-green-700 mt-1">
+            <p className="text-sm text-green-700 dark:text-green-400 mt-1">
               Redirecionando para os resultados...
             </p>
           </div>
@@ -165,13 +165,13 @@ export function AnalysisProgress({ analysisId }: AnalysisProgressProps) {
                 <div
                   className={`
                     h-2 w-2 rounded-full
-                    ${isCompleted ? 'bg-green-500' : isCurrent ? 'bg-purple-500 animate-pulse' : 'bg-gray-300'}
+                    ${isCompleted ? 'bg-green-500' : isCurrent ? 'bg-purple-500 animate-pulse' : 'bg-gray-300 dark:bg-gray-600'}
                   `}
                 />
                 <p
                   className={`
                     text-sm
-                    ${isCompleted ? 'text-green-700 font-medium' : isCurrent ? 'text-purple-700 font-medium' : 'text-muted-foreground'}
+                    ${isCompleted ? 'text-green-700 dark:text-green-400 font-medium' : isCurrent ? 'text-purple-700 dark:text-purple-400 font-medium' : 'text-muted-foreground'}
                   `}
                 >
                   {step.label}

@@ -79,11 +79,11 @@ export function CompleteAnalysesList() {
         const statusConfig = {
           completed: {
             icon: <CheckCircle2 className="h-5 w-5 text-green-600" />,
-            badge: <Badge className="bg-green-100 text-green-700">Concluída</Badge>,
+            badge: <Badge className="bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border-green-200 dark:border-green-700/60">Concluída</Badge>,
           },
           failed: {
             icon: <XCircle className="h-5 w-5 text-red-600" />,
-            badge: <Badge className="bg-red-100 text-red-700">Erro</Badge>,
+            badge: <Badge className="bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 border-red-200 dark:border-red-700/60">Erro</Badge>,
           },
           pending: {
             icon: <Clock className="h-5 w-5 text-gray-600" />,
@@ -91,26 +91,26 @@ export function CompleteAnalysesList() {
           },
           analyzing_integrative: {
             icon: <Loader2 className="h-5 w-5 animate-spin text-purple-600" />,
-            badge: <Badge className="bg-purple-100 text-purple-700">Em andamento</Badge>,
+            badge: <Badge className="bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400 border-purple-200 dark:border-purple-700/60">Em andamento</Badge>,
           },
           analyzing_specialized: {
             icon: <Loader2 className="h-5 w-5 animate-spin text-purple-600" />,
-            badge: <Badge className="bg-purple-100 text-purple-700">Em andamento</Badge>,
+            badge: <Badge className="bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400 border-purple-200 dark:border-purple-700/60">Em andamento</Badge>,
           },
           generating_synthesis: {
             icon: <Loader2 className="h-5 w-5 animate-spin text-purple-600" />,
-            badge: <Badge className="bg-purple-100 text-purple-700">Em andamento</Badge>,
+            badge: <Badge className="bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400 border-purple-200 dark:border-purple-700/60">Em andamento</Badge>,
           },
           generating_products: {
             icon: <Loader2 className="h-5 w-5 animate-spin text-purple-600" />,
-            badge: <Badge className="bg-purple-100 text-purple-700">Em andamento</Badge>,
+            badge: <Badge className="bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400 border-purple-200 dark:border-purple-700/60">Em andamento</Badge>,
           },
         }
 
         const config = statusConfig[analysis.status as keyof typeof statusConfig] || statusConfig.pending
 
-        return (
-          <Card key={analysis.id} className="hover:shadow-md transition-shadow">
+        const card = (
+          <Card className={`hover:shadow-md transition-all ${analysis.status === 'completed' ? 'cursor-pointer hover:bg-accent' : ''}`}>
             <CardContent className="p-6">
               <div className="flex items-start justify-between gap-4">
                 {/* Left side - Info */}
@@ -153,19 +153,18 @@ export function CompleteAnalysesList() {
                 {/* Right side - Actions */}
                 <div className="flex flex-col items-end gap-3">
                   {config.badge}
-
-                  {analysis.status === 'completed' && (
-                    <Link href={`/analyze-complete/${analysis.id}`}>
-                      <Button size="sm" variant="outline" className="gap-2">
-                        <Eye className="h-4 w-4" />
-                        Ver Resultados
-                      </Button>
-                    </Link>
-                  )}
                 </div>
               </div>
             </CardContent>
           </Card>
+        )
+
+        return analysis.status === 'completed' ? (
+          <Link key={analysis.id} href={`/analyze-complete/${analysis.id}`} className="block">
+            {card}
+          </Link>
+        ) : (
+          <div key={analysis.id}>{card}</div>
         )
       })}
     </div>

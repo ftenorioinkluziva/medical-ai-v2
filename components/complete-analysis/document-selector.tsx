@@ -87,7 +87,7 @@ export function DocumentSelector({
 
   if (documents.length === 0) {
     return (
-      <div className="text-center py-12 border-2 border-dashed rounded-lg">
+      <div className="text-center py-12 border-2 border-dashed rounded-lg border-border">
         <FileText className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
         <h3 className="font-semibold text-lg mb-2">Nenhum documento disponível</h3>
         <p className="text-sm text-muted-foreground">
@@ -125,7 +125,7 @@ export function DocumentSelector({
               key={doc.id}
               className={`
                 flex items-center gap-3 p-4 border rounded-lg transition-all
-                ${isSelected ? 'border-purple-300 bg-purple-50/50' : 'border-gray-200 hover:border-gray-300'}
+                ${isSelected ? 'border-purple-300 bg-purple-50/50 dark:border-purple-600 dark:bg-purple-950/20' : 'border-border hover:bg-accent'}
                 ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
               `}
               onClick={() => handleToggle(doc.id)}
@@ -157,7 +157,7 @@ export function DocumentSelector({
               </div>
 
               {isSelected && (
-                <CheckCircle2 className="h-5 w-5 text-purple-600 shrink-0" />
+                <CheckCircle2 className="h-5 w-5 text-purple-600 dark:text-purple-400 shrink-0" />
               )}
             </div>
           )

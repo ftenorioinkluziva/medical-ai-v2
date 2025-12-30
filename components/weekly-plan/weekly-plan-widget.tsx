@@ -125,15 +125,15 @@ export function WeeklyPlanWidget({ patientId }: WeeklyPlanWidgetProps = {}) {
     return (
       <Card className="hover:shadow-md transition-shadow">
         <CardContent className="p-6">
-          <div className={`flex items-start gap-3 p-4 rounded-lg border ${isNoPlan ? 'bg-sky-50 border-sky-200' : 'bg-red-50 border-red-200'}`}>
-            <div className={`p-2 rounded-lg shrink-0 ${isNoPlan ? 'bg-sky-100' : 'bg-red-100'}`}>
-              <AlertCircle className={`h-5 w-5 ${isNoPlan ? 'text-sky-600' : 'text-red-600'}`} />
+          <div className={`flex items-start gap-3 p-4 rounded-lg border ${isNoPlan ? 'bg-sky-50 dark:bg-sky-950/20 border-sky-200 dark:border-sky-800' : 'bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-800'}`}>
+            <div className={`p-2 rounded-lg shrink-0 ${isNoPlan ? 'bg-sky-100 dark:bg-sky-900/30' : 'bg-red-100 dark:bg-red-900/30'}`}>
+              <AlertCircle className={`h-5 w-5 ${isNoPlan ? 'text-sky-600 dark:text-sky-400' : 'text-red-600 dark:text-red-400'}`} />
             </div>
             <div className="flex-1">
-              <p className={`font-semibold ${isNoPlan ? 'text-sky-900' : 'text-red-900'}`}>
+              <p className={`font-semibold ${isNoPlan ? 'text-sky-900 dark:text-sky-200' : 'text-red-900 dark:text-red-200'}`}>
                 {isNoPlan ? 'Nenhum plano semanal disponível' : 'Erro ao carregar plano'}
               </p>
-              <p className={`text-sm mt-1 ${isNoPlan ? 'text-sky-700' : 'text-red-700'}`}>
+              <p className={`text-sm mt-1 ${isNoPlan ? 'text-sky-700 dark:text-sky-400' : 'text-red-700 dark:text-red-400'}`}>
                 {isNoPlan
                   ? 'Realize uma análise médica para gerar seu primeiro plano semanal personalizado.'
                   : error || 'Ocorreu um erro ao carregar o plano.'}
@@ -171,22 +171,32 @@ export function WeeklyPlanWidget({ patientId }: WeeklyPlanWidgetProps = {}) {
         </div>
       </CardHeader>
       <CardContent>
-        <Tabs defaultValue="overview" className="w-full">
-          <TabsList className="grid w-full grid-cols-5">
-            <TabsTrigger value="overview">Visão Geral</TabsTrigger>
-            <TabsTrigger value="supplements">Suplementação</TabsTrigger>
-            <TabsTrigger value="shopping">Compras</TabsTrigger>
-            <TabsTrigger value="meals">Refeições</TabsTrigger>
-            <TabsTrigger value="workouts">Treinos</TabsTrigger>
+        <Tabs defaultValue="supplements" className="w-full">
+          <TabsList className="grid w-full grid-cols-4 bg-muted">
+            {/* <TabsTrigger value="overview" className="data-[state=active]:!bg-teal-600 dark:data-[state=active]:!bg-teal-500 data-[state=active]:!text-white">
+              Visão Geral
+            </TabsTrigger> */}
+            <TabsTrigger value="supplements" className="data-[state=active]:!bg-purple-600 dark:data-[state=active]:!bg-purple-500 data-[state=active]:!text-white">
+              Suplementação
+            </TabsTrigger>
+            <TabsTrigger value="shopping" className="data-[state=active]:!bg-emerald-600 dark:data-[state=active]:!bg-emerald-500 data-[state=active]:!text-white">
+              Compras
+            </TabsTrigger>
+            <TabsTrigger value="meals" className="data-[state=active]:!bg-orange-600 dark:data-[state=active]:!bg-orange-500 data-[state=active]:!text-white">
+              Refeições
+            </TabsTrigger>
+            <TabsTrigger value="workouts" className="data-[state=active]:!bg-sky-600 dark:data-[state=active]:!bg-sky-500 data-[state=active]:!text-white">
+              Treinos
+            </TabsTrigger>
           </TabsList>
 
-          {/* Overview Tab */}
+          {/* Overview Tab 
           <TabsContent value="overview" className="mt-6 space-y-4">
             <div className="grid gap-4 md:grid-cols-2">
-              <div className="p-4 border border-border rounded-lg hover:border-purple-300 hover:bg-purple-50/30 transition-all">
+              <div className="p-4 border border-border rounded-lg hover:border-purple-300 hover:bg-purple-50/30 dark:hover:bg-purple-950/30 transition-all">
                 <div className="flex items-center gap-2 mb-2">
-                  <div className="bg-purple-100 p-2 rounded-lg">
-                    <Pill className="h-4 w-4 text-purple-700" />
+                  <div className="bg-purple-100 dark:bg-purple-900/20 p-2 rounded-lg">
+                    <Pill className="h-4 w-4 text-purple-700 dark:text-purple-400" />
                   </div>
                   <h4 className="font-semibold text-foreground">Suplementação</h4>
                 </div>
@@ -196,10 +206,10 @@ export function WeeklyPlanWidget({ patientId }: WeeklyPlanWidgetProps = {}) {
                 <Badge variant="outline" className="mt-2">{totalSupplements} suplementos</Badge>
               </div>
 
-              <div className="p-4 border border-border rounded-lg hover:border-emerald-300 hover:bg-emerald-50/30 transition-all">
+              <div className="p-4 border border-border rounded-lg hover:border-emerald-300 hover:bg-emerald-50/30 dark:hover:bg-emerald-950/30 transition-all">
                 <div className="flex items-center gap-2 mb-2">
-                  <div className="bg-emerald-100 p-2 rounded-lg">
-                    <ShoppingCart className="h-4 w-4 text-emerald-700" />
+                  <div className="bg-emerald-100 dark:bg-emerald-900/20 p-2 rounded-lg">
+                    <ShoppingCart className="h-4 w-4 text-emerald-700 dark:text-emerald-400" />
                   </div>
                   <h4 className="font-semibold text-foreground">Compras</h4>
                 </div>
@@ -209,10 +219,10 @@ export function WeeklyPlanWidget({ patientId }: WeeklyPlanWidgetProps = {}) {
                 <Badge variant="outline" className="mt-2">{totalCategories} categorias</Badge>
               </div>
 
-              <div className="p-4 border border-border rounded-lg hover:border-orange-300 hover:bg-orange-50/30 transition-all">
+              <div className="p-4 border border-border rounded-lg hover:border-orange-300 hover:bg-orange-50/30 dark:hover:bg-orange-950/30 transition-all">
                 <div className="flex items-center gap-2 mb-2">
-                  <div className="bg-orange-100 p-2 rounded-lg">
-                    <UtensilsCrossed className="h-4 w-4 text-orange-700" />
+                  <div className="bg-orange-100 dark:bg-orange-900/20 p-2 rounded-lg">
+                    <UtensilsCrossed className="h-4 w-4 text-orange-700 dark:text-orange-400" />
                   </div>
                   <h4 className="font-semibold text-foreground">Refeições</h4>
                 </div>
@@ -222,10 +232,10 @@ export function WeeklyPlanWidget({ patientId }: WeeklyPlanWidgetProps = {}) {
                 <Badge variant="outline" className="mt-2">{totalMeals} dias planejados</Badge>
               </div>
 
-              <div className="p-4 border border-border rounded-lg hover:border-sky-300 hover:bg-sky-50/30 transition-all">
+              <div className="p-4 border border-border rounded-lg hover:border-sky-300 hover:bg-sky-50/30 dark:hover:bg-sky-950/30 transition-all">
                 <div className="flex items-center gap-2 mb-2">
-                  <div className="bg-sky-100 p-2 rounded-lg">
-                    <Dumbbell className="h-4 w-4 text-sky-700" />
+                  <div className="bg-sky-100 dark:bg-sky-900/20 p-2 rounded-lg">
+                    <Dumbbell className="h-4 w-4 text-sky-700 dark:text-sky-400" />
                   </div>
                   <h4 className="font-semibold text-foreground">Treinos</h4>
                 </div>
@@ -236,7 +246,7 @@ export function WeeklyPlanWidget({ patientId }: WeeklyPlanWidgetProps = {}) {
               </div>
             </div>
           </TabsContent>
-
+*/}
           {/* Supplements Tab */}
           <TabsContent value="supplements" className="mt-6">
             <div className="mb-4">
@@ -244,10 +254,10 @@ export function WeeklyPlanWidget({ patientId }: WeeklyPlanWidgetProps = {}) {
             </div>
             <div className="space-y-3">
               {plan.supplementationStrategy.supplements.map((supplement, index) => (
-                <div key={index} className="p-3 border border-border rounded-lg hover:border-purple-300 hover:bg-purple-50/30 transition-all">
+                <div key={index} className="p-3 border border-border rounded-lg hover:border-purple-300 hover:bg-purple-50/30 dark:hover:bg-purple-950/30 transition-all">
                   <div className="flex items-start gap-2">
-                    <div className="bg-purple-100 p-1.5 rounded shrink-0">
-                      <Pill className="h-3 w-3 text-purple-700" />
+                    <div className="bg-purple-100 dark:bg-purple-900/20 p-1.5 rounded shrink-0">
+                      <Pill className="h-3 w-3 text-purple-700 dark:text-purple-400" />
                     </div>
                     <div className="flex-1">
                       <h4 className="font-semibold text-foreground">{supplement.name}</h4>
@@ -269,7 +279,7 @@ export function WeeklyPlanWidget({ patientId }: WeeklyPlanWidgetProps = {}) {
             </div>
             <div className="space-y-3">
               {plan.shoppingList.categories.map((category, index) => (
-                <div key={index} className="p-3 border border-border rounded-lg hover:border-emerald-300 hover:bg-emerald-50/30 transition-all">
+                <div key={index} className="p-3 border border-border rounded-lg hover:border-emerald-300 hover:bg-emerald-50/30 dark:hover:bg-emerald-950/30 transition-all">
                   <h4 className="font-semibold text-foreground mb-2">{category.category}</h4>
                   <div className="flex flex-wrap gap-1">
                     {category.items.map((item, idx) => (
@@ -290,14 +300,14 @@ export function WeeklyPlanWidget({ patientId }: WeeklyPlanWidgetProps = {}) {
             </div>
             <div className="space-y-4">
               {plan.mealPlan.meals.map((day: any, index: number) => (
-                <div key={index} className="border border-border rounded-lg p-4 bg-card hover:border-orange-300 hover:bg-orange-50/20 transition-all">
+                <div key={index} className="border border-border rounded-lg p-4 bg-card hover:border-orange-300 hover:bg-orange-50/20 dark:hover:bg-orange-950/20 transition-all">
                   <h4 className="font-semibold text-foreground mb-4">{day.day}</h4>
 
                   <div className="space-y-4">
                     {/* Breakfast */}
                     {day.breakfast && (
                       <div>
-                        <h5 className="font-semibold text-sm text-orange-600 mb-2">☀️ Café da Manhã</h5>
+                        <h5 className="font-semibold text-sm text-orange-600 dark:text-orange-400 mb-2">☀️ Café da Manhã</h5>
                         <div className="pl-4 space-y-1">
                           <p className="font-semibold text-sm text-foreground">{day.breakfast.name}</p>
                           <ul className="text-xs text-muted-foreground space-y-0.5 mt-1">
@@ -312,7 +322,7 @@ export function WeeklyPlanWidget({ patientId }: WeeklyPlanWidgetProps = {}) {
                     {/* Lunch */}
                     {day.lunch && (
                       <div>
-                        <h5 className="font-semibold text-sm text-emerald-600 mb-2">🌞 Almoço</h5>
+                        <h5 className="font-semibold text-sm text-emerald-600 dark:text-emerald-400 mb-2">🌞 Almoço</h5>
                         <div className="pl-4 space-y-1">
                           <p className="font-semibold text-sm text-foreground">{day.lunch.name}</p>
                           <ul className="text-xs text-muted-foreground space-y-0.5 mt-1">
@@ -327,7 +337,7 @@ export function WeeklyPlanWidget({ patientId }: WeeklyPlanWidgetProps = {}) {
                     {/* Dinner */}
                     {day.dinner && (
                       <div>
-                        <h5 className="font-semibold text-sm text-sky-600 mb-2">🌙 Jantar</h5>
+                        <h5 className="font-semibold text-sm text-sky-600 dark:text-sky-400 mb-2">🌙 Jantar</h5>
                         <div className="pl-4 space-y-1">
                           <p className="font-semibold text-sm text-foreground">{day.dinner.name}</p>
                           <ul className="text-xs text-muted-foreground space-y-0.5 mt-1">
@@ -342,7 +352,7 @@ export function WeeklyPlanWidget({ patientId }: WeeklyPlanWidgetProps = {}) {
                     {/* Snacks */}
                     {day.snacks && day.snacks.length > 0 && (
                       <div>
-                        <h5 className="font-semibold text-sm text-purple-600 mb-2">🍎 Lanches</h5>
+                        <h5 className="font-semibold text-sm text-purple-600 dark:text-purple-400 mb-2">🍎 Lanches</h5>
                         <div className="pl-4 space-y-1">
                           {day.snacks.map((snack: any, i: number) => (
                             <div key={i} className="text-xs">
@@ -366,7 +376,7 @@ export function WeeklyPlanWidget({ patientId }: WeeklyPlanWidgetProps = {}) {
             </div>
             <div className="space-y-4">
               {plan.workoutPlan.workouts.map((workout: any, index: number) => (
-                <div key={index} className="border border-border rounded-lg p-4 bg-card hover:border-sky-300 hover:bg-sky-50/20 transition-all">
+                <div key={index} className="border border-border rounded-lg p-4 bg-card hover:border-sky-300 hover:bg-sky-50/20 dark:hover:bg-sky-950/20 transition-all">
                   <div className="flex items-start justify-between mb-4">
                     <div>
                       <h4 className="font-semibold text-foreground">{workout.day}</h4>
@@ -400,7 +410,7 @@ export function WeeklyPlanWidget({ patientId }: WeeklyPlanWidgetProps = {}) {
 
                   <div className="space-y-2">
                     {workout.exercises?.map((exercise: any, exIndex: number) => (
-                      <div key={exIndex} className="p-3 bg-muted rounded border border-border hover:border-sky-300 hover:bg-sky-50/30 transition-all">
+                      <div key={exIndex} className="p-3 bg-muted rounded border border-border hover:border-sky-300 hover:bg-sky-50/30 dark:hover:bg-sky-950/30 transition-all">
                         <p className="font-semibold text-sm text-foreground">{exercise.name}</p>
                         <div className="flex gap-3 text-xs text-muted-foreground mt-1">
                           {exercise.sets && <span>Séries: {exercise.sets}</span>}

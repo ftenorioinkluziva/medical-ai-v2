@@ -4,6 +4,7 @@
  */
 
 import { Suspense } from 'react'
+import { Loader2 } from 'lucide-react'
 import { Metadata } from 'next'
 import { auth } from '@/lib/auth/config'
 import { redirect } from 'next/navigation'
@@ -33,7 +34,14 @@ export default async function CompleteAnalysisPage() {
         </div>
 
         {/* Main Content */}
-        <Suspense fallback={<div>Carregando...</div>}>
+        <Suspense
+          fallback={
+            <div className="flex flex-col items-center justify-center rounded-lg border border-dashed p-12 text-center min-h-[400px]">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              <p className="mt-4 text-muted-foreground">Carregando análise completa...</p>
+            </div>
+          }
+        >
           <CompleteAnalysisView userId={session.user.id} />
         </Suspense>
       </div>
