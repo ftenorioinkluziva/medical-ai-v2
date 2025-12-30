@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
+import { Separator } from '@/components/ui/separator'
 import {
   Activity,
   AlertCircle,
@@ -19,6 +20,7 @@ import {
   CheckCircle2,
   CheckSquare,
   ClipboardList,
+  Clock,
   Dumbbell,
   FileText,
   Lightbulb,
@@ -487,27 +489,158 @@ export function CompleteAnalysisResultView({ analysis }: CompleteAnalysisResultV
 
                 <div className="mt-6">
                   {/* Supplements */}
-                  <TabsContent value="supplements" className="mt-0 space-y-3">
-                    <p className="text-sm text-muted-foreground mb-4">{weeklyPlan.supplementationStrategy.overview}</p>
-                    {weeklyPlan.supplementationStrategy.supplements.map((item: any, index: number) => (
-                      <div key={index} className="p-3 border rounded-lg hover:border-purple-300 hover:bg-purple-50/30 dark:hover:bg-purple-950/30 transition-all">
-                        <h4 className="font-semibold">{item.name}</h4>
-                        <p className="text-sm text-muted-foreground">{item.dosage} - {item.timing}</p>
-                      </div>
-                    ))}
+                  <TabsContent value="supplements" className="mt-0">
+                    <Card className="hover:shadow-md transition-shadow">
+                      <CardHeader className="pb-4">
+                        <CardTitle className="text-lg font-semibold text-foreground">Estratégia de Suplementação</CardTitle>
+                        <CardDescription className="text-sm text-muted-foreground mt-1 leading-relaxed">
+                          {weeklyPlan.supplementationStrategy.overview}
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        {weeklyPlan.supplementationStrategy.supplements?.map((supplement: any, index: number) => (
+                          <div key={index} className="p-4 border border-border rounded-lg bg-card hover:border-purple-300 dark:hover:border-purple-700 hover:bg-purple-50/30 dark:hover:bg-purple-950/30 transition-all">
+                            <h4 className="font-semibold text-base text-foreground mb-3">{supplement.name}</h4>
+                            <div className="space-y-2.5 text-sm">
+                              <div className="flex items-center gap-2">
+                                <Pill className="h-4 w-4 text-muted-foreground shrink-0" />
+                                <p className="text-muted-foreground">{supplement.dosage}</p>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <Clock className="h-4 w-4 text-muted-foreground shrink-0" />
+                                <p className="text-muted-foreground">{supplement.timing}</p>
+                              </div>
+                              <div className="flex items-start gap-2">
+                                <Target className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
+                                <p className="text-muted-foreground leading-relaxed">{supplement.purpose}</p>
+                              </div>
+                              {supplement.duration && (
+                                <p className="text-xs text-muted-foreground mt-2">Duração: {supplement.duration}</p>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+
+                        {weeklyPlan.supplementationStrategy.hormonalSupport &&
+                         weeklyPlan.supplementationStrategy.hormonalSupport.length > 0 && (
+                          <>
+                            <Separator className="my-6" />
+                            <div>
+                              <h4 className="font-semibold text-base text-foreground mb-4">Suporte Hormonal</h4>
+                              <div className="space-y-3">
+                                {weeklyPlan.supplementationStrategy.hormonalSupport.map((hormone: any, index: number) => (
+                                  <div key={index} className="p-4 border border-purple-200 dark:border-purple-700 rounded-lg bg-card hover:bg-purple-50/30 dark:hover:bg-purple-950/30 transition-colors">
+                                    <h5 className="font-semibold text-sm text-foreground">{hormone.hormone}</h5>
+                                    <p className="text-sm text-foreground mt-2 leading-relaxed">{hormone.strategy}</p>
+                                    <p className="text-xs text-muted-foreground mt-2">
+                                      Monitoramento: {hormone.monitoring}
+                                    </p>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          </>
+                        )}
+
+                        {weeklyPlan.supplementationStrategy.nextExamRecommendations &&
+                         weeklyPlan.supplementationStrategy.nextExamRecommendations.length > 0 && (
+                          <>
+                            <Separator className="my-6" />
+                            <div>
+                              <h4 className="font-semibold text-base text-foreground mb-4">Exames Recomendados para o Próximo Ciclo</h4>
+                              <ul className="space-y-2.5">
+                                {weeklyPlan.supplementationStrategy.nextExamRecommendations.map((exam: string, index: number) => (
+                                  <li key={index} className="flex items-start gap-2.5 text-sm">
+                                    <span className="text-teal-600 mt-0.5">•</span>
+                                    <span className="text-foreground leading-relaxed">{exam}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          </>
+                        )}
+                      </CardContent>
+                    </Card>
                   </TabsContent>
 
                   {/* Shopping */}
-                  <TabsContent value="shopping" className="mt-0 space-y-3">
-                    <p className="text-sm text-muted-foreground mb-4">{weeklyPlan.shoppingList.overview}</p>
-                    {weeklyPlan.shoppingList.categories.map((cat: any, index: number) => (
-                      <div key={index} className="p-3 border rounded-lg hover:border-emerald-300 hover:bg-emerald-50/30 dark:hover:bg-emerald-950/30 transition-all">
-                        <h4 className="font-semibold mb-2">{cat.category}</h4>
-                        <div className="flex flex-wrap gap-1">
-                          {cat.items.map((item: any, idx: number) => <Badge key={idx} variant="outline">{item.item}</Badge>)}
-                        </div>
-                      </div>
-                    ))}
+                  <TabsContent value="shopping" className="mt-0">
+                    <Card className="hover:shadow-md transition-shadow">
+                      <CardHeader className="pb-4">
+                        <CardTitle className="text-lg font-semibold text-foreground">Lista de Compras</CardTitle>
+                        <CardDescription className="text-sm text-muted-foreground mt-1 leading-relaxed">{weeklyPlan.shoppingList.overview}</CardDescription>
+                        {weeklyPlan.shoppingList.estimatedCost && (
+                          <div className="mt-3 p-3 bg-sky-50 dark:bg-sky-950/20 border border-sky-200 dark:border-sky-800 rounded-lg space-y-2">
+                            <p className="text-sm text-sky-900 dark:text-sky-100 leading-relaxed font-medium">
+                              {weeklyPlan.shoppingList.estimatedCost}
+                            </p>
+                          </div>
+                        )}
+                      </CardHeader>
+                      <CardContent className="space-y-6">
+                        {weeklyPlan.shoppingList.categories?.map((category: any, index: number) => (
+                          <div key={index}>
+                            <h4 className="font-semibold text-base text-foreground mb-4 flex items-center gap-2">
+                              <ShoppingCart className="h-5 w-5 text-sky-600 dark:text-sky-400" />
+                              {category.category}
+                            </h4>
+                            <div className="grid gap-3 md:grid-cols-2">
+                              {category.items.map((item: any, itemIndex: number) => (
+                                <div
+                                  key={itemIndex}
+                                  className={`p-4 border rounded-lg transition-all ${
+                                    item.priority === 'high'
+                                      ? 'border-red-200 dark:border-red-800 bg-card hover:bg-red-50/30 dark:hover:bg-red-950/30'
+                                      : item.priority === 'medium'
+                                      ? 'border-amber-200 dark:border-amber-800 bg-card hover:bg-amber-50/30 dark:hover:bg-amber-950/30'
+                                      : 'border-border bg-card hover:border-sky-300 dark:hover:border-sky-700 hover:bg-sky-50/30 dark:hover:bg-sky-950/30'
+                                  }`}
+                                >
+                                  <div className="flex items-start justify-between mb-2">
+                                    <p className="font-semibold text-sm text-foreground">{item.item}</p>
+                                    {item.priority && (
+                                      <Badge
+                                        className={`text-xs ${
+                                          item.priority === 'high'
+                                            ? 'bg-red-100 dark:bg-red-950/30 text-red-700 dark:text-red-300 border-red-200 dark:border-red-700'
+                                            : 'bg-amber-100 dark:bg-amber-950/30 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-700'
+                                        }`}
+                                      >
+                                        {item.priority}
+                                      </Badge>
+                                    )}
+                                  </div>
+                                  {item.quantity && (
+                                    <p className="text-sm text-muted-foreground mt-1">{item.quantity}</p>
+                                  )}
+                                  {item.notes && (
+                                    <p className="text-xs text-muted-foreground mt-2 italic leading-relaxed">{item.notes}</p>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                            {index < weeklyPlan.shoppingList.categories.length - 1 && <Separator className="mt-6" />}
+                          </div>
+                        ))}
+
+                        {weeklyPlan.shoppingList.tips && weeklyPlan.shoppingList.tips.length > 0 && (
+                          <>
+                            <Separator className="my-6" />
+                            <div className="border border-sky-200 dark:border-sky-800 rounded-lg p-4 bg-card hover:bg-sky-50/30 dark:hover:bg-sky-950/30 transition-colors">
+                              <h4 className="font-semibold text-base text-foreground mb-3">Dicas de Compra</h4>
+                              <ul className="space-y-2">
+                                {weeklyPlan.shoppingList.tips.map((tip: string, index: number) => (
+                                  <li key={index} className="text-sm text-foreground flex items-start gap-2.5 leading-relaxed">
+                                    <span className="text-sky-600 mt-0.5">•</span>
+                                    {tip}
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          </>
+                        )}
+                      </CardContent>
+                    </Card>
                   </TabsContent>
 
                   {/* Meals */}
