@@ -8,6 +8,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
 import {
   Activity,
   AlertCircle,
@@ -168,65 +169,67 @@ export function CompleteAnalysisResultView({ analysis }: CompleteAnalysisResultV
         </TabsList>
 
         {/* Synthesis Tab */}
-        <TabsContent value="synthesis" className="mt-6 space-y-6">
-          {/* Card 1: Síntese Executiva */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
-                <Brain className="h-5 w-5 text-purple-600 dark:text-purple-400" />
-                Síntese Executiva
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                {synthesis.executiveSummary}
-              </p>
-            </CardContent>
-          </Card>
+        <TabsContent value="synthesis" className="mt-6">
+          <Accordion type="multiple" className="w-full">
+            {/* Item 1: Síntese Executiva */}
+            <AccordionItem value="executive-summary">
+              <AccordionTrigger className="hover:no-underline">
+                <div className="flex items-center gap-2 text-base sm:text-lg">
+                  <Brain className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                  <span>Síntese Executiva</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="pt-4">
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  {synthesis.executiveSummary}
+                </p>
+              </AccordionContent>
+            </AccordionItem>
 
-          {/* Card 2: Principais Achados */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
-                <CheckCircle2 className="h-5 w-5 text-green-600 dark:text-green-400" />
-                Principais Achados
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-2.5">
-                {synthesis.keyFindings.map((finding, idx) => (
-                  <li key={idx} className="flex items-start gap-3">
-                    <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400 mt-1 flex-shrink-0" />
-                    <span className="text-sm text-muted-foreground leading-relaxed">{finding}</span>
-                  </li>
-                ))}
-              </ul>
-            </CardContent>
-          </Card>
-
-          {/* Card 3: Principais Recomendações (NOVO) */}
-          {synthesis.mainRecommendations && synthesis.mainRecommendations.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
-                  <Lightbulb className="h-5 w-5 text-amber-600 dark:text-amber-400" />
-                  Principais Recomendações
-                </CardTitle>
-                <CardDescription>
-                  Top 5 ações prioritárias baseadas em todas as análises
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ol className="space-y-2.5 list-decimal list-inside">
-                  {synthesis.mainRecommendations.map((rec, idx) => (
-                    <li key={idx} className="text-sm text-muted-foreground leading-relaxed pl-2">
-                      {rec}
+            {/* Item 2: Principais Achados */}
+            <AccordionItem value="key-findings">
+              <AccordionTrigger className="hover:no-underline">
+                <div className="flex items-center gap-2 text-base sm:text-lg">
+                  <CheckCircle2 className="h-5 w-5 text-green-600 dark:text-green-400" />
+                  <span>Principais Achados</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="pt-4">
+                <ul className="space-y-2.5">
+                  {synthesis.keyFindings.map((finding, idx) => (
+                    <li key={idx} className="flex items-start gap-3">
+                      <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400 mt-1 flex-shrink-0" />
+                      <span className="text-sm text-muted-foreground leading-relaxed">{finding}</span>
                     </li>
                   ))}
-                </ol>
-              </CardContent>
-            </Card>
-          )}
+                </ul>
+              </AccordionContent>
+            </AccordionItem>
+
+            {/* Item 3: Principais Recomendações */}
+            {synthesis.mainRecommendations && synthesis.mainRecommendations.length > 0 && (
+              <AccordionItem value="main-recommendations">
+                <AccordionTrigger className="hover:no-underline">
+                  <div className="flex items-center gap-2 text-base sm:text-lg">
+                    <Lightbulb className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+                    <span>Principais Recomendações</span>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="pt-4">
+                  <p className="text-xs sm:text-sm text-muted-foreground mb-3">
+                    Ações prioritárias baseadas em todas as análises
+                  </p>
+                  <ol className="space-y-2.5 list-decimal list-inside">
+                    {synthesis.mainRecommendations.map((rec, idx) => (
+                      <li key={idx} className="text-sm text-muted-foreground leading-relaxed pl-2">
+                        {rec}
+                      </li>
+                    ))}
+                  </ol>
+                </AccordionContent>
+              </AccordionItem>
+            )}
+          </Accordion>
         </TabsContent>
 
         {/* Analyses Tab (NOVO) */}

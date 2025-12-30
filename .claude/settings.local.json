@@ -59,7 +59,8 @@
       "Bash(ls:*)",
       "Bash(npx tsc:*)",
       "Bash(npx eslint:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(npx shadcn@latest add:*)"
     ],
     "deny": [],
     "ask": []
