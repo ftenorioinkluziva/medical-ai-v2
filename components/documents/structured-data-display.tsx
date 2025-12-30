@@ -33,6 +33,32 @@ interface StructuredDataDisplayProps {
 
 export function StructuredDataDisplay({ modules }: StructuredDataDisplayProps) {
 
+  // Deduplicate modules by name
+  const deduplicatedModules = modules.reduce((acc, module) => {
+    const moduleName = module.moduleName || module.type || 'Módulo'
+    const existing = acc.find(m => (m.moduleName || m.type) === moduleName)
+
+    if (existing && module.parameters) {
+      // Merge parameters from duplicate module
+      if (!existing.parameters) existing.parameters = []
+
+      // Add only new parameters (avoid duplicating same parameter)
+      module.parameters.forEach(param => {
+        const isDuplicate = existing.parameters!.some(
+          existingParam => existingParam.name === param.name && existingParam.value === param.value
+        )
+        if (!isDuplicate) {
+          existing.parameters!.push(param)
+        }
+      })
+    } else {
+      // New module, add to accumulator
+      acc.push({ ...module })
+    }
+
+    return acc
+  }, [] as Module[])
+
   // Normalize status from schema values to display values
   const normalizeStatus = (status?: string): 'normal' | 'abnormal' | 'critical' | undefined => {
     const s = status?.toLowerCase()
@@ -83,7 +109,7 @@ export function StructuredDataDisplay({ modules }: StructuredDataDisplayProps) {
 
   return (
     <div className="space-y-3">
-      {modules.map((module, index) => {
+      {deduplicatedModules.map((module, index) => {
         const title = module.moduleName || module.type || `Módulo ${index + 1}`
         const hasParameters = module.parameters && Array.isArray(module.parameters) && module.parameters.length > 0
         const moduleStatus = module.status
