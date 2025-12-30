@@ -96,148 +96,55 @@ export function DocumentViewModal({ document, isOpen, onClose }: DocumentViewMod
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-[95vw] sm:max-w-3xl lg:max-w-4xl max-h-[90vh] p-0">
-        <DialogHeader className="px-4 pt-4 pb-3 sm:px-6 sm:pt-6 sm:pb-4">
-          <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+      <DialogContent className="max-w-[95vw] sm:max-w-4xl lg:max-w-5xl max-h-[90vh] p-0">
+        {/* Compact Header */}
+        <DialogHeader className="px-4 pt-4 pb-3 sm:px-6 border-b">
+          <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-3 flex-1 min-w-0">
-              <FileText className="h-5 w-5 sm:h-6 sm:w-6 text-teal-600 dark:text-teal-400 shrink-0" />
+              <FileText className="h-5 w-5 text-teal-600 dark:text-teal-400 shrink-0" />
               <div className="flex-1 min-w-0">
-                <DialogTitle className="text-lg sm:text-xl lg:text-2xl truncate">{document.fileName}</DialogTitle>
-                <DialogDescription className="mt-1 text-xs sm:text-sm">
-                  {format(new Date(document.createdAt), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
+                <DialogTitle className="text-base sm:text-lg truncate">{document.fileName}</DialogTitle>
+                <DialogDescription className="text-xs flex items-center gap-2 mt-1">
+                  <Calendar className="h-3 w-3" />
+                  {format(new Date(document.createdAt), "dd/MM/yyyy", { locale: ptBR })}
+                  <span>•</span>
+                  {getDocumentTypeLabel(document.documentType)}
                 </DialogDescription>
               </div>
             </div>
-            <div className="flex gap-2 flex-wrap">
-              {getStatusBadge(document.processingStatus)}
-            </div>
+            {getStatusBadge(document.processingStatus)}
           </div>
         </DialogHeader>
 
-        <Separator />
-
-        <ScrollArea className="h-[calc(90vh-140px)]">
-          <div className="px-4 py-3 sm:px-6 sm:py-4 space-y-4 sm:space-y-6">
-            {/* Metadata Section */}
-            <div>
-              <h3 className="text-xs sm:text-sm font-semibold text-muted-foreground mb-2 sm:mb-3 flex items-center gap-2">
-                <Database className="h-4 w-4" />
-                INFORMAÇÕES DO DOCUMENTO
-              </h3>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
-                {/* Status */}
-                <div className="flex items-start gap-2">
-                  {getStatusIcon(document.processingStatus)}
-                  <div>
-                    <p className="text-xs text-muted-foreground">Status</p>
-                    <p className="text-sm font-medium">
-                      {document.processingStatus === 'completed' ? 'Processado' :
-                       document.processingStatus === 'failed' ? 'Falhou' : 'Processando'}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Type */}
-                <div className="flex items-start gap-2">
-                  <FileType className="h-4 w-4 text-muted-foreground mt-0.5" />
-                  <div>
-                    <p className="text-xs text-muted-foreground">Tipo</p>
-                    <p className="text-sm font-medium">
-                      {getDocumentTypeLabel(document.documentType)}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Size */}
-                <div className="flex items-start gap-2">
-                  <Hash className="h-4 w-4 text-muted-foreground mt-0.5" />
-                  <div>
-                    <p className="text-xs text-muted-foreground">Tamanho</p>
-                    <p className="text-sm font-medium">
-                      {formatFileSize(document.fileSize)}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Date */}
-                <div className="flex items-start gap-2">
-                  <Calendar className="h-4 w-4 text-muted-foreground mt-0.5" />
-                  <div>
-                    <p className="text-xs text-muted-foreground">Data de Upload</p>
-                    <p className="text-sm font-medium">
-                      {format(new Date(document.createdAt), 'dd/MM/yyyy', { locale: ptBR })}
-                    </p>
-                  </div>
-                </div>
-
-                {/* MIME Type */}
-                <div className="flex items-start gap-2">
-                  <FileText className="h-4 w-4 text-muted-foreground mt-0.5" />
-                  <div>
-                    <p className="text-xs text-muted-foreground">Formato</p>
-                    <p className="text-sm font-medium truncate">
-                      {document.mimeType}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Modules */}
-                {modulesCount > 0 && (
-                  <div className="flex items-start gap-2">
-                    <Database className="h-4 w-4 text-muted-foreground mt-0.5" />
-                    <div>
-                      <p className="text-xs text-muted-foreground">Módulos Estruturados</p>
-                      <p className="text-sm font-medium">
-                        {modulesCount} módulo{modulesCount !== 1 ? 's' : ''}
-                      </p>
-                    </div>
-                  </div>
-                )}
+        <ScrollArea className="h-[calc(90vh-120px)]">
+          <div className="p-4 sm:p-6">
+            {/* Structured Data - Main Content */}
+            {document.structuredData && modulesCount > 0 ? (
+              <StructuredDataDisplay modules={document.structuredData.modules} />
+            ) : (
+              /* No Structured Data - Show Message */
+              <div className="text-center py-12">
+                <Database className="h-12 w-12 mx-auto mb-4 text-muted-foreground opacity-50" />
+                <h3 className="text-lg font-semibold mb-2">Sem Dados Estruturados</h3>
+                <p className="text-sm text-muted-foreground max-w-md mx-auto">
+                  Este documento não possui dados estruturados (parâmetros de exames).
+                  {document.processingStatus === 'completed' && (
+                    <span className="block mt-2">
+                      O documento foi processado, mas não foram identificados parâmetros estruturáveis.
+                    </span>
+                  )}
+                </p>
               </div>
-            </div>
-
-            {/* Extracted Text Section */}
-            {document.extractedText && (
-              <>
-                <Separator />
-                <div>
-                  <h3 className="text-xs sm:text-sm font-semibold text-muted-foreground mb-2 sm:mb-3 flex items-center gap-2">
-                    <FileText className="h-4 w-4" />
-                    TEXTO EXTRAÍDO
-                  </h3>
-                  <div className="p-3 sm:p-4 bg-muted/30 rounded-lg border border-border">
-                    <p className="text-xs sm:text-sm text-foreground whitespace-pre-wrap leading-relaxed">
-                      {document.extractedText}
-                    </p>
-                  </div>
-                </div>
-              </>
             )}
-
-            {/* Structured Data Section */}
-            {document.structuredData && modulesCount > 0 && (
-              <>
-                <Separator />
-                <div>
-                  <h3 className="text-xs sm:text-sm font-semibold text-muted-foreground mb-2 sm:mb-3 flex items-center gap-2">
-                    <Database className="h-4 w-4" />
-                    DADOS ESTRUTURADOS
-                  </h3>
-                  <StructuredDataDisplay modules={document.structuredData.modules} />
-                </div>
-              </>
-            )}
-
-            <Separator />
-
-            {/* Footer Actions */}
-            <div className="flex justify-end gap-3">
-              <Button variant="outline" onClick={onClose} size="sm">
-                Fechar
-              </Button>
-            </div>
           </div>
         </ScrollArea>
+
+        {/* Footer */}
+        <div className="border-t px-4 py-3 sm:px-6 flex justify-end">
+          <Button variant="outline" onClick={onClose} size="sm">
+            Fechar
+          </Button>
+        </div>
       </DialogContent>
     </Dialog>
   )

@@ -109,18 +109,79 @@ export function StructuredDataDisplay({ modules }: StructuredDataDisplayProps) {
               </div>
             )}
 
-            {/* Parameters Table */}
+            {/* Parameters - Responsive Layout */}
             {hasParameters && (
-              <div className="px-4 pb-4 pt-4">
-                <div className="rounded-lg border border-border overflow-hidden">
+              <div className="px-3 sm:px-4 pb-3 sm:pb-4 pt-3 sm:pt-4">
+                {/* Mobile: Card Layout */}
+                <div className="sm:hidden space-y-3">
+                  {module.parameters.map((param, paramIndex) => {
+                    const isAbnormal = param.status && param.status !== 'normal'
+                    const isCritical = param.status === 'critical'
+                    const hasReference = param.referenceRange && param.referenceRange !== 'N/A'
+
+                    return (
+                      <div
+                        key={paramIndex}
+                        className={`
+                          rounded-lg border-2 p-3 ${
+                          isCritical ? 'bg-red-50 dark:bg-red-950/20 border-red-300 dark:border-red-700' :
+                          isAbnormal ? 'bg-yellow-50 dark:bg-yellow-950/20 border-yellow-300 dark:border-yellow-700' :
+                          'bg-card border-border'
+                        }`}
+                      >
+                        {/* Parameter Name & Status */}
+                        <div className="flex items-start justify-between gap-2 mb-2">
+                          <h4 className="text-sm font-semibold text-foreground flex-1">{param.name}</h4>
+                          {isCritical ? (
+                            <Badge className="bg-red-600 text-white border-0 shrink-0">
+                              Crítico
+                            </Badge>
+                          ) : isAbnormal ? (
+                            <Badge className="bg-yellow-600 text-white border-0 shrink-0">
+                              Anormal
+                            </Badge>
+                          ) : (
+                            <Badge className="bg-green-600 text-white border-0 shrink-0">
+                              Normal
+                            </Badge>
+                          )}
+                        </div>
+
+                        {/* Value & Unit */}
+                        <div className="flex items-baseline gap-2 mb-2">
+                          <span className={`text-2xl font-bold ${
+                            isCritical ? 'text-red-700 dark:text-red-300' :
+                            isAbnormal ? 'text-yellow-700 dark:text-yellow-300' :
+                            'text-foreground'
+                          }`}>
+                            {param.value}
+                          </span>
+                          {param.unit && (
+                            <span className="text-sm text-muted-foreground">{param.unit}</span>
+                          )}
+                        </div>
+
+                        {/* Reference Range */}
+                        {hasReference && (
+                          <div className="text-xs text-muted-foreground">
+                            Referência: {param.referenceRange}
+                          </div>
+                        )}
+                      </div>
+                    )
+                  })}
+                </div>
+
+                {/* Desktop: Table Layout */}
+                <div className="hidden sm:block rounded-lg border border-border overflow-hidden">
                   <table className="w-full">
                     <thead>
                       <tr className="bg-muted border-b">
-                        <th className="text-left py-3 px-4 text-xs font-bold text-foreground uppercase">Parâmetro</th>
-                        <th className="text-center py-3 px-4 text-xs font-bold text-foreground uppercase">Valor</th>
-                        <th className="text-center py-3 px-4 text-xs font-bold text-foreground uppercase">Unidade</th>
-                        <th className="text-center py-3 px-4 text-xs font-bold text-foreground uppercase">Referência</th>
-                        <th className="text-center py-3 px-4 text-xs font-bold text-foreground uppercase">Status</th>
+                        <th className="text-left py-2 px-3 text-xs font-bold text-foreground uppercase">Parâmetro</th>
+                        <th className="text-center py-2 px-3 text-xs font-bold text-foreground uppercase">Valor</th>
+                        <th className="text-center py-2 px-3 text-xs font-bold text-foreground uppercase">Unidade</th>
+                        <th className="text-center py-2 px-3 text-xs font-bold text-foreground uppercase">Referência</th>
+                        <th className="text-center py-2 px-3 text-xs font-bold text-foreground uppercase">Status</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-border">
@@ -138,10 +199,10 @@ export function StructuredDataDisplay({ modules }: StructuredDataDisplayProps) {
                                 'bg-card'} hover:bg-muted transition-colors
                             `}
                           >
-                            <td className="py-3 px-4">
+                            <td className="py-2.5 px-3">
                               <span className="text-sm font-medium text-foreground">{param.name}</span>
                             </td>
-                            <td className="py-3 px-4 text-center">
+                            <td className="py-2.5 px-3 text-center">
                               <span className={`text-sm font-bold ${
                                 isCritical ? 'text-red-700 dark:text-red-300' :
                                 isAbnormal ? 'text-yellow-700 dark:text-yellow-300' :
@@ -150,27 +211,24 @@ export function StructuredDataDisplay({ modules }: StructuredDataDisplayProps) {
                                 {param.value}
                               </span>
                             </td>
-                            <td className="py-3 px-4 text-center">
+                            <td className="py-2.5 px-3 text-center">
                               <span className="text-xs text-muted-foreground">{param.unit || '-'}</span>
                             </td>
-                            <td className="py-3 px-4 text-center">
+                            <td className="py-2.5 px-3 text-center">
                               <span className="text-xs text-muted-foreground">{hasReference ? param.referenceRange : '-'}</span>
                             </td>
-                            <td className="py-3 px-4 text-center">
+                            <td className="py-2.5 px-3 text-center">
                               {isCritical ? (
-                                <Badge className="bg-red-100 dark:bg-red-950/30 text-red-800 dark:text-red-300 border border-red-300 dark:border-red-700 inline-flex items-center gap-1 px-2 py-0.5">
-                                  <AlertCircle className="h-3 w-3" />
-                                  <span className="font-semibold text-xs">Crítico</span>
+                                <Badge className="bg-red-600 text-white border-0">
+                                  Crítico
                                 </Badge>
                               ) : isAbnormal ? (
-                                <Badge className="bg-yellow-100 dark:bg-yellow-950/30 text-yellow-800 dark:text-yellow-300 border border-yellow-300 dark:border-yellow-700 inline-flex items-center gap-1 px-2 py-0.5">
-                                  <AlertTriangle className="h-3 w-3" />
-                                  <span className="font-semibold text-xs">{getStatusLabel(param.status)}</span>
+                                <Badge className="bg-yellow-600 text-white border-0">
+                                  Anormal
                                 </Badge>
                               ) : (
-                                <Badge className="bg-green-100 dark:bg-green-950/30 text-green-800 dark:text-green-300 border border-green-300 dark:border-green-700 inline-flex items-center gap-1 px-2 py-0.5">
-                                  <CheckCircle2 className="h-3 w-3" />
-                                  <span className="font-semibold text-xs">Normal</span>
+                                <Badge className="bg-green-600 text-white border-0">
+                                  Normal
                                 </Badge>
                               )}
                             </td>
