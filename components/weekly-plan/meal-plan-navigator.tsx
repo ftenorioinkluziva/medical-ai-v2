@@ -196,10 +196,10 @@ export function MealPlanNavigator({ mealPlan }: MealPlanNavigatorProps) {
         </div>
 
         {/* Selected Day Content */}
-        <div className="border-2 border-orange-200 dark:border-orange-800 rounded-lg p-6 bg-gradient-to-br from-card to-orange-50/30 dark:to-orange-950/20">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-bold text-foreground">{selectedDay.day}</h3>
-            <Badge className="bg-orange-600 text-white text-sm">
+        <div className="border-2 border-orange-200 dark:border-orange-800 rounded-lg p-4 sm:p-6 bg-gradient-to-br from-card to-orange-50/30 dark:to-orange-950/20">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+            <h3 className="text-lg sm:text-xl font-bold text-foreground">{selectedDay.day}</h3>
+            <Badge className="bg-orange-600 text-white text-xs sm:text-sm">
               Dia {selectedDayIndex + 1} de {mealPlan.meals.length}
             </Badge>
           </div>

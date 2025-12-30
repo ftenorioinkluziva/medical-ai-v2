@@ -216,26 +216,26 @@ export function WorkoutPlanNavigator({ workoutPlan }: WorkoutPlanNavigatorProps)
         </div>
 
         {/* Selected Day Content */}
-        <div className="border-2 border-emerald-200 dark:border-emerald-800 rounded-lg p-6 bg-gradient-to-br from-card to-emerald-50/30 dark:to-emerald-950/20">
-          <div className="flex items-center justify-between mb-6">
+        <div className="border-2 border-emerald-200 dark:border-emerald-800 rounded-lg p-4 sm:p-6 bg-gradient-to-br from-card to-emerald-50/30 dark:to-emerald-950/20">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
             <div>
-              <h3 className="text-xl font-bold text-foreground">{selectedDayName}</h3>
+              <h3 className="text-lg sm:text-xl font-bold text-foreground">{selectedDayName}</h3>
               {selectedWorkout && (
-                <p className="text-sm text-muted-foreground mt-1">{selectedWorkout.type}</p>
+                <p className="text-xs sm:text-sm text-muted-foreground mt-1">{selectedWorkout.type}</p>
               )}
             </div>
-            <div className="flex gap-2">
-              <Badge className="bg-emerald-600 text-white text-sm">
+            <div className="flex flex-wrap gap-2">
+              <Badge className="bg-emerald-600 text-white text-xs sm:text-sm">
                 Dia {selectedDayIndex + 1} de 7
               </Badge>
               {selectedWorkout && (
                 <>
-                  <Badge className="bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-700 text-sm flex items-center gap-1">
+                  <Badge className="bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-700 text-xs sm:text-sm flex items-center gap-1">
                     <Clock className="h-3 w-3" />
                     {selectedWorkout.duration}
                   </Badge>
                   {selectedWorkout.intensity && (
-                    <Badge className={`text-sm ${getIntensityColor(selectedWorkout.intensity)}`}>
+                    <Badge className={`text-xs sm:text-sm ${getIntensityColor(selectedWorkout.intensity)}`}>
                       <Flame className="h-3 w-3 mr-1" />
                       {getIntensityLabel(selectedWorkout.intensity)}
                     </Badge>
