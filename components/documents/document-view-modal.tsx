@@ -117,43 +117,41 @@ export function DocumentViewModal({ document, isOpen, onClose, userName }: Docum
         </DialogHeader>
 
         <ScrollArea className="h-[calc(90vh-120px)]">
-          <div className="p-4 sm:p-6 space-y-6">
+          <div className="p-3 sm:p-4 space-y-3">
             {/* Patient and Document Info Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {/* Patient Information */}
-              <Card className="p-4">
-                <div className="flex items-center gap-2 mb-3">
-                  <User className="h-4 w-4 text-muted-foreground" />
-                  <h3 className="text-sm font-semibold text-foreground">Informações do Paciente</h3>
+              <Card className="p-2.5 overflow-hidden">
+                <div className="flex items-center gap-1.5 mb-2">
+                  <User className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                  <h3 className="text-xs font-semibold text-foreground truncate">Informações do Paciente</h3>
                 </div>
-                <div className="space-y-2">
-                  <div>
-                    <p className="text-xs text-muted-foreground">Nome</p>
-                    <p className="text-sm font-medium text-foreground">{userName || 'N/A'}</p>
-                  </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">Nome</p>
+                  <p className="text-xs font-medium text-foreground truncate">{userName || 'N/A'}</p>
                 </div>
               </Card>
 
               {/* Document Information */}
-              <Card className="p-4">
-                <div className="flex items-center gap-2 mb-3">
-                  <Building2 className="h-4 w-4 text-muted-foreground" />
-                  <h3 className="text-sm font-semibold text-foreground">Informações do Documento</h3>
+              <Card className="p-2.5 overflow-hidden">
+                <div className="flex items-center gap-1.5 mb-2">
+                  <Building2 className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                  <h3 className="text-xs font-semibold text-foreground truncate">Informações do Documento</h3>
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-1.5">
                   <div>
-                    <p className="text-xs text-muted-foreground">Data de Upload</p>
-                    <p className="text-sm font-medium text-foreground">
+                    <p className="text-xs text-muted-foreground">Data</p>
+                    <p className="text-xs font-medium text-foreground">
                       {new Date(document.createdAt).toLocaleDateString('pt-BR', {
                         day: '2-digit',
-                        month: 'long',
+                        month: 'short',
                         year: 'numeric',
                       })}
                     </p>
                   </div>
                   <div>
                     <p className="text-xs text-muted-foreground">Status</p>
-                    <Badge variant={document.processingStatus === 'completed' ? 'default' : 'secondary'} className="text-xs">
+                    <Badge variant={document.processingStatus === 'completed' ? 'default' : 'secondary'} className="text-xs py-0">
                       {document.processingStatus === 'completed' ? 'Processado' : 'Processando'}
                     </Badge>
                   </div>
@@ -163,11 +161,11 @@ export function DocumentViewModal({ document, isOpen, onClose, userName }: Docum
 
             {/* Extracted Text Summary */}
             {document.extractedText && (
-              <Card className="p-4">
-                <h3 className="text-sm font-semibold text-foreground mb-3">Resumo Geral</h3>
-                <p className="text-xs text-muted-foreground leading-relaxed whitespace-pre-wrap line-clamp-6">
-                  {document.extractedText.substring(0, 500)}
-                  {document.extractedText.length > 500 && '...'}
+              <Card className="p-2.5 overflow-hidden">
+                <h3 className="text-xs font-semibold text-foreground mb-2">Resumo Geral</h3>
+                <p className="text-xs text-muted-foreground leading-relaxed whitespace-pre-wrap line-clamp-3">
+                  {document.extractedText.substring(0, 300)}
+                  {document.extractedText.length > 300 && '...'}
                 </p>
               </Card>
             )}
@@ -175,16 +173,16 @@ export function DocumentViewModal({ document, isOpen, onClose, userName }: Docum
             {/* Exam Results */}
             {document.structuredData && modulesCount > 0 && (
               <div>
-                <h3 className="text-base font-bold text-foreground mb-3">Resultados dos Exames</h3>
+                <h3 className="text-sm font-bold text-foreground mb-2">Resultados dos Exames</h3>
                 <StructuredDataDisplay modules={document.structuredData.modules} />
               </div>
             )}
 
             {/* Raw Text Fallback */}
             {(!document.structuredData || modulesCount === 0) && document.extractedText && (
-              <Card className="p-4">
-                <h3 className="text-sm font-semibold text-foreground mb-3">Texto Extraído</h3>
-                <pre className="text-xs text-muted-foreground whitespace-pre-wrap font-mono">
+              <Card className="p-2.5 overflow-hidden">
+                <h3 className="text-xs font-semibold text-foreground mb-2">Texto Extraído</h3>
+                <pre className="text-xs text-muted-foreground whitespace-pre-wrap font-mono line-clamp-[20] overflow-hidden">
                   {document.extractedText}
                 </pre>
               </Card>
