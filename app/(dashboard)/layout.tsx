@@ -20,7 +20,7 @@ export default async function DashboardLayout({
         userRole={session.user?.role || 'patient'}
       />
       <SidebarNav userRole={session.user?.role || 'patient'} />
-      <main className="pb-16 lg:pb-0 lg:pl-64 pt-16">{children}</main>
+      <main className="pb-16 lg:pb-0 lg:pl-64 transition-all duration-300">{children}</main>
       <BottomNav userRole={session.user?.role || 'patient'} />
     </div>
   )
