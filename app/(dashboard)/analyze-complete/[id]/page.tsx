@@ -140,7 +140,7 @@ export default async function CompleteAnalysisResultPage({ params }: PageProps) 
       errorMessage: completeAnalysis.errorMessage,
       createdAt: completeAnalysis.createdAt,
       completedAt: completeAnalysis.completedAt,
-      analyses: relatedAnalyses,
+      analyses: relatedAnalyses, // Passing individual analyses (Integrative, Nutrition, Exercise)
       recommendations: recommendationsData,
       weeklyPlan: weeklyPlanData,
     }

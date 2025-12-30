@@ -11,13 +11,16 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {
   Activity,
   AlertCircle,
+  AlertTriangle,
   ArrowLeft,
   Brain,
   Calendar,
   CheckCircle2,
+  CheckSquare,
   ClipboardList,
   Dumbbell,
   FileText,
+  Lightbulb,
   Pill,
   ShoppingCart,
   Target,
@@ -35,7 +38,20 @@ interface CompleteAnalysis {
   synthesis: {
     executiveSummary: string
     keyFindings: string[]
+    criticalAlerts?: string[]
+    mainRecommendations?: string[]
   }
+  analyses: Array<{
+    id: string
+    analysis: string
+    insights: any
+    actionItems: any
+    createdAt: string
+    agentName: string
+    agentKey: string
+    agentTitle: string
+    agentColor: string
+  }>
   recommendations: {
     examRecommendations: any[]
     lifestyleRecommendations: any[]
@@ -50,7 +66,7 @@ interface CompleteAnalysisResultViewProps {
 }
 
 export function CompleteAnalysisResultView({ analysis }: CompleteAnalysisResultViewProps) {
-  const { synthesis, recommendations, weeklyPlan } = analysis
+  const { synthesis, analyses, recommendations, weeklyPlan } = analysis
 
   const formatDate = (dateString: string) => {
     return format(new Date(dateString), "dd 'de' MMMM, yyyy 'às' HH:mm", { locale: ptBR })
@@ -105,45 +121,217 @@ export function CompleteAnalysisResultView({ analysis }: CompleteAnalysisResultV
         </div>
       </div>
 
-      {/* Synthesis */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Brain className="h-5 w-5 text-purple-600 dark:text-purple-400" />
-            Síntese Executiva
-          </CardTitle>
-          <CardDescription>{synthesis.executiveSummary}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <h4 className="font-semibold mb-3">Principais Achados:</h4>
-          <ul className="space-y-2">
-            {synthesis.keyFindings.map((finding, index) => (
-              <li key={index} className="flex items-start gap-3">
-                <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400 mt-1 flex-shrink-0" />
-                <span className="text-sm text-muted-foreground">{finding}</span>
-              </li>
-            ))}
-          </ul>
-        </CardContent>
-      </Card>
+      {/* Critical Alerts Card */}
+      {synthesis.criticalAlerts && synthesis.criticalAlerts.length > 0 && (
+        <Card className="border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950/20">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-red-900 dark:text-red-100">
+              <AlertTriangle className="h-5 w-5" />
+              Alertas Críticos
+            </CardTitle>
+            <CardDescription className="text-red-800 dark:text-red-200">
+              Atenção: os seguintes pontos requerem atenção imediata
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ul className="space-y-3">
+              {synthesis.criticalAlerts.map((alert, idx) => (
+                <li key={idx} className="flex items-start gap-3 p-3 bg-white dark:bg-red-900/20 rounded-lg border border-red-300 dark:border-red-700">
+                  <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400 mt-0.5 flex-shrink-0" />
+                  <span className="text-sm text-red-900 dark:text-red-100 leading-relaxed">{alert}</span>
+                </li>
+              ))}
+            </ul>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Main Content Tabs */}
-      <Tabs defaultValue="recommendations" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 bg-muted">
-          <TabsTrigger value="recommendations" className="gap-1.5 sm:gap-2 data-[state=active]:!bg-teal-600 dark:data-[state=active]:!bg-teal-500 data-[state=active]:!text-white">
-            <Target className="h-4 w-4" />
-            <span className="hidden sm:inline">Recomendações e Metas</span>
-            <span className="sm:hidden">Metas</span>
+      <Tabs defaultValue="synthesis" className="w-full">
+        <TabsList className="grid w-full grid-cols-4 bg-muted">
+          <TabsTrigger value="synthesis" className="gap-1.5 data-[state=active]:!bg-purple-600 dark:data-[state=active]:!bg-purple-500 data-[state=active]:!text-white">
+            <Brain className="h-4 w-4" />
+            <span className="hidden sm:inline">Síntese</span>
           </TabsTrigger>
-          <TabsTrigger value="weekly-plan" className="gap-1.5 sm:gap-2 data-[state=active]:!bg-teal-600 dark:data-[state=active]:!bg-teal-500 data-[state=active]:!text-white">
+          <TabsTrigger value="analyses" className="gap-1.5 data-[state=active]:!bg-teal-600 dark:data-[state=active]:!bg-teal-500 data-[state=active]:!text-white">
+            <FileText className="h-4 w-4" />
+            <span className="hidden sm:inline">Análises</span>
+          </TabsTrigger>
+          <TabsTrigger value="goals" className="gap-1.5 data-[state=active]:!bg-amber-600 dark:data-[state=active]:!bg-amber-500 data-[state=active]:!text-white">
+            <Target className="h-4 w-4" />
+            <span className="hidden sm:inline">Metas</span>
+          </TabsTrigger>
+          <TabsTrigger value="plan" className="gap-1.5 data-[state=active]:!bg-teal-600 dark:data-[state=active]:!bg-teal-500 data-[state=active]:!text-white">
             <Calendar className="h-4 w-4" />
-            <span className="hidden sm:inline">Plano Semanal</span>
-            <span className="sm:hidden">Plano</span>
+            <span className="hidden sm:inline">Plano</span>
           </TabsTrigger>
         </TabsList>
 
-        {/* Recommendations Tab */}
-        <TabsContent value="recommendations" className="mt-6">
+        {/* Synthesis Tab */}
+        <TabsContent value="synthesis" className="mt-6 space-y-6">
+          {/* Card 1: Síntese Executiva */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                <Brain className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                Síntese Executiva
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                {synthesis.executiveSummary}
+              </p>
+            </CardContent>
+          </Card>
+
+          {/* Card 2: Principais Achados */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                <CheckCircle2 className="h-5 w-5 text-green-600 dark:text-green-400" />
+                Principais Achados
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ul className="space-y-2.5">
+                {synthesis.keyFindings.map((finding, idx) => (
+                  <li key={idx} className="flex items-start gap-3">
+                    <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400 mt-1 flex-shrink-0" />
+                    <span className="text-sm text-muted-foreground leading-relaxed">{finding}</span>
+                  </li>
+                ))}
+              </ul>
+            </CardContent>
+          </Card>
+
+          {/* Card 3: Principais Recomendações (NOVO) */}
+          {synthesis.mainRecommendations && synthesis.mainRecommendations.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                  <Lightbulb className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+                  Principais Recomendações
+                </CardTitle>
+                <CardDescription>
+                  Top 5 ações prioritárias baseadas em todas as análises
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ol className="space-y-2.5 list-decimal list-inside">
+                  {synthesis.mainRecommendations.map((rec, idx) => (
+                    <li key={idx} className="text-sm text-muted-foreground leading-relaxed pl-2">
+                      {rec}
+                    </li>
+                  ))}
+                </ol>
+              </CardContent>
+            </Card>
+          )}
+        </TabsContent>
+
+        {/* Analyses Tab (NOVO) */}
+        <TabsContent value="analyses" className="mt-6">
+          <Card>
+            <CardContent className="p-0">
+              <Tabs defaultValue={analyses[0]?.agentKey || 'integrative'} className="w-full">
+                <TabsList className="grid w-full grid-cols-3 rounded-t-lg rounded-b-none bg-muted-foreground/10">
+                  {analyses.map(analysis => (
+                    <TabsTrigger
+                      key={analysis.id}
+                      value={analysis.agentKey}
+                      className={`gap-1.5 sm:gap-2 data-[state=active]:!text-white ${
+                        analysis.agentKey === 'integrative' ? 'data-[state=active]:!bg-teal-600 dark:data-[state=active]:!bg-teal-500' :
+                        analysis.agentKey === 'nutrition' ? 'data-[state=active]:!bg-orange-600 dark:data-[state=active]:!bg-orange-500' :
+                        'data-[state=active]:!bg-sky-600 dark:data-[state=active]:!bg-sky-500'
+                      }`}
+                    >
+                      <Brain className="h-4 w-4" />
+                      <span className="hidden sm:inline">{analysis.agentName}</span>
+                    </TabsTrigger>
+                  ))}
+                </TabsList>
+
+                <div className="p-4 sm:p-6">
+                  {analyses.map(analysis => (
+                    <TabsContent key={analysis.id} value={analysis.agentKey} className="mt-0 space-y-4">
+                      {/* Header do agente */}
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <h3 className="text-base sm:text-lg font-semibold">{analysis.agentTitle}</h3>
+                          <p className="text-xs sm:text-sm text-muted-foreground mt-1">
+                            {format(new Date(analysis.createdAt), "dd 'de' MMMM, yyyy", { locale: ptBR })}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Análise Completa */}
+                      <Card>
+                        <CardHeader>
+                          <CardTitle className="text-base flex items-center gap-2">
+                            <FileText className="h-4 w-4" />
+                            Análise Detalhada
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">
+                            {analysis.analysis}
+                          </p>
+                        </CardContent>
+                      </Card>
+
+                      {/* Insights (se existir) */}
+                      {analysis.insights && analysis.insights.length > 0 && (
+                        <Card>
+                          <CardHeader>
+                            <CardTitle className="text-base flex items-center gap-2">
+                              <Lightbulb className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+                              Insights-Chave
+                            </CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                            <ul className="space-y-2">
+                              {analysis.insights.map((insight: string, idx: number) => (
+                                <li key={idx} className="flex items-start gap-2">
+                                  <span className="text-teal-600 dark:text-teal-400 mt-1">•</span>
+                                  <span className="text-sm text-muted-foreground leading-relaxed">{insight}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </CardContent>
+                        </Card>
+                      )}
+
+                      {/* Action Items (se existir) */}
+                      {analysis.actionItems && analysis.actionItems.length > 0 && (
+                        <Card>
+                          <CardHeader>
+                            <CardTitle className="text-base flex items-center gap-2">
+                              <CheckSquare className="h-4 w-4 text-green-600 dark:text-green-400" />
+                              Ações Recomendadas
+                            </CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                            <ul className="space-y-2">
+                              {analysis.actionItems.map((item: string, idx: number) => (
+                                <li key={idx} className="flex items-start gap-3">
+                                  <CheckSquare className="h-4 w-4 text-green-600 dark:text-green-400 mt-0.5 flex-shrink-0" />
+                                  <span className="text-sm text-muted-foreground leading-relaxed">{item}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </CardContent>
+                        </Card>
+                      )}
+                    </TabsContent>
+                  ))}
+                </div>
+              </Tabs>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Goals Tab (ex-Recommendations) */}
+        <TabsContent value="goals" className="mt-6">
           <Card>
             <CardContent className="p-0">
               <Tabs defaultValue="exams" className="w-full">
@@ -256,8 +444,8 @@ export function CompleteAnalysisResultView({ analysis }: CompleteAnalysisResultV
           </Card>
         </TabsContent>
 
-        {/* Weekly Plan Tab */}
-        <TabsContent value="weekly-plan" className="mt-6">
+        {/* Plan Tab (ex-Weekly Plan) */}
+        <TabsContent value="plan" className="mt-6">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
