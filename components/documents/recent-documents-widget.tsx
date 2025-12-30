@@ -174,48 +174,50 @@ export function RecentDocumentsWidget({ limit = 5, onDocumentsLoad, patientId }:
             </p>
           </div>
         ) : (
-          <div className="space-y-3 max-h-[200px] overflow-y-auto overflow-x-hidden">
+          <div className="space-y-3 max-h-[400px] overflow-y-auto overflow-x-hidden">
             {documents.map((doc) => (
               <div
                 key={doc.id}
-                className="p-2.5 sm:p-3 rounded-lg border border-gray-200 hover:border-teal-300 hover:bg-teal-50/50 transition-colors dark:border-gray-700 dark:hover:bg-teal-900/30 cursor-pointer overflow-hidden"
+                onClick={() => handleViewDocument(doc)}
+                className="p-3 sm:p-3 rounded-lg border border-border hover:border-teal-300 hover:bg-teal-50/50 transition-all dark:hover:bg-teal-900/30 cursor-pointer group"
               >
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex items-start gap-3 flex-1 min-w-0">
-                    <div className="p-1.5 sm:p-2 rounded bg-teal-100">
-                      <FileText className="h-4 w-4 text-teal-700" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-foreground truncate">
+                <div className="flex items-start gap-3">
+                  <div className="p-2 rounded bg-teal-100 dark:bg-teal-900/30 shrink-0">
+                    <FileText className="h-4 w-4 text-teal-700 dark:text-teal-400" />
+                  </div>
+                  <div className="flex-1 min-w-0 space-y-2">
+                    {/* Title with status icon */}
+                    <div className="flex items-start gap-2">
+                      <p className="text-sm font-medium text-foreground truncate flex-1">
                         {doc.fileName}
                       </p>
-                      <div className="flex items-center gap-2 mt-1 overflow-hidden">
-                        {getStatusIcon(doc.processingStatus)}
-                        <span className="text-xs text-muted-foreground truncate">
+                      {getStatusIcon(doc.processingStatus)}
+                    </div>
+
+                    {/* Metadata - Stack on mobile */}
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2 text-xs text-muted-foreground">
+                      <div className="flex items-center gap-2">
+                        <Badge variant="outline" className="text-xs">
                           {getDocumentTypeLabel(doc.documentType)}
-                        </span>
-                        <span className="text-xs text-gray-400">•</span>
-                        <span className="text-xs text-muted-foreground whitespace-nowrap">
-                          {formatFileSize(doc.fileSize)}
-                        </span>
+                        </Badge>
+                        <span>{formatFileSize(doc.fileSize)}</span>
                       </div>
-                      <div className="flex items-center gap-1 mt-1 text-xs text-muted-foreground overflow-hidden">
+                      <span className="hidden sm:inline">•</span>
+                      <div className="flex items-center gap-1">
                         <Calendar className="h-3 w-3 shrink-0" />
                         <span className="truncate">
-                          {format(new Date(doc.createdAt), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
+                          {format(new Date(doc.createdAt), "dd/MM/yy 'às' HH:mm", { locale: ptBR })}
                         </span>
                       </div>
                     </div>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleViewDocument(doc)}
-                      className="shrink-0"
-                    >
-                      <Eye className="h-4 w-4" />
-                    </Button>
+
+                    {/* View hint on hover - Desktop only */}
+                    <div className="hidden sm:block opacity-0 group-hover:opacity-100 transition-opacity">
+                      <span className="text-xs text-teal-600 dark:text-teal-400 flex items-center gap-1">
+                        <Eye className="h-3 w-3" />
+                        Clique para visualizar
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>

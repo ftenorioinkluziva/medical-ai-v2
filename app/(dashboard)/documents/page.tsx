@@ -249,47 +249,45 @@ export default function DocumentsPage() {
             const modulesCount = doc.structuredData?.modules?.length || 0
 
             return (
-              <Card key={doc.id} className="hover:shadow-md transition-shadow">
-                <CardContent className="p-6">
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex items-start gap-4 flex-1 min-w-0">
-                      <div className="p-3 rounded-lg bg-primary/10">
+              <Link key={doc.id} href={`/documents/${doc.id}`} className="block">
+                <Card className="hover:shadow-md transition-all hover:border-primary/50 cursor-pointer">
+                  <CardContent className="p-4 sm:p-6">
+                    <div className="flex flex-col sm:flex-row sm:items-start gap-3 sm:gap-4">
+                      {/* Icon - Hidden on mobile to save space */}
+                      <div className="hidden sm:block p-3 rounded-lg bg-primary/10 shrink-0">
                         <File className="h-6 w-6 text-primary" />
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-start justify-between gap-4 mb-2">
-                          <div className="flex-1 min-w-0">
-                            <h3 className="font-semibold text-lg truncate">{doc.fileName}</h3>
-                            <div className="flex items-center gap-3 mt-1">
-                              {getStatusIcon(doc.processingStatus)}
-                              {getStatusBadge(doc.processingStatus)}
-                              <Badge variant="outline">{doc.documentType || 'Documento'}</Badge>
+
+                      <div className="flex-1 min-w-0 space-y-3">
+                        {/* Title and Status */}
+                        <div>
+                          <div className="flex items-start gap-2 mb-2">
+                            <div className="sm:hidden p-2 rounded bg-primary/10 shrink-0">
+                              <File className="h-4 w-4 text-primary" />
                             </div>
+                            <h3 className="font-semibold text-base sm:text-lg truncate flex-1">{doc.fileName}</h3>
                           </div>
-                          <Link href={`/documents/${doc.id}`}>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="gap-2"
-                            >
-                              <Eye className="h-4 w-4" />
-                              Visualizar
-                            </Button>
-                          </Link>
+                          <div className="flex flex-wrap items-center gap-2">
+                            {getStatusIcon(doc.processingStatus)}
+                            {getStatusBadge(doc.processingStatus)}
+                            <Badge variant="outline" className="text-xs">{doc.documentType || 'Documento'}</Badge>
+                          </div>
                         </div>
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4 text-sm">
+
+                        {/* Metadata Grid - Responsive */}
+                        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3 text-sm">
                           <div>
                             <p className="text-muted-foreground text-xs">Tamanho</p>
-                            <p className="font-medium">{formatFileSize(doc.fileSize)}</p>
+                            <p className="font-medium text-xs sm:text-sm">{formatFileSize(doc.fileSize)}</p>
                           </div>
                           <div>
                             <p className="text-muted-foreground text-xs">Tipo</p>
-                            <p className="font-medium truncate">{doc.mimeType}</p>
+                            <p className="font-medium text-xs sm:text-sm truncate">{doc.mimeType.split('/')[1]?.toUpperCase() || 'N/A'}</p>
                           </div>
                           <div>
                             <p className="text-muted-foreground text-xs">Módulos</p>
-                            <p className="font-medium">
-                              {modulesCount > 0 ? `${modulesCount} módulo${modulesCount !== 1 ? 's' : ''}` : 'N/A'}
+                            <p className="font-medium text-xs sm:text-sm">
+                              {modulesCount > 0 ? modulesCount : 'N/A'}
                             </p>
                           </div>
                           <div>
@@ -297,16 +295,46 @@ export default function DocumentsPage() {
                               <Calendar className="h-3 w-3" />
                               Data
                             </p>
-                            <p className="font-medium">
-                              {format(new Date(doc.createdAt), 'dd/MM/yyyy', { locale: ptBR })}
+                            <p className="font-medium text-xs sm:text-sm">
+                              {format(new Date(doc.createdAt), 'dd/MM/yy', { locale: ptBR })}
                             </p>
                           </div>
                         </div>
+
+                        {/* View Button - Mobile */}
+                        <div className="sm:hidden pt-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="w-full gap-2"
+                            asChild
+                          >
+                            <span>
+                              <Eye className="h-4 w-4" />
+                              Visualizar Documento
+                            </span>
+                          </Button>
+                        </div>
+                      </div>
+
+                      {/* View Button - Desktop */}
+                      <div className="hidden sm:flex items-start shrink-0">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="gap-2"
+                          asChild
+                        >
+                          <span>
+                            <Eye className="h-4 w-4" />
+                            Visualizar
+                          </span>
+                        </Button>
                       </div>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
+              </Link>
             )
           })}
         </div>
