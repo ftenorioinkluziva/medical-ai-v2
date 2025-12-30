@@ -294,8 +294,8 @@ export default function WeeklyPlanPage() {
                   <CardContent className="space-y-4">
                     {selectedPlan.supplementationStrategy.supplements?.map((supplement: any, index: number) => (
                       <div key={index} className="p-4 border border-border rounded-lg bg-card hover:border-purple-300 dark:hover:border-purple-700 hover:bg-purple-50/30 dark:hover:bg-purple-950/30 transition-all">
-                        <div className="flex items-start justify-between mb-3">
-                          <h4 className="font-semibold text-base text-foreground">{supplement.name}</h4>
+                        <div className="mb-3">
+                          <h4 className="font-semibold text-base text-foreground mb-3">{supplement.name}</h4>
                           <Badge className="bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-700">{supplement.dosage}</Badge>
                         </div>
                         <div className="space-y-2.5 text-sm">
