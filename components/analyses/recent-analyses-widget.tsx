@@ -146,7 +146,7 @@ export function RecentAnalysesWidget({ limit = 5, onAnalysesLoad, patientId }: R
               </Link>
             </div>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-3 max-h-[400px] overflow-y-auto">
               {analyses.map((analysis) => (
                 <div
                   key={analysis.id}

@@ -174,7 +174,7 @@ export function RecentDocumentsWidget({ limit = 5, onDocumentsLoad, patientId }:
             </p>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-3 max-h-[400px] overflow-y-auto">
             {documents.map((doc) => (
               <div
                 key={doc.id}
