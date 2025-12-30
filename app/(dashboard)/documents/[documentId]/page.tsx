@@ -51,7 +51,7 @@ export default async function DocumentViewPage({ params }: PageProps) {
   const modulesCount = document.structuredData?.modules?.length || 0
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-background py-8">
       <div className="max-w-5xl mx-auto px-6">
         {/* Header */}
         <div className="mb-6">
@@ -64,10 +64,10 @@ export default async function DocumentViewPage({ params }: PageProps) {
 
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              <h1 className="text-3xl font-bold text-foreground mb-2">
                 {document.fileName}
               </h1>
-              <Badge variant="secondary" className="bg-teal-100 text-teal-800">
+              <Badge variant="secondary" className="bg-teal-100 dark:bg-teal-900/30 text-teal-800 dark:text-teal-300">
                 <FileText className="h-3 w-3 mr-1" />
                 {getDocumentTypeLabel(document.documentType)}
               </Badge>
@@ -80,13 +80,13 @@ export default async function DocumentViewPage({ params }: PageProps) {
           {/* Patient Information */}
           <Card className="p-6">
             <div className="flex items-center gap-2 mb-4">
-              <User className="h-5 w-5 text-gray-600" />
-              <h2 className="text-lg font-semibold text-gray-900">Informações do Paciente</h2>
+              <User className="h-5 w-5 text-muted-foreground" />
+              <h2 className="text-lg font-semibold text-foreground">Informações do Paciente</h2>
             </div>
             <div className="space-y-3">
               <div>
-                <p className="text-sm text-gray-500">Nome</p>
-                <p className="text-sm font-medium text-gray-900">{session.user.name}</p>
+                <p className="text-sm text-muted-foreground">Nome</p>
+                <p className="text-sm font-medium text-foreground">{session.user.name}</p>
               </div>
               {/* Add more patient fields as needed */}
             </div>
@@ -95,13 +95,13 @@ export default async function DocumentViewPage({ params }: PageProps) {
           {/* Laboratory Information */}
           <Card className="p-6">
             <div className="flex items-center gap-2 mb-4">
-              <Building2 className="h-5 w-5 text-gray-600" />
-              <h2 className="text-lg font-semibold text-gray-900">Informações do Documento</h2>
+              <Building2 className="h-5 w-5 text-muted-foreground" />
+              <h2 className="text-lg font-semibold text-foreground">Informações do Documento</h2>
             </div>
             <div className="space-y-3">
               <div>
-                <p className="text-sm text-gray-500">Data de Upload</p>
-                <p className="text-sm font-medium text-gray-900">
+                <p className="text-sm text-muted-foreground">Data de Upload</p>
+                <p className="text-sm font-medium text-foreground">
                   {new Date(document.createdAt).toLocaleDateString('pt-BR', {
                     day: '2-digit',
                     month: 'long',
@@ -110,7 +110,7 @@ export default async function DocumentViewPage({ params }: PageProps) {
                 </p>
               </div>
               <div>
-                <p className="text-sm text-gray-500">Status</p>
+                <p className="text-sm text-muted-foreground">Status</p>
                 <Badge variant={document.processingStatus === 'completed' ? 'default' : 'secondary'}>
                   {document.processingStatus === 'completed' ? 'Processado' : 'Processando'}
                 </Badge>
@@ -122,8 +122,8 @@ export default async function DocumentViewPage({ params }: PageProps) {
         {/* Extracted Text Summary */}
         {document.extractedText && (
           <Card className="p-6 mb-8">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Resumo Geral</h2>
-            <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap line-clamp-6">
+            <h2 className="text-lg font-semibold text-foreground mb-4">Resumo Geral</h2>
+            <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap line-clamp-6">
               {document.extractedText.substring(0, 500)}
               {document.extractedText.length > 500 && '...'}
             </p>
@@ -133,7 +133,7 @@ export default async function DocumentViewPage({ params }: PageProps) {
         {/* Exam Results */}
         {document.structuredData && modulesCount > 0 && (
           <div>
-            <h2 className="text-xl font-bold text-gray-900 mb-4">Resultados dos Exames</h2>
+            <h2 className="text-xl font-bold text-foreground mb-4">Resultados dos Exames</h2>
             <StructuredDataDisplay modules={document.structuredData.modules} />
           </div>
         )}
@@ -141,8 +141,8 @@ export default async function DocumentViewPage({ params }: PageProps) {
         {/* Raw Text Fallback */}
         {(!document.structuredData || modulesCount === 0) && document.extractedText && (
           <Card className="p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Texto Extraído</h2>
-            <pre className="text-sm text-gray-700 whitespace-pre-wrap font-mono">
+            <h2 className="text-lg font-semibold text-foreground mb-4">Texto Extraído</h2>
+            <pre className="text-sm text-muted-foreground whitespace-pre-wrap font-mono">
               {document.extractedText}
             </pre>
           </Card>
