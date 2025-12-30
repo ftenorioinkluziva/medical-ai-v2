@@ -85,13 +85,13 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
+    <div className="container mx-auto px-4 py-4 sm:px-6 sm:py-6 space-y-4 sm:space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-semibold text-foreground">
+        <h1 className="text-xl sm:text-2xl font-semibold text-foreground">
           Olá, {session?.user?.name?.split(' ')[0]}
         </h1>
-        <p className="text-muted-foreground mt-1">
+        <p className="text-sm sm:text-base text-muted-foreground mt-1">
           Aqui está um resumo da sua saúde e atividades recentes
         </p>
       </div>
@@ -99,7 +99,7 @@ export default function DashboardPage() {
             {/* Quick Actions */}
       <Card className="hover:shadow-md transition-shadow">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-lg">
+          <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
             <User className="h-5 w-5 text-teal-600" />
             Perfil Médico
           </CardTitle>
@@ -113,10 +113,10 @@ export default function DashboardPage() {
             <Link href="/profile">
               <Button
                 variant="outline"
-                className="w-full justify-between group"
+                className="w-full justify-between group min-h-[44px]"
               >
-                Atualizar Perfil Médico
-                <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                <span className="truncate">Atualizar Perfil Médico</span>
+                <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform shrink-0" />
               </Button>
             </Link>
           </div>
@@ -124,14 +124,14 @@ export default function DashboardPage() {
       </Card>
 
       {/* Documents and Analyses Section - 3 Column Grid*/}
-      <div className="grid gap-4 lg:grid-cols-3 sm:grid-cols-1">
+      <div className="grid gap-3 sm:gap-4 md:grid-cols-2 lg:grid-cols-3">
         <DocumentUploadWidget onUploadComplete={handleUploadComplete} />
         <RecentDocumentsWidget key={refreshKey} limit={5} />
         <RecentAnalysesWidget limit={5} />
       </div>
 
       {/* Recommendations and Weekly Plan Section - 2 Column Grid */}
-      <div className="grid gap-6 lg:grid-cols-2 sm:grid-cols-1">
+      <div className="grid gap-4 sm:gap-6 lg:grid-cols-2">
         <RecommendationsWidget />
         <WeeklyPlanWidget />
       </div>

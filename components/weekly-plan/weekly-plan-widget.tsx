@@ -176,17 +176,21 @@ export function WeeklyPlanWidget({ patientId }: WeeklyPlanWidgetProps = {}) {
             {/* <TabsTrigger value="overview" className="data-[state=active]:!bg-teal-600 dark:data-[state=active]:!bg-teal-500 data-[state=active]:!text-white">
               Visão Geral
             </TabsTrigger> */}
-            <TabsTrigger value="supplements" className="data-[state=active]:!bg-purple-600 dark:data-[state=active]:!bg-purple-500 data-[state=active]:!text-white">
-              Suplementação
+            <TabsTrigger value="supplements" className="gap-1.5 sm:gap-2 data-[state=active]:!bg-purple-600 dark:data-[state=active]:!bg-purple-500 data-[state=active]:!text-white">
+              <Pill className="h-4 w-4" />
+              <span className="hidden sm:inline">Suplementação</span>
             </TabsTrigger>
-            <TabsTrigger value="shopping" className="data-[state=active]:!bg-emerald-600 dark:data-[state=active]:!bg-emerald-500 data-[state=active]:!text-white">
-              Compras
+            <TabsTrigger value="shopping" className="gap-1.5 sm:gap-2 data-[state=active]:!bg-emerald-600 dark:data-[state=active]:!bg-emerald-500 data-[state=active]:!text-white">
+              <ShoppingCart className="h-4 w-4" />
+              <span className="hidden sm:inline">Compras</span>
             </TabsTrigger>
-            <TabsTrigger value="meals" className="data-[state=active]:!bg-orange-600 dark:data-[state=active]:!bg-orange-500 data-[state=active]:!text-white">
-              Refeições
+            <TabsTrigger value="meals" className="gap-1.5 sm:gap-2 data-[state=active]:!bg-orange-600 dark:data-[state=active]:!bg-orange-500 data-[state=active]:!text-white">
+              <UtensilsCrossed className="h-4 w-4" />
+              <span className="hidden sm:inline">Refeições</span>
             </TabsTrigger>
-            <TabsTrigger value="workouts" className="data-[state=active]:!bg-sky-600 dark:data-[state=active]:!bg-sky-500 data-[state=active]:!text-white">
-              Treinos
+            <TabsTrigger value="workouts" className="gap-1.5 sm:gap-2 data-[state=active]:!bg-sky-600 dark:data-[state=active]:!bg-sky-500 data-[state=active]:!text-white">
+              <Dumbbell className="h-4 w-4" />
+              <span className="hidden sm:inline">Treinos</span>
             </TabsTrigger>
           </TabsList>
 
@@ -248,7 +252,7 @@ export function WeeklyPlanWidget({ patientId }: WeeklyPlanWidgetProps = {}) {
           </TabsContent>
 */}
           {/* Supplements Tab */}
-          <TabsContent value="supplements" className="mt-6">
+          <TabsContent value="supplements" className="mt-4 sm:mt-6">
             <div className="mb-4">
               <p className="text-sm text-muted-foreground">{plan.supplementationStrategy.overview}</p>
             </div>
@@ -273,7 +277,7 @@ export function WeeklyPlanWidget({ patientId }: WeeklyPlanWidgetProps = {}) {
           </TabsContent>
 
           {/* Shopping Tab */}
-          <TabsContent value="shopping" className="mt-6">
+          <TabsContent value="shopping" className="mt-4 sm:mt-6">
             <div className="mb-4">
               <p className="text-sm text-muted-foreground">{plan.shoppingList.overview}</p>
             </div>
@@ -294,7 +298,7 @@ export function WeeklyPlanWidget({ patientId }: WeeklyPlanWidgetProps = {}) {
           </TabsContent>
 
           {/* Meals Tab */}
-          <TabsContent value="meals" className="mt-6">
+          <TabsContent value="meals" className="mt-4 sm:mt-6">
             <div className="mb-4">
               <p className="text-sm text-muted-foreground">{plan.mealPlan.overview}</p>
             </div>
@@ -370,7 +374,7 @@ export function WeeklyPlanWidget({ patientId }: WeeklyPlanWidgetProps = {}) {
           </TabsContent>
 
           {/* Workouts Tab */}
-          <TabsContent value="workouts" className="mt-6">
+          <TabsContent value="workouts" className="mt-4 sm:mt-6">
             <div className="mb-4">
               <p className="text-sm text-muted-foreground">{plan.workoutPlan.overview}</p>
             </div>

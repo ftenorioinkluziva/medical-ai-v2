@@ -178,11 +178,11 @@ export function RecentDocumentsWidget({ limit = 5, onDocumentsLoad, patientId }:
             {documents.map((doc) => (
               <div
                 key={doc.id}
-                className="p-3 rounded-lg border border-gray-200 hover:border-teal-300 hover:bg-teal-50/50 transition-colors dark:border-gray-700 dark:hover:bg-teal-900/30 cursor-pointer"
+                className="p-2.5 sm:p-3 rounded-lg border border-gray-200 hover:border-teal-300 hover:bg-teal-50/50 transition-colors dark:border-gray-700 dark:hover:bg-teal-900/30 cursor-pointer"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-start gap-3 flex-1 min-w-0">
-                    <div className="p-2 rounded bg-teal-100">
+                    <div className="p-1.5 sm:p-2 rounded bg-teal-100">
                       <FileText className="h-4 w-4 text-teal-700" />
                     </div>
                     <div className="flex-1 min-w-0">

@@ -172,7 +172,7 @@ export function DocumentUploadWidget({ onUploadComplete, patientId }: DocumentUp
         {/* Drag & Drop Area */}
         <div
           className={`
-            border-2 border-dashed rounded-lg p-6 text-center transition-colors cursor-pointer
+            border-2 border-dashed rounded-lg p-4 sm:p-6 text-center transition-colors cursor-pointer
             ${isDragging ? 'border-teal-500 dark:border-teal-400 bg-teal-50 dark:bg-teal-950/20' : 'border-border hover:border-teal-400 dark:hover:border-teal-500'}
             ${file ? 'bg-muted' : ''}
           `}
@@ -184,7 +184,7 @@ export function DocumentUploadWidget({ onUploadComplete, patientId }: DocumentUp
         >
           {!file ? (
             <div className="space-y-3">
-              <Upload className="mx-auto h-10 w-10 text-muted-foreground" />
+              <Upload className="mx-auto h-8 w-8 sm:h-10 sm:w-10 text-muted-foreground" />
               <div>
                 <p className="text-sm font-medium text-foreground">
                   Arraste e solte seu arquivo aqui

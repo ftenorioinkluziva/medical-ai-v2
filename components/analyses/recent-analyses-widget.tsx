@@ -150,11 +150,11 @@ export function RecentAnalysesWidget({ limit = 5, onAnalysesLoad, patientId }: R
               {analyses.map((analysis) => (
                 <div
                   key={analysis.id}
-                  className="p-3 rounded-lg border border-gray-200 hover:border-teal-300 hover:bg-teal-50/50 transition-colors dark:border-gray-700 dark:hover:bg-teal-900/30 cursor-pointer"
+                  className="p-2.5 sm:p-3 rounded-lg border border-gray-200 hover:border-teal-300 hover:bg-teal-50/50 transition-colors dark:border-gray-700 dark:hover:bg-teal-900/30 cursor-pointer"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex items-start gap-3 flex-1 min-w-0">
-                      <div className={`p-2 rounded ${getAgentColor(analysis.agentKey)}`}>
+                      <div className={`p-1.5 sm:p-2 rounded ${getAgentColor(analysis.agentKey)}`}>
                         <Brain className="h-4 w-4" />
                       </div>
                       <div className="flex-1 min-w-0">
