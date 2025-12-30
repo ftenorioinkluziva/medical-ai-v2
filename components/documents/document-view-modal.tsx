@@ -96,7 +96,7 @@ export function DocumentViewModal({ document, isOpen, onClose }: DocumentViewMod
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-[95vw] sm:max-w-3xl lg:max-w-5xl max-h-[90vh] p-0 overflow-hidden">
+      <DialogContent className="max-w-[95vw] sm:max-w-3xl lg:max-w-4xl max-h-[90vh] p-0">
         <DialogHeader className="px-4 pt-4 pb-3 sm:px-6 sm:pt-6 sm:pb-4">
           <div className="flex flex-col sm:flex-row sm:items-center gap-3">
             <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -108,7 +108,7 @@ export function DocumentViewModal({ document, isOpen, onClose }: DocumentViewMod
                 </DialogDescription>
               </div>
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-2 flex-wrap">
               {getStatusBadge(document.processingStatus)}
             </div>
           </div>
@@ -116,15 +116,15 @@ export function DocumentViewModal({ document, isOpen, onClose }: DocumentViewMod
 
         <Separator />
 
-        <ScrollArea className="h-[calc(90vh-180px)]">
-          <div className="px-4 py-3 sm:px-6 sm:py-4 space-y-4 sm:space-y-6 max-w-full">
+        <ScrollArea className="h-[calc(90vh-140px)]">
+          <div className="px-4 py-3 sm:px-6 sm:py-4 space-y-4 sm:space-y-6">
             {/* Metadata Section */}
-            <div className="max-w-full">
+            <div>
               <h3 className="text-xs sm:text-sm font-semibold text-muted-foreground mb-2 sm:mb-3 flex items-center gap-2">
                 <Database className="h-4 w-4" />
-                INFORMAÇÕES
+                INFORMAÇÕES DO DOCUMENTO
               </h3>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
                 {/* Status */}
                 <div className="flex items-start gap-2">
                   {getStatusIcon(document.processingStatus)}
@@ -161,9 +161,9 @@ export function DocumentViewModal({ document, isOpen, onClose }: DocumentViewMod
 
                 {/* Date */}
                 <div className="flex items-start gap-2">
-                  <Calendar className="h-4 w-4 text-gray-500 mt-0.5" />
+                  <Calendar className="h-4 w-4 text-muted-foreground mt-0.5" />
                   <div>
-                    <p className="text-xs text-gray-500">Data de Upload</p>
+                    <p className="text-xs text-muted-foreground">Data de Upload</p>
                     <p className="text-sm font-medium">
                       {format(new Date(document.createdAt), 'dd/MM/yyyy', { locale: ptBR })}
                     </p>
@@ -172,9 +172,9 @@ export function DocumentViewModal({ document, isOpen, onClose }: DocumentViewMod
 
                 {/* MIME Type */}
                 <div className="flex items-start gap-2">
-                  <FileText className="h-4 w-4 text-gray-500 mt-0.5" />
+                  <FileText className="h-4 w-4 text-muted-foreground mt-0.5" />
                   <div>
-                    <p className="text-xs text-gray-500">Formato</p>
+                    <p className="text-xs text-muted-foreground">Formato</p>
                     <p className="text-sm font-medium truncate">
                       {document.mimeType}
                     </p>
@@ -184,9 +184,9 @@ export function DocumentViewModal({ document, isOpen, onClose }: DocumentViewMod
                 {/* Modules */}
                 {modulesCount > 0 && (
                   <div className="flex items-start gap-2">
-                    <Database className="h-4 w-4 text-gray-500 mt-0.5" />
+                    <Database className="h-4 w-4 text-muted-foreground mt-0.5" />
                     <div>
-                      <p className="text-xs text-gray-500">Módulos Estruturados</p>
+                      <p className="text-xs text-muted-foreground">Módulos Estruturados</p>
                       <p className="text-sm font-medium">
                         {modulesCount} módulo{modulesCount !== 1 ? 's' : ''}
                       </p>
@@ -196,12 +196,30 @@ export function DocumentViewModal({ document, isOpen, onClose }: DocumentViewMod
               </div>
             </div>
 
+            {/* Extracted Text Section */}
+            {document.extractedText && (
+              <>
+                <Separator />
+                <div>
+                  <h3 className="text-xs sm:text-sm font-semibold text-muted-foreground mb-2 sm:mb-3 flex items-center gap-2">
+                    <FileText className="h-4 w-4" />
+                    TEXTO EXTRAÍDO
+                  </h3>
+                  <div className="p-3 sm:p-4 bg-muted/30 rounded-lg border border-border">
+                    <p className="text-xs sm:text-sm text-foreground whitespace-pre-wrap leading-relaxed">
+                      {document.extractedText}
+                    </p>
+                  </div>
+                </div>
+              </>
+            )}
+
             {/* Structured Data Section */}
             {document.structuredData && modulesCount > 0 && (
               <>
                 <Separator />
-                <div className="max-w-full">
-                  <h3 className="text-sm font-semibold text-gray-600 mb-4 flex items-center gap-2">
+                <div>
+                  <h3 className="text-xs sm:text-sm font-semibold text-muted-foreground mb-2 sm:mb-3 flex items-center gap-2">
                     <Database className="h-4 w-4" />
                     DADOS ESTRUTURADOS
                   </h3>
@@ -210,17 +228,16 @@ export function DocumentViewModal({ document, isOpen, onClose }: DocumentViewMod
               </>
             )}
 
+            <Separator />
+
+            {/* Footer Actions */}
+            <div className="flex justify-end gap-3">
+              <Button variant="outline" onClick={onClose} size="sm">
+                Fechar
+              </Button>
+            </div>
           </div>
         </ScrollArea>
-
-        <Separator />
-
-        {/* Footer Actions */}
-        <div className="px-4 py-3 sm:px-6 sm:py-4 flex justify-end gap-3">
-          <Button variant="outline" onClick={onClose} size="sm">
-            Fechar
-          </Button>
-        </div>
       </DialogContent>
     </Dialog>
   )
