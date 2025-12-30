@@ -49,20 +49,20 @@ export function DocumentViewModal({ document, isOpen, onClose }: DocumentViewMod
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'completed':
-        return <CheckCircle2 className="h-5 w-5 text-green-600" />
+        return <CheckCircle2 className="h-5 w-5 text-green-600 dark:text-green-400" />
       case 'failed':
-        return <XCircle className="h-5 w-5 text-red-600" />
+        return <XCircle className="h-5 w-5 text-red-600 dark:text-red-400" />
       case 'processing':
-        return <Clock className="h-5 w-5 text-yellow-600" />
+        return <Clock className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
       default:
-        return <Clock className="h-5 w-5 text-gray-600" />
+        return <Clock className="h-5 w-5 text-muted-foreground" />
     }
   }
 
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'completed':
-        return <Badge className="bg-green-600">Processado</Badge>
+        return <Badge className="bg-green-600 dark:bg-green-700">Processado</Badge>
       case 'failed':
         return <Badge variant="destructive">Falhou</Badge>
       case 'processing':
@@ -99,7 +99,7 @@ export function DocumentViewModal({ document, isOpen, onClose }: DocumentViewMod
       <DialogContent className="max-w-5xl max-h-[90vh] p-0 overflow-hidden">
         <DialogHeader className="px-6 pt-6 pb-4">
           <div className="flex items-center gap-3">
-            <FileText className="h-6 w-6 text-teal-600" />
+            <FileText className="h-6 w-6 text-teal-600 dark:text-teal-400" />
             <div className="flex-1 min-w-0">
               <DialogTitle className="text-2xl truncate">{document.fileName}</DialogTitle>
               <DialogDescription className="mt-1">
@@ -118,7 +118,7 @@ export function DocumentViewModal({ document, isOpen, onClose }: DocumentViewMod
           <div className="px-6 py-4 space-y-6 max-w-full">
             {/* Metadata Section */}
             <div className="max-w-full">
-              <h3 className="text-sm font-semibold text-gray-600 mb-3 flex items-center gap-2">
+              <h3 className="text-sm font-semibold text-muted-foreground mb-3 flex items-center gap-2">
                 <Database className="h-4 w-4" />
                 INFORMAÇÕES DO DOCUMENTO
               </h3>
@@ -127,7 +127,7 @@ export function DocumentViewModal({ document, isOpen, onClose }: DocumentViewMod
                 <div className="flex items-start gap-2">
                   {getStatusIcon(document.processingStatus)}
                   <div>
-                    <p className="text-xs text-gray-500">Status</p>
+                    <p className="text-xs text-muted-foreground">Status</p>
                     <p className="text-sm font-medium">
                       {document.processingStatus === 'completed' ? 'Processado' :
                        document.processingStatus === 'failed' ? 'Falhou' : 'Processando'}
@@ -137,9 +137,9 @@ export function DocumentViewModal({ document, isOpen, onClose }: DocumentViewMod
 
                 {/* Type */}
                 <div className="flex items-start gap-2">
-                  <FileType className="h-4 w-4 text-gray-500 mt-0.5" />
+                  <FileType className="h-4 w-4 text-muted-foreground mt-0.5" />
                   <div>
-                    <p className="text-xs text-gray-500">Tipo</p>
+                    <p className="text-xs text-muted-foreground">Tipo</p>
                     <p className="text-sm font-medium">
                       {getDocumentTypeLabel(document.documentType)}
                     </p>
@@ -148,9 +148,9 @@ export function DocumentViewModal({ document, isOpen, onClose }: DocumentViewMod
 
                 {/* Size */}
                 <div className="flex items-start gap-2">
-                  <Hash className="h-4 w-4 text-gray-500 mt-0.5" />
+                  <Hash className="h-4 w-4 text-muted-foreground mt-0.5" />
                   <div>
-                    <p className="text-xs text-gray-500">Tamanho</p>
+                    <p className="text-xs text-muted-foreground">Tamanho</p>
                     <p className="text-sm font-medium">
                       {formatFileSize(document.fileSize)}
                     </p>

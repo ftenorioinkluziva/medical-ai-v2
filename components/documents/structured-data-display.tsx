@@ -36,26 +36,26 @@ export function StructuredDataDisplay({ modules }: StructuredDataDisplayProps) {
   const getStatusColor = (status?: string) => {
     switch (status?.toLowerCase()) {
       case 'normal':
-        return 'bg-green-100 text-green-800 border-green-300'
+        return 'bg-green-100 dark:bg-green-950/30 text-green-800 dark:text-green-300 border-green-300 dark:border-green-700'
       case 'abnormal':
-        return 'bg-yellow-100 text-yellow-800 border-yellow-300'
+        return 'bg-yellow-100 dark:bg-yellow-950/30 text-yellow-800 dark:text-yellow-300 border-yellow-300 dark:border-yellow-700'
       case 'critical':
-        return 'bg-red-100 text-red-800 border-red-300'
+        return 'bg-red-100 dark:bg-red-950/30 text-red-800 dark:text-red-300 border-red-300 dark:border-red-700'
       default:
-        return 'bg-gray-100 text-gray-800 border-gray-300'
+        return 'bg-muted text-foreground border-border'
     }
   }
 
   const getStatusIcon = (status?: string) => {
     switch (status?.toLowerCase()) {
       case 'normal':
-        return <CheckCircle2 className="h-4 w-4 text-green-600" />
+        return <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400" />
       case 'abnormal':
-        return <AlertTriangle className="h-4 w-4 text-yellow-600" />
+        return <AlertTriangle className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
       case 'critical':
-        return <AlertCircle className="h-4 w-4 text-red-600" />
+        return <AlertCircle className="h-4 w-4 text-red-600 dark:text-red-400" />
       default:
-        return <CheckCircle2 className="h-4 w-4 text-gray-600" />
+        return <CheckCircle2 className="h-4 w-4 text-muted-foreground" />
     }
   }
 
@@ -82,11 +82,11 @@ export function StructuredDataDisplay({ modules }: StructuredDataDisplayProps) {
         return (
           <Card key={index} className="overflow-hidden">
             {/* Module Header */}
-            <div className="flex items-center justify-between p-4 bg-white border-b">
+            <div className="flex items-center justify-between p-4 bg-card border-b">
               <div className="flex items-center gap-3">
-                <h3 className="text-lg font-bold text-gray-900 uppercase">{title}</h3>
+                <h3 className="text-lg font-bold text-foreground uppercase">{title}</h3>
                 {module.category && (
-                  <span className="text-sm text-gray-500">{module.category}</span>
+                  <span className="text-sm text-muted-foreground">{module.category}</span>
                 )}
               </div>
               <div className="flex items-center gap-2">
@@ -101,10 +101,10 @@ export function StructuredDataDisplay({ modules }: StructuredDataDisplayProps) {
 
             {/* Summary Section */}
             {module.summary && (
-              <div className="bg-blue-50 border-l-4 border-blue-500 p-4 mx-4 mt-4 rounded-r">
+              <div className="bg-blue-50 dark:bg-blue-950/20 border-l-4 border-blue-500 dark:border-blue-600 p-4 mx-4 mt-4 rounded-r">
                 <div className="flex items-start gap-3">
-                  <Info className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
-                  <p className="text-sm text-gray-800 leading-relaxed">{module.summary}</p>
+                  <Info className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
+                  <p className="text-sm text-foreground leading-relaxed">{module.summary}</p>
                 </div>
               </div>
             )}
@@ -112,18 +112,18 @@ export function StructuredDataDisplay({ modules }: StructuredDataDisplayProps) {
             {/* Parameters Table */}
             {hasParameters && (
               <div className="px-4 pb-4 pt-4">
-                <div className="rounded-lg border border-gray-200 overflow-hidden">
+                <div className="rounded-lg border border-border overflow-hidden">
                   <table className="w-full">
                     <thead>
-                      <tr className="bg-gray-50 border-b">
-                        <th className="text-left py-3 px-4 text-xs font-bold text-gray-700 uppercase">Parâmetro</th>
-                        <th className="text-center py-3 px-4 text-xs font-bold text-gray-700 uppercase">Valor</th>
-                        <th className="text-center py-3 px-4 text-xs font-bold text-gray-700 uppercase">Unidade</th>
-                        <th className="text-center py-3 px-4 text-xs font-bold text-gray-700 uppercase">Referência</th>
-                        <th className="text-center py-3 px-4 text-xs font-bold text-gray-700 uppercase">Status</th>
+                      <tr className="bg-muted border-b">
+                        <th className="text-left py-3 px-4 text-xs font-bold text-foreground uppercase">Parâmetro</th>
+                        <th className="text-center py-3 px-4 text-xs font-bold text-foreground uppercase">Valor</th>
+                        <th className="text-center py-3 px-4 text-xs font-bold text-foreground uppercase">Unidade</th>
+                        <th className="text-center py-3 px-4 text-xs font-bold text-foreground uppercase">Referência</th>
+                        <th className="text-center py-3 px-4 text-xs font-bold text-foreground uppercase">Status</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-100">
+                    <tbody className="divide-y divide-border">
                       {module.parameters.map((param, paramIndex) => {
                         const isAbnormal = param.status && param.status !== 'normal'
                         const isCritical = param.status === 'critical'
@@ -133,42 +133,42 @@ export function StructuredDataDisplay({ modules }: StructuredDataDisplayProps) {
                           <tr
                             key={paramIndex}
                             className={`
-                              ${isCritical ? 'bg-red-50' :
-                                isAbnormal ? 'bg-yellow-50' :
-                                'bg-white'} hover:bg-gray-50 transition-colors
+                              ${isCritical ? 'bg-red-50 dark:bg-red-950/20' :
+                                isAbnormal ? 'bg-yellow-50 dark:bg-yellow-950/20' :
+                                'bg-card'} hover:bg-muted transition-colors
                             `}
                           >
                             <td className="py-3 px-4">
-                              <span className="text-sm font-medium text-gray-900">{param.name}</span>
+                              <span className="text-sm font-medium text-foreground">{param.name}</span>
                             </td>
                             <td className="py-3 px-4 text-center">
                               <span className={`text-sm font-bold ${
-                                isCritical ? 'text-red-700' :
-                                isAbnormal ? 'text-yellow-700' :
-                                'text-gray-900'
+                                isCritical ? 'text-red-700 dark:text-red-300' :
+                                isAbnormal ? 'text-yellow-700 dark:text-yellow-300' :
+                                'text-foreground'
                               }`}>
                                 {param.value}
                               </span>
                             </td>
                             <td className="py-3 px-4 text-center">
-                              <span className="text-xs text-gray-600">{param.unit || '-'}</span>
+                              <span className="text-xs text-muted-foreground">{param.unit || '-'}</span>
                             </td>
                             <td className="py-3 px-4 text-center">
-                              <span className="text-xs text-gray-600">{hasReference ? param.referenceRange : '-'}</span>
+                              <span className="text-xs text-muted-foreground">{hasReference ? param.referenceRange : '-'}</span>
                             </td>
                             <td className="py-3 px-4 text-center">
                               {isCritical ? (
-                                <Badge className="bg-red-100 text-red-800 border border-red-300 inline-flex items-center gap-1 px-2 py-0.5">
+                                <Badge className="bg-red-100 dark:bg-red-950/30 text-red-800 dark:text-red-300 border border-red-300 dark:border-red-700 inline-flex items-center gap-1 px-2 py-0.5">
                                   <AlertCircle className="h-3 w-3" />
                                   <span className="font-semibold text-xs">Crítico</span>
                                 </Badge>
                               ) : isAbnormal ? (
-                                <Badge className="bg-yellow-100 text-yellow-800 border border-yellow-300 inline-flex items-center gap-1 px-2 py-0.5">
+                                <Badge className="bg-yellow-100 dark:bg-yellow-950/30 text-yellow-800 dark:text-yellow-300 border border-yellow-300 dark:border-yellow-700 inline-flex items-center gap-1 px-2 py-0.5">
                                   <AlertTriangle className="h-3 w-3" />
                                   <span className="font-semibold text-xs">{getStatusLabel(param.status)}</span>
                                 </Badge>
                               ) : (
-                                <Badge className="bg-green-100 text-green-800 border border-green-300 inline-flex items-center gap-1 px-2 py-0.5">
+                                <Badge className="bg-green-100 dark:bg-green-950/30 text-green-800 dark:text-green-300 border border-green-300 dark:border-green-700 inline-flex items-center gap-1 px-2 py-0.5">
                                   <CheckCircle2 className="h-3 w-3" />
                                   <span className="font-semibold text-xs">Normal</span>
                                 </Badge>
@@ -186,7 +186,7 @@ export function StructuredDataDisplay({ modules }: StructuredDataDisplayProps) {
             {/* Fallback for non-standard structure */}
             {!hasParameters && (
               <div className="p-4">
-                <pre className="text-xs text-gray-700 whitespace-pre-wrap font-mono bg-gray-50 p-3 rounded border">
+                <pre className="text-xs text-foreground whitespace-pre-wrap font-mono bg-muted p-3 rounded border">
                   {JSON.stringify(
                     Object.fromEntries(
                       Object.entries(module).filter(([key]) =>

@@ -17,11 +17,11 @@ export default function ComparePage() {
     <div className="container mx-auto py-6 px-4 space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-semibold text-gray-900 flex items-center gap-3">
+        <h1 className="text-2xl font-semibold text-foreground flex items-center gap-3">
           <GitCompare className="h-6 w-6 text-teal-600" />
           Comparação de Exames
         </h1>
-        <p className="text-gray-600 mt-1">
+        <p className="text-muted-foreground mt-1">
           Compare seus exames ao longo do tempo para acompanhar sua evolução
         </p>
       </div>
@@ -43,8 +43,8 @@ export default function ComparePage() {
           <div className="bg-teal-50 rounded-lg p-4 mb-4 inline-block">
             <GitCompare className="h-12 w-12 text-teal-600" />
           </div>
-          <p className="text-lg font-semibold text-gray-900 mb-2">Selecione pelo menos 2 documentos</p>
-          <p className="text-sm text-gray-600">
+          <p className="text-lg font-semibold text-foreground mb-2">Selecione pelo menos 2 documentos</p>
+          <p className="text-sm text-muted-foreground">
             Escolha os exames que deseja comparar para visualizar a evolução dos parâmetros
           </p>
         </div>

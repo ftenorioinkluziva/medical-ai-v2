@@ -41,7 +41,7 @@ export function HealthAlerts({ metrics }: HealthAlertsProps) {
             <CheckCircle className="h-12 w-12 text-emerald-600" />
           </div>
           <p className="text-sm font-medium text-emerald-600 mb-1">Tudo Ótimo!</p>
-          <p className="text-xs text-gray-600">
+          <p className="text-xs text-muted-foreground">
             Todos os parâmetros estão dentro do normal
           </p>
         </CardContent>
@@ -94,7 +94,7 @@ export function HealthAlerts({ metrics }: HealthAlertsProps) {
                         {metric.status}
                       </Badge>
                     </div>
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs text-muted-foreground mt-1">
                       {format(new Date(metric.date), "dd 'de' MMM", { locale: ptBR })}
                     </p>
                   </div>
@@ -104,7 +104,7 @@ export function HealthAlerts({ metrics }: HealthAlertsProps) {
           })}
 
           {metrics.length > 5 && (
-            <p className="text-xs text-center text-gray-500 mt-2 py-2 bg-gray-50 rounded-lg">
+            <p className="text-xs text-center text-muted-foreground mt-2 py-2 bg-muted rounded-lg">
               + {metrics.length - 5} outro{metrics.length - 5 !== 1 ? 's' : ''}
             </p>
           )}

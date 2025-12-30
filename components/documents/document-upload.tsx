@@ -265,21 +265,21 @@ export function DocumentUpload({ onUploadComplete }: { onUploadComplete?: (resul
           <div
             className={`
               p-4 rounded-lg border
-              ${uploadResult.success ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}
+              ${uploadResult.success ? 'bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-700' : 'bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-700'}
             `}
           >
             <div className="flex items-start gap-3">
               {uploadResult.success ? (
-                <CheckCircle2 className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
+                <CheckCircle2 className="h-5 w-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
               ) : (
-                <XCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
+                <XCircle className="h-5 w-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
               )}
               <div className="flex-1 space-y-1">
-                <p className={`text-sm font-medium ${uploadResult.success ? 'text-green-900' : 'text-red-900'}`}>
+                <p className={`text-sm font-medium ${uploadResult.success ? 'text-green-900 dark:text-green-100' : 'text-red-900 dark:text-red-100'}`}>
                   {uploadResult.success ? 'Upload realizado com sucesso!' : 'Erro no upload'}
                 </p>
                 {uploadResult.success && uploadResult.stats && (
-                  <div className="text-xs text-green-700 space-y-0.5">
+                  <div className="text-xs text-green-700 dark:text-green-300 space-y-0.5">
                     <p>• Texto extraído: {uploadResult.stats.textLength.toLocaleString()} caracteres</p>
                     {uploadResult.stats.modulesCount !== undefined && (
                       <p>• Módulos estruturados: {uploadResult.stats.modulesCount} exames identificados</p>
@@ -288,7 +288,7 @@ export function DocumentUpload({ onUploadComplete }: { onUploadComplete?: (resul
                   </div>
                 )}
                 {uploadResult.error && (
-                  <p className="text-xs text-red-700">{uploadResult.error}</p>
+                  <p className="text-xs text-red-700 dark:text-red-300">{uploadResult.error}</p>
                 )}
               </div>
             </div>

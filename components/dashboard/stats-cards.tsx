@@ -51,8 +51,8 @@ export function StatsCards({
       value: abnormalParametersCount,
       description: 'Valores alterados',
       icon: AlertCircle,
-      color: abnormalParametersCount > 0 ? 'text-orange-600' : 'text-gray-400',
-      bg: abnormalParametersCount > 0 ? 'bg-orange-50' : 'bg-gray-50',
+      color: abnormalParametersCount > 0 ? 'text-orange-600' : 'text-muted-foreground',
+      bg: abnormalParametersCount > 0 ? 'bg-orange-50' : 'bg-muted',
     },
   ]
 
@@ -67,7 +67,7 @@ export function StatsCards({
           >
             <CardHeader className="pb-2">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-sm font-medium text-gray-600">
+                <CardTitle className="text-sm font-medium text-muted-foreground">
                   {stat.title}
                 </CardTitle>
                 <div className={`${stat.bg} p-2 rounded-lg`}>
@@ -76,8 +76,8 @@ export function StatsCards({
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-semibold text-gray-900">{stat.value}</div>
-              <p className="text-xs text-gray-500 mt-1">
+              <div className="text-3xl font-semibold text-foreground">{stat.value}</div>
+              <p className="text-xs text-muted-foreground mt-1">
                 {stat.description}
               </p>
             </CardContent>

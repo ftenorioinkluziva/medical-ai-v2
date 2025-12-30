@@ -286,9 +286,9 @@ export default function CompareAnalysesPage() {
                   <Separator />
 
                   {/* Disclaimer */}
-                  <Card className="bg-yellow-50 border-yellow-200">
+                  <Card className="bg-amber-50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-800">
                     <CardContent className="p-4">
-                      <p className="text-xs text-yellow-900">
+                      <p className="text-xs text-amber-900 dark:text-amber-100">
                         <strong>⚠️ Aviso Importante:</strong> Esta análise comparativa é educacional
                         e <strong>NÃO substitui consulta médica profissional</strong>. Sempre consulte
                         seu médico para interpretação definitiva e decisões sobre tratamento.

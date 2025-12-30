@@ -112,7 +112,7 @@ export function WeeklyPlanWidget({ patientId }: WeeklyPlanWidgetProps = {}) {
         <CardContent className="flex items-center justify-center py-12">
           <div className="text-center space-y-3">
             <Loader2 className="h-8 w-8 animate-spin mx-auto text-teal-600" />
-            <p className="text-gray-600">Carregando plano semanal...</p>
+            <p className="text-muted-foreground">Carregando plano semanal...</p>
           </div>
         </CardContent>
       </Card>
@@ -183,53 +183,53 @@ export function WeeklyPlanWidget({ patientId }: WeeklyPlanWidgetProps = {}) {
           {/* Overview Tab */}
           <TabsContent value="overview" className="mt-6 space-y-4">
             <div className="grid gap-4 md:grid-cols-2">
-              <div className="p-4 border border-gray-200 rounded-lg hover:border-purple-300 hover:bg-purple-50/30 transition-all">
+              <div className="p-4 border border-border rounded-lg hover:border-purple-300 hover:bg-purple-50/30 transition-all">
                 <div className="flex items-center gap-2 mb-2">
                   <div className="bg-purple-100 p-2 rounded-lg">
                     <Pill className="h-4 w-4 text-purple-700" />
                   </div>
-                  <h4 className="font-semibold text-gray-900">Suplementação</h4>
+                  <h4 className="font-semibold text-foreground">Suplementação</h4>
                 </div>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-muted-foreground">
                   {plan.supplementationStrategy.overview}
                 </p>
                 <Badge variant="outline" className="mt-2">{totalSupplements} suplementos</Badge>
               </div>
 
-              <div className="p-4 border border-gray-200 rounded-lg hover:border-emerald-300 hover:bg-emerald-50/30 transition-all">
+              <div className="p-4 border border-border rounded-lg hover:border-emerald-300 hover:bg-emerald-50/30 transition-all">
                 <div className="flex items-center gap-2 mb-2">
                   <div className="bg-emerald-100 p-2 rounded-lg">
                     <ShoppingCart className="h-4 w-4 text-emerald-700" />
                   </div>
-                  <h4 className="font-semibold text-gray-900">Compras</h4>
+                  <h4 className="font-semibold text-foreground">Compras</h4>
                 </div>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-muted-foreground">
                   {plan.shoppingList.overview}
                 </p>
                 <Badge variant="outline" className="mt-2">{totalCategories} categorias</Badge>
               </div>
 
-              <div className="p-4 border border-gray-200 rounded-lg hover:border-orange-300 hover:bg-orange-50/30 transition-all">
+              <div className="p-4 border border-border rounded-lg hover:border-orange-300 hover:bg-orange-50/30 transition-all">
                 <div className="flex items-center gap-2 mb-2">
                   <div className="bg-orange-100 p-2 rounded-lg">
                     <UtensilsCrossed className="h-4 w-4 text-orange-700" />
                   </div>
-                  <h4 className="font-semibold text-gray-900">Refeições</h4>
+                  <h4 className="font-semibold text-foreground">Refeições</h4>
                 </div>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-muted-foreground">
                   {plan.mealPlan.overview}
                 </p>
                 <Badge variant="outline" className="mt-2">{totalMeals} dias planejados</Badge>
               </div>
 
-              <div className="p-4 border border-gray-200 rounded-lg hover:border-sky-300 hover:bg-sky-50/30 transition-all">
+              <div className="p-4 border border-border rounded-lg hover:border-sky-300 hover:bg-sky-50/30 transition-all">
                 <div className="flex items-center gap-2 mb-2">
                   <div className="bg-sky-100 p-2 rounded-lg">
                     <Dumbbell className="h-4 w-4 text-sky-700" />
                   </div>
-                  <h4 className="font-semibold text-gray-900">Treinos</h4>
+                  <h4 className="font-semibold text-foreground">Treinos</h4>
                 </div>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-muted-foreground">
                   {plan.workoutPlan.overview}
                 </p>
                 <Badge variant="outline" className="mt-2">{totalWorkouts} treinos</Badge>
@@ -240,21 +240,21 @@ export function WeeklyPlanWidget({ patientId }: WeeklyPlanWidgetProps = {}) {
           {/* Supplements Tab */}
           <TabsContent value="supplements" className="mt-6">
             <div className="mb-4">
-              <p className="text-sm text-gray-600">{plan.supplementationStrategy.overview}</p>
+              <p className="text-sm text-muted-foreground">{plan.supplementationStrategy.overview}</p>
             </div>
             <div className="space-y-3">
               {plan.supplementationStrategy.supplements.map((supplement, index) => (
-                <div key={index} className="p-3 border border-gray-200 rounded-lg hover:border-purple-300 hover:bg-purple-50/30 transition-all">
+                <div key={index} className="p-3 border border-border rounded-lg hover:border-purple-300 hover:bg-purple-50/30 transition-all">
                   <div className="flex items-start gap-2">
                     <div className="bg-purple-100 p-1.5 rounded shrink-0">
                       <Pill className="h-3 w-3 text-purple-700" />
                     </div>
                     <div className="flex-1">
-                      <h4 className="font-semibold text-gray-900">{supplement.name}</h4>
-                      <p className="text-sm text-gray-600 mt-1">
+                      <h4 className="font-semibold text-foreground">{supplement.name}</h4>
+                      <p className="text-sm text-muted-foreground mt-1">
                         {supplement.dosage} - {supplement.timing}
                       </p>
-                      <p className="text-xs text-gray-500 mt-1">{supplement.purpose}</p>
+                      <p className="text-xs text-muted-foreground mt-1">{supplement.purpose}</p>
                     </div>
                   </div>
                 </div>
@@ -265,12 +265,12 @@ export function WeeklyPlanWidget({ patientId }: WeeklyPlanWidgetProps = {}) {
           {/* Shopping Tab */}
           <TabsContent value="shopping" className="mt-6">
             <div className="mb-4">
-              <p className="text-sm text-gray-600">{plan.shoppingList.overview}</p>
+              <p className="text-sm text-muted-foreground">{plan.shoppingList.overview}</p>
             </div>
             <div className="space-y-3">
               {plan.shoppingList.categories.map((category, index) => (
-                <div key={index} className="p-3 border border-gray-200 rounded-lg hover:border-emerald-300 hover:bg-emerald-50/30 transition-all">
-                  <h4 className="font-semibold text-gray-900 mb-2">{category.category}</h4>
+                <div key={index} className="p-3 border border-border rounded-lg hover:border-emerald-300 hover:bg-emerald-50/30 transition-all">
+                  <h4 className="font-semibold text-foreground mb-2">{category.category}</h4>
                   <div className="flex flex-wrap gap-1">
                     {category.items.map((item, idx) => (
                       <Badge key={idx} variant="outline">
@@ -286,12 +286,12 @@ export function WeeklyPlanWidget({ patientId }: WeeklyPlanWidgetProps = {}) {
           {/* Meals Tab */}
           <TabsContent value="meals" className="mt-6">
             <div className="mb-4">
-              <p className="text-sm text-gray-600">{plan.mealPlan.overview}</p>
+              <p className="text-sm text-muted-foreground">{plan.mealPlan.overview}</p>
             </div>
             <div className="space-y-4">
               {plan.mealPlan.meals.map((day: any, index: number) => (
-                <div key={index} className="border border-gray-200 rounded-lg p-4 bg-white hover:border-orange-300 hover:bg-orange-50/20 transition-all">
-                  <h4 className="font-semibold text-gray-900 mb-4">{day.day}</h4>
+                <div key={index} className="border border-border rounded-lg p-4 bg-card hover:border-orange-300 hover:bg-orange-50/20 transition-all">
+                  <h4 className="font-semibold text-foreground mb-4">{day.day}</h4>
 
                   <div className="space-y-4">
                     {/* Breakfast */}
@@ -299,8 +299,8 @@ export function WeeklyPlanWidget({ patientId }: WeeklyPlanWidgetProps = {}) {
                       <div>
                         <h5 className="font-semibold text-sm text-orange-600 mb-2">☀️ Café da Manhã</h5>
                         <div className="pl-4 space-y-1">
-                          <p className="font-semibold text-sm text-gray-900">{day.breakfast.name}</p>
-                          <ul className="text-xs text-gray-600 space-y-0.5 mt-1">
+                          <p className="font-semibold text-sm text-foreground">{day.breakfast.name}</p>
+                          <ul className="text-xs text-muted-foreground space-y-0.5 mt-1">
                             {day.breakfast.ingredients?.map((ing: string, i: number) => (
                               <li key={i}>• {ing}</li>
                             ))}
@@ -314,8 +314,8 @@ export function WeeklyPlanWidget({ patientId }: WeeklyPlanWidgetProps = {}) {
                       <div>
                         <h5 className="font-semibold text-sm text-emerald-600 mb-2">🌞 Almoço</h5>
                         <div className="pl-4 space-y-1">
-                          <p className="font-semibold text-sm text-gray-900">{day.lunch.name}</p>
-                          <ul className="text-xs text-gray-600 space-y-0.5 mt-1">
+                          <p className="font-semibold text-sm text-foreground">{day.lunch.name}</p>
+                          <ul className="text-xs text-muted-foreground space-y-0.5 mt-1">
                             {day.lunch.ingredients?.map((ing: string, i: number) => (
                               <li key={i}>• {ing}</li>
                             ))}
@@ -329,8 +329,8 @@ export function WeeklyPlanWidget({ patientId }: WeeklyPlanWidgetProps = {}) {
                       <div>
                         <h5 className="font-semibold text-sm text-sky-600 mb-2">🌙 Jantar</h5>
                         <div className="pl-4 space-y-1">
-                          <p className="font-semibold text-sm text-gray-900">{day.dinner.name}</p>
-                          <ul className="text-xs text-gray-600 space-y-0.5 mt-1">
+                          <p className="font-semibold text-sm text-foreground">{day.dinner.name}</p>
+                          <ul className="text-xs text-muted-foreground space-y-0.5 mt-1">
                             {day.dinner.ingredients?.map((ing: string, i: number) => (
                               <li key={i}>• {ing}</li>
                             ))}
@@ -346,8 +346,8 @@ export function WeeklyPlanWidget({ patientId }: WeeklyPlanWidgetProps = {}) {
                         <div className="pl-4 space-y-1">
                           {day.snacks.map((snack: any, i: number) => (
                             <div key={i} className="text-xs">
-                              <span className="font-semibold text-gray-900">{snack.name}</span>
-                              <span className="text-gray-600"> ({snack.timing})</span>
+                              <span className="font-semibold text-foreground">{snack.name}</span>
+                              <span className="text-muted-foreground"> ({snack.timing})</span>
                             </div>
                           ))}
                         </div>
@@ -362,28 +362,28 @@ export function WeeklyPlanWidget({ patientId }: WeeklyPlanWidgetProps = {}) {
           {/* Workouts Tab */}
           <TabsContent value="workouts" className="mt-6">
             <div className="mb-4">
-              <p className="text-sm text-gray-600">{plan.workoutPlan.overview}</p>
+              <p className="text-sm text-muted-foreground">{plan.workoutPlan.overview}</p>
             </div>
             <div className="space-y-4">
               {plan.workoutPlan.workouts.map((workout: any, index: number) => (
-                <div key={index} className="border border-gray-200 rounded-lg p-4 bg-white hover:border-sky-300 hover:bg-sky-50/20 transition-all">
+                <div key={index} className="border border-border rounded-lg p-4 bg-card hover:border-sky-300 hover:bg-sky-50/20 transition-all">
                   <div className="flex items-start justify-between mb-4">
                     <div>
-                      <h4 className="font-semibold text-gray-900">{workout.day}</h4>
-                      <p className="text-sm text-gray-600 mt-1">{workout.type}</p>
+                      <h4 className="font-semibold text-foreground">{workout.day}</h4>
+                      <p className="text-sm text-muted-foreground mt-1">{workout.type}</p>
                     </div>
                     <div className="flex gap-2">
                       {workout.duration && (
-                        <Badge className="bg-sky-100 text-sky-700 border-sky-200">{workout.duration}</Badge>
+                        <Badge className="bg-sky-100 dark:bg-sky-900/30 text-sky-700 dark:text-sky-300 border-sky-200 dark:border-sky-800">{workout.duration}</Badge>
                       )}
                       {workout.intensity && (
                         <Badge
                           className={
                             workout.intensity === 'high'
-                              ? 'bg-red-100 text-red-700 border-red-200'
+                              ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 border-red-200 dark:border-red-800'
                               : workout.intensity === 'medium'
-                              ? 'bg-amber-100 text-amber-700 border-amber-200'
-                              : 'bg-gray-100 text-gray-700 border-gray-200'
+                              ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800'
+                              : 'bg-accent text-foreground border-border'
                           }
                         >
                           {workout.intensity === 'high' ? 'Alta' : workout.intensity === 'medium' ? 'Média' : 'Baixa'}
@@ -393,29 +393,29 @@ export function WeeklyPlanWidget({ patientId }: WeeklyPlanWidgetProps = {}) {
                   </div>
 
                   {workout.warmup && (
-                    <div className="mb-3 p-2 bg-amber-50 border border-amber-200 rounded text-xs">
+                    <div className="mb-3 p-2 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded text-xs">
                       <strong>Aquecimento:</strong> {workout.warmup}
                     </div>
                   )}
 
                   <div className="space-y-2">
                     {workout.exercises?.map((exercise: any, exIndex: number) => (
-                      <div key={exIndex} className="p-3 bg-gray-50 rounded border border-gray-200 hover:border-sky-300 hover:bg-sky-50/30 transition-all">
-                        <p className="font-semibold text-sm text-gray-900">{exercise.name}</p>
-                        <div className="flex gap-3 text-xs text-gray-600 mt-1">
+                      <div key={exIndex} className="p-3 bg-muted rounded border border-border hover:border-sky-300 hover:bg-sky-50/30 transition-all">
+                        <p className="font-semibold text-sm text-foreground">{exercise.name}</p>
+                        <div className="flex gap-3 text-xs text-muted-foreground mt-1">
                           {exercise.sets && <span>Séries: {exercise.sets}</span>}
                           {exercise.reps && <span>Reps: {exercise.reps}</span>}
                           {exercise.duration && <span>Duração: {exercise.duration}</span>}
                         </div>
                         {exercise.notes && (
-                          <p className="text-xs text-gray-500 mt-1 italic">{exercise.notes}</p>
+                          <p className="text-xs text-muted-foreground mt-1 italic">{exercise.notes}</p>
                         )}
                       </div>
                     ))}
                   </div>
 
                   {workout.cooldown && (
-                    <div className="mt-3 p-2 bg-sky-50 border border-sky-200 rounded text-xs">
+                    <div className="mt-3 p-2 bg-sky-50 dark:bg-sky-950/20 border border-sky-200 dark:border-sky-800 rounded text-xs">
                       <strong>Alongamento:</strong> {workout.cooldown}
                     </div>
                   )}
@@ -427,7 +427,7 @@ export function WeeklyPlanWidget({ patientId }: WeeklyPlanWidgetProps = {}) {
 
         {/* Disclaimer */}
         <div className="mt-6 pt-6 border-t">
-          <p className="text-xs text-center text-gray-500">
+          <p className="text-xs text-center text-muted-foreground">
             ⚕️ Este plano é educacional e não substitui acompanhamento médico profissional.
           </p>
         </div>

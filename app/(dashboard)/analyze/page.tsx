@@ -78,8 +78,8 @@ export default function AnalyzePage() {
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-900">Análise Médica com IA</h1>
-          <p className="text-gray-600 mt-1">
+          <h1 className="text-2xl font-semibold text-foreground">Análise Médica com IA</h1>
+          <p className="text-muted-foreground mt-1">
             Consulte especialistas em IA e visualize suas análises anteriores
           </p>
         </div>
@@ -133,7 +133,7 @@ export default function AnalyzePage() {
 
           {/* Help Text */}
           {!selectedAgent && (
-            <div className="text-center py-16 text-gray-500">
+            <div className="text-center py-16 text-muted-foreground">
               <div className="bg-teal-50 rounded-lg p-4 mb-4 inline-block">
                 <FileText className="h-12 w-12 text-teal-600" />
               </div>

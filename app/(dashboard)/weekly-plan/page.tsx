@@ -122,8 +122,8 @@ export default function WeeklyPlanPage() {
       <div className="container mx-auto py-6 px-4">
         <div className="flex items-center justify-center min-h-[60vh]">
           <div className="text-center space-y-4">
-            <Loader2 className="h-8 w-8 animate-spin mx-auto text-teal-600" />
-            <p className="text-sm text-gray-600">Carregando plano semanal...</p>
+            <Loader2 className="h-8 w-8 animate-spin mx-auto text-teal-600 dark:text-teal-400" />
+            <p className="text-sm text-muted-foreground">Carregando plano semanal...</p>
           </div>
         </div>
       </div>
@@ -137,17 +137,17 @@ export default function WeeklyPlanPage() {
         <div>
           <div className="flex items-center gap-3 mb-2">
             <Link href="/dashboard">
-              <Button variant="ghost" size="sm" className="gap-2 text-gray-600 hover:text-gray-900">
+              <Button variant="ghost" size="sm" className="gap-2 text-muted-foreground hover:text-foreground">
                 <ArrowLeft className="h-4 w-4" />
                 Voltar
               </Button>
             </Link>
           </div>
-          <h1 className="text-2xl font-semibold text-gray-900 flex items-center gap-3">
-            <Calendar className="h-6 w-6 text-teal-600" />
+          <h1 className="text-2xl font-semibold text-foreground flex items-center gap-3">
+            <Calendar className="h-6 w-6 text-teal-600 dark:text-teal-400" />
             Plano Semanal Personalizado
           </h1>
-          <p className="text-gray-600 mt-1">
+          <p className="text-muted-foreground mt-1">
             Seu guia completo de saúde para a semana
           </p>
         </div>
@@ -155,10 +155,10 @@ export default function WeeklyPlanPage() {
 
       {/* Error State */}
       {error && (
-        <Card className="border-red-200 bg-red-50/30 hover:shadow-md transition-shadow">
+        <Card className="border-red-200 dark:border-red-800 bg-red-50/30 dark:bg-red-950/20 hover:shadow-md transition-shadow">
           <CardContent className="p-6 flex items-center gap-3">
-            <AlertCircle className="h-5 w-5 text-red-600" />
-            <p className="text-sm text-red-600">{error}</p>
+            <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400" />
+            <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
             <Button onClick={loadPlans} variant="outline" size="sm" className="ml-auto">
               Tentar Novamente
             </Button>
@@ -170,11 +170,11 @@ export default function WeeklyPlanPage() {
       {!error && plans.length === 0 && (
         <Card className="hover:shadow-md transition-shadow">
           <CardContent className="p-12 text-center">
-            <div className="bg-teal-50 rounded-lg p-4 mb-4 inline-block">
-              <FileText className="h-12 w-12 text-teal-600" />
+            <div className="bg-teal-50 dark:bg-teal-950/20 rounded-lg p-4 mb-4 inline-block">
+              <FileText className="h-12 w-12 text-teal-600 dark:text-teal-400" />
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Nenhum plano semanal disponível</h3>
-            <p className="text-sm text-gray-600 mb-6">
+            <h3 className="text-lg font-semibold text-foreground mb-2">Nenhum plano semanal disponível</h3>
+            <p className="text-sm text-muted-foreground mb-6">
               Gere um plano semanal a partir da sua última análise ou realize uma nova análise médica
             </p>
             <div className="flex gap-3 justify-center">
@@ -211,8 +211,8 @@ export default function WeeklyPlanPage() {
             <div className="lg:col-span-1">
               <Card className="hover:shadow-md transition-shadow">
                 <CardHeader className="pb-4">
-                  <CardTitle className="text-lg font-semibold text-gray-900">Planos Anteriores</CardTitle>
-                  <CardDescription className="text-sm text-gray-600">{plans.length} planos gerados</CardDescription>
+                  <CardTitle className="text-lg font-semibold text-foreground">Planos Anteriores</CardTitle>
+                  <CardDescription className="text-sm text-muted-foreground">{plans.length} planos gerados</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-2">
                   {plans.map((plan) => (
@@ -221,17 +221,17 @@ export default function WeeklyPlanPage() {
                       onClick={() => setSelectedPlan(plan)}
                       className={`p-3 rounded-lg border cursor-pointer transition-all ${
                         selectedPlan.id === plan.id
-                          ? 'border-teal-300 bg-teal-50 shadow-sm'
-                          : 'border-gray-200 hover:border-teal-200 hover:bg-teal-50/30'
+                          ? 'border-teal-300 dark:border-teal-700 bg-teal-50 dark:bg-teal-950/20 shadow-sm'
+                          : 'border-border hover:border-teal-200 dark:hover:border-teal-700 hover:bg-teal-50/30 dark:hover:bg-teal-950/30'
                       }`}
                     >
                       <div className="flex items-center gap-2 mb-1.5">
-                        <Calendar className="h-4 w-4 text-teal-600" />
-                        <p className="text-sm font-semibold text-gray-900">
+                        <Calendar className="h-4 w-4 text-teal-600 dark:text-teal-400" />
+                        <p className="text-sm font-semibold text-foreground">
                           {format(new Date(plan.weekStartDate), 'dd/MM/yyyy', { locale: ptBR })}
                         </p>
                       </div>
-                      <p className="text-xs text-gray-500">
+                      <p className="text-xs text-muted-foreground">
                         {format(new Date(plan.createdAt), "dd/MM 'às' HH:mm", { locale: ptBR })}
                       </p>
                     </div>
@@ -248,15 +248,15 @@ export default function WeeklyPlanPage() {
               <CardHeader className="pb-4">
                 <div className="flex items-start justify-between">
                   <div>
-                    <CardTitle className="text-lg font-semibold text-gray-900">
+                    <CardTitle className="text-lg font-semibold text-foreground">
                       Semana de {format(new Date(selectedPlan.weekStartDate), "dd 'de' MMMM", { locale: ptBR })}
                     </CardTitle>
-                    <CardDescription className="text-sm text-gray-600 mt-1">
+                    <CardDescription className="text-sm text-muted-foreground mt-1">
                       Gerado em: {format(new Date(selectedPlan.createdAt), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
                       {selectedPlan.agentName && ` • ${selectedPlan.agentName}`}
                     </CardDescription>
                   </div>
-                  <Button onClick={() => window.print()} variant="outline" className="text-gray-700">
+                  <Button onClick={() => window.print()} variant="outline" className="text-foreground">
                     Imprimir
                   </Button>
                 </div>
@@ -265,20 +265,20 @@ export default function WeeklyPlanPage() {
 
             {/* Tabs for Different Sections */}
             <Tabs defaultValue="supplements" className="w-full">
-              <TabsList className="grid w-full grid-cols-4 bg-gray-100">
-                <TabsTrigger value="supplements" className="gap-2 data-[state=active]:bg-purple-600 data-[state=active]:text-white">
+              <TabsList className="grid w-full grid-cols-4 bg-muted">
+                <TabsTrigger value="supplements" className="gap-2 data-[state=active]:bg-purple-600 dark:data-[state=active]:bg-purple-500 data-[state=active]:text-white">
                   <Pill className="h-4 w-4" />
                   Suplementação
                 </TabsTrigger>
-                <TabsTrigger value="shopping" className="gap-2 data-[state=active]:bg-sky-600 data-[state=active]:text-white">
+                <TabsTrigger value="shopping" className="gap-2 data-[state=active]:bg-sky-600 dark:data-[state=active]:bg-sky-500 data-[state=active]:text-white">
                   <ShoppingCart className="h-4 w-4" />
                   Compras
                 </TabsTrigger>
-                <TabsTrigger value="meals" className="gap-2 data-[state=active]:bg-orange-600 data-[state=active]:text-white">
+                <TabsTrigger value="meals" className="gap-2 data-[state=active]:bg-orange-600 dark:data-[state=active]:bg-orange-500 data-[state=active]:text-white">
                   <UtensilsCrossed className="h-4 w-4" />
                   Refeições
                 </TabsTrigger>
-                <TabsTrigger value="workout" className="gap-2 data-[state=active]:bg-emerald-600 data-[state=active]:text-white">
+                <TabsTrigger value="workout" className="gap-2 data-[state=active]:bg-emerald-600 dark:data-[state=active]:bg-emerald-500 data-[state=active]:text-white">
                   <Dumbbell className="h-4 w-4" />
                   Treinos
                 </TabsTrigger>
@@ -288,29 +288,29 @@ export default function WeeklyPlanPage() {
               <TabsContent value="supplements" className="mt-6 space-y-6">
                 <Card className="hover:shadow-md transition-shadow">
                   <CardHeader className="pb-4">
-                    <CardTitle className="text-lg font-semibold text-gray-900">Estratégia de Suplementação</CardTitle>
-                    <CardDescription className="text-sm text-gray-600 mt-1 leading-relaxed">
+                    <CardTitle className="text-lg font-semibold text-foreground">Estratégia de Suplementação</CardTitle>
+                    <CardDescription className="text-sm text-muted-foreground mt-1 leading-relaxed">
                       {selectedPlan.supplementationStrategy.overview}
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     {selectedPlan.supplementationStrategy.supplements?.map((supplement: any, index: number) => (
-                      <div key={index} className="p-4 border border-gray-200 rounded-lg bg-white hover:border-purple-300 hover:bg-purple-50/30 transition-all">
+                      <div key={index} className="p-4 border border-border rounded-lg bg-card hover:border-purple-300 dark:hover:border-purple-700 hover:bg-purple-50/30 dark:hover:bg-purple-950/30 transition-all">
                         <div className="flex items-start justify-between mb-3">
-                          <h4 className="font-semibold text-base text-gray-900">{supplement.name}</h4>
-                          <Badge className="bg-purple-100 text-purple-700 border-purple-200">{supplement.dosage}</Badge>
+                          <h4 className="font-semibold text-base text-foreground">{supplement.name}</h4>
+                          <Badge className="bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-700">{supplement.dosage}</Badge>
                         </div>
                         <div className="space-y-2.5 text-sm">
                           <div className="flex items-center gap-2">
-                            <Clock className="h-4 w-4 text-gray-500 shrink-0" />
-                            <p className="text-gray-600">{supplement.timing}</p>
+                            <Clock className="h-4 w-4 text-muted-foreground shrink-0" />
+                            <p className="text-muted-foreground">{supplement.timing}</p>
                           </div>
                           <div className="flex items-start gap-2">
-                            <Target className="h-4 w-4 text-gray-500 shrink-0 mt-0.5" />
-                            <p className="text-gray-600 leading-relaxed">{supplement.purpose}</p>
+                            <Target className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
+                            <p className="text-muted-foreground leading-relaxed">{supplement.purpose}</p>
                           </div>
                           {supplement.duration && (
-                            <p className="text-xs text-gray-500 mt-2">Duração: {supplement.duration}</p>
+                            <p className="text-xs text-muted-foreground mt-2">Duração: {supplement.duration}</p>
                           )}
                         </div>
                       </div>
@@ -321,13 +321,13 @@ export default function WeeklyPlanPage() {
                       <>
                         <Separator className="my-6" />
                         <div>
-                          <h4 className="font-semibold text-base text-gray-900 mb-4">Suporte Hormonal</h4>
+                          <h4 className="font-semibold text-base text-foreground mb-4">Suporte Hormonal</h4>
                           <div className="space-y-3">
                             {selectedPlan.supplementationStrategy.hormonalSupport.map((hormone: any, index: number) => (
-                              <div key={index} className="p-4 border border-purple-200 rounded-lg bg-white hover:bg-purple-50/30 transition-colors">
-                                <h5 className="font-semibold text-sm text-gray-900">{hormone.hormone}</h5>
-                                <p className="text-sm text-gray-700 mt-2 leading-relaxed">{hormone.strategy}</p>
-                                <p className="text-xs text-gray-600 mt-2">
+                              <div key={index} className="p-4 border border-purple-200 dark:border-purple-700 rounded-lg bg-card hover:bg-purple-50/30 dark:hover:bg-purple-950/30 transition-colors">
+                                <h5 className="font-semibold text-sm text-foreground">{hormone.hormone}</h5>
+                                <p className="text-sm text-foreground mt-2 leading-relaxed">{hormone.strategy}</p>
+                                <p className="text-xs text-muted-foreground mt-2">
                                   Monitoramento: {hormone.monitoring}
                                 </p>
                               </div>
@@ -342,12 +342,12 @@ export default function WeeklyPlanPage() {
                       <>
                         <Separator className="my-6" />
                         <div>
-                          <h4 className="font-semibold text-base text-gray-900 mb-4">Exames Recomendados para o Próximo Ciclo</h4>
+                          <h4 className="font-semibold text-base text-foreground mb-4">Exames Recomendados para o Próximo Ciclo</h4>
                           <ul className="space-y-2.5">
                             {selectedPlan.supplementationStrategy.nextExamRecommendations.map((exam: string, index: number) => (
                               <li key={index} className="flex items-start gap-2.5 text-sm">
                                 <span className="text-teal-600 mt-0.5">•</span>
-                                <span className="text-gray-700 leading-relaxed">{exam}</span>
+                                <span className="text-foreground leading-relaxed">{exam}</span>
                               </li>
                             ))}
                           </ul>
@@ -362,11 +362,11 @@ export default function WeeklyPlanPage() {
               <TabsContent value="shopping" className="mt-6">
                 <Card className="hover:shadow-md transition-shadow">
                   <CardHeader className="pb-4">
-                    <CardTitle className="text-lg font-semibold text-gray-900">Lista de Compras</CardTitle>
-                    <CardDescription className="text-sm text-gray-600 mt-1 leading-relaxed">{selectedPlan.shoppingList.overview}</CardDescription>
+                    <CardTitle className="text-lg font-semibold text-foreground">Lista de Compras</CardTitle>
+                    <CardDescription className="text-sm text-muted-foreground mt-1 leading-relaxed">{selectedPlan.shoppingList.overview}</CardDescription>
                     {selectedPlan.shoppingList.estimatedCost && (
-                      <div className="mt-3 p-3 bg-sky-50 border border-sky-200 rounded-lg space-y-2">
-                        <p className="text-sm text-sky-900 leading-relaxed font-medium">
+                      <div className="mt-3 p-3 bg-sky-50 dark:bg-sky-950/20 border border-sky-200 dark:border-sky-800 rounded-lg space-y-2">
+                        <p className="text-sm text-sky-900 dark:text-sky-100 leading-relaxed font-medium">
                           {selectedPlan.shoppingList.estimatedCost}
                         </p>
                       </div>
@@ -375,8 +375,8 @@ export default function WeeklyPlanPage() {
                   <CardContent className="space-y-6">
                     {selectedPlan.shoppingList.categories?.map((category: any, index: number) => (
                       <div key={index}>
-                        <h4 className="font-semibold text-base text-gray-900 mb-4 flex items-center gap-2">
-                          <ShoppingCart className="h-5 w-5 text-sky-600" />
+                        <h4 className="font-semibold text-base text-foreground mb-4 flex items-center gap-2">
+                          <ShoppingCart className="h-5 w-5 text-sky-600 dark:text-sky-400" />
                           {category.category}
                         </h4>
                         <div className="grid gap-3 md:grid-cols-2">
@@ -385,20 +385,20 @@ export default function WeeklyPlanPage() {
                               key={itemIndex}
                               className={`p-4 border rounded-lg transition-all ${
                                 item.priority === 'high'
-                                  ? 'border-red-200 bg-white hover:bg-red-50/30'
+                                  ? 'border-red-200 dark:border-red-800 bg-card hover:bg-red-50/30 dark:hover:bg-red-950/30'
                                   : item.priority === 'medium'
-                                  ? 'border-amber-200 bg-white hover:bg-amber-50/30'
-                                  : 'border-gray-200 bg-white hover:border-sky-300 hover:bg-sky-50/30'
+                                  ? 'border-amber-200 dark:border-amber-800 bg-card hover:bg-amber-50/30 dark:hover:bg-amber-950/30'
+                                  : 'border-border bg-card hover:border-sky-300 dark:hover:border-sky-700 hover:bg-sky-50/30 dark:hover:bg-sky-950/30'
                               }`}
                             >
                               <div className="flex items-start justify-between mb-2">
-                                <p className="font-semibold text-sm text-gray-900">{item.item}</p>
+                                <p className="font-semibold text-sm text-foreground">{item.item}</p>
                                 {item.priority && (
                                   <Badge
                                     className={`text-xs ${
                                       item.priority === 'high'
-                                        ? 'bg-red-100 text-red-700 border-red-200'
-                                        : 'bg-amber-100 text-amber-700 border-amber-200'
+                                        ? 'bg-red-100 dark:bg-red-950/30 text-red-700 dark:text-red-300 border-red-200 dark:border-red-700'
+                                        : 'bg-amber-100 dark:bg-amber-950/30 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-700'
                                     }`}
                                   >
                                     {item.priority}
@@ -406,10 +406,10 @@ export default function WeeklyPlanPage() {
                                 )}
                               </div>
                               {item.quantity && (
-                                <p className="text-sm text-gray-600 mt-1">{item.quantity}</p>
+                                <p className="text-sm text-muted-foreground mt-1">{item.quantity}</p>
                               )}
                               {item.notes && (
-                                <p className="text-xs text-gray-500 mt-2 italic leading-relaxed">{item.notes}</p>
+                                <p className="text-xs text-muted-foreground mt-2 italic leading-relaxed">{item.notes}</p>
                               )}
                             </div>
                           ))}
@@ -421,11 +421,11 @@ export default function WeeklyPlanPage() {
                     {selectedPlan.shoppingList.tips && selectedPlan.shoppingList.tips.length > 0 && (
                       <>
                         <Separator className="my-6" />
-                        <div className="border border-sky-200 rounded-lg p-4 bg-white hover:bg-sky-50/30 transition-colors">
-                          <h4 className="font-semibold text-base text-gray-900 mb-3">Dicas de Compra</h4>
+                        <div className="border border-sky-200 dark:border-sky-800 rounded-lg p-4 bg-card hover:bg-sky-50/30 dark:hover:bg-sky-950/30 transition-colors">
+                          <h4 className="font-semibold text-base text-foreground mb-3">Dicas de Compra</h4>
                           <ul className="space-y-2">
                             {selectedPlan.shoppingList.tips.map((tip: string, index: number) => (
-                              <li key={index} className="text-sm text-gray-700 flex items-start gap-2.5 leading-relaxed">
+                              <li key={index} className="text-sm text-foreground flex items-start gap-2.5 leading-relaxed">
                                 <span className="text-sky-600 mt-0.5">•</span>
                                 {tip}
                               </li>
@@ -450,10 +450,10 @@ export default function WeeklyPlanPage() {
             </Tabs>
 
             {/* Disclaimer */}
-            <Card className="mt-6 border-amber-200 bg-white hover:shadow-md transition-shadow">
+            <Card className="mt-6 border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/20 hover:shadow-md transition-shadow">
               <CardContent className="p-5">
-                <p className="text-sm text-gray-700 leading-relaxed">
-                  <strong className="text-amber-700">⚠️ Aviso Importante:</strong> Este plano semanal é educacional e <strong>NÃO substitui acompanhamento médico, nutricional ou de educador físico profissional</strong>. Sempre consulte profissionais de saúde antes de iniciar qualquer suplementação, mudança alimentar ou programa de exercícios.
+                <p className="text-sm text-foreground leading-relaxed">
+                  <strong className="text-amber-700 dark:text-amber-400">⚠️ Aviso Importante:</strong> Este plano semanal é educacional e <strong>NÃO substitui acompanhamento médico, nutricional ou de educador físico profissional</strong>. Sempre consulte profissionais de saúde antes de iniciar qualquer suplementação, mudança alimentar ou programa de exercícios.
                 </p>
               </CardContent>
             </Card>

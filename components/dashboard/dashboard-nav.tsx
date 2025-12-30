@@ -9,7 +9,20 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Button } from '@/components/ui/button'
-import { Menu, Heart, LogOut, User } from 'lucide-react'
+import {
+  Menu,
+  Heart,
+  LogOut,
+  User,
+  Home,
+  FileText,
+  FolderOpen,
+  TrendingUp,
+  Calendar,
+  GitCompare,
+  Coins,
+  Sparkles,
+} from 'lucide-react'
 import { handleSignOut } from '@/app/actions/auth'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
 import { CreditBadge } from '@/components/credits/credit-badge'
@@ -30,22 +43,37 @@ export function DashboardNav({ userName, userRole }: DashboardNavProps) {
   const [isOpen, setIsOpen] = useState(false)
   const pathname = usePathname()
 
-  // Admin users only see Admin link, others see regular dashboard links
-  const navLinks = userRole === 'admin'
+  // Desktop navigation (all links) - shown on lg+ screens
+  const desktopNavLinks = userRole === 'admin'
     ? [
-        { href: '/admin', label: 'Admin' },
-        { href: '/admin/credits', label: 'Créditos' },
+        { href: '/admin', label: 'Admin', icon: Home },
+        { href: '/admin/credits', label: 'Créditos', icon: Coins },
       ]
     : [
-        { href: '/dashboard', label: 'Dashboard' },
-        { href: '/analyze', label: 'Análise' },
-        { href: '/analyze-complete', label: 'Análise Completa' },
-        { href: '/recommendations', label: 'Recomendações' },
-        { href: '/weekly-plan', label: 'Plano Semanal' },
-        { href: '/compare', label: 'Comparar' },
-        { href: '/documents', label: 'Documentos' },
-        { href: '/dashboard/credits', label: 'Créditos' },
-        { href: '/profile', label: 'Perfil' },
+        { href: '/dashboard', label: 'Dashboard', icon: Home },
+        { href: '/analyze', label: 'Análise', icon: FileText },
+        { href: '/analyze-complete', label: 'Análise Completa', icon: Sparkles },
+        { href: '/recommendations', label: 'Recomendações', icon: TrendingUp },
+        { href: '/weekly-plan', label: 'Plano Semanal', icon: Calendar },
+        { href: '/compare', label: 'Comparar', icon: GitCompare },
+        { href: '/documents', label: 'Documentos', icon: FolderOpen },
+        { href: '/dashboard/credits', label: 'Créditos', icon: Coins },
+        { href: '/profile', label: 'Perfil', icon: User },
+      ]
+
+  // Mobile menu navigation (secondary actions only - primary ones are in BottomNav)
+  const mobileMenuLinks = userRole === 'admin'
+    ? [
+        { href: '/admin', label: 'Admin', icon: Home },
+        { href: '/admin/credits', label: 'Créditos', icon: Coins },
+      ]
+    : [
+        { href: '/analyze', label: 'Análise', icon: FileText },
+        { href: '/analyze-complete', label: 'Análise Completa', icon: Sparkles },
+        { href: '/recommendations', label: 'Recomendações', icon: TrendingUp },
+        { href: '/weekly-plan', label: 'Plano Semanal', icon: Calendar },
+        { href: '/compare', label: 'Comparar', icon: GitCompare },
+        { href: '/dashboard/credits', label: 'Créditos', icon: Coins },
       ]
 
   const isActive = (href: string) => pathname === href
@@ -64,19 +92,23 @@ export function DashboardNav({ userName, userRole }: DashboardNavProps) {
 
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex gap-1">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                  isActive(link.href)
-                    ? 'bg-accent text-accent-foreground'
-                    : 'text-muted-foreground hover:text-foreground hover:bg-muted'
-                }`}
-              >
-                {link.label}
-              </Link>
-            ))}
+            {desktopNavLinks.map((link) => {
+              const Icon = link.icon
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                    isActive(link.href)
+                      ? 'bg-accent text-accent-foreground'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                  }`}
+                >
+                  <Icon className="h-4 w-4" />
+                  {link.label}
+                </Link>
+              )
+            })}
           </nav>
         </div>
 
@@ -123,7 +155,7 @@ export function DashboardNav({ userName, userRole }: DashboardNavProps) {
                 <span className="sr-only">Abrir menu</span>
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="w-64">
+            <SheetContent side="right" className="w-80">
               <SheetHeader>
                 <SheetTitle className="flex items-center gap-2">
                   <Heart className="h-5 w-5 text-primary" />
@@ -132,37 +164,55 @@ export function DashboardNav({ userName, userRole }: DashboardNavProps) {
               </SheetHeader>
               <div className="mt-6 flex flex-col gap-4">
                 {/* User Info Card */}
-                <div className="p-3 rounded-lg bg-accent border border-border">
-                  <div className="flex items-center justify-between mb-2">
-                    <div>
+                <div className="p-4 rounded-lg bg-accent border border-border">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+                      <User className="h-5 w-5 text-primary" />
+                    </div>
+                    <div className="flex-1">
                       <p className="text-sm font-semibold text-foreground">{userName}</p>
                       <p className="text-xs text-muted-foreground capitalize mt-0.5">{userRole}</p>
                     </div>
-                    {userRole !== 'admin' && <CreditBadge />}
                   </div>
+                  {userRole !== 'admin' && (
+                    <div className="pt-3 border-t border-border/50">
+                      <CreditBadge />
+                    </div>
+                  )}
                 </div>
 
-                {/* Mobile Navigation Links */}
-                <nav className="flex flex-col gap-1">
-                  {navLinks.map((link) => (
-                    <Link
-                      key={link.href}
-                      href={link.href}
-                      onClick={() => setIsOpen(false)}
-                      className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                        isActive(link.href)
-                          ? 'bg-accent text-accent-foreground'
-                          : 'text-muted-foreground hover:bg-muted'
-                      }`}
-                    >
-                      {link.label}
-                    </Link>
-                  ))}
-                </nav>
+                {/* Mobile Navigation Links - Secondary only */}
+                {mobileMenuLinks.length > 0 && (
+                  <>
+                    <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide px-1">
+                      Mais Opções
+                    </div>
+                    <nav className="flex flex-col gap-1">
+                      {mobileMenuLinks.map((link) => {
+                        const Icon = link.icon
+                        return (
+                          <Link
+                            key={link.href}
+                            href={link.href}
+                            onClick={() => setIsOpen(false)}
+                            className={`flex items-center gap-3 px-4 py-3 rounded-md text-sm font-medium transition-colors min-h-[44px] ${
+                              isActive(link.href)
+                                ? 'bg-accent text-accent-foreground'
+                                : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                            }`}
+                          >
+                            <Icon className="h-5 w-5 flex-shrink-0" />
+                            <span>{link.label}</span>
+                          </Link>
+                        )
+                      })}
+                    </nav>
+                  </>
+                )}
 
                 {/* Theme Toggle Mobile */}
                 <div className="pt-4 border-t">
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between px-1">
                     <span className="text-sm font-medium text-foreground">Tema</span>
                     <ThemeToggle />
                   </div>
@@ -174,7 +224,7 @@ export function DashboardNav({ userName, userRole }: DashboardNavProps) {
                     <Button
                       type="submit"
                       variant="outline"
-                      className="w-full"
+                      className="w-full h-11"
                     >
                       <LogOut className="h-4 w-4 mr-2" />
                       Sair

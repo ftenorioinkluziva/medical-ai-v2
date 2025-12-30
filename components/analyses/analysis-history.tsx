@@ -106,8 +106,8 @@ export function AnalysisHistory({ onViewAnalysis }: AnalysisHistoryProps) {
 
   if (error) {
     return (
-      <Card className="p-12 border-red-200 bg-red-50">
-        <div className="flex flex-col items-center gap-3 text-red-600">
+      <Card className="p-12 border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950/20">
+        <div className="flex flex-col items-center gap-3 text-red-600 dark:text-red-400">
           <AlertCircle className="h-8 w-8" />
           <p className="font-medium">Erro ao carregar histórico</p>
           <p className="text-sm">{error}</p>

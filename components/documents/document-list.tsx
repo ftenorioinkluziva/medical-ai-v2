@@ -80,9 +80,9 @@ export function DocumentList({ onSelectDocument, refreshTrigger }: {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'completed':
-        return <Badge variant="default" className="bg-green-600">Processado</Badge>
+        return <Badge variant="default" className="bg-green-600 dark:bg-green-700">Processado</Badge>
       case 'processing':
-        return <Badge variant="default" className="bg-yellow-600">Processando</Badge>
+        return <Badge variant="default" className="bg-yellow-600 dark:bg-yellow-700">Processando</Badge>
       case 'failed':
         return <Badge variant="destructive">Falhou</Badge>
       default:

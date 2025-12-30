@@ -161,7 +161,7 @@ export function DocumentUploadWidget({ onUploadComplete, patientId }: DocumentUp
     <Card className="hover:shadow-md transition-shadow">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-lg">
-          <Upload className="h-5 w-5 text-teal-600" />
+          <Upload className="h-5 w-5 text-teal-600 dark:text-teal-400" />
           Upload de Documentos
         </CardTitle>
         <CardDescription>
@@ -173,8 +173,8 @@ export function DocumentUploadWidget({ onUploadComplete, patientId }: DocumentUp
         <div
           className={`
             border-2 border-dashed rounded-lg p-6 text-center transition-colors cursor-pointer
-            ${isDragging ? 'border-teal-500 bg-teal-50' : 'border-gray-300 hover:border-teal-400'}
-            ${file ? 'bg-gray-50' : ''}
+            ${isDragging ? 'border-teal-500 dark:border-teal-400 bg-teal-50 dark:bg-teal-950/20' : 'border-border hover:border-teal-400 dark:hover:border-teal-500'}
+            ${file ? 'bg-muted' : ''}
           `}
           onDragEnter={handleDragEnter}
           onDragOver={handleDragOver}
@@ -184,12 +184,12 @@ export function DocumentUploadWidget({ onUploadComplete, patientId }: DocumentUp
         >
           {!file ? (
             <div className="space-y-3">
-              <Upload className="mx-auto h-10 w-10 text-gray-400" />
+              <Upload className="mx-auto h-10 w-10 text-muted-foreground" />
               <div>
-                <p className="text-sm font-medium text-gray-700">
+                <p className="text-sm font-medium text-foreground">
                   Arraste e solte seu arquivo aqui
                 </p>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-muted-foreground mt-1">
                   PDF ou Imagens • Máx 10MB
                 </p>
               </div>
@@ -203,10 +203,10 @@ export function DocumentUploadWidget({ onUploadComplete, patientId }: DocumentUp
             </div>
           ) : (
             <div className="space-y-3">
-              <File className="mx-auto h-10 w-10 text-teal-600" />
+              <File className="mx-auto h-10 w-10 text-teal-600 dark:text-teal-400" />
               <div>
-                <p className="text-sm font-medium text-gray-900 truncate">{file.name}</p>
-                <p className="text-xs text-gray-500">
+                <p className="text-sm font-medium text-foreground truncate">{file.name}</p>
+                <p className="text-xs text-muted-foreground">
                   {(file.size / 1024).toFixed(0)} KB
                 </p>
               </div>
@@ -220,7 +220,7 @@ export function DocumentUploadWidget({ onUploadComplete, patientId }: DocumentUp
         {/* Document Type Selection */}
         {file && !uploadResult && (
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">Tipo de Documento</label>
+            <label className="text-sm font-medium text-foreground">Tipo de Documento</label>
             <Select value={documentType} onValueChange={setDocumentType}>
               <SelectTrigger>
                 <SelectValue />

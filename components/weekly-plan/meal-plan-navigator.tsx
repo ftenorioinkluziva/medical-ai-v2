@@ -91,11 +91,11 @@ export function MealPlanNavigator({ mealPlan }: MealPlanNavigatorProps) {
   return (
     <Card className="hover:shadow-md transition-shadow">
       <CardHeader className="pb-4">
-        <CardTitle className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+        <CardTitle className="text-lg font-semibold text-foreground flex items-center gap-2">
           <UtensilsCrossed className="h-5 w-5 text-orange-600" />
           Plano de Refeições
         </CardTitle>
-        <CardDescription className="text-sm text-gray-600 mt-1 leading-relaxed">
+        <CardDescription className="text-sm text-muted-foreground mt-1 leading-relaxed">
           {mealPlan.overview}
         </CardDescription>
         {(mealPlan.dailyCalories || mealPlan.macros) && (
@@ -142,7 +142,7 @@ export function MealPlanNavigator({ mealPlan }: MealPlanNavigatorProps) {
               onValueChange={(value) => setSelectedDayIndex(parseInt(value))}
               className="w-full"
             >
-              <TabsList className="grid w-full grid-cols-7 bg-gray-100">
+              <TabsList className="grid w-full grid-cols-7 bg-muted">
                 {mealPlan.meals.map((day, index) => (
                   <TabsTrigger
                     key={index}
@@ -169,9 +169,9 @@ export function MealPlanNavigator({ mealPlan }: MealPlanNavigatorProps) {
         </div>
 
         {/* Selected Day Content */}
-        <div className="border-2 border-orange-200 rounded-lg p-6 bg-linear-to-br from-white to-orange-50/30">
+        <div className="border-2 border-orange-200 dark:border-orange-800 rounded-lg p-6 bg-gradient-to-br from-card to-orange-50/30 dark:to-orange-950/20">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-bold text-gray-900">{selectedDay.day}</h3>
+            <h3 className="text-xl font-bold text-foreground">{selectedDay.day}</h3>
             <Badge className="bg-orange-600 text-white text-sm">
               Dia {selectedDayIndex + 1} de {mealPlan.meals.length}
             </Badge>
@@ -179,7 +179,7 @@ export function MealPlanNavigator({ mealPlan }: MealPlanNavigatorProps) {
 
           <div className="grid gap-4 md:grid-cols-2">
             {/* Breakfast Card */}
-            <Card className="border-2 border-amber-200 bg-white hover:shadow-md transition-shadow">
+            <Card className="border-2 border-amber-200 bg-card hover:shadow-md transition-shadow">
               <CardHeader className="pb-3">
                 <CardTitle className="text-base font-semibold text-amber-600 flex items-center gap-2">
                   <Sunrise className="h-5 w-5" />
@@ -187,8 +187,8 @@ export function MealPlanNavigator({ mealPlan }: MealPlanNavigatorProps) {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                <p className="font-semibold text-gray-900">{selectedDay.breakfast.name}</p>
-                <div className="flex gap-3 text-xs text-gray-600">
+                <p className="font-semibold text-foreground">{selectedDay.breakfast.name}</p>
+                <div className="flex gap-3 text-xs text-muted-foreground">
                   {selectedDay.breakfast.calories && (
                     <span className="flex items-center gap-1">
                       <Flame className="h-3 w-3" />
@@ -203,7 +203,7 @@ export function MealPlanNavigator({ mealPlan }: MealPlanNavigatorProps) {
                   )}
                 </div>
                 <Separator />
-                <ul className="text-sm text-gray-600 space-y-1 leading-relaxed">
+                <ul className="text-sm text-muted-foreground space-y-1 leading-relaxed">
                   {selectedDay.breakfast.ingredients.map((ing: string, i: number) => (
                     <li key={i} className="flex items-start gap-2">
                       <span className="text-amber-600 mt-0.5">•</span>
@@ -215,7 +215,7 @@ export function MealPlanNavigator({ mealPlan }: MealPlanNavigatorProps) {
             </Card>
 
             {/* Lunch Card */}
-            <Card className="border-2 border-emerald-200 bg-white hover:shadow-md transition-shadow">
+            <Card className="border-2 border-emerald-200 bg-card hover:shadow-md transition-shadow">
               <CardHeader className="pb-3">
                 <CardTitle className="text-base font-semibold text-emerald-600 flex items-center gap-2">
                   <Sun className="h-5 w-5" />
@@ -223,8 +223,8 @@ export function MealPlanNavigator({ mealPlan }: MealPlanNavigatorProps) {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                <p className="font-semibold text-gray-900">{selectedDay.lunch.name}</p>
-                <div className="flex gap-3 text-xs text-gray-600">
+                <p className="font-semibold text-foreground">{selectedDay.lunch.name}</p>
+                <div className="flex gap-3 text-xs text-muted-foreground">
                   {selectedDay.lunch.calories && (
                     <span className="flex items-center gap-1">
                       <Flame className="h-3 w-3" />
@@ -239,7 +239,7 @@ export function MealPlanNavigator({ mealPlan }: MealPlanNavigatorProps) {
                   )}
                 </div>
                 <Separator />
-                <ul className="text-sm text-gray-600 space-y-1 leading-relaxed">
+                <ul className="text-sm text-muted-foreground space-y-1 leading-relaxed">
                   {selectedDay.lunch.ingredients.map((ing: string, i: number) => (
                     <li key={i} className="flex items-start gap-2">
                       <span className="text-emerald-600 mt-0.5">•</span>
@@ -251,7 +251,7 @@ export function MealPlanNavigator({ mealPlan }: MealPlanNavigatorProps) {
             </Card>
 
             {/* Dinner Card */}
-            <Card className="border-2 border-sky-200 bg-white hover:shadow-md transition-shadow">
+            <Card className="border-2 border-sky-200 bg-card hover:shadow-md transition-shadow">
               <CardHeader className="pb-3">
                 <CardTitle className="text-base font-semibold text-sky-600 flex items-center gap-2">
                   <Moon className="h-5 w-5" />
@@ -259,8 +259,8 @@ export function MealPlanNavigator({ mealPlan }: MealPlanNavigatorProps) {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                <p className="font-semibold text-gray-900">{selectedDay.dinner.name}</p>
-                <div className="flex gap-3 text-xs text-gray-600">
+                <p className="font-semibold text-foreground">{selectedDay.dinner.name}</p>
+                <div className="flex gap-3 text-xs text-muted-foreground">
                   {selectedDay.dinner.calories && (
                     <span className="flex items-center gap-1">
                       <Flame className="h-3 w-3" />
@@ -275,7 +275,7 @@ export function MealPlanNavigator({ mealPlan }: MealPlanNavigatorProps) {
                   )}
                 </div>
                 <Separator />
-                <ul className="text-sm text-gray-600 space-y-1 leading-relaxed">
+                <ul className="text-sm text-muted-foreground space-y-1 leading-relaxed">
                   {selectedDay.dinner.ingredients.map((ing: string, i: number) => (
                     <li key={i} className="flex items-start gap-2">
                       <span className="text-sky-600 mt-0.5">•</span>
@@ -288,7 +288,7 @@ export function MealPlanNavigator({ mealPlan }: MealPlanNavigatorProps) {
 
             {/* Snacks Card */}
             {selectedDay.snacks && selectedDay.snacks.length > 0 && (
-              <Card className="border-2 border-purple-200 bg-white hover:shadow-md transition-shadow">
+              <Card className="border-2 border-purple-200 bg-card hover:shadow-md transition-shadow">
                 <CardHeader className="pb-3">
                   <CardTitle className="text-base font-semibold text-purple-600 flex items-center gap-2">
                     <Apple className="h-5 w-5" />
@@ -298,8 +298,8 @@ export function MealPlanNavigator({ mealPlan }: MealPlanNavigatorProps) {
                 <CardContent className="space-y-3">
                   {selectedDay.snacks.map((snack: any, i: number) => (
                     <div key={i} className="pb-3 last:pb-0 border-b last:border-0">
-                      <p className="font-semibold text-gray-900 text-sm">{snack.name}</p>
-                      <div className="flex items-center gap-3 text-xs text-gray-600 mt-1">
+                      <p className="font-semibold text-foreground text-sm">{snack.name}</p>
+                      <div className="flex items-center gap-3 text-xs text-muted-foreground mt-1">
                         <span className="flex items-center gap-1">
                           <Clock className="h-3 w-3" />
                           {snack.timing}
@@ -323,12 +323,12 @@ export function MealPlanNavigator({ mealPlan }: MealPlanNavigatorProps) {
         {mealPlan.mealPrepTips && mealPlan.mealPrepTips.length > 0 && (
           <>
             <Separator className="my-6" />
-            <div className="border border-orange-200 rounded-lg p-4 bg-white hover:bg-orange-50/30 transition-colors">
-              <h4 className="font-semibold text-base text-gray-900 mb-3">Dicas de Meal Prep</h4>
+            <div className="border border-orange-200 dark:border-orange-800 rounded-lg p-4 bg-card hover:bg-orange-50/30 dark:hover:bg-orange-950/30 transition-colors">
+              <h4 className="font-semibold text-base text-foreground mb-3">Dicas de Meal Prep</h4>
               <ul className="space-y-2">
                 {mealPlan.mealPrepTips.map((tip: string, index: number) => (
-                  <li key={index} className="text-sm text-gray-700 flex items-start gap-2.5 leading-relaxed">
-                    <span className="text-orange-600 mt-0.5">•</span>
+                  <li key={index} className="text-sm text-foreground flex items-start gap-2.5 leading-relaxed">
+                    <span className="text-orange-600 dark:text-orange-400 mt-0.5">•</span>
                     {tip}
                   </li>
                 ))}

@@ -86,9 +86,9 @@ export function DocumentSelector({ selectedDocuments, onSelectionChange }: Docum
 
   if (error) {
     return (
-      <Card className="border-red-200 bg-red-50">
+      <Card className="border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950/20">
         <CardContent className="p-6">
-          <p className="text-red-600">Erro: {error}</p>
+          <p className="text-red-600 dark:text-red-400">Erro: {error}</p>
         </CardContent>
       </Card>
     )
@@ -138,7 +138,7 @@ export function DocumentSelector({ selectedDocuments, onSelectionChange }: Docum
                     flex items-start gap-4 p-4 rounded-lg border-2 cursor-pointer transition-all
                     ${isSelected
                       ? 'border-primary bg-primary/5'
-                      : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                      : 'border-border hover:border-border/80 hover:bg-muted'
                     }
                   `}
                 >

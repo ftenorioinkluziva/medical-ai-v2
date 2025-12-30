@@ -140,7 +140,7 @@ export function RecommendationsWidget({ patientId }: RecommendationsWidgetProps 
         <CardContent className="flex items-center justify-center py-12">
           <div className="text-center space-y-3">
             <Loader2 className="h-8 w-8 animate-spin mx-auto text-teal-600" />
-            <p className="text-gray-600">Gerando recomendações personalizadas...</p>
+            <p className="text-muted-foreground">Gerando recomendações personalizadas...</p>
           </div>
         </CardContent>
       </Card>
@@ -221,7 +221,7 @@ export function RecommendationsWidget({ patientId }: RecommendationsWidgetProps 
             </CardDescription>
           </div>
           <Link href="/recommendations">
-            <Button variant="ghost" size="sm" className="gap-2 text-gray-600">
+            <Button variant="ghost" size="sm" className="gap-2 text-muted-foreground">
               <History className="h-4 w-4" />
               Histórico
             </Button>
@@ -230,17 +230,17 @@ export function RecommendationsWidget({ patientId }: RecommendationsWidgetProps 
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="exams" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="exams">
+          <TabsList className="grid w-full grid-cols-4 bg-muted">
+            <TabsTrigger value="exams" className="gap-2 data-[state=active]:!bg-sky-600 dark:data-[state=active]:!bg-sky-500 data-[state=active]:!text-white dark:data-[state=active]:!text-white">
               Exames ({recommendations.examRecommendations.length})
             </TabsTrigger>
-            <TabsTrigger value="lifestyle">
+            <TabsTrigger value="lifestyle" className="gap-2 data-[state=active]:!bg-teal-600 dark:data-[state=active]:!bg-teal-500 data-[state=active]:!text-white dark:data-[state=active]:!text-white">
               Lifestyle ({recommendations.lifestyleRecommendations.length})
             </TabsTrigger>
-            <TabsTrigger value="goals">
+            <TabsTrigger value="goals" className="gap-2 data-[state=active]:!bg-purple-600 dark:data-[state=active]:!bg-purple-500 data-[state=active]:!text-white dark:data-[state=active]:!text-white">
               Metas ({recommendations.healthGoals.length})
             </TabsTrigger>
-            <TabsTrigger value="alerts">
+            <TabsTrigger value="alerts" className="gap-2 data-[state=active]:!bg-amber-600 dark:data-[state=active]:!bg-amber-500 data-[state=active]:!text-white dark:data-[state=active]:!text-white">
               Alertas ({recommendations.alerts.length})
             </TabsTrigger>
           </TabsList>
@@ -248,14 +248,14 @@ export function RecommendationsWidget({ patientId }: RecommendationsWidgetProps 
           {/* Exams Tab */}
           <TabsContent value="exams" className="mt-6 space-y-3">
             {recommendations.examRecommendations.length === 0 ? (
-              <p className="text-sm text-gray-600 text-center py-8">
+              <p className="text-sm text-muted-foreground text-center py-8">
                 Nenhum exame recomendado no momento
               </p>
             ) : (
               recommendations.examRecommendations.map((exam, index) => (
                 <div
                   key={index}
-                  className="p-4 rounded-lg border border-gray-200 bg-white hover:border-sky-300 hover:bg-sky-50/30 transition-all"
+                  className="p-4 rounded-lg border border-border bg-card hover:border-sky-300 hover:bg-sky-50/30 transition-all"
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex items-start gap-3 flex-1">
@@ -263,15 +263,15 @@ export function RecommendationsWidget({ patientId }: RecommendationsWidgetProps 
                         <ClipboardList className="h-4 w-4 text-sky-700" />
                       </div>
                       <div className="flex-1">
-                        <h4 className="font-semibold text-gray-900">{exam.exam}</h4>
-                        <p className="text-sm text-gray-600 mt-1">{exam.reason}</p>
+                        <h4 className="font-semibold text-foreground">{exam.exam}</h4>
+                        <p className="text-sm text-muted-foreground mt-1">{exam.reason}</p>
                       </div>
                     </div>
                     <Badge variant={getUrgencyColor(exam.urgency) as any}>
                       {exam.urgency === 'high' ? 'Urgente' : exam.urgency === 'medium' ? 'Moderado' : 'Baixo'}
                     </Badge>
                   </div>
-                  <div className="flex items-center gap-2 text-xs text-gray-500 pl-11 mt-2">
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground pl-11 mt-2">
                     <Calendar className="h-3 w-3" />
                     {exam.suggestedTimeframe}
                   </div>
@@ -283,14 +283,14 @@ export function RecommendationsWidget({ patientId }: RecommendationsWidgetProps 
           {/* Lifestyle Tab */}
           <TabsContent value="lifestyle" className="mt-6 space-y-3">
             {recommendations.lifestyleRecommendations.length === 0 ? (
-              <p className="text-sm text-gray-600 text-center py-8">
+              <p className="text-sm text-muted-foreground text-center py-8">
                 Nenhuma recomendação de lifestyle no momento
               </p>
             ) : (
               recommendations.lifestyleRecommendations.map((lifestyle, index) => (
                 <div
                   key={index}
-                  className="p-4 rounded-lg border border-gray-200 bg-white hover:border-teal-300 hover:bg-teal-50/30 transition-all"
+                  className="p-4 rounded-lg border border-border bg-card hover:border-teal-300 hover:bg-teal-50/30 transition-all"
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex items-start gap-3 flex-1">
@@ -299,12 +299,12 @@ export function RecommendationsWidget({ patientId }: RecommendationsWidgetProps 
                       </div>
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
-                          <h4 className="font-semibold capitalize text-gray-900">{lifestyle.category}</h4>
+                          <h4 className="font-semibold capitalize text-foreground">{lifestyle.category}</h4>
                           <Badge variant="outline" className="text-xs">
                             {lifestyle.priority === 'high' ? 'Alta Prioridade' : lifestyle.priority === 'medium' ? 'Média' : 'Baixa'}
                           </Badge>
                         </div>
-                        <p className="text-sm text-gray-600">{lifestyle.recommendation}</p>
+                        <p className="text-sm text-muted-foreground">{lifestyle.recommendation}</p>
                         <p className="text-xs text-emerald-600 mt-2 flex items-center gap-1 font-medium">
                           <TrendingUp className="h-3 w-3" />
                           {lifestyle.expectedBenefit}
@@ -320,30 +320,30 @@ export function RecommendationsWidget({ patientId }: RecommendationsWidgetProps 
           {/* Goals Tab */}
           <TabsContent value="goals" className="mt-6 space-y-3">
             {recommendations.healthGoals.length === 0 ? (
-              <p className="text-sm text-gray-600 text-center py-8">
+              <p className="text-sm text-muted-foreground text-center py-8">
                 Nenhuma meta definida no momento
               </p>
             ) : (
               recommendations.healthGoals.map((goal, index) => (
                 <div
                   key={index}
-                  className="p-4 rounded-lg border border-gray-200 bg-white hover:border-purple-300 hover:bg-purple-50/30 transition-all"
+                  className="p-4 rounded-lg border border-border bg-card hover:border-purple-300 hover:bg-purple-50/30 transition-all"
                 >
                   <div className="flex items-start gap-3">
                     <div className="bg-purple-100 p-2 rounded-lg shrink-0">
                       <Target className="h-4 w-4 text-purple-700" />
                     </div>
                     <div className="flex-1">
-                      <h4 className="font-semibold text-gray-900">{goal.goal}</h4>
+                      <h4 className="font-semibold text-foreground">{goal.goal}</h4>
                       <div className="grid grid-cols-2 gap-2 mt-2 text-sm">
                         <div>
-                          <span className="text-gray-600 font-medium">Atual:</span> <span className="text-gray-900">{goal.currentStatus}</span>
+                          <span className="text-muted-foreground font-medium">Atual:</span> <span className="text-foreground">{goal.currentStatus}</span>
                         </div>
                         <div>
-                          <span className="text-gray-600 font-medium">Meta:</span> <span className="text-gray-900">{goal.targetValue}</span>
+                          <span className="text-muted-foreground font-medium">Meta:</span> <span className="text-foreground">{goal.targetValue}</span>
                         </div>
                       </div>
-                      <p className="text-xs text-gray-500 mt-1">
+                      <p className="text-xs text-muted-foreground mt-1">
                         Prazo: {goal.timeframe}
                       </p>
                     </div>
@@ -353,10 +353,10 @@ export function RecommendationsWidget({ patientId }: RecommendationsWidgetProps 
                     <>
                       <Separator className="my-3" />
                       <div className="space-y-2">
-                        <h5 className="text-sm font-semibold text-gray-900">Passos de Ação:</h5>
+                        <h5 className="text-sm font-semibold text-foreground">Passos de Ação:</h5>
                         <ul className="space-y-1">
                           {goal.actionSteps.map((step, stepIndex) => (
-                            <li key={stepIndex} className="text-sm text-gray-700 flex items-start gap-2">
+                            <li key={stepIndex} className="text-sm text-foreground flex items-start gap-2">
                               <CheckCircle2 className="h-4 w-4 text-emerald-600 mt-0.5 shrink-0" />
                               {step}
                             </li>
@@ -374,18 +374,18 @@ export function RecommendationsWidget({ patientId }: RecommendationsWidgetProps 
           <TabsContent value="alerts" className="mt-6 space-y-3">
             {recommendations.alerts.length === 0 ? (
               <div className="text-center py-8">
-                <div className="bg-emerald-50 rounded-lg p-4 mb-4 inline-block">
-                  <CheckCircle2 className="h-12 w-12 text-emerald-600" />
+                <div className="bg-emerald-50 dark:bg-emerald-950/20 rounded-lg p-4 mb-4 inline-block">
+                  <CheckCircle2 className="h-12 w-12 text-emerald-600 dark:text-emerald-400" />
                 </div>
-                <p className="text-sm font-semibold text-emerald-600">Tudo Ótimo!</p>
-                <p className="text-xs text-gray-600 mt-1">Nenhum alerta no momento</p>
+                <p className="text-sm font-semibold text-emerald-600 dark:text-emerald-400">Tudo Ótimo!</p>
+                <p className="text-xs text-muted-foreground mt-1">Nenhum alerta no momento</p>
               </div>
             ) : (
               recommendations.alerts.map((alert, index) => {
                 const alertConfig = {
-                  urgent: { bg: 'bg-red-50', border: 'border-red-200', iconBg: 'bg-red-100', color: 'text-red-600' },
-                  warning: { bg: 'bg-orange-50', border: 'border-orange-200', iconBg: 'bg-orange-100', color: 'text-orange-600' },
-                  info: { bg: 'bg-sky-50', border: 'border-sky-200', iconBg: 'bg-sky-100', color: 'text-sky-600' },
+                  urgent: { bg: 'bg-red-50 dark:bg-red-950/20', border: 'border-red-200 dark:border-red-800', iconBg: 'bg-red-100 dark:bg-red-900/30', color: 'text-red-600 dark:text-red-400' },
+                  warning: { bg: 'bg-orange-50 dark:bg-orange-950/20', border: 'border-orange-200 dark:border-orange-800', iconBg: 'bg-orange-100 dark:bg-orange-900/30', color: 'text-orange-600 dark:text-orange-400' },
+                  info: { bg: 'bg-sky-50 dark:bg-sky-950/20', border: 'border-sky-200 dark:border-sky-800', iconBg: 'bg-sky-100 dark:bg-sky-900/30', color: 'text-sky-600 dark:text-sky-400' },
                 }[alert.type]
 
                 return (
@@ -399,7 +399,7 @@ export function RecommendationsWidget({ patientId }: RecommendationsWidgetProps 
                       </div>
                       <div className="flex-1">
                         <p className={`font-semibold ${alertConfig.color}`}>{alert.message}</p>
-                        <p className="text-sm text-gray-600 mt-1">{alert.action}</p>
+                        <p className="text-sm text-muted-foreground mt-1">{alert.action}</p>
                       </div>
                     </div>
                   </div>
@@ -411,7 +411,7 @@ export function RecommendationsWidget({ patientId }: RecommendationsWidgetProps 
 
         {/* Disclaimer */}
         <div className="mt-6 pt-6 border-t">
-          <p className="text-xs text-gray-500 text-center">
+          <p className="text-xs text-muted-foreground text-center">
             ⚕️ Estas recomendações são educacionais e não substituem consulta médica profissional.
           </p>
         </div>

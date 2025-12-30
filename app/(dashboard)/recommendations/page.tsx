@@ -198,7 +198,7 @@ export default function RecommendationsHistoryPage() {
             Voltar
           </Button>
         </Link>
-        <Card className="border-red-200 bg-red-50">
+        <Card className="border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950/20">
           <CardContent className="p-6">
             <p className="text-red-600">{error}</p>
           </CardContent>
@@ -459,20 +459,20 @@ export default function RecommendationsHistoryPage() {
                           key={index}
                           className={`border rounded-lg p-4 space-y-2 ${
                             alert.type === 'urgent'
-                              ? 'bg-red-50 border-red-200'
+                              ? 'bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-800'
                               : alert.type === 'warning'
-                              ? 'bg-yellow-50 border-yellow-200'
-                              : 'bg-blue-50 border-blue-200'
+                              ? 'bg-yellow-50 dark:bg-yellow-950/20 border-yellow-200 dark:border-yellow-800'
+                              : 'bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800'
                           }`}
                         >
                           <div className="flex items-start gap-2">
                             <AlertCircle
                               className={`h-5 w-5 flex-shrink-0 ${
                                 alert.type === 'urgent'
-                                  ? 'text-red-600'
+                                  ? 'text-red-600 dark:text-red-400'
                                   : alert.type === 'warning'
-                                  ? 'text-yellow-600'
-                                  : 'text-blue-600'
+                                  ? 'text-yellow-600 dark:text-yellow-400'
+                                  : 'text-blue-600 dark:text-blue-400'
                               }`}
                             />
                             <div className="flex-1">
@@ -494,9 +494,9 @@ export default function RecommendationsHistoryPage() {
                 </Tabs>
 
                 {/* Disclaimer */}
-                <Card className="mt-6 bg-yellow-50 border-yellow-200">
+                <Card className="mt-6 bg-amber-50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-800">
                   <CardContent className="p-4">
-                    <p className="text-xs text-yellow-900">
+                    <p className="text-xs text-amber-900 dark:text-amber-100">
                       <strong>⚠️ Aviso Importante:</strong> Estas recomendações são educacionais
                       e <strong>NÃO substituem consulta médica profissional</strong>. Sempre consulte um profissional
                       de saúde qualificado.

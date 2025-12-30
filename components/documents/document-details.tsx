@@ -40,15 +40,15 @@ export function DocumentDetails({ document, onClose }: DocumentDetailsProps) {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'normal':
-        return 'bg-green-100 text-green-800 border-green-200'
+        return 'bg-green-100 dark:bg-green-950/30 text-green-800 dark:text-green-300 border-green-200 dark:border-green-700'
       case 'high':
       case 'low':
       case 'abnormal':
-        return 'bg-red-100 text-red-800 border-red-200'
+        return 'bg-red-100 dark:bg-red-950/30 text-red-800 dark:text-red-300 border-red-200 dark:border-red-700'
       case 'borderline':
-        return 'bg-yellow-100 text-yellow-800 border-yellow-200'
+        return 'bg-yellow-100 dark:bg-yellow-950/30 text-yellow-800 dark:text-yellow-300 border-yellow-200 dark:border-yellow-700'
       default:
-        return 'bg-gray-100 text-gray-800 border-gray-200'
+        return 'bg-muted text-foreground border-border'
     }
   }
 

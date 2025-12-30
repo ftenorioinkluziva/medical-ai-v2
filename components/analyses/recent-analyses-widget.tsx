@@ -98,7 +98,7 @@ export function RecentAnalysesWidget({ limit = 5, onAnalysesLoad, patientId }: R
       nutrition: 'bg-orange-100 text-orange-700',
       exercise: 'bg-blue-100 text-blue-700',
     }
-    return colors[agentKey] || 'bg-gray-100 text-gray-700'
+    return colors[agentKey] || 'bg-accent text-foreground'
   }
 
   return (
@@ -118,7 +118,7 @@ export function RecentAnalysesWidget({ limit = 5, onAnalysesLoad, patientId }: R
             <div className="flex items-center justify-center py-8">
               <div className="text-center space-y-2">
                 <Loader2 className="h-6 w-6 animate-spin mx-auto text-teal-600" />
-                <p className="text-sm text-gray-500">Carregando análises...</p>
+                <p className="text-sm text-muted-foreground">Carregando análises...</p>
               </div>
             </div>
           ) : error ? (
@@ -132,10 +132,10 @@ export function RecentAnalysesWidget({ limit = 5, onAnalysesLoad, patientId }: R
           ) : analyses.length === 0 ? (
             <div className="text-center py-8">
               <Brain className="h-12 w-12 mx-auto mb-3 text-gray-300" />
-              <p className="text-sm text-gray-600 mb-1 font-medium">
+              <p className="text-sm text-muted-foreground mb-1 font-medium">
                 Nenhuma análise realizada
               </p>
-              <p className="text-xs text-gray-500 mb-4">
+              <p className="text-xs text-muted-foreground mb-4">
                 Faça sua primeira análise com um agente de IA
               </p>
               <Link href="/analyze">
@@ -159,7 +159,7 @@ export function RecentAnalysesWidget({ limit = 5, onAnalysesLoad, patientId }: R
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
-                          <p className="text-sm font-medium text-gray-900">
+                          <p className="text-sm font-medium text-foreground">
                             {analysis.agentName}
                           </p>
                           {analysis.ragUsed && (
@@ -168,10 +168,10 @@ export function RecentAnalysesWidget({ limit = 5, onAnalysesLoad, patientId }: R
                             </Badge>
                           )}
                         </div>
-                        <p className="text-xs text-gray-600 line-clamp-2 mb-2">
+                        <p className="text-xs text-muted-foreground line-clamp-2 mb-2">
                           {analysis.prompt}
                         </p>
-                        <div className="flex items-center gap-1 text-xs text-gray-500">
+                        <div className="flex items-center gap-1 text-xs text-muted-foreground">
                           <Calendar className="h-3 w-3" />
                           <span>
                             {format(new Date(analysis.createdAt), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}

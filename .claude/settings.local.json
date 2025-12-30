@@ -53,7 +53,14 @@
       "Bash(pnpm exec tsx:*)",
       "Bash(node apply-migration.js:*)",
       "Bash(git push)",
-      "Bash(node check-packages.js:*)"
+      "Bash(node check-packages.js:*)",
+      "Bash(pnpm lint:*)",
+      "Bash(node scripts/check-migration-status.mjs:*)",
+      "Bash(ls:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npx eslint:*)",
+      "Bash(find:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nfix: Corrigir compatibilidade com dark mode em toda aplicação\n\n- Substituir cores hardcoded \\(text-gray-*, bg-gray-*\\) por variáveis CSS do tema\n- Adicionar variantes dark: para todos os componentes coloridos\n- Corrigir gradientes e hovers em meal/workout navigators\n- Corrigir tabs coloridas em weekly-plan e recommendations\n- Adicionar opção \"Análise\" no menu mobile \\(hamburguer\\)\n- Corrigir cores de badges, alertas e cards de status\n\nComponentes afetados:\n- weekly-plan: tabs, gradientes, tips sections\n- recommendations: tabs coloridas, alertas\n- documents: status icons, modals\n- analysis: comparison, history, chat\n- dashboard: stats, nav, widgets\n\n🤖 Generated with [Claude Code]\\(https://claude.com/claude-code\\)\n\nCo-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>\nEOF\n\\)\")"
     ],
     "deny": [],
     "ask": []

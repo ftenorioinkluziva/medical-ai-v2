@@ -209,12 +209,12 @@ export function AnalysisChat({
               {/* Avatar */}
               <Avatar className={`h-8 w-8 shrink-0 border-2 ${
                 message.role === 'user'
-                  ? 'bg-gray-100 text-gray-700 border-gray-300'
+                  ? 'bg-muted text-foreground border-gray-300'
                   : getAgentColor(agentColor)
               }`}>
                 <AvatarFallback className={
                   message.role === 'user'
-                    ? 'bg-gray-100 text-gray-700'
+                    ? 'bg-muted text-foreground'
                     : getAgentColor(agentColor)
                 }>
                   {message.role === 'user' ? <User className="h-4 w-4" /> : agentInitial}
@@ -225,8 +225,8 @@ export function AnalysisChat({
               <div
                 className={`max-w-[80%] rounded-lg p-3 ${
                   message.role === 'user'
-                    ? 'bg-gray-100 text-gray-900'
-                    : 'bg-white border border-gray-200'
+                    ? 'bg-muted text-gray-900'
+                    : 'bg-card border border-border'
                 }`}
               >
                 {message.role === 'assistant' ? (
@@ -248,9 +248,9 @@ export function AnalysisChat({
                   {agentInitial}
                 </AvatarFallback>
               </Avatar>
-              <div className="bg-white border border-gray-200 rounded-lg p-3">
+              <div className="bg-card border border-border rounded-lg p-3">
                 <div className="flex items-center gap-2">
-                  <Loader2 className="h-4 w-4 animate-spin text-gray-400" />
+                  <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
                   <span className="text-sm text-gray-500">Pensando...</span>
                 </div>
               </div>

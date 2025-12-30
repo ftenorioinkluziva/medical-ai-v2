@@ -104,7 +104,7 @@ export function WorkoutPlanNavigator({ workoutPlan }: WorkoutPlanNavigatorProps)
       case 'medium':
         return 'bg-amber-100 text-amber-700 border-amber-200'
       case 'low':
-        return 'bg-gray-100 text-gray-700 border-gray-200'
+        return 'bg-gray-100 text-foreground border-border'
       default:
         return 'bg-emerald-100 text-emerald-700 border-emerald-200'
     }
@@ -126,11 +126,11 @@ export function WorkoutPlanNavigator({ workoutPlan }: WorkoutPlanNavigatorProps)
   return (
     <Card className="hover:shadow-md transition-shadow">
       <CardHeader className="pb-4">
-        <CardTitle className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+        <CardTitle className="text-lg font-semibold text-foreground flex items-center gap-2">
           <Dumbbell className="h-5 w-5 text-emerald-600" />
           Plano de Treinamento
         </CardTitle>
-        <CardDescription className="text-sm text-gray-600 mt-1 leading-relaxed">
+        <CardDescription className="text-sm text-muted-foreground mt-1 leading-relaxed">
           {workoutPlan.overview}
         </CardDescription>
         {workoutPlan.weeklyGoal && (
@@ -162,7 +162,7 @@ export function WorkoutPlanNavigator({ workoutPlan }: WorkoutPlanNavigatorProps)
               onValueChange={(value) => setSelectedDayIndex(parseInt(value))}
               className="w-full"
             >
-              <TabsList className="grid w-full grid-cols-7 bg-gray-100">
+              <TabsList className="grid w-full grid-cols-7 bg-muted">
                 {WEEK_DAYS_SHORT.map((day, index) => (
                   <TabsTrigger
                     key={index}
@@ -189,12 +189,12 @@ export function WorkoutPlanNavigator({ workoutPlan }: WorkoutPlanNavigatorProps)
         </div>
 
         {/* Selected Day Content */}
-        <div className="border-2 border-emerald-200 rounded-lg p-6 bg-gradient-to-br from-white to-emerald-50/30">
+        <div className="border-2 border-emerald-200 dark:border-emerald-800 rounded-lg p-6 bg-gradient-to-br from-card to-emerald-50/30 dark:to-emerald-950/20">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h3 className="text-xl font-bold text-gray-900">{selectedDayName}</h3>
+              <h3 className="text-xl font-bold text-foreground">{selectedDayName}</h3>
               {selectedWorkout && (
-                <p className="text-sm text-gray-600 mt-1">{selectedWorkout.type}</p>
+                <p className="text-sm text-muted-foreground mt-1">{selectedWorkout.type}</p>
               )}
             </div>
             <div className="flex gap-2">
@@ -220,13 +220,13 @@ export function WorkoutPlanNavigator({ workoutPlan }: WorkoutPlanNavigatorProps)
 
           {/* Rest Day Message */}
           {selectedIsRestDay && !selectedWorkout && (
-            <Card className="border-2 border-sky-200 bg-white">
+            <Card className="border-2 border-sky-200 bg-card">
               <CardContent className="p-8 text-center">
-                <div className="bg-sky-50 rounded-lg p-4 mb-4 inline-block">
+                <div className="bg-sky-50 dark:bg-sky-950/20 rounded-lg p-4 mb-4 inline-block">
                   <Coffee className="h-12 w-12 text-sky-600" />
                 </div>
-                <h4 className="text-lg font-semibold text-gray-900 mb-2">Dia de Descanso</h4>
-                <p className="text-sm text-gray-600 leading-relaxed">
+                <h4 className="text-lg font-semibold text-foreground mb-2">Dia de Descanso</h4>
+                <p className="text-sm text-muted-foreground leading-relaxed">
                   Este é um dia de recuperação. Aproveite para descansar seus músculos e permitir que seu corpo se recupere adequadamente.
                 </p>
               </CardContent>
@@ -235,13 +235,13 @@ export function WorkoutPlanNavigator({ workoutPlan }: WorkoutPlanNavigatorProps)
 
           {/* No Workout Message */}
           {!selectedWorkout && !selectedIsRestDay && (
-            <Card className="border-2 border-gray-200 bg-white">
+            <Card className="border-2 border-border bg-card">
               <CardContent className="p-8 text-center">
-                <div className="bg-gray-50 rounded-lg p-4 mb-4 inline-block">
+                <div className="bg-muted rounded-lg p-4 mb-4 inline-block">
                   <CalendarX className="h-12 w-12 text-gray-400" />
                 </div>
-                <h4 className="text-lg font-semibold text-gray-900 mb-2">Sem treino programado</h4>
-                <p className="text-sm text-gray-600 leading-relaxed">
+                <h4 className="text-lg font-semibold text-foreground mb-2">Sem treino programado</h4>
+                <p className="text-sm text-muted-foreground leading-relaxed">
                   Não há treino programado para este dia. Você pode aproveitar para descansar ou realizar atividades leves.
                 </p>
               </CardContent>
@@ -253,7 +253,7 @@ export function WorkoutPlanNavigator({ workoutPlan }: WorkoutPlanNavigatorProps)
             <div className="space-y-4">
               {/* Warmup */}
               {selectedWorkout.warmup && (
-                <Card className="border-2 border-amber-200 bg-white hover:shadow-md transition-shadow">
+                <Card className="border-2 border-amber-200 bg-card hover:shadow-md transition-shadow">
                   <CardHeader className="pb-3">
                     <CardTitle className="text-base font-semibold text-amber-600 flex items-center gap-2">
                       <Wind className="h-5 w-5" />
@@ -261,13 +261,13 @@ export function WorkoutPlanNavigator({ workoutPlan }: WorkoutPlanNavigatorProps)
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-sm text-gray-700 leading-relaxed">{selectedWorkout.warmup}</p>
+                    <p className="text-sm text-foreground leading-relaxed">{selectedWorkout.warmup}</p>
                   </CardContent>
                 </Card>
               )}
 
               {/* Exercises */}
-              <Card className="border-2 border-emerald-200 bg-white hover:shadow-md transition-shadow">
+              <Card className="border-2 border-emerald-200 bg-card hover:shadow-md transition-shadow">
                 <CardHeader className="pb-3">
                   <CardTitle className="text-base font-semibold text-emerald-600 flex items-center gap-2">
                     <Dumbbell className="h-5 w-5" />
@@ -278,10 +278,10 @@ export function WorkoutPlanNavigator({ workoutPlan }: WorkoutPlanNavigatorProps)
                   {selectedWorkout.exercises.map((exercise, index) => (
                     <div
                       key={index}
-                      className="p-4 bg-gray-50 rounded-lg border border-gray-200 hover:border-emerald-300 hover:bg-emerald-50/30 transition-all"
+                      className="p-4 bg-muted rounded-lg border border-border hover:border-emerald-300 dark:hover:border-emerald-700 hover:bg-emerald-50/30 dark:hover:bg-emerald-950/30 transition-all"
                     >
-                      <p className="font-semibold text-sm text-gray-900 mb-2">{exercise.name}</p>
-                      <div className="flex gap-4 text-xs text-gray-600">
+                      <p className="font-semibold text-sm text-foreground mb-2">{exercise.name}</p>
+                      <div className="flex gap-4 text-xs text-muted-foreground">
                         {exercise.sets && (
                           <span className="flex items-center gap-1">
                             <Activity className="h-3 w-3" />
@@ -302,7 +302,7 @@ export function WorkoutPlanNavigator({ workoutPlan }: WorkoutPlanNavigatorProps)
                         )}
                       </div>
                       {exercise.notes && (
-                        <p className="text-xs text-gray-500 mt-2 italic leading-relaxed">{exercise.notes}</p>
+                        <p className="text-xs text-muted-foreground mt-2 italic leading-relaxed">{exercise.notes}</p>
                       )}
                     </div>
                   ))}
@@ -311,7 +311,7 @@ export function WorkoutPlanNavigator({ workoutPlan }: WorkoutPlanNavigatorProps)
 
               {/* Cooldown */}
               {selectedWorkout.cooldown && (
-                <Card className="border-2 border-sky-200 bg-white hover:shadow-md transition-shadow">
+                <Card className="border-2 border-sky-200 bg-card hover:shadow-md transition-shadow">
                   <CardHeader className="pb-3">
                     <CardTitle className="text-base font-semibold text-sky-600 flex items-center gap-2">
                       <Wind className="h-5 w-5" />
@@ -319,7 +319,7 @@ export function WorkoutPlanNavigator({ workoutPlan }: WorkoutPlanNavigatorProps)
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-sm text-gray-700 leading-relaxed">{selectedWorkout.cooldown}</p>
+                    <p className="text-sm text-foreground leading-relaxed">{selectedWorkout.cooldown}</p>
                   </CardContent>
                 </Card>
               )}
@@ -331,11 +331,11 @@ export function WorkoutPlanNavigator({ workoutPlan }: WorkoutPlanNavigatorProps)
         {workoutPlan.progressionTips && workoutPlan.progressionTips.length > 0 && (
           <>
             <Separator className="my-6" />
-            <div className="border border-emerald-200 rounded-lg p-4 bg-white hover:bg-emerald-50/30 transition-colors">
-              <h4 className="font-semibold text-base text-gray-900 mb-3">Dicas de Progressão</h4>
+            <div className="border border-emerald-200 dark:border-emerald-800 rounded-lg p-4 bg-card hover:bg-emerald-50/30 dark:hover:bg-emerald-950/30 transition-colors">
+              <h4 className="font-semibold text-base text-foreground mb-3">Dicas de Progressão</h4>
               <ul className="space-y-2">
                 {workoutPlan.progressionTips.map((tip: string, index: number) => (
-                  <li key={index} className="text-sm text-gray-700 flex items-start gap-2.5 leading-relaxed">
+                  <li key={index} className="text-sm text-foreground flex items-start gap-2.5 leading-relaxed">
                     <span className="text-emerald-600 mt-0.5">•</span>
                     {tip}
                   </li>

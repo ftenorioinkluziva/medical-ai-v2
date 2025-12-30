@@ -249,7 +249,7 @@ function RecommendationsView({ recommendations }: RecommendationsViewProps) {
 
       {/* Tabs para Navegação */}
       <Tabs defaultValue="exams" className="w-full">
-        <TabsList className="grid w-full grid-cols-4 bg-gray-100">
+        <TabsList className="grid w-full grid-cols-4 bg-accent">
           <TabsTrigger value="exams" className="gap-2 data-[state=active]:bg-sky-600 data-[state=active]:text-white">
             <ClipboardList className="h-4 w-4" />
             Exames
@@ -287,28 +287,28 @@ function RecommendationsView({ recommendations }: RecommendationsViewProps) {
                   key={index}
                   className={`p-4 border rounded-lg transition-all ${
                     exam.urgency === 'high'
-                      ? 'border-red-200 bg-white hover:bg-red-50/30'
+                      ? 'border-red-200 bg-card hover:bg-red-50/30'
                       : exam.urgency === 'medium'
-                      ? 'border-amber-200 bg-white hover:bg-amber-50/30'
-                      : 'border-gray-200 bg-white hover:border-sky-300 hover:bg-sky-50/30'
+                      ? 'border-amber-200 bg-card hover:bg-amber-50/30'
+                      : 'border-border bg-card hover:border-sky-300 hover:bg-sky-50/30'
                   }`}
                 >
                   <div className="flex items-start justify-between mb-2">
-                    <h4 className="font-semibold text-sm text-gray-900">{exam.exam}</h4>
+                    <h4 className="font-semibold text-sm text-foreground">{exam.exam}</h4>
                     <Badge
                       className={`text-xs ${
                         exam.urgency === 'high'
                           ? 'bg-red-100 text-red-700 border-red-200'
                           : exam.urgency === 'medium'
                           ? 'bg-amber-100 text-amber-700 border-amber-200'
-                          : 'bg-gray-100 text-gray-700 border-gray-200'
+                          : 'bg-accent text-foreground border-border'
                       }`}
                     >
                       {exam.urgency === 'high' ? 'Urgente' : exam.urgency === 'medium' ? 'Moderado' : 'Baixo'}
                     </Badge>
                   </div>
-                  <p className="text-sm text-gray-600 mt-2 leading-relaxed">{exam.reason}</p>
-                  <p className="text-xs text-gray-500 mt-3 flex items-center gap-1">
+                  <p className="text-sm text-muted-foreground mt-2 leading-relaxed">{exam.reason}</p>
+                  <p className="text-xs text-muted-foreground mt-3 flex items-center gap-1">
                     <CalendarIcon className="h-3 w-3" />
                     {exam.suggestedTimeframe}
                   </p>
@@ -338,28 +338,28 @@ function RecommendationsView({ recommendations }: RecommendationsViewProps) {
                   key={index}
                   className={`p-4 border rounded-lg transition-all ${
                     lifestyle.priority === 'high'
-                      ? 'border-teal-300 bg-white hover:bg-teal-50/30'
+                      ? 'border-teal-300 bg-card hover:bg-teal-50/30'
                       : lifestyle.priority === 'medium'
-                      ? 'border-amber-200 bg-white hover:bg-amber-50/30'
-                      : 'border-gray-200 bg-white hover:border-teal-300 hover:bg-teal-50/30'
+                      ? 'border-amber-200 bg-card hover:bg-amber-50/30'
+                      : 'border-border bg-card hover:border-teal-300 hover:bg-teal-50/30'
                   }`}
                 >
                   <div className="flex items-start justify-between mb-2">
-                    <h4 className="font-semibold text-sm capitalize text-gray-900">{lifestyle.category}</h4>
+                    <h4 className="font-semibold text-sm capitalize text-foreground">{lifestyle.category}</h4>
                     <Badge
                       className={`text-xs ${
                         lifestyle.priority === 'high'
                           ? 'bg-teal-100 text-teal-700 border-teal-200'
                           : lifestyle.priority === 'medium'
                           ? 'bg-amber-100 text-amber-700 border-amber-200'
-                          : 'bg-gray-100 text-gray-700 border-gray-200'
+                          : 'bg-accent text-foreground border-border'
                       }`}
                     >
                       {lifestyle.priority === 'high' ? 'Alta Prioridade' : lifestyle.priority === 'medium' ? 'Média' : 'Baixa'}
                     </Badge>
                   </div>
-                  <p className="text-sm text-gray-600 mt-2 leading-relaxed">{lifestyle.recommendation}</p>
-                  <div className="mt-3 pt-3 border-t border-gray-200">
+                  <p className="text-sm text-muted-foreground mt-2 leading-relaxed">{lifestyle.recommendation}</p>
+                  <div className="mt-3 pt-3 border-t border-border">
                     <p className="text-xs text-emerald-600 flex items-center gap-1 font-medium">
                       <TrendingUp className="h-3 w-3" />
                       {lifestyle.expectedBenefit}
@@ -388,37 +388,37 @@ function RecommendationsView({ recommendations }: RecommendationsViewProps) {
               {recommendations.healthGoals.map((goal, index) => (
               <div
                 key={index}
-                className="p-4 rounded-lg border border-purple-200 bg-white hover:bg-purple-50/30 transition-all"
+                className="p-4 rounded-lg border border-purple-200 bg-card hover:bg-purple-50/30 transition-all"
               >
                 <div className="flex items-start gap-3">
                   <div className="bg-purple-100 p-2 rounded-lg shrink-0">
                     <Target className="h-4 w-4 text-purple-700" />
                   </div>
                   <div className="flex-1">
-                    <h4 className="font-semibold text-base text-gray-900 mb-3">{goal.goal}</h4>
+                    <h4 className="font-semibold text-base text-foreground mb-3">{goal.goal}</h4>
 
                     <div className="grid grid-cols-2 gap-3 p-3 bg-purple-50 rounded-lg border border-purple-100">
                       <div>
-                        <p className="text-xs text-gray-600 font-medium mb-1">Status Atual</p>
-                        <p className="text-sm text-gray-900 font-semibold">{goal.currentStatus}</p>
+                        <p className="text-xs text-muted-foreground font-medium mb-1">Status Atual</p>
+                        <p className="text-sm text-foreground font-semibold">{goal.currentStatus}</p>
                       </div>
                       <div>
-                        <p className="text-xs text-gray-600 font-medium mb-1">Meta</p>
+                        <p className="text-xs text-muted-foreground font-medium mb-1">Meta</p>
                         <p className="text-sm text-purple-700 font-semibold">{goal.targetValue}</p>
                       </div>
                     </div>
 
-                    <div className="mt-3 flex items-center gap-2 text-xs text-gray-500">
+                    <div className="mt-3 flex items-center gap-2 text-xs text-muted-foreground">
                       <CalendarIcon className="h-3 w-3" />
                       Prazo: {goal.timeframe}
                     </div>
 
                     {goal.actionSteps.length > 0 && (
-                      <div className="mt-4 pt-4 border-t border-gray-200">
-                        <h5 className="text-sm font-semibold text-gray-900 mb-2">Passos de Ação</h5>
+                      <div className="mt-4 pt-4 border-t border-border">
+                        <h5 className="text-sm font-semibold text-foreground mb-2">Passos de Ação</h5>
                         <ul className="space-y-2">
                           {goal.actionSteps.map((step, stepIndex) => (
-                            <li key={stepIndex} className="text-sm text-gray-700 flex items-start gap-2 leading-relaxed">
+                            <li key={stepIndex} className="text-sm text-foreground flex items-start gap-2 leading-relaxed">
                               <CheckCircle2 className="h-4 w-4 text-emerald-600 mt-0.5 shrink-0" />
                               {step}
                             </li>
@@ -488,7 +488,7 @@ function RecommendationsView({ recommendations }: RecommendationsViewProps) {
                     </div>
                     <div>
                       <p className={`font-semibold text-sm mb-2 ${alertConfig.color}`}>{alert.message}</p>
-                      <p className="text-sm text-gray-700 leading-relaxed">{alert.action}</p>
+                      <p className="text-sm text-foreground leading-relaxed">{alert.action}</p>
                     </div>
                   </div>
                 )
@@ -553,7 +553,7 @@ function WeeklyPlanView({ weeklyPlan }: WeeklyPlanViewProps) {
 
       {/* Tabs para Navegação */}
       <Tabs defaultValue="supplements" className="w-full">
-        <TabsList className="grid w-full grid-cols-4 bg-gray-100">
+        <TabsList className="grid w-full grid-cols-4 bg-accent">
           <TabsTrigger value="supplements" className="gap-2 data-[state=active]:bg-purple-600 data-[state=active]:text-white">
             <Pill className="h-4 w-4" />
             Suplementação
@@ -588,18 +588,18 @@ function WeeklyPlanView({ weeklyPlan }: WeeklyPlanViewProps) {
               {weeklyPlan.supplementationStrategy.supplements.map((supplement, index) => (
                 <div
                   key={index}
-                  className="p-4 border border-gray-200 rounded-lg hover:border-purple-300 hover:bg-purple-50/30 transition-all"
+                  className="p-4 border border-border rounded-lg hover:border-purple-300 hover:bg-purple-50/30 transition-all"
                 >
                   <div className="flex items-start gap-2">
                     <div className="bg-purple-100 p-1.5 rounded shrink-0">
                       <Pill className="h-3 w-3 text-purple-700" />
                     </div>
                     <div className="flex-1">
-                      <h4 className="font-semibold text-gray-900">{supplement.name}</h4>
-                      <p className="text-sm text-gray-600 mt-1">
+                      <h4 className="font-semibold text-foreground">{supplement.name}</h4>
+                      <p className="text-sm text-muted-foreground mt-1">
                         {supplement.dosage} - {supplement.timing}
                       </p>
-                      <p className="text-xs text-gray-500 mt-1">{supplement.purpose}</p>
+                      <p className="text-xs text-muted-foreground mt-1">{supplement.purpose}</p>
                     </div>
                   </div>
                 </div>
@@ -623,7 +623,7 @@ function WeeklyPlanView({ weeklyPlan }: WeeklyPlanViewProps) {
             <CardContent className="space-y-6">
               {weeklyPlan.shoppingList.categories.map((category, index) => (
                 <div key={index}>
-                  <h4 className="font-semibold text-base text-gray-900 mb-4 flex items-center gap-2">
+                  <h4 className="font-semibold text-base text-foreground mb-4 flex items-center gap-2">
                     <ShoppingCart className="h-5 w-5 text-sky-600" />
                     {category.category}
                   </h4>
@@ -633,14 +633,14 @@ function WeeklyPlanView({ weeklyPlan }: WeeklyPlanViewProps) {
                         key={itemIndex}
                         className={`p-4 border rounded-lg transition-all ${
                           item.priority === 'high'
-                            ? 'border-red-200 bg-white hover:bg-red-50/30'
+                            ? 'border-red-200 bg-card hover:bg-red-50/30'
                             : item.priority === 'medium'
-                            ? 'border-amber-200 bg-white hover:bg-amber-50/30'
-                            : 'border-gray-200 bg-white hover:border-sky-300 hover:bg-sky-50/30'
+                            ? 'border-amber-200 bg-card hover:bg-amber-50/30'
+                            : 'border-border bg-card hover:border-sky-300 hover:bg-sky-50/30'
                         }`}
                       >
                         <div className="flex items-start justify-between mb-2">
-                          <p className="font-semibold text-sm text-gray-900">{item.item}</p>
+                          <p className="font-semibold text-sm text-foreground">{item.item}</p>
                           {item.priority && (
                             <Badge
                               className={`text-xs ${
@@ -648,7 +648,7 @@ function WeeklyPlanView({ weeklyPlan }: WeeklyPlanViewProps) {
                                   ? 'bg-red-100 text-red-700 border-red-200'
                                   : item.priority === 'medium'
                                   ? 'bg-amber-100 text-amber-700 border-amber-200'
-                                  : 'bg-gray-100 text-gray-700 border-gray-200'
+                                  : 'bg-accent text-foreground border-border'
                               }`}
                             >
                               {item.priority === 'high' ? 'High' : item.priority === 'medium' ? 'Medium' : 'Low'}
@@ -656,27 +656,27 @@ function WeeklyPlanView({ weeklyPlan }: WeeklyPlanViewProps) {
                           )}
                         </div>
                         {item.quantity && (
-                          <p className="text-sm text-gray-600 mt-1">{item.quantity}</p>
+                          <p className="text-sm text-muted-foreground mt-1">{item.quantity}</p>
                         )}
                         {item.notes && (
-                          <p className="text-xs text-gray-500 mt-2 italic leading-relaxed">{item.notes}</p>
+                          <p className="text-xs text-muted-foreground mt-2 italic leading-relaxed">{item.notes}</p>
                         )}
                       </div>
                     ))}
                   </div>
                   {index < weeklyPlan.shoppingList.categories.length - 1 && (
-                    <div className="border-t border-gray-200 mt-6" />
+                    <div className="border-t border-border mt-6" />
                   )}
                 </div>
               ))}
 
               {/* Dicas de Compra */}
               {weeklyPlan.shoppingList.tips && weeklyPlan.shoppingList.tips.length > 0 && (
-                <div className="border border-sky-200 rounded-lg p-4 bg-white hover:bg-sky-50/30 transition-colors mt-6">
-                  <h4 className="font-semibold text-base text-gray-900 mb-3">💡 Dicas de Compra</h4>
+                <div className="border border-sky-200 rounded-lg p-4 bg-card hover:bg-sky-50/30 transition-colors mt-6">
+                  <h4 className="font-semibold text-base text-foreground mb-3">💡 Dicas de Compra</h4>
                   <ul className="space-y-2">
                     {weeklyPlan.shoppingList.tips.map((tip: string, index: number) => (
-                      <li key={index} className="text-sm text-gray-700 flex items-start gap-2.5 leading-relaxed">
+                      <li key={index} className="text-sm text-foreground flex items-start gap-2.5 leading-relaxed">
                         <span className="text-sky-600 mt-0.5">•</span>
                         {tip}
                       </li>
@@ -704,9 +704,9 @@ function WeeklyPlanView({ weeklyPlan }: WeeklyPlanViewProps) {
               {weeklyPlan.mealPlan.meals.map((day: any, index: number) => (
                 <div
                   key={index}
-                  className="border border-gray-200 rounded-lg p-4 bg-white hover:border-orange-300 hover:bg-orange-50/20 transition-all"
+                  className="border border-border rounded-lg p-4 bg-card hover:border-orange-300 hover:bg-orange-50/20 transition-all"
                 >
-                  <h4 className="font-semibold text-gray-900 mb-4">{day.day}</h4>
+                  <h4 className="font-semibold text-foreground mb-4">{day.day}</h4>
                   <div className="space-y-4">
                     {day.breakfast && (
                       <div>
@@ -714,9 +714,9 @@ function WeeklyPlanView({ weeklyPlan }: WeeklyPlanViewProps) {
                           ☀️ Café da Manhã
                         </h5>
                         <div className="pl-4">
-                          <p className="font-semibold text-sm text-gray-900">{day.breakfast.name}</p>
+                          <p className="font-semibold text-sm text-foreground">{day.breakfast.name}</p>
                           {day.breakfast.ingredients && (
-                            <ul className="text-xs text-gray-600 space-y-0.5 mt-1">
+                            <ul className="text-xs text-muted-foreground space-y-0.5 mt-1">
                               {day.breakfast.ingredients.map((ing: string, i: number) => (
                                 <li key={i}>• {ing}</li>
                               ))}
@@ -729,9 +729,9 @@ function WeeklyPlanView({ weeklyPlan }: WeeklyPlanViewProps) {
                       <div>
                         <h5 className="font-semibold text-sm text-emerald-600 mb-2">🌞 Almoço</h5>
                         <div className="pl-4">
-                          <p className="font-semibold text-sm text-gray-900">{day.lunch.name}</p>
+                          <p className="font-semibold text-sm text-foreground">{day.lunch.name}</p>
                           {day.lunch.ingredients && (
-                            <ul className="text-xs text-gray-600 space-y-0.5 mt-1">
+                            <ul className="text-xs text-muted-foreground space-y-0.5 mt-1">
                               {day.lunch.ingredients.map((ing: string, i: number) => (
                                 <li key={i}>• {ing}</li>
                               ))}
@@ -744,9 +744,9 @@ function WeeklyPlanView({ weeklyPlan }: WeeklyPlanViewProps) {
                       <div>
                         <h5 className="font-semibold text-sm text-sky-600 mb-2">🌙 Jantar</h5>
                         <div className="pl-4">
-                          <p className="font-semibold text-sm text-gray-900">{day.dinner.name}</p>
+                          <p className="font-semibold text-sm text-foreground">{day.dinner.name}</p>
                           {day.dinner.ingredients && (
-                            <ul className="text-xs text-gray-600 space-y-0.5 mt-1">
+                            <ul className="text-xs text-muted-foreground space-y-0.5 mt-1">
                               {day.dinner.ingredients.map((ing: string, i: number) => (
                                 <li key={i}>• {ing}</li>
                               ))}
@@ -761,8 +761,8 @@ function WeeklyPlanView({ weeklyPlan }: WeeklyPlanViewProps) {
                         <div className="pl-4 space-y-1">
                           {day.snacks.map((snack: any, i: number) => (
                             <div key={i} className="text-xs">
-                              <span className="font-semibold text-gray-900">{snack.name}</span>
-                              <span className="text-gray-600"> ({snack.timing})</span>
+                              <span className="font-semibold text-foreground">{snack.name}</span>
+                              <span className="text-muted-foreground"> ({snack.timing})</span>
                             </div>
                           ))}
                         </div>
@@ -791,12 +791,12 @@ function WeeklyPlanView({ weeklyPlan }: WeeklyPlanViewProps) {
               {weeklyPlan.workoutPlan.workouts.map((workout: any, index: number) => (
                 <div
                   key={index}
-                  className="border border-gray-200 rounded-lg p-4 bg-white hover:border-emerald-300 hover:bg-emerald-50/20 transition-all"
+                  className="border border-border rounded-lg p-4 bg-card hover:border-emerald-300 hover:bg-emerald-50/20 transition-all"
                 >
                   <div className="flex items-start justify-between mb-4">
                     <div>
-                      <h4 className="font-semibold text-gray-900">{workout.day}</h4>
-                      <p className="text-sm text-gray-600 mt-1">{workout.type}</p>
+                      <h4 className="font-semibold text-foreground">{workout.day}</h4>
+                      <p className="text-sm text-muted-foreground mt-1">{workout.type}</p>
                     </div>
                     <div className="flex gap-2">
                       {workout.duration && (
@@ -811,7 +811,7 @@ function WeeklyPlanView({ weeklyPlan }: WeeklyPlanViewProps) {
                               ? 'bg-red-100 text-red-700 border-red-200'
                               : workout.intensity === 'medium'
                               ? 'bg-amber-100 text-amber-700 border-amber-200'
-                              : 'bg-gray-100 text-gray-700 border-gray-200'
+                              : 'bg-accent text-foreground border-border'
                           }
                         >
                           {workout.intensity === 'high'
@@ -833,16 +833,16 @@ function WeeklyPlanView({ weeklyPlan }: WeeklyPlanViewProps) {
                       {workout.exercises.map((exercise: any, exIndex: number) => (
                         <div
                           key={exIndex}
-                          className="p-3 bg-gray-50 rounded border border-gray-200 hover:border-emerald-300 hover:bg-emerald-50/30 transition-all"
+                          className="p-3 bg-muted rounded border border-border hover:border-emerald-300 hover:bg-emerald-50/30 transition-all"
                         >
-                          <p className="font-semibold text-sm text-gray-900">{exercise.name}</p>
-                          <div className="flex gap-3 text-xs text-gray-600 mt-1">
+                          <p className="font-semibold text-sm text-foreground">{exercise.name}</p>
+                          <div className="flex gap-3 text-xs text-muted-foreground mt-1">
                             {exercise.sets && <span>Séries: {exercise.sets}</span>}
                             {exercise.reps && <span>Reps: {exercise.reps}</span>}
                             {exercise.duration && <span>Duração: {exercise.duration}</span>}
                           </div>
                           {exercise.notes && (
-                            <p className="text-xs text-gray-500 mt-1 italic">{exercise.notes}</p>
+                            <p className="text-xs text-muted-foreground mt-1 italic">{exercise.notes}</p>
                           )}
                         </div>
                       ))}

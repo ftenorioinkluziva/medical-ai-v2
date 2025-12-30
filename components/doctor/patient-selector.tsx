@@ -95,30 +95,62 @@ export function PatientSelector() {
   }
 
   return (
-    <div className="bg-white border-b">
-      <div className="container mx-auto px-6">
-        <div className="flex items-center justify-between py-4">
+    <div className="bg-card border-b">
+      <div className="container mx-auto px-4">
+        {/* Mobile version - compact */}
+        <div className="flex lg:hidden items-center justify-between py-2">
+          <div className="flex items-center gap-2 flex-1 min-w-0">
+            <User className="h-4 w-4 text-primary flex-shrink-0" />
+            {selectedPatient ? (
+              <div className="flex items-center gap-2 min-w-0">
+                <Avatar className="h-7 w-7 flex-shrink-0">
+                  <AvatarFallback className="text-xs bg-primary/10 text-primary">
+                    {selectedPatient.name?.[0]?.toUpperCase() || '?'}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-semibold text-foreground truncate">{selectedPatient.name}</p>
+                </div>
+              </div>
+            ) : (
+              <p className="text-xs text-muted-foreground">Nenhum paciente</p>
+            )}
+          </div>
+          {selectedPatient && (
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              onClick={handleBackToList}
+              className="flex-shrink-0"
+            >
+              <ArrowLeft className="h-4 w-4" />
+            </Button>
+          )}
+        </div>
+
+        {/* Desktop version - full */}
+        <div className="hidden lg:flex items-center justify-between py-4">
           {/* Left side - Patient selector */}
           <div className="flex items-center gap-4">
-            <User className="h-5 w-5 text-teal-600" />
+            <User className="h-5 w-5 text-primary" />
 
             {selectedPatient ? (
               <div className="flex items-center gap-3">
                 <div>
-                  <p className="text-xs text-gray-500">Atendendo</p>
+                  <p className="text-xs text-muted-foreground">Atendendo</p>
                   <div className="flex items-center gap-2">
                     <Avatar className="h-6 w-6">
-                      <AvatarFallback className="text-xs bg-teal-100 text-teal-700">
+                      <AvatarFallback className="text-xs bg-primary/10 text-primary">
                         {selectedPatient.name?.[0]?.toUpperCase() || '?'}
                       </AvatarFallback>
                     </Avatar>
-                    <span className="font-semibold text-gray-900">{selectedPatient.name}</span>
-                    <span className="text-sm text-gray-500">({selectedPatient.email})</span>
+                    <span className="font-semibold text-foreground">{selectedPatient.name}</span>
+                    <span className="text-sm text-muted-foreground">({selectedPatient.email})</span>
                   </div>
                 </div>
               </div>
             ) : (
-              <p className="text-sm text-gray-600">Nenhum paciente selecionado</p>
+              <p className="text-sm text-muted-foreground">Nenhum paciente selecionado</p>
             )}
           </div>
 

@@ -83,7 +83,7 @@ export function AgentAnalysisView({ analysis, color }: AgentAnalysisViewProps) {
         </CardHeader>
         <CardContent>
           <div className="prose prose-sm max-w-none">
-            <div className="whitespace-pre-line text-gray-700 leading-relaxed">
+            <div className="whitespace-pre-line text-foreground leading-relaxed">
               {analysis.analysis}
             </div>
           </div>
@@ -109,7 +109,7 @@ export function AgentAnalysisView({ analysis, color }: AgentAnalysisViewProps) {
                   <div className={`shrink-0 h-6 w-6 rounded-full ${config.accentColor} text-white flex items-center justify-center text-xs font-bold`}>
                     {index + 1}
                   </div>
-                  <p className="text-sm text-gray-700">{insight}</p>
+                  <p className="text-sm text-foreground">{insight}</p>
                 </div>
               ))}
             </div>
@@ -134,7 +134,7 @@ export function AgentAnalysisView({ analysis, color }: AgentAnalysisViewProps) {
                   className="flex gap-3 p-3 border border-blue-200 rounded-lg bg-blue-50/50"
                 >
                   <div className="shrink-0 h-5 w-5 rounded border-2 border-blue-600 mt-0.5" />
-                  <p className="text-sm text-gray-700">{item}</p>
+                  <p className="text-sm text-foreground">{item}</p>
                 </div>
               ))}
             </div>
@@ -143,8 +143,8 @@ export function AgentAnalysisView({ analysis, color }: AgentAnalysisViewProps) {
       )}
 
       {/* Disclaimer */}
-      <div className="p-4 border border-gray-200 rounded-lg bg-gray-50">
-        <p className="text-xs text-center text-gray-600">
+      <div className="p-4 border border-border rounded-lg bg-muted">
+        <p className="text-xs text-center text-muted-foreground">
           ⚕️ Esta análise é gerada por IA especializada e é para fins educacionais.
           Não substitui consulta médica profissional.
         </p>

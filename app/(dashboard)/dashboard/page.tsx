@@ -67,7 +67,7 @@ export default function DashboardPage() {
         <div className="flex items-center justify-center min-h-[60vh]">
           <div className="text-center space-y-3">
             <Loader2 className="h-8 w-8 animate-spin mx-auto text-teal-600" />
-            <p className="text-gray-600">Carregando dashboard...</p>
+            <p className="text-muted-foreground">Carregando dashboard...</p>
           </div>
         </div>
       </div>
@@ -88,10 +88,10 @@ export default function DashboardPage() {
     <div className="container mx-auto p-6 space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-semibold text-gray-900">
+        <h1 className="text-2xl font-semibold text-foreground">
           Olá, {session?.user?.name?.split(' ')[0]}
         </h1>
-        <p className="text-gray-600 mt-1">
+        <p className="text-muted-foreground mt-1">
           Aqui está um resumo da sua saúde e atividades recentes
         </p>
       </div>

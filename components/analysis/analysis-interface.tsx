@@ -439,8 +439,8 @@ export function AnalysisInterface({
       )}
 
       {/* Disclaimer */}
-      <Card className="p-4 bg-yellow-50 border-yellow-200">
-        <p className="text-xs text-yellow-900">
+      <Card className="p-4 bg-amber-50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-800">
+        <p className="text-xs text-amber-900 dark:text-amber-100">
           <strong>⚠️ Aviso Importante:</strong> Esta análise é gerada por IA para fins educacionais
           e <strong>NÃO substitui consulta médica profissional</strong>. Sempre consulte um profissional
           de saúde qualificado para interpretação médica definitiva.
