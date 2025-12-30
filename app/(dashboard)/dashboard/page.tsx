@@ -10,12 +10,13 @@ import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { RecommendationsWidget } from '@/components/recommendations/recommendations-widget'
 import { WeeklyPlanWidget } from '@/components/weekly-plan/weekly-plan-widget'
 import { DocumentUploadWidget } from '@/components/documents/document-upload-widget'
 import { RecentDocumentsWidget } from '@/components/documents/recent-documents-widget'
 import { RecentAnalysesWidget } from '@/components/analyses/recent-analyses-widget'
-import { Loader2, User, ArrowRight } from 'lucide-react'
+import { Loader2, User, ArrowRight, Upload, FileText, Brain, Lightbulb, Calendar } from 'lucide-react'
 
 interface DashboardStats {
   documentsCount: number
@@ -123,17 +124,73 @@ export default function DashboardPage() {
         </CardContent>
       </Card>
 
-      {/* Documents and Analyses Section - 3 Column Grid*/}
-      <div className="grid gap-3 sm:gap-4 md:grid-cols-2 lg:grid-cols-3">
-        <DocumentUploadWidget onUploadComplete={handleUploadComplete} />
-        <RecentDocumentsWidget key={refreshKey} limit={5} />
-        <RecentAnalysesWidget limit={5} />
+      {/* Mobile: Tabs Layout */}
+      <div className="lg:hidden">
+        <Tabs defaultValue="upload" className="w-full">
+          <TabsList className="grid w-full grid-cols-3 bg-muted">
+            <TabsTrigger value="upload" className="gap-1.5">
+              <Upload className="h-4 w-4" />
+              <span className="hidden sm:inline">Upload</span>
+            </TabsTrigger>
+            <TabsTrigger value="documents" className="gap-1.5">
+              <FileText className="h-4 w-4" />
+              <span className="hidden sm:inline">Documentos</span>
+            </TabsTrigger>
+            <TabsTrigger value="analyses" className="gap-1.5">
+              <Brain className="h-4 w-4" />
+              <span className="hidden sm:inline">Análises</span>
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="upload" className="mt-4">
+            <DocumentUploadWidget onUploadComplete={handleUploadComplete} />
+          </TabsContent>
+
+          <TabsContent value="documents" className="mt-4">
+            <RecentDocumentsWidget key={refreshKey} limit={5} />
+          </TabsContent>
+
+          <TabsContent value="analyses" className="mt-4">
+            <RecentAnalysesWidget limit={5} />
+          </TabsContent>
+        </Tabs>
+
+        <Tabs defaultValue="recommendations" className="w-full mt-4">
+          <TabsList className="grid w-full grid-cols-2 bg-muted">
+            <TabsTrigger value="recommendations" className="gap-1.5">
+              <Lightbulb className="h-4 w-4" />
+              <span className="hidden sm:inline">Recomendações</span>
+            </TabsTrigger>
+            <TabsTrigger value="weekly-plan" className="gap-1.5">
+              <Calendar className="h-4 w-4" />
+              <span className="hidden sm:inline">Plano Semanal</span>
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="recommendations" className="mt-4">
+            <RecommendationsWidget />
+          </TabsContent>
+
+          <TabsContent value="weekly-plan" className="mt-4">
+            <WeeklyPlanWidget />
+          </TabsContent>
+        </Tabs>
       </div>
 
-      {/* Recommendations and Weekly Plan Section - 2 Column Grid */}
-      <div className="grid gap-4 sm:gap-6 lg:grid-cols-2">
-        <RecommendationsWidget />
-        <WeeklyPlanWidget />
+      {/* Desktop: Grid Layout */}
+      <div className="hidden lg:block space-y-6">
+        {/* Documents and Analyses Section - 3 Column Grid */}
+        <div className="grid gap-4 grid-cols-3">
+          <DocumentUploadWidget onUploadComplete={handleUploadComplete} />
+          <RecentDocumentsWidget key={refreshKey} limit={5} />
+          <RecentAnalysesWidget limit={5} />
+        </div>
+
+        {/* Recommendations and Weekly Plan Section - 2 Column Grid */}
+        <div className="grid gap-6 grid-cols-2">
+          <RecommendationsWidget />
+          <WeeklyPlanWidget />
+        </div>
       </div>
 
 
