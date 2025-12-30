@@ -174,7 +174,7 @@ export function RecentDocumentsWidget({ limit = 5, onDocumentsLoad, patientId }:
             </p>
           </div>
         ) : (
-          <div className="space-y-3 max-h-[400px] overflow-y-auto">
+          <div className="space-y-3 max-h-[200px] overflow-y-auto overflow-x-hidden">
             {documents.map((doc) => (
               <div
                 key={doc.id}
@@ -189,19 +189,19 @@ export function RecentDocumentsWidget({ limit = 5, onDocumentsLoad, patientId }:
                       <p className="text-sm font-medium text-foreground truncate">
                         {doc.fileName}
                       </p>
-                      <div className="flex items-center gap-2 mt-1">
+                      <div className="flex items-center gap-2 mt-1 overflow-hidden">
                         {getStatusIcon(doc.processingStatus)}
-                        <span className="text-xs text-muted-foreground">
+                        <span className="text-xs text-muted-foreground truncate">
                           {getDocumentTypeLabel(doc.documentType)}
                         </span>
                         <span className="text-xs text-gray-400">•</span>
-                        <span className="text-xs text-muted-foreground">
+                        <span className="text-xs text-muted-foreground whitespace-nowrap">
                           {formatFileSize(doc.fileSize)}
                         </span>
                       </div>
-                      <div className="flex items-center gap-1 mt-1 text-xs text-muted-foreground">
-                        <Calendar className="h-3 w-3" />
-                        <span>
+                      <div className="flex items-center gap-1 mt-1 text-xs text-muted-foreground overflow-hidden">
+                        <Calendar className="h-3 w-3 shrink-0" />
+                        <span className="truncate">
                           {format(new Date(doc.createdAt), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
                         </span>
                       </div>

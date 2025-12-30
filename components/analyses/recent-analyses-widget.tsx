@@ -146,7 +146,7 @@ export function RecentAnalysesWidget({ limit = 5, onAnalysesLoad, patientId }: R
               </Link>
             </div>
           ) : (
-            <div className="space-y-3 max-h-[400px] overflow-y-auto">
+            <div className="space-y-3 max-h-[200px] overflow-y-auto overflow-x-hidden">
               {analyses.map((analysis) => (
                 <div
                   key={analysis.id}
@@ -158,8 +158,8 @@ export function RecentAnalysesWidget({ limit = 5, onAnalysesLoad, patientId }: R
                         <Brain className="h-4 w-4" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <p className="text-sm font-medium text-foreground">
+                        <div className="flex items-center gap-2 mb-1 min-w-0">
+                          <p className="text-sm font-medium text-foreground truncate">
                             {analysis.agentName}
                           </p>
                           {analysis.ragUsed && (
