@@ -90,74 +90,44 @@ export function StructuredDataDisplay({ modules }: StructuredDataDisplayProps) {
 
         return (
           <Card key={index} className="overflow-hidden">
-            {/* Module Header - Compact */}
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 p-3 sm:p-4 bg-muted/50 border-b">
-              <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-                <h3 className="text-sm sm:text-base font-bold text-foreground">{title}</h3>
-                {module.category && (
-                  <span className="text-xs text-muted-foreground">• {module.category}</span>
-                )}
-              </div>
-              {moduleStatus && (
-                <Badge className={`${getStatusColor(moduleStatus)} flex items-center gap-1 px-2 py-0.5 text-xs font-semibold shrink-0 w-fit`}>
-                  {getStatusIcon(moduleStatus)}
-                  <span>{getStatusLabel(moduleStatus)}</span>
+            {/* Module Header - Minimal */}
+            <div className="flex items-center justify-between gap-2 p-2 sm:p-2.5 bg-muted/50 border-b">
+              <h3 className="text-xs sm:text-sm font-bold text-foreground">{title}</h3>
+              {moduleStatus && normalizeStatus(moduleStatus) !== 'normal' && (
+                <Badge className={`${getStatusColor(moduleStatus)} px-1.5 py-0 text-xs font-semibold shrink-0`}>
+                  {getStatusLabel(moduleStatus)}
                 </Badge>
               )}
             </div>
 
-            {/* Summary Section - Compact */}
-            {module.summary && (
-              <div className="bg-blue-50 dark:bg-blue-950/20 border-l-4 border-blue-500 dark:border-blue-600 p-2.5 sm:p-3 mx-3 sm:mx-4 mt-3 rounded-r">
-                <div className="flex items-start gap-2">
-                  <Info className="h-4 w-4 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
-                  <p className="text-xs sm:text-sm text-foreground leading-relaxed">{module.summary}</p>
-                </div>
-              </div>
-            )}
-
             {/* Parameters - Responsive Layout */}
             {hasParameters && (
               <div className="px-3 sm:px-4 pb-3 sm:pb-4 pt-3 sm:pt-4">
-                {/* Mobile: Card Layout */}
-                <div className="sm:hidden space-y-3">
+                {/* Mobile: Minimal Card Layout */}
+                <div className="sm:hidden space-y-2">
                   {module.parameters.map((param, paramIndex) => {
                     const normalized = normalizeStatus(param.status)
                     const isAbnormal = normalized === 'abnormal'
                     const isCritical = normalized === 'critical'
-                    const hasReference = param.referenceRange && param.referenceRange !== 'N/A'
 
                     return (
                       <div
                         key={paramIndex}
                         className={`
-                          rounded-lg border-2 p-3 ${
-                          isCritical ? 'bg-red-50 dark:bg-red-950/20 border-red-300 dark:border-red-700' :
-                          isAbnormal ? 'bg-yellow-50 dark:bg-yellow-950/20 border-yellow-300 dark:border-yellow-700' :
-                          'bg-card border-border'
+                          rounded border-l-4 p-2 ${
+                          isCritical ? 'bg-red-50/50 dark:bg-red-950/10 border-red-500' :
+                          isAbnormal ? 'bg-yellow-50/50 dark:bg-yellow-950/10 border-yellow-500' :
+                          'bg-card border-green-500'
                         }`}
                       >
-                        {/* Parameter Name & Status */}
-                        <div className="flex items-start justify-between gap-2 mb-2">
-                          <h4 className="text-sm font-semibold text-foreground flex-1">{param.name}</h4>
-                          {isCritical ? (
-                            <Badge className="bg-red-600 text-white border-0 shrink-0">
-                              Crítico
-                            </Badge>
-                          ) : isAbnormal ? (
-                            <Badge className="bg-yellow-600 text-white border-0 shrink-0">
-                              Anormal
-                            </Badge>
-                          ) : (
-                            <Badge className="bg-green-600 text-white border-0 shrink-0">
-                              Normal
-                            </Badge>
-                          )}
+                        {/* Parameter Name */}
+                        <div className="text-xs font-medium text-muted-foreground mb-1">
+                          {param.name}
                         </div>
 
                         {/* Value & Unit */}
-                        <div className="flex items-baseline gap-2 mb-2">
-                          <span className={`text-2xl font-bold ${
+                        <div className="flex items-baseline gap-1.5">
+                          <span className={`text-lg font-bold ${
                             isCritical ? 'text-red-700 dark:text-red-300' :
                             isAbnormal ? 'text-yellow-700 dark:text-yellow-300' :
                             'text-foreground'
@@ -165,31 +135,22 @@ export function StructuredDataDisplay({ modules }: StructuredDataDisplayProps) {
                             {param.value}
                           </span>
                           {param.unit && (
-                            <span className="text-sm text-muted-foreground">{param.unit}</span>
+                            <span className="text-xs text-muted-foreground">{param.unit}</span>
                           )}
                         </div>
-
-                        {/* Reference Range */}
-                        {hasReference && (
-                          <div className="text-xs text-muted-foreground">
-                            Referência: {param.referenceRange}
-                          </div>
-                        )}
                       </div>
                     )
                   })}
                 </div>
 
-                {/* Desktop: Table Layout */}
+                {/* Desktop: Minimal Table Layout */}
                 <div className="hidden sm:block rounded-lg border border-border overflow-hidden">
                   <table className="w-full">
                     <thead>
                       <tr className="bg-muted border-b">
-                        <th className="text-left py-2 px-3 text-xs font-bold text-foreground uppercase">Parâmetro</th>
-                        <th className="text-center py-2 px-3 text-xs font-bold text-foreground uppercase">Valor</th>
-                        <th className="text-center py-2 px-3 text-xs font-bold text-foreground uppercase">Unidade</th>
-                        <th className="text-center py-2 px-3 text-xs font-bold text-foreground uppercase">Referência</th>
-                        <th className="text-center py-2 px-3 text-xs font-bold text-foreground uppercase">Status</th>
+                        <th className="text-left py-1.5 px-2 text-xs font-bold text-foreground uppercase">Parâmetro</th>
+                        <th className="text-right py-1.5 px-2 text-xs font-bold text-foreground uppercase">Valor</th>
+                        <th className="text-left py-1.5 px-2 text-xs font-bold text-foreground uppercase">Unidade</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-border">
@@ -197,21 +158,20 @@ export function StructuredDataDisplay({ modules }: StructuredDataDisplayProps) {
                         const normalized = normalizeStatus(param.status)
                         const isAbnormal = normalized === 'abnormal'
                         const isCritical = normalized === 'critical'
-                        const hasReference = param.referenceRange && param.referenceRange !== 'N/A'
 
                         return (
                           <tr
                             key={paramIndex}
                             className={`
-                              ${isCritical ? 'bg-red-50 dark:bg-red-950/20' :
-                                isAbnormal ? 'bg-yellow-50 dark:bg-yellow-950/20' :
-                                'bg-card'} hover:bg-muted transition-colors
+                              ${isCritical ? 'bg-red-50 dark:bg-red-950/10 border-l-4 border-l-red-500' :
+                                isAbnormal ? 'bg-yellow-50 dark:bg-yellow-950/10 border-l-4 border-l-yellow-500' :
+                                'bg-card border-l-4 border-l-green-500'} hover:bg-muted/50 transition-colors
                             `}
                           >
-                            <td className="py-2.5 px-3">
-                              <span className="text-sm font-medium text-foreground">{param.name}</span>
+                            <td className="py-1.5 px-2">
+                              <span className="text-xs font-medium text-foreground">{param.name}</span>
                             </td>
-                            <td className="py-2.5 px-3 text-center">
+                            <td className="py-1.5 px-2 text-right">
                               <span className={`text-sm font-bold ${
                                 isCritical ? 'text-red-700 dark:text-red-300' :
                                 isAbnormal ? 'text-yellow-700 dark:text-yellow-300' :
@@ -220,26 +180,8 @@ export function StructuredDataDisplay({ modules }: StructuredDataDisplayProps) {
                                 {param.value}
                               </span>
                             </td>
-                            <td className="py-2.5 px-3 text-center">
+                            <td className="py-1.5 px-2">
                               <span className="text-xs text-muted-foreground">{param.unit || '-'}</span>
-                            </td>
-                            <td className="py-2.5 px-3 text-center">
-                              <span className="text-xs text-muted-foreground">{hasReference ? param.referenceRange : '-'}</span>
-                            </td>
-                            <td className="py-2.5 px-3 text-center">
-                              {isCritical ? (
-                                <Badge className="bg-red-600 text-white border-0">
-                                  Crítico
-                                </Badge>
-                              ) : isAbnormal ? (
-                                <Badge className="bg-yellow-600 text-white border-0">
-                                  Anormal
-                                </Badge>
-                              ) : (
-                                <Badge className="bg-green-600 text-white border-0">
-                                  Normal
-                                </Badge>
-                              )}
                             </td>
                           </tr>
                         )
