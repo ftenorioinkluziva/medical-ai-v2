@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Separator } from '@/components/ui/separator'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { toast } from 'sonner'
 import { MealPlanNavigator } from '@/components/weekly-plan/meal-plan-navigator'
 import { WorkoutPlanNavigator } from '@/components/weekly-plan/workout-plan-navigator'
@@ -205,61 +206,58 @@ export default function WeeklyPlanPage() {
 
       {/* Plans List & Detail View */}
       {selectedPlan && (
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          {/* Sidebar - Plans History */}
+        <div className="space-y-6">
+          {/* Plan Selector - Only show if multiple plans */}
           {plans.length > 1 && (
-            <div className="lg:col-span-1">
-              <Card className="hover:shadow-md transition-shadow">
-                <CardHeader className="pb-4">
-                  <CardTitle className="text-lg font-semibold text-foreground">Planos Anteriores</CardTitle>
-                  <CardDescription className="text-sm text-muted-foreground">{plans.length} planos gerados</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-2">
-                  {plans.map((plan) => (
-                    <div
-                      key={plan.id}
-                      onClick={() => setSelectedPlan(plan)}
-                      className={`p-3 rounded-lg border cursor-pointer transition-all ${
-                        selectedPlan.id === plan.id
-                          ? 'border-teal-300 dark:border-teal-700 bg-teal-50 dark:bg-teal-950/20 shadow-sm'
-                          : 'border-border hover:border-teal-200 dark:hover:border-teal-700 hover:bg-teal-50/30 dark:hover:bg-teal-950/30'
-                      }`}
-                    >
-                      <div className="flex items-center gap-2 mb-1.5">
-                        <Calendar className="h-4 w-4 text-teal-600 dark:text-teal-400" />
-                        <p className="text-sm font-semibold text-foreground">
-                          {format(new Date(plan.weekStartDate), 'dd/MM/yyyy', { locale: ptBR })}
-                        </p>
-                      </div>
-                      <p className="text-xs text-muted-foreground">
-                        {format(new Date(plan.createdAt), "dd/MM 'às' HH:mm", { locale: ptBR })}
-                      </p>
-                    </div>
-                  ))}
-                </CardContent>
-              </Card>
-            </div>
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                  <label className="text-sm font-medium text-muted-foreground whitespace-nowrap">
+                    Selecionar Plano:
+                  </label>
+                  <Select
+                    value={selectedPlan.id}
+                    onValueChange={(value) => {
+                      const plan = plans.find(p => p.id === value)
+                      if (plan) setSelectedPlan(plan)
+                    }}
+                  >
+                    <SelectTrigger className="flex-1">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {plans.map((plan) => (
+                        <SelectItem key={plan.id} value={plan.id}>
+                          <div className="flex items-center gap-2">
+                            <Calendar className="h-4 w-4 text-teal-600" />
+                            <span>
+                              Semana de {format(new Date(plan.weekStartDate), 'dd/MM/yyyy', { locale: ptBR })}
+                            </span>
+                            <span className="text-xs text-muted-foreground">
+                              ({format(new Date(plan.createdAt), "dd/MM 'às' HH:mm", { locale: ptBR })})
+                            </span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </CardContent>
+            </Card>
           )}
 
           {/* Main Content */}
-          <div className={plans.length > 1 ? 'lg:col-span-3' : 'lg:col-span-4'}>
+          <div>
             {/* Plan Info Card */}
             <Card className="mb-6 hover:shadow-md transition-shadow">
               <CardHeader className="pb-4">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <CardTitle className="text-lg font-semibold text-foreground">
-                      Semana de {format(new Date(selectedPlan.weekStartDate), "dd 'de' MMMM", { locale: ptBR })}
-                    </CardTitle>
-                    <CardDescription className="text-sm text-muted-foreground mt-1">
-                      Gerado em: {format(new Date(selectedPlan.createdAt), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
-                      {selectedPlan.agentName && ` • ${selectedPlan.agentName}`}
-                    </CardDescription>
-                  </div>
-                  <Button onClick={() => window.print()} variant="outline" className="text-foreground">
-                    Imprimir
-                  </Button>
-                </div>
+                <CardTitle className="text-base sm:text-lg font-semibold text-foreground">
+                  Semana de {format(new Date(selectedPlan.weekStartDate), "dd 'de' MMMM", { locale: ptBR })}
+                </CardTitle>
+                <CardDescription className="text-xs sm:text-sm text-muted-foreground mt-1">
+                  Gerado em: {format(new Date(selectedPlan.createdAt), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
+                  {selectedPlan.agentName && ` • ${selectedPlan.agentName}`}
+                </CardDescription>
               </CardHeader>
             </Card>
 

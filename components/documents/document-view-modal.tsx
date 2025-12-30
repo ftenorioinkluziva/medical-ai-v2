@@ -96,15 +96,17 @@ export function DocumentViewModal({ document, isOpen, onClose }: DocumentViewMod
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-5xl max-h-[90vh] p-0 overflow-hidden">
-        <DialogHeader className="px-6 pt-6 pb-4">
-          <div className="flex items-center gap-3">
-            <FileText className="h-6 w-6 text-teal-600 dark:text-teal-400" />
-            <div className="flex-1 min-w-0">
-              <DialogTitle className="text-2xl truncate">{document.fileName}</DialogTitle>
-              <DialogDescription className="mt-1">
-                Enviado em {format(new Date(document.createdAt), "dd 'de' MMMM 'de' yyyy 'às' HH:mm", { locale: ptBR })}
-              </DialogDescription>
+      <DialogContent className="max-w-[95vw] sm:max-w-3xl lg:max-w-5xl max-h-[90vh] p-0 overflow-hidden">
+        <DialogHeader className="px-4 pt-4 pb-3 sm:px-6 sm:pt-6 sm:pb-4">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+            <div className="flex items-center gap-3 flex-1 min-w-0">
+              <FileText className="h-5 w-5 sm:h-6 sm:w-6 text-teal-600 dark:text-teal-400 shrink-0" />
+              <div className="flex-1 min-w-0">
+                <DialogTitle className="text-lg sm:text-xl lg:text-2xl truncate">{document.fileName}</DialogTitle>
+                <DialogDescription className="mt-1 text-xs sm:text-sm">
+                  {format(new Date(document.createdAt), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
+                </DialogDescription>
+              </div>
             </div>
             <div className="flex gap-2">
               {getStatusBadge(document.processingStatus)}
@@ -115,14 +117,14 @@ export function DocumentViewModal({ document, isOpen, onClose }: DocumentViewMod
         <Separator />
 
         <ScrollArea className="h-[calc(90vh-180px)]">
-          <div className="px-6 py-4 space-y-6 max-w-full">
+          <div className="px-4 py-3 sm:px-6 sm:py-4 space-y-4 sm:space-y-6 max-w-full">
             {/* Metadata Section */}
             <div className="max-w-full">
-              <h3 className="text-sm font-semibold text-muted-foreground mb-3 flex items-center gap-2">
+              <h3 className="text-xs sm:text-sm font-semibold text-muted-foreground mb-2 sm:mb-3 flex items-center gap-2">
                 <Database className="h-4 w-4" />
-                INFORMAÇÕES DO DOCUMENTO
+                INFORMAÇÕES
               </h3>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
                 {/* Status */}
                 <div className="flex items-start gap-2">
                   {getStatusIcon(document.processingStatus)}
@@ -214,8 +216,8 @@ export function DocumentViewModal({ document, isOpen, onClose }: DocumentViewMod
         <Separator />
 
         {/* Footer Actions */}
-        <div className="px-6 py-4 flex justify-end gap-3">
-          <Button variant="outline" onClick={onClose}>
+        <div className="px-4 py-3 sm:px-6 sm:py-4 flex justify-end gap-3">
+          <Button variant="outline" onClick={onClose} size="sm">
             Fechar
           </Button>
         </div>
