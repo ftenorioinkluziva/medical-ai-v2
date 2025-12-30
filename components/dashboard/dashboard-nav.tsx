@@ -61,19 +61,22 @@ export function DashboardNav({ userName, userRole }: DashboardNavProps) {
         { href: '/profile', label: 'Perfil', icon: User },
       ]
 
-  // Mobile menu navigation (secondary actions only - primary ones are in BottomNav)
+  // Mobile menu navigation (all options, same as desktop)
   const mobileMenuLinks = userRole === 'admin'
     ? [
         { href: '/admin', label: 'Admin', icon: Home },
         { href: '/admin/credits', label: 'Créditos', icon: Coins },
       ]
     : [
+        { href: '/dashboard', label: 'Dashboard', icon: Home },
         { href: '/analyze', label: 'Análise', icon: FileText },
         { href: '/analyze-complete', label: 'Análise Completa', icon: Sparkles },
         { href: '/recommendations', label: 'Recomendações', icon: TrendingUp },
         { href: '/weekly-plan', label: 'Plano Semanal', icon: Calendar },
         { href: '/compare', label: 'Comparar', icon: GitCompare },
+        { href: '/documents', label: 'Documentos', icon: FolderOpen },
         { href: '/dashboard/credits', label: 'Créditos', icon: Coins },
+        { href: '/profile', label: 'Perfil', icon: User },
       ]
 
   const isActive = (href: string) => pathname === href
@@ -164,11 +167,11 @@ export function DashboardNav({ userName, userRole }: DashboardNavProps) {
                   )}
                 </div>
 
-                {/* Mobile Navigation Links - Secondary only */}
+                {/* Mobile Navigation Links - All options */}
                 {mobileMenuLinks.length > 0 && (
                   <>
                     <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide px-1">
-                      Mais Opções
+                      Navegação
                     </div>
                     <nav className="flex flex-col gap-1">
                       {mobileMenuLinks.map((link) => {
