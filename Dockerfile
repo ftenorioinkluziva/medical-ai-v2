@@ -39,7 +39,11 @@ ENV STRIPE_WEBHOOK_SECRET=$STRIPE_WEBHOOK_SECRET
 ENV NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL
 
 # Build the application
-RUN corepack enable pnpm && pnpm run build
+# Increase Node memory to prevent timeouts during build
+ENV NODE_OPTIONS="--max-old-space-size=4096"
+# Disable Turbopack telemetry and use webpack for production builds
+ENV NEXT_TELEMETRY_DISABLED=1
+RUN corepack enable pnpm && TURBOPACK=0 pnpm run build
 
 # Production image, copy all the files and run next
 FROM base AS runner
