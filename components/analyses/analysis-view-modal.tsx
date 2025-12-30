@@ -124,21 +124,29 @@ export function AnalysisViewModal({ analysis, isOpen, onClose }: AnalysisViewMod
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] p-0">
-        <DialogHeader className="px-6 pt-6 pb-4">
-          <div className="flex items-center gap-3">
-            <Brain className="h-6 w-6 text-primary" />
-            <div className="flex-1">
-              <DialogTitle className="text-2xl">{analysis.agentName}</DialogTitle>
-              <DialogDescription className="mt-1">
-                Análise realizada em {new Date(analysis.createdAt).toLocaleString('pt-BR')}
-              </DialogDescription>
+      <DialogContent className="max-w-[95vw] sm:max-w-3xl lg:max-w-4xl max-h-[90vh] p-0">
+        <DialogHeader className="px-4 pt-4 pb-3 sm:px-6 sm:pt-6 sm:pb-4">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+            <div className="flex items-center gap-3 flex-1">
+              <Brain className="h-5 w-5 sm:h-6 sm:w-6 text-primary shrink-0" />
+              <div className="flex-1 min-w-0">
+                <DialogTitle className="text-lg sm:text-xl lg:text-2xl truncate">{analysis.agentName}</DialogTitle>
+                <DialogDescription className="mt-1 text-xs sm:text-sm">
+                  {new Date(analysis.createdAt).toLocaleDateString('pt-BR', {
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                  })}
+                </DialogDescription>
+              </div>
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-2 flex-wrap">
               {analysis.ragUsed && (
-                <Badge variant="secondary">RAG Ativo</Badge>
+                <Badge variant="secondary" className="text-xs">RAG</Badge>
               )}
-              <Badge variant="outline">{analysis.modelUsed}</Badge>
+              <Badge variant="outline" className="text-xs">{analysis.modelUsed}</Badge>
             </div>
           </div>
         </DialogHeader>
@@ -146,22 +154,21 @@ export function AnalysisViewModal({ analysis, isOpen, onClose }: AnalysisViewMod
         <Separator />
 
         <ScrollArea className="h-[calc(90vh-180px)]">
-          <div className="px-6 py-4 space-y-6">
+          <div className="px-4 py-3 sm:px-6 sm:py-4 space-y-4 sm:space-y-6">
             {/* Alert Card - Show if analysis contains critical information */}
             {(analysis.analysis.includes('ALTO RISCO') ||
               analysis.analysis.includes('⚠️') ||
               analysis.analysis.includes('ALERTA') ||
               analysis.analysis.includes('preocupante')) && (
-              <div className="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-lg">
-                <div className="flex items-start gap-3">
-                  <AlertTriangle className="h-5 w-5 text-amber-600 mt-0.5 flex-shrink-0" />
+              <div className="bg-amber-50 dark:bg-amber-950/20 border-l-4 border-amber-500 p-3 sm:p-4 rounded-r-lg">
+                <div className="flex items-start gap-2 sm:gap-3">
+                  <AlertTriangle className="h-4 w-4 sm:h-5 sm:w-5 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
                   <div className="flex-1">
-                    <h4 className="font-semibold text-amber-900 mb-1">
-                      Atenção: Pontos Importantes Identificados
+                    <h4 className="text-sm sm:text-base font-semibold text-amber-900 dark:text-amber-100 mb-1">
+                      Atenção: Pontos Importantes
                     </h4>
-                    <p className="text-sm text-amber-800">
+                    <p className="text-xs sm:text-sm text-amber-800 dark:text-amber-200">
                       Esta análise contém informações que requerem atenção especial.
-                      Revise cuidadosamente os pontos destacados abaixo.
                     </p>
                   </div>
                 </div>
@@ -170,17 +177,17 @@ export function AnalysisViewModal({ analysis, isOpen, onClose }: AnalysisViewMod
 
             {/* Quick Summary Card */}
             {analysis.documentIds && analysis.documentIds.length > 0 && (
-              <div className="bg-primary/5 border border-primary/20 p-4 rounded-lg">
-                <div className="flex items-start gap-3">
-                  <TrendingUp className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+              <div className="bg-primary/5 border border-primary/20 p-3 sm:p-4 rounded-lg">
+                <div className="flex items-start gap-2 sm:gap-3">
+                  <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-primary mt-0.5 flex-shrink-0" />
                   <div className="flex-1">
-                    <h4 className="font-semibold text-primary mb-1">
+                    <h4 className="text-sm sm:text-base font-semibold text-primary mb-1">
                       Análise Baseada em Dados
                     </h4>
-                    <p className="text-sm text-muted-foreground">
-                      Esta análise foi gerada considerando{' '}
+                    <p className="text-xs sm:text-sm text-muted-foreground">
+                      Esta análise considerou{' '}
                       <strong className="text-primary">{analysis.documentIds.length}</strong>{' '}
-                      documento(s) médico(s){analysis.ragUsed && ', enriquecida com referências da base de conhecimento médico'}.
+                      documento(s){analysis.ragUsed && ' e referências médicas'}.
                     </p>
                   </div>
                 </div>
@@ -286,25 +293,28 @@ export function AnalysisViewModal({ analysis, isOpen, onClose }: AnalysisViewMod
 
             {/* Action Buttons */}
             <div>
-              <h3 className="text-sm font-semibold text-muted-foreground mb-3">
+              <h3 className="text-xs sm:text-sm font-semibold text-muted-foreground mb-2 sm:mb-3">
                 AÇÕES
               </h3>
-              <div className="flex gap-3">
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
                 <Button
                   onClick={handleGenerateRecommendations}
                   disabled={isGeneratingRec}
                   className="flex-1"
                   variant="outline"
+                  size="sm"
                 >
                   {isGeneratingRec ? (
                     <>
                       <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Gerando...
+                      <span className="hidden sm:inline">Gerando...</span>
+                      <span className="sm:hidden">Gerando</span>
                     </>
                   ) : (
                     <>
                       <Lightbulb className="h-4 w-4 mr-2" />
-                      Gerar Recomendações
+                      <span className="hidden sm:inline">Gerar Recomendações</span>
+                      <span className="sm:hidden">Recomendações</span>
                     </>
                   )}
                 </Button>
@@ -313,16 +323,19 @@ export function AnalysisViewModal({ analysis, isOpen, onClose }: AnalysisViewMod
                   disabled={isGeneratingPlan}
                   className="flex-1"
                   variant="outline"
+                  size="sm"
                 >
                   {isGeneratingPlan ? (
                     <>
                       <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Gerando...
+                      <span className="hidden sm:inline">Gerando...</span>
+                      <span className="sm:hidden">Gerando</span>
                     </>
                   ) : (
                     <>
                       <CalendarDays className="h-4 w-4 mr-2" />
-                      Gerar Plano Semanal
+                      <span className="hidden sm:inline">Gerar Plano Semanal</span>
+                      <span className="sm:hidden">Plano Semanal</span>
                     </>
                   )}
                 </Button>
@@ -333,10 +346,10 @@ export function AnalysisViewModal({ analysis, isOpen, onClose }: AnalysisViewMod
 
             {/* Metadata Section */}
             <div>
-              <h3 className="text-sm font-semibold text-muted-foreground mb-3">
+              <h3 className="text-xs sm:text-sm font-semibold text-muted-foreground mb-2 sm:mb-3">
                 METADADOS
               </h3>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
                 {/* Date */}
                 <div className="flex items-start gap-2">
                   <Calendar className="h-4 w-4 text-muted-foreground mt-0.5" />
