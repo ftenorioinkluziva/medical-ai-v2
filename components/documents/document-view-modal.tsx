@@ -7,20 +7,19 @@
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import { Badge } from '@/components/ui/badge'
+import { Card } from '@/components/ui/card'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { Separator } from '@/components/ui/separator'
 import { Button } from '@/components/ui/button'
 import { StructuredDataDisplay } from './structured-data-display'
 import {
   FileText,
   Calendar,
   Database,
-  FileType,
   CheckCircle2,
   XCircle,
   Clock,
-  Download,
-  Hash,
+  User,
+  Building2,
 } from 'lucide-react'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
@@ -41,9 +40,10 @@ interface DocumentViewModalProps {
   document: Document | null
   isOpen: boolean
   onClose: () => void
+  userName?: string
 }
 
-export function DocumentViewModal({ document, isOpen, onClose }: DocumentViewModalProps) {
+export function DocumentViewModal({ document, isOpen, onClose, userName }: DocumentViewModalProps) {
   if (!document) return null
 
   const getStatusIcon = (status: string) => {
@@ -117,24 +117,77 @@ export function DocumentViewModal({ document, isOpen, onClose }: DocumentViewMod
         </DialogHeader>
 
         <ScrollArea className="h-[calc(90vh-120px)]">
-          <div className="p-4 sm:p-6">
-            {/* Structured Data - Main Content */}
-            {document.structuredData && modulesCount > 0 ? (
-              <StructuredDataDisplay modules={document.structuredData.modules} />
-            ) : (
-              /* No Structured Data - Show Message */
-              <div className="text-center py-12">
-                <Database className="h-12 w-12 mx-auto mb-4 text-muted-foreground opacity-50" />
-                <h3 className="text-lg font-semibold mb-2">Sem Dados Estruturados</h3>
-                <p className="text-sm text-muted-foreground max-w-md mx-auto">
-                  Este documento não possui dados estruturados (parâmetros de exames).
-                  {document.processingStatus === 'completed' && (
-                    <span className="block mt-2">
-                      O documento foi processado, mas não foram identificados parâmetros estruturáveis.
-                    </span>
-                  )}
+          <div className="p-4 sm:p-6 space-y-6">
+            {/* Patient and Document Info Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Patient Information */}
+              <Card className="p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <User className="h-4 w-4 text-muted-foreground" />
+                  <h3 className="text-sm font-semibold text-foreground">Informações do Paciente</h3>
+                </div>
+                <div className="space-y-2">
+                  <div>
+                    <p className="text-xs text-muted-foreground">Nome</p>
+                    <p className="text-sm font-medium text-foreground">{userName || 'N/A'}</p>
+                  </div>
+                </div>
+              </Card>
+
+              {/* Document Information */}
+              <Card className="p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <Building2 className="h-4 w-4 text-muted-foreground" />
+                  <h3 className="text-sm font-semibold text-foreground">Informações do Documento</h3>
+                </div>
+                <div className="space-y-2">
+                  <div>
+                    <p className="text-xs text-muted-foreground">Data de Upload</p>
+                    <p className="text-sm font-medium text-foreground">
+                      {new Date(document.createdAt).toLocaleDateString('pt-BR', {
+                        day: '2-digit',
+                        month: 'long',
+                        year: 'numeric',
+                      })}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground">Status</p>
+                    <Badge variant={document.processingStatus === 'completed' ? 'default' : 'secondary'} className="text-xs">
+                      {document.processingStatus === 'completed' ? 'Processado' : 'Processando'}
+                    </Badge>
+                  </div>
+                </div>
+              </Card>
+            </div>
+
+            {/* Extracted Text Summary */}
+            {document.extractedText && (
+              <Card className="p-4">
+                <h3 className="text-sm font-semibold text-foreground mb-3">Resumo Geral</h3>
+                <p className="text-xs text-muted-foreground leading-relaxed whitespace-pre-wrap line-clamp-6">
+                  {document.extractedText.substring(0, 500)}
+                  {document.extractedText.length > 500 && '...'}
                 </p>
+              </Card>
+            )}
+
+            {/* Exam Results */}
+            {document.structuredData && modulesCount > 0 && (
+              <div>
+                <h3 className="text-base font-bold text-foreground mb-3">Resultados dos Exames</h3>
+                <StructuredDataDisplay modules={document.structuredData.modules} />
               </div>
+            )}
+
+            {/* Raw Text Fallback */}
+            {(!document.structuredData || modulesCount === 0) && document.extractedText && (
+              <Card className="p-4">
+                <h3 className="text-sm font-semibold text-foreground mb-3">Texto Extraído</h3>
+                <pre className="text-xs text-muted-foreground whitespace-pre-wrap font-mono">
+                  {document.extractedText}
+                </pre>
+              </Card>
             )}
           </div>
         </ScrollArea>

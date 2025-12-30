@@ -40,9 +40,10 @@ interface RecentDocumentsWidgetProps {
   limit?: number
   onDocumentsLoad?: (count: number) => void
   patientId?: string
+  userName?: string
 }
 
-export function RecentDocumentsWidget({ limit = 5, onDocumentsLoad, patientId }: RecentDocumentsWidgetProps) {
+export function RecentDocumentsWidget({ limit = 5, onDocumentsLoad, patientId, userName }: RecentDocumentsWidgetProps) {
   const [documents, setDocuments] = useState<Document[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -238,6 +239,7 @@ export function RecentDocumentsWidget({ limit = 5, onDocumentsLoad, patientId }:
         document={selectedDocument}
         isOpen={isModalOpen}
         onClose={handleCloseModal}
+        userName={userName}
       />
     </>
   )

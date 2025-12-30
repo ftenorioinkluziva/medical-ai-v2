@@ -148,7 +148,7 @@ export default function DashboardPage() {
           </TabsContent>
 
           <TabsContent value="documents" className="mt-4">
-            <RecentDocumentsWidget key={refreshKey} limit={5} />
+            <RecentDocumentsWidget key={refreshKey} limit={5} userName={session?.user?.name} />
           </TabsContent>
 
           <TabsContent value="analyses" className="mt-4">
@@ -185,7 +185,7 @@ export default function DashboardPage() {
         {/* Documents and Analyses Section - 3 Column Grid */}
         <div className="grid gap-4 grid-cols-3">
           <DocumentUploadWidget onUploadComplete={handleUploadComplete} />
-          <RecentDocumentsWidget key={refreshKey} limit={5} />
+          <RecentDocumentsWidget key={refreshKey} limit={5} userName={session?.user?.name} />
           <RecentAnalysesWidget limit={5} />
         </div>
 
