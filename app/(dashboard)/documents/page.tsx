@@ -251,47 +251,47 @@ export default function DocumentsPage() {
             return (
               <Link key={doc.id} href={`/documents/${doc.id}`} className="block">
                 <Card className="hover:shadow-md transition-all hover:border-primary/50 cursor-pointer">
-                  <CardContent className="p-4 sm:p-6">
-                    <div className="flex flex-col sm:flex-row sm:items-start gap-3 sm:gap-4">
+                  <CardContent className="p-3 sm:p-5">
+                    <div className="flex flex-col sm:flex-row sm:items-start gap-2 sm:gap-4">
                       {/* Icon - Hidden on mobile to save space */}
                       <div className="hidden sm:block p-3 rounded-lg bg-primary/10 shrink-0">
                         <File className="h-6 w-6 text-primary" />
                       </div>
 
-                      <div className="flex-1 min-w-0 space-y-3">
+                      <div className="flex-1 min-w-0 space-y-2">
                         {/* Title and Status */}
                         <div>
-                          <div className="flex items-start gap-2 mb-2">
-                            <div className="sm:hidden p-2 rounded bg-primary/10 shrink-0">
-                              <File className="h-4 w-4 text-primary" />
+                          <div className="flex items-start gap-2 mb-1.5">
+                            <div className="sm:hidden p-1.5 rounded bg-primary/10 shrink-0">
+                              <File className="h-3.5 w-3.5 text-primary" />
                             </div>
-                            <h3 className="font-semibold text-base sm:text-lg truncate flex-1">{doc.fileName}</h3>
+                            <h3 className="font-semibold text-base sm:text-lg truncate flex-1 leading-tight">{doc.fileName}</h3>
                           </div>
-                          <div className="flex flex-wrap items-center gap-2">
+                          <div className="flex flex-wrap items-center gap-1.5">
                             {getStatusIcon(doc.processingStatus)}
                             {getStatusBadge(doc.processingStatus)}
-                            <Badge variant="outline" className="text-xs">{doc.documentType || 'Documento'}</Badge>
+                            <Badge variant="outline" className="text-xs py-0">{doc.documentType || 'Documento'}</Badge>
                           </div>
                         </div>
 
                         {/* Metadata Grid - Responsive */}
-                        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+                        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-2 text-sm">
                           <div>
-                            <p className="text-muted-foreground text-xs">Tamanho</p>
+                            <p className="text-muted-foreground text-xs leading-tight">Tamanho</p>
                             <p className="font-medium text-xs sm:text-sm">{formatFileSize(doc.fileSize)}</p>
                           </div>
                           <div>
-                            <p className="text-muted-foreground text-xs">Tipo</p>
+                            <p className="text-muted-foreground text-xs leading-tight">Tipo</p>
                             <p className="font-medium text-xs sm:text-sm truncate">{doc.mimeType.split('/')[1]?.toUpperCase() || 'N/A'}</p>
                           </div>
                           <div>
-                            <p className="text-muted-foreground text-xs">Módulos</p>
+                            <p className="text-muted-foreground text-xs leading-tight">Módulos</p>
                             <p className="font-medium text-xs sm:text-sm">
                               {modulesCount > 0 ? modulesCount : 'N/A'}
                             </p>
                           </div>
                           <div>
-                            <p className="text-muted-foreground text-xs flex items-center gap-1">
+                            <p className="text-muted-foreground text-xs flex items-center gap-1 leading-tight">
                               <Calendar className="h-3 w-3" />
                               Data
                             </p>
@@ -302,16 +302,16 @@ export default function DocumentsPage() {
                         </div>
 
                         {/* View Button - Mobile */}
-                        <div className="sm:hidden pt-2">
+                        <div className="sm:hidden pt-1">
                           <Button
                             variant="outline"
                             size="sm"
-                            className="w-full gap-2"
+                            className="w-full gap-2 h-8"
                             asChild
                           >
                             <span>
-                              <Eye className="h-4 w-4" />
-                              Visualizar Documento
+                              <Eye className="h-3.5 w-3.5" />
+                              Visualizar
                             </span>
                           </Button>
                         </div>

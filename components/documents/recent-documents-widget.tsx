@@ -174,49 +174,41 @@ export function RecentDocumentsWidget({ limit = 5, onDocumentsLoad, patientId }:
             </p>
           </div>
         ) : (
-          <div className="space-y-3 max-h-[400px] overflow-y-auto overflow-x-hidden">
+          <div className="space-y-2 max-h-[280px] overflow-y-auto overflow-x-hidden">
             {documents.map((doc) => (
               <div
                 key={doc.id}
                 onClick={() => handleViewDocument(doc)}
-                className="p-3 sm:p-3 rounded-lg border border-border hover:border-teal-300 hover:bg-teal-50/50 transition-all dark:hover:bg-teal-900/30 cursor-pointer group"
+                className="p-2.5 rounded-lg border border-border hover:border-teal-300 hover:bg-teal-50/50 transition-all dark:hover:bg-teal-900/30 cursor-pointer group"
               >
-                <div className="flex items-start gap-3">
-                  <div className="p-2 rounded bg-teal-100 dark:bg-teal-900/30 shrink-0">
-                    <FileText className="h-4 w-4 text-teal-700 dark:text-teal-400" />
+                <div className="flex items-start gap-2.5">
+                  <div className="p-1.5 rounded bg-teal-100 dark:bg-teal-900/30 shrink-0">
+                    <FileText className="h-3.5 w-3.5 text-teal-700 dark:text-teal-400" />
                   </div>
-                  <div className="flex-1 min-w-0 space-y-2">
+                  <div className="flex-1 min-w-0 space-y-1">
                     {/* Title with status icon */}
                     <div className="flex items-start gap-2">
-                      <p className="text-sm font-medium text-foreground truncate flex-1">
+                      <p className="text-sm font-medium text-foreground truncate flex-1 leading-tight">
                         {doc.fileName}
                       </p>
                       {getStatusIcon(doc.processingStatus)}
                     </div>
 
                     {/* Metadata - Stack on mobile */}
-                    <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2 text-xs text-muted-foreground">
-                      <div className="flex items-center gap-2">
-                        <Badge variant="outline" className="text-xs">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 text-xs text-muted-foreground">
+                      <div className="flex items-center gap-1.5">
+                        <Badge variant="outline" className="text-xs py-0">
                           {getDocumentTypeLabel(doc.documentType)}
                         </Badge>
-                        <span>{formatFileSize(doc.fileSize)}</span>
+                        <span className="text-xs">{formatFileSize(doc.fileSize)}</span>
                       </div>
-                      <span className="hidden sm:inline">•</span>
+                      <span className="hidden sm:inline text-xs">•</span>
                       <div className="flex items-center gap-1">
                         <Calendar className="h-3 w-3 shrink-0" />
-                        <span className="truncate">
-                          {format(new Date(doc.createdAt), "dd/MM/yy 'às' HH:mm", { locale: ptBR })}
+                        <span className="truncate text-xs">
+                          {format(new Date(doc.createdAt), "dd/MM/yy HH:mm", { locale: ptBR })}
                         </span>
                       </div>
-                    </div>
-
-                    {/* View hint on hover - Desktop only */}
-                    <div className="hidden sm:block opacity-0 group-hover:opacity-100 transition-opacity">
-                      <span className="text-xs text-teal-600 dark:text-teal-400 flex items-center gap-1">
-                        <Eye className="h-3 w-3" />
-                        Clique para visualizar
-                      </span>
                     </div>
                   </div>
                 </div>
