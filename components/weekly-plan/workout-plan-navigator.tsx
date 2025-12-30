@@ -191,7 +191,7 @@ export function WorkoutPlanNavigator({ workoutPlan }: WorkoutPlanNavigatorProps)
                   <TabsTrigger
                     key={index}
                     value={index.toString()}
-                    className="text-xs sm:text-sm data-[state=active]:bg-emerald-600 data-[state=active]:text-white px-1"
+                    className="text-xs sm:text-sm data-[state=active]:!bg-emerald-600 dark:data-[state=active]:!bg-emerald-500 data-[state=active]:!text-white px-1"
                   >
                     {/* Show 1 letter on mobile, full abbreviation on desktop */}
                     <span className="sm:hidden">{day.charAt(0)}</span>

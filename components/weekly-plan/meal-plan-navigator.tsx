@@ -171,7 +171,7 @@ export function MealPlanNavigator({ mealPlan }: MealPlanNavigatorProps) {
                   <TabsTrigger
                     key={index}
                     value={index.toString()}
-                    className="text-xs sm:text-sm data-[state=active]:bg-orange-600 data-[state=active]:text-white px-1"
+                    className="text-xs sm:text-sm data-[state=active]:!bg-orange-600 dark:data-[state=active]:!bg-orange-500 data-[state=active]:!text-white px-1"
                   >
                     {/* Show 1 letter on mobile, 3 letters on desktop */}
                     <span className="sm:hidden">{day.day.charAt(0)}</span>
