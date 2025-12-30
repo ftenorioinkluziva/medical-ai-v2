@@ -96,18 +96,18 @@ export function DocumentViewModal({ document, isOpen, onClose, userName }: Docum
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-[95vw] sm:max-w-4xl lg:max-w-5xl max-h-[90vh] p-0">
+      <DialogContent className="max-w-[95vw] sm:max-w-4xl lg:max-w-5xl h-[90vh] flex flex-col p-0">
         {/* Compact Header */}
-        <DialogHeader className="px-4 pt-4 pb-3 sm:px-6 border-b">
+        <DialogHeader className="px-4 pt-4 pb-3 sm:px-6 border-b shrink-0">
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-3 flex-1 min-w-0">
               <FileText className="h-5 w-5 text-teal-600 dark:text-teal-400 shrink-0" />
               <div className="flex-1 min-w-0">
                 <DialogTitle className="text-base sm:text-lg truncate">{document.fileName}</DialogTitle>
-                <DialogDescription className="text-xs flex items-center gap-2 mt-1">
+                <DialogDescription className="text-xs flex flex-wrap items-center gap-x-2 gap-y-1 mt-1">
                   <Calendar className="h-3 w-3" />
                   {format(new Date(document.createdAt), "dd/MM/yyyy", { locale: ptBR })}
-                  <span>•</span>
+                  <span className="hidden sm:inline">•</span>
                   {getDocumentTypeLabel(document.documentType)}
                 </DialogDescription>
               </div>
@@ -116,7 +116,7 @@ export function DocumentViewModal({ document, isOpen, onClose, userName }: Docum
           </div>
         </DialogHeader>
 
-        <ScrollArea className="h-[calc(90vh-120px)]">
+        <ScrollArea className="flex-1">
           <div className="p-3 sm:p-4 space-y-3">
             {/* Patient and Document Info Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -133,7 +133,7 @@ export function DocumentViewModal({ document, isOpen, onClose, userName }: Docum
               </Card>
 
               {/* Document Information */}
-              <Card className="p-2.5 overflow-hidden">
+              <Card className="p-2.5">
                 <div className="flex items-center gap-1.5 mb-2">
                   <Building2 className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
                   <h3 className="text-xs font-semibold text-foreground truncate">Informações do Documento</h3>
@@ -160,7 +160,7 @@ export function DocumentViewModal({ document, isOpen, onClose, userName }: Docum
             </div>
 
             {/* Extracted Text Summary */}
-            {document.extractedText && (
+            {/* {document.extractedText && (
               <Card className="p-2.5 overflow-hidden">
                 <h3 className="text-xs font-semibold text-foreground mb-2">Resumo Geral</h3>
                 <p className="text-xs text-muted-foreground leading-relaxed whitespace-pre-wrap line-clamp-3">
@@ -168,13 +168,16 @@ export function DocumentViewModal({ document, isOpen, onClose, userName }: Docum
                   {document.extractedText.length > 300 && '...'}
                 </p>
               </Card>
-            )}
+            )} */}
 
             {/* Exam Results */}
             {document.structuredData && modulesCount > 0 && (
               <div>
                 <h3 className="text-sm font-bold text-foreground mb-2">Resultados dos Exames</h3>
-                <StructuredDataDisplay modules={document.structuredData.modules} />
+                <div className="h-1 w-full bg-muted rounded mb-4">
+                  <StructuredDataDisplay modules={document.structuredData.modules} />
+                </div>
+                
               </div>
             )}
 
@@ -191,7 +194,7 @@ export function DocumentViewModal({ document, isOpen, onClose, userName }: Docum
         </ScrollArea>
 
         {/* Footer */}
-        <div className="border-t px-4 py-3 sm:px-6 flex justify-end">
+        <div className="border-t px-4 py-3 sm:px-6 flex justify-end shrink-0">
           <Button variant="outline" onClick={onClose} size="sm">
             Fechar
           </Button>

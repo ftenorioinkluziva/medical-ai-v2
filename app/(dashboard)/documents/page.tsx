@@ -150,20 +150,9 @@ export default function DocumentsPage() {
       </div>
 
       {/* Upload Section */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Upload className="h-5 w-5 text-teal-600" />
-            Upload de Documentos
-          </CardTitle>
-          <CardDescription>
-            Envie exames, laudos médicos, prescrições ou qualquer documento relacionado à saúde
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <DocumentUpload onUploadComplete={handleUploadComplete} />
-        </CardContent>
-      </Card>
+
+      <DocumentUpload onUploadComplete={handleUploadComplete} />
+
 
       {/* Stats */}
       <div className="grid gap-4 md:grid-cols-3">
@@ -244,7 +233,7 @@ export default function DocumentsPage() {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-4">
+        <div className="grid gap-4 items-start">
           {filteredDocuments.map((doc) => {
             const modulesCount = doc.structuredData?.modules?.length || 0
 
@@ -258,14 +247,15 @@ export default function DocumentsPage() {
                         <File className="h-6 w-6 text-primary" />
                       </div>
 
-                      <div className="flex-1 min-w-0 space-y-2">
+                      <div className="sm:flex-1 min-w-0 space-y-2">
+
                         {/* Title and Status */}
                         <div>
                           <div className="flex items-start gap-2 mb-1.5">
                             <div className="sm:hidden p-1.5 rounded bg-primary/10 shrink-0">
                               <File className="h-3.5 w-3.5 text-primary" />
                             </div>
-                            <h3 className="font-semibold text-base sm:text-lg truncate flex-1 leading-tight">{doc.fileName}</h3>
+                            <div className="font-semibold text-base sm:text-lg flex-1 leading-tight break-words">{doc.fileName}</div>
                           </div>
                           <div className="flex flex-wrap items-center gap-1.5">
                             {getStatusIcon(doc.processingStatus)}
@@ -275,7 +265,7 @@ export default function DocumentsPage() {
                         </div>
 
                         {/* Metadata Grid - Responsive */}
-                        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-2 text-sm">
+                        <div className="grid grid-cols-4 sm:grid-cols-2 md:grid-cols-4 gap-2 text-sm text-muted-foreground sm:text-xs sm:gap-3">
                           <div>
                             <p className="text-muted-foreground text-xs leading-tight">Tamanho</p>
                             <p className="font-medium text-xs sm:text-sm">{formatFileSize(doc.fileSize)}</p>
@@ -302,11 +292,11 @@ export default function DocumentsPage() {
                         </div>
 
                         {/* View Button - Mobile */}
-                        <div className="sm:hidden pt-1">
+                        <div className="sm:hidden pt-1 flex items-center justify-center">
                           <Button
                             variant="outline"
                             size="sm"
-                            className="w-full gap-2 h-8"
+                            className="gap-2 h-8"
                             asChild
                           >
                             <span>

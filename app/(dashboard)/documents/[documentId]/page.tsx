@@ -120,7 +120,7 @@ export default async function DocumentViewPage({ params }: PageProps) {
         </div>
 
         {/* Extracted Text Summary */}
-        {document.extractedText && (
+        {/* {document.extractedText && (
           <Card className="p-6 mb-8">
             <h2 className="text-lg font-semibold text-foreground mb-4">Resumo Geral</h2>
             <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap line-clamp-6">
@@ -128,7 +128,7 @@ export default async function DocumentViewPage({ params }: PageProps) {
               {document.extractedText.length > 500 && '...'}
             </p>
           </Card>
-        )}
+        )} */}
 
         {/* Exam Results */}
         {document.structuredData && modulesCount > 0 && (
