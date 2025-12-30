@@ -224,7 +224,7 @@ export function WorkoutPlanNavigator({ workoutPlan }: WorkoutPlanNavigatorProps)
                 <p className="text-sm text-muted-foreground mt-1">{selectedWorkout.type}</p>
               )}
             </div>
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-wrap gap-2">
               <Badge className="bg-emerald-600 text-white">
                 Dia {selectedDayIndex + 1} de 7
               </Badge>
