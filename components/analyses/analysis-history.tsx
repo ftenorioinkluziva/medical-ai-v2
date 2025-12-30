@@ -201,26 +201,19 @@ export function AnalysisHistory({ onViewAnalysis }: AnalysisHistoryProps) {
               className="hover:shadow-md transition-all cursor-pointer hover:bg-accent"
               onClick={() => onViewAnalysis?.(analysis)}
             >
-              <CardHeader className="pb-3">
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-2 min-w-0">
-                      <Brain className="h-4 w-4 text-primary flex-shrink-0" />
-                      <CardTitle className="text-base truncate" title={analysis.agentName}>{analysis.agentName}</CardTitle>
-                      {analysis.ragUsed && (
-                        <Badge variant="secondary" className="text-xs">
-                          RAG
-                        </Badge>
-                      )}
-                    </div>
-                    <CardDescription className="line-clamp-2">
-                      {analysis.prompt}
-                    </CardDescription>
-                  </div>
+              <CardHeader className="pb-2">
+                <div className="flex items-center gap-2 min-w-0">
+                  <Brain className="h-4 w-4 text-primary flex-shrink-0" />
+                  <CardTitle className="text-base truncate" title={analysis.agentName}>{analysis.agentName}</CardTitle>
+                  {analysis.ragUsed && (
+                    <Badge variant="secondary" className="text-xs">
+                      RAG
+                    </Badge>
+                  )}
                 </div>
               </CardHeader>
 
-              <CardContent className="pt-0">
+              <CardContent className="pt-2">
                 <div className="flex items-center gap-4 text-xs text-muted-foreground">
                   <div className="flex items-center gap-1">
                     <Calendar className="h-3 w-3" />
