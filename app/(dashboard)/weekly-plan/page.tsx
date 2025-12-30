@@ -266,21 +266,21 @@ export default function WeeklyPlanPage() {
             {/* Tabs for Different Sections */}
             <Tabs defaultValue="supplements" className="w-full">
               <TabsList className="grid w-full grid-cols-4 bg-muted">
-                <TabsTrigger value="supplements" className="gap-2 data-[state=active]:bg-purple-600 dark:data-[state=active]:bg-purple-500 data-[state=active]:text-white">
+                <TabsTrigger value="supplements" className="gap-1.5 sm:gap-2 data-[state=active]:bg-purple-600 dark:data-[state=active]:bg-purple-500 data-[state=active]:text-white">
                   <Pill className="h-4 w-4" />
-                  Suplementação
+                  <span className="hidden sm:inline">Suplementação</span>
                 </TabsTrigger>
-                <TabsTrigger value="shopping" className="gap-2 data-[state=active]:bg-sky-600 dark:data-[state=active]:bg-sky-500 data-[state=active]:text-white">
+                <TabsTrigger value="shopping" className="gap-1.5 sm:gap-2 data-[state=active]:bg-sky-600 dark:data-[state=active]:bg-sky-500 data-[state=active]:text-white">
                   <ShoppingCart className="h-4 w-4" />
-                  Compras
+                  <span className="hidden sm:inline">Compras</span>
                 </TabsTrigger>
-                <TabsTrigger value="meals" className="gap-2 data-[state=active]:bg-orange-600 dark:data-[state=active]:bg-orange-500 data-[state=active]:text-white">
+                <TabsTrigger value="meals" className="gap-1.5 sm:gap-2 data-[state=active]:bg-orange-600 dark:data-[state=active]:bg-orange-500 data-[state=active]:text-white">
                   <UtensilsCrossed className="h-4 w-4" />
-                  Refeições
+                  <span className="hidden sm:inline">Refeições</span>
                 </TabsTrigger>
-                <TabsTrigger value="workout" className="gap-2 data-[state=active]:bg-emerald-600 dark:data-[state=active]:bg-emerald-500 data-[state=active]:text-white">
+                <TabsTrigger value="workout" className="gap-1.5 sm:gap-2 data-[state=active]:bg-emerald-600 dark:data-[state=active]:bg-emerald-500 data-[state=active]:text-white">
                   <Dumbbell className="h-4 w-4" />
-                  Treinos
+                  <span className="hidden sm:inline">Treinos</span>
                 </TabsTrigger>
               </TabsList>
 

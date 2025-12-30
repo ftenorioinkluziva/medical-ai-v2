@@ -25,6 +25,7 @@ import {
   Calendar,
   Stethoscope,
   RefreshCw,
+  ClipboardList,
 } from 'lucide-react'
 
 interface RecommendationHistory {
@@ -179,7 +180,7 @@ export default function RecommendationsHistoryPage() {
 
   if (isLoading) {
     return (
-      <div className="container mx-auto p-6">
+      <div className="container mx-auto px-4 py-4 sm:px-6 sm:py-6">
         <div className="flex items-center justify-center min-h-[60vh]">
           <div className="text-center space-y-3">
             <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" />
@@ -192,7 +193,7 @@ export default function RecommendationsHistoryPage() {
 
   if (error) {
     return (
-      <div className="container mx-auto p-6 space-y-6">
+      <div className="container mx-auto px-4 py-4 sm:px-6 sm:py-6 space-y-4 sm:space-y-6">
         <Link href="/dashboard">
           <Button variant="ghost" className="gap-2">
             <ArrowLeft className="h-4 w-4" />
@@ -210,7 +211,7 @@ export default function RecommendationsHistoryPage() {
 
   if (recommendations.length === 0) {
     return (
-      <div className="container mx-auto p-6 space-y-6">
+      <div className="container mx-auto px-4 py-4 sm:px-6 sm:py-6 space-y-4 sm:space-y-6">
         <Link href="/dashboard">
           <Button variant="ghost" className="gap-2">
             <ArrowLeft className="h-4 w-4" />
@@ -249,20 +250,20 @@ export default function RecommendationsHistoryPage() {
   }
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
+    <div className="container mx-auto px-4 py-4 sm:px-6 sm:py-6 space-y-4 sm:space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4">
         <div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 mb-2">
             <Link href="/dashboard">
               <Button variant="ghost" size="sm" className="gap-2">
                 <ArrowLeft className="h-4 w-4" />
                 Voltar
               </Button>
             </Link>
-            <h1 className="text-3xl font-bold">Histórico de Recomendações</h1>
           </div>
-          <p className="text-muted-foreground mt-2">
+          <h1 className="text-2xl sm:text-3xl font-bold">Histórico de Recomendações</h1>
+          <p className="text-sm sm:text-base text-muted-foreground mt-2">
             {recommendations.length} recomendação(ões) encontrada(s)
           </p>
         </div>
@@ -330,17 +331,29 @@ export default function RecommendationsHistoryPage() {
               <CardContent>
                 <Tabs defaultValue="exams" className="w-full">
                   <TabsList className="grid w-full grid-cols-4 bg-muted">
-                    <TabsTrigger value="exams" className="data-[state=active]:!bg-sky-600 dark:data-[state=active]:!bg-sky-500 data-[state=active]:!text-white">
-                      Exames ({selectedRec.examRecommendations.length})
+                    <TabsTrigger value="exams" className="gap-1.5 sm:gap-2 data-[state=active]:!bg-sky-600 dark:data-[state=active]:!bg-sky-500 data-[state=active]:!text-white">
+                      <ClipboardList className="h-4 w-4" />
+                      <span className="hidden sm:inline">Exames</span>
+                      <span className="sm:hidden">({selectedRec.examRecommendations.length})</span>
+                      <span className="hidden sm:inline">({selectedRec.examRecommendations.length})</span>
                     </TabsTrigger>
-                    <TabsTrigger value="lifestyle" className="data-[state=active]:!bg-teal-600 dark:data-[state=active]:!bg-teal-500 data-[state=active]:!text-white">
-                      Lifestyle ({selectedRec.lifestyleRecommendations.length})
+                    <TabsTrigger value="lifestyle" className="gap-1.5 sm:gap-2 data-[state=active]:!bg-teal-600 dark:data-[state=active]:!bg-teal-500 data-[state=active]:!text-white">
+                      <Activity className="h-4 w-4" />
+                      <span className="hidden sm:inline">Lifestyle</span>
+                      <span className="sm:hidden">({selectedRec.lifestyleRecommendations.length})</span>
+                      <span className="hidden sm:inline">({selectedRec.lifestyleRecommendations.length})</span>
                     </TabsTrigger>
-                    <TabsTrigger value="goals" className="data-[state=active]:!bg-purple-600 dark:data-[state=active]:!bg-purple-500 data-[state=active]:!text-white">
-                      Metas ({selectedRec.healthGoals.length})
+                    <TabsTrigger value="goals" className="gap-1.5 sm:gap-2 data-[state=active]:!bg-purple-600 dark:data-[state=active]:!bg-purple-500 data-[state=active]:!text-white">
+                      <Target className="h-4 w-4" />
+                      <span className="hidden sm:inline">Metas</span>
+                      <span className="sm:hidden">({selectedRec.healthGoals.length})</span>
+                      <span className="hidden sm:inline">({selectedRec.healthGoals.length})</span>
                     </TabsTrigger>
-                    <TabsTrigger value="alerts" className="data-[state=active]:!bg-amber-600 dark:data-[state=active]:!bg-amber-500 data-[state=active]:!text-white">
-                      Alertas ({selectedRec.alerts.length})
+                    <TabsTrigger value="alerts" className="gap-1.5 sm:gap-2 data-[state=active]:!bg-amber-600 dark:data-[state=active]:!bg-amber-500 data-[state=active]:!text-white">
+                      <AlertCircle className="h-4 w-4" />
+                      <span className="hidden sm:inline">Alertas</span>
+                      <span className="sm:hidden">({selectedRec.alerts.length})</span>
+                      <span className="hidden sm:inline">({selectedRec.alerts.length})</span>
                     </TabsTrigger>
                   </TabsList>
 

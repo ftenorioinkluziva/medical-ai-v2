@@ -115,7 +115,7 @@ export default function DocumentsPage() {
 
   if (isLoading) {
     return (
-      <div className="container mx-auto p-6">
+      <div className="container mx-auto px-4 py-4 sm:px-6 sm:py-6">
         <div className="flex items-center justify-center min-h-[60vh]">
           <div className="text-center space-y-3">
             <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" />
@@ -127,23 +127,23 @@ export default function DocumentsPage() {
   }
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
+    <div className="container mx-auto px-4 py-4 sm:px-6 sm:py-6 space-y-4 sm:space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4">
         <div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 mb-2">
             <Link href="/dashboard">
               <Button variant="ghost" size="sm" className="gap-2">
                 <ArrowLeft className="h-4 w-4" />
                 Voltar
               </Button>
             </Link>
-            <h1 className="text-3xl font-bold flex items-center gap-3">
-              <FileText className="h-8 w-8" />
-              Meus Documentos
-            </h1>
           </div>
-          <p className="text-muted-foreground mt-2">
+          <h1 className="text-2xl sm:text-3xl font-bold flex items-center gap-3">
+            <FileText className="h-6 w-6 sm:h-8 sm:w-8" />
+            Meus Documentos
+          </h1>
+          <p className="text-sm sm:text-base text-muted-foreground mt-2">
             Gerencie e envie seus documentos médicos
           </p>
         </div>
