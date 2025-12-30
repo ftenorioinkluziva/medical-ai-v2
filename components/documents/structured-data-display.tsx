@@ -33,8 +33,18 @@ interface StructuredDataDisplayProps {
 
 export function StructuredDataDisplay({ modules }: StructuredDataDisplayProps) {
 
+  // Normalize status from schema values to display values
+  const normalizeStatus = (status?: string): 'normal' | 'abnormal' | 'critical' | undefined => {
+    const s = status?.toLowerCase()
+    if (s === 'normal') return 'normal'
+    if (s === 'high' || s === 'low' || s === 'borderline' || s === 'abnormal') return 'abnormal'
+    if (s === 'critical') return 'critical'
+    return undefined
+  }
+
   const getStatusColor = (status?: string) => {
-    switch (status?.toLowerCase()) {
+    const normalized = normalizeStatus(status)
+    switch (normalized) {
       case 'normal':
         return 'bg-green-100 dark:bg-green-950/30 text-green-800 dark:text-green-300 border-green-300 dark:border-green-700'
       case 'abnormal':
@@ -47,7 +57,8 @@ export function StructuredDataDisplay({ modules }: StructuredDataDisplayProps) {
   }
 
   const getStatusIcon = (status?: string) => {
-    switch (status?.toLowerCase()) {
+    const normalized = normalizeStatus(status)
+    switch (normalized) {
       case 'normal':
         return <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400" />
       case 'abnormal':
@@ -55,25 +66,23 @@ export function StructuredDataDisplay({ modules }: StructuredDataDisplayProps) {
       case 'critical':
         return <AlertCircle className="h-4 w-4 text-red-600 dark:text-red-400" />
       default:
-        return <CheckCircle2 className="h-4 w-4 text-muted-foreground" />
+        return <Info className="h-4 w-4 text-muted-foreground" />
     }
   }
 
   const getStatusLabel = (status?: string) => {
-    switch (status?.toLowerCase()) {
-      case 'normal':
-        return 'Normal'
-      case 'abnormal':
-        return 'Anormal'
-      case 'critical':
-        return 'Crítico'
-      default:
-        return status || 'N/A'
-    }
+    const s = status?.toLowerCase()
+    if (s === 'normal') return 'Normal'
+    if (s === 'high') return 'Alto'
+    if (s === 'low') return 'Baixo'
+    if (s === 'borderline') return 'Limítrofe'
+    if (s === 'abnormal') return 'Anormal'
+    if (s === 'critical') return 'Crítico'
+    return status || 'N/A'
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {modules.map((module, index) => {
         const title = module.moduleName || module.type || `Módulo ${index + 1}`
         const hasParameters = module.parameters && Array.isArray(module.parameters) && module.parameters.length > 0
@@ -81,30 +90,28 @@ export function StructuredDataDisplay({ modules }: StructuredDataDisplayProps) {
 
         return (
           <Card key={index} className="overflow-hidden">
-            {/* Module Header */}
-            <div className="flex items-center justify-between p-4 bg-card border-b">
-              <div className="flex items-center gap-3">
-                <h3 className="text-lg font-bold text-foreground uppercase">{title}</h3>
+            {/* Module Header - Compact */}
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 p-3 sm:p-4 bg-muted/50 border-b">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                <h3 className="text-sm sm:text-base font-bold text-foreground">{title}</h3>
                 {module.category && (
-                  <span className="text-sm text-muted-foreground">{module.category}</span>
+                  <span className="text-xs text-muted-foreground">• {module.category}</span>
                 )}
               </div>
-              <div className="flex items-center gap-2">
-                {moduleStatus && (
-                  <Badge className={`${getStatusColor(moduleStatus)} flex items-center gap-1.5 px-3 py-1 font-semibold`}>
-                    {getStatusIcon(moduleStatus)}
-                    <span>{getStatusLabel(moduleStatus)}</span>
-                  </Badge>
-                )}
-              </div>
+              {moduleStatus && (
+                <Badge className={`${getStatusColor(moduleStatus)} flex items-center gap-1 px-2 py-0.5 text-xs font-semibold shrink-0 w-fit`}>
+                  {getStatusIcon(moduleStatus)}
+                  <span>{getStatusLabel(moduleStatus)}</span>
+                </Badge>
+              )}
             </div>
 
-            {/* Summary Section */}
+            {/* Summary Section - Compact */}
             {module.summary && (
-              <div className="bg-blue-50 dark:bg-blue-950/20 border-l-4 border-blue-500 dark:border-blue-600 p-4 mx-4 mt-4 rounded-r">
-                <div className="flex items-start gap-3">
-                  <Info className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
-                  <p className="text-sm text-foreground leading-relaxed">{module.summary}</p>
+              <div className="bg-blue-50 dark:bg-blue-950/20 border-l-4 border-blue-500 dark:border-blue-600 p-2.5 sm:p-3 mx-3 sm:mx-4 mt-3 rounded-r">
+                <div className="flex items-start gap-2">
+                  <Info className="h-4 w-4 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
+                  <p className="text-xs sm:text-sm text-foreground leading-relaxed">{module.summary}</p>
                 </div>
               </div>
             )}
@@ -115,8 +122,9 @@ export function StructuredDataDisplay({ modules }: StructuredDataDisplayProps) {
                 {/* Mobile: Card Layout */}
                 <div className="sm:hidden space-y-3">
                   {module.parameters.map((param, paramIndex) => {
-                    const isAbnormal = param.status && param.status !== 'normal'
-                    const isCritical = param.status === 'critical'
+                    const normalized = normalizeStatus(param.status)
+                    const isAbnormal = normalized === 'abnormal'
+                    const isCritical = normalized === 'critical'
                     const hasReference = param.referenceRange && param.referenceRange !== 'N/A'
 
                     return (
@@ -186,8 +194,9 @@ export function StructuredDataDisplay({ modules }: StructuredDataDisplayProps) {
                     </thead>
                     <tbody className="divide-y divide-border">
                       {module.parameters.map((param, paramIndex) => {
-                        const isAbnormal = param.status && param.status !== 'normal'
-                        const isCritical = param.status === 'critical'
+                        const normalized = normalizeStatus(param.status)
+                        const isAbnormal = normalized === 'abnormal'
+                        const isCritical = normalized === 'critical'
                         const hasReference = param.referenceRange && param.referenceRange !== 'N/A'
 
                         return (
