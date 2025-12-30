@@ -4,11 +4,11 @@
  */
 
 import { Suspense } from 'react'
-import { Loader2 } from 'lucide-react'
 import { Metadata } from 'next'
 import { auth } from '@/lib/auth/config'
 import { redirect } from 'next/navigation'
 import { CompleteAnalysisView } from '@/components/complete-analysis/complete-analysis-view'
+import { Skeleton } from '@/components/ui/skeleton'
 
 export const metadata: Metadata = {
   title: 'Análise Completa | Medical AI',
@@ -36,9 +36,10 @@ export default async function CompleteAnalysisPage() {
         {/* Main Content */}
         <Suspense
           fallback={
-            <div className="flex flex-col items-center justify-center rounded-lg border border-dashed p-12 text-center min-h-[400px]">
-              <Loader2 className="h-8 w-8 animate-spin text-primary" />
-              <p className="mt-4 text-muted-foreground">Carregando análise completa...</p>
+            <div className="space-y-6">
+              <Skeleton className="h-12 w-3/4" />
+              <Skeleton className="h-64 w-full" />
+              <Skeleton className="h-32 w-full" />
             </div>
           }
         >

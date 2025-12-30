@@ -59,8 +59,7 @@
       "Bash(ls:*)",
       "Bash(npx tsc:*)",
       "Bash(npx eslint:*)",
-      "Bash(find:*)",
-      "Bash(find:*)",
+      "Bash(find:*)"
     ],
     "deny": [],
     "ask": []

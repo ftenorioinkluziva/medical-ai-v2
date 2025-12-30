@@ -102,11 +102,11 @@ export default function AnalyzePage() {
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-2 bg-muted">
-          <TabsTrigger value="new" className="gap-2 data-[state=active]:bg-teal-600! data-[state=active]:text-white! dark:data-[state=active]:bg-teal-600!">
+          <TabsTrigger value="new" className="gap-2 data-[state=active]:!bg-teal-600 data-[state=active]:!text-white dark:data-[state=active]:!bg-teal-600">
             <Sparkles className="h-4 w-4" />
             Nova Análise
           </TabsTrigger>
-          <TabsTrigger value="history" className="gap-2 data-[state=active]:bg-teal-600! data-[state=active]:text-white! dark:data-[state=active]:bg-teal-600!">
+          <TabsTrigger value="history" className="gap-2 data-[state=active]:!bg-teal-600 data-[state=active]:!text-white dark:data-[state=active]:!bg-teal-600">
             <History className="h-4 w-4" />
             Histórico de Análises
           </TabsTrigger>

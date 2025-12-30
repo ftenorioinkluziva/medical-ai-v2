@@ -69,7 +69,7 @@ export function AnalysisHistory({ onViewAnalysis }: AnalysisHistoryProps) {
       setAllAnalyses(loadedAnalyses)
       setAnalyses(loadedAnalyses)
     } catch (err) {
-      console.error('Error loading history:', err)
+      console.error('[ANALYSIS-HISTORY] Error loading history:', err)
       setError(err instanceof Error ? err.message : 'Erro desconhecido')
     } finally {
       setIsLoading(false)

@@ -13,6 +13,7 @@ import { Loader2, FileText, Eye, CheckCircle2, XCircle, Clock } from 'lucide-rea
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import Link from 'next/link'
+import { cn } from '@/lib/utils'
 
 interface Analysis {
   id: string
@@ -43,7 +44,7 @@ export function CompleteAnalysesList() {
         setAnalyses(data.analyses)
       }
     } catch (error) {
-      console.error('Error loading analyses:', error)
+      console.error('[COMPLETE-ANALYSES-LIST] Error loading analyses:', error)
     } finally {
       setIsLoading(false)
     }
@@ -110,7 +111,10 @@ export function CompleteAnalysesList() {
         const config = statusConfig[analysis.status as keyof typeof statusConfig] || statusConfig.pending
 
         const card = (
-          <Card className={`hover:shadow-md transition-all ${analysis.status === 'completed' ? 'cursor-pointer hover:bg-accent' : ''}`}>
+          <Card className={cn(
+            'hover:shadow-md transition-all',
+            analysis.status === 'completed' && 'cursor-pointer hover:bg-accent'
+          )}>
             <CardContent className="p-6">
               <div className="flex items-start justify-between gap-4">
                 {/* Left side - Info */}
