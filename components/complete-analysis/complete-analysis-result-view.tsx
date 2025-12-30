@@ -256,9 +256,9 @@ export function CompleteAnalysisResultView({ analysis }: CompleteAnalysisResultV
 
                 <div className="p-4 sm:p-6">
                   {analyses.map(analysis => (
-                    <TabsContent key={analysis.id} value={analysis.agentKey} className="mt-0 space-y-4">
+                    <TabsContent key={analysis.id} value={analysis.agentKey} className="mt-0">
                       {/* Header do agente */}
-                      <div className="flex items-start justify-between gap-3">
+                      <div className="flex items-start justify-between gap-3 mb-4">
                         <div>
                           <h3 className="text-base sm:text-lg font-semibold">{analysis.agentTitle}</h3>
                           <p className="text-xs sm:text-sm text-muted-foreground mt-1">
@@ -267,64 +267,67 @@ export function CompleteAnalysisResultView({ analysis }: CompleteAnalysisResultV
                         </div>
                       </div>
 
-                      {/* Análise Completa */}
-                      <Card>
-                        <CardHeader>
-                          <CardTitle className="text-base flex items-center gap-2">
-                            <FileText className="h-4 w-4" />
-                            Análise Detalhada
-                          </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                          <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">
-                            {analysis.analysis}
-                          </p>
-                        </CardContent>
-                      </Card>
+                      {/* Accordion para cada seção da análise */}
+                      <Accordion type="multiple" className="w-full">
+                        {/* Item 1: Análise Detalhada */}
+                        <AccordionItem value="detailed-analysis">
+                          <AccordionTrigger className="hover:no-underline">
+                            <div className="flex items-center gap-2 text-base sm:text-lg">
+                              <FileText className="h-4 w-4" />
+                              <span>Análise Detalhada</span>
+                            </div>
+                          </AccordionTrigger>
+                          <AccordionContent className="pt-4">
+                            <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">
+                              {analysis.analysis}
+                            </p>
+                          </AccordionContent>
+                        </AccordionItem>
 
-                      {/* Insights (se existir) */}
-                      {analysis.insights && analysis.insights.length > 0 && (
-                        <Card>
-                          <CardHeader>
-                            <CardTitle className="text-base flex items-center gap-2">
-                              <Lightbulb className="h-4 w-4 text-amber-600 dark:text-amber-400" />
-                              Insights-Chave
-                            </CardTitle>
-                          </CardHeader>
-                          <CardContent>
-                            <ul className="space-y-2">
-                              {analysis.insights.map((insight: string, idx: number) => (
-                                <li key={idx} className="flex items-start gap-2">
-                                  <span className="text-teal-600 dark:text-teal-400 mt-1">•</span>
-                                  <span className="text-sm text-muted-foreground leading-relaxed">{insight}</span>
-                                </li>
-                              ))}
-                            </ul>
-                          </CardContent>
-                        </Card>
-                      )}
+                        {/* Item 2: Insights-Chave (se existir) */}
+                        {analysis.insights && analysis.insights.length > 0 && (
+                          <AccordionItem value="insights">
+                            <AccordionTrigger className="hover:no-underline">
+                              <div className="flex items-center gap-2 text-base sm:text-lg">
+                                <Lightbulb className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+                                <span>Insights-Chave</span>
+                              </div>
+                            </AccordionTrigger>
+                            <AccordionContent className="pt-4">
+                              <ul className="space-y-2">
+                                {analysis.insights.map((insight: string, idx: number) => (
+                                  <li key={idx} className="flex items-start gap-2">
+                                    <span className="text-teal-600 dark:text-teal-400 mt-1">•</span>
+                                    <span className="text-sm text-muted-foreground leading-relaxed">{insight}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            </AccordionContent>
+                          </AccordionItem>
+                        )}
 
-                      {/* Action Items (se existir) */}
-                      {analysis.actionItems && analysis.actionItems.length > 0 && (
-                        <Card>
-                          <CardHeader>
-                            <CardTitle className="text-base flex items-center gap-2">
-                              <CheckSquare className="h-4 w-4 text-green-600 dark:text-green-400" />
-                              Ações Recomendadas
-                            </CardTitle>
-                          </CardHeader>
-                          <CardContent>
-                            <ul className="space-y-2">
-                              {analysis.actionItems.map((item: string, idx: number) => (
-                                <li key={idx} className="flex items-start gap-3">
-                                  <CheckSquare className="h-4 w-4 text-green-600 dark:text-green-400 mt-0.5 flex-shrink-0" />
-                                  <span className="text-sm text-muted-foreground leading-relaxed">{item}</span>
-                                </li>
-                              ))}
-                            </ul>
-                          </CardContent>
-                        </Card>
-                      )}
+                        {/* Item 3: Ações Recomendadas (se existir) */}
+                        {analysis.actionItems && analysis.actionItems.length > 0 && (
+                          <AccordionItem value="action-items">
+                            <AccordionTrigger className="hover:no-underline">
+                              <div className="flex items-center gap-2 text-base sm:text-lg">
+                                <CheckSquare className="h-4 w-4 text-green-600 dark:text-green-400" />
+                                <span>Ações Recomendadas</span>
+                              </div>
+                            </AccordionTrigger>
+                            <AccordionContent className="pt-4">
+                              <ul className="space-y-2">
+                                {analysis.actionItems.map((item: string, idx: number) => (
+                                  <li key={idx} className="flex items-start gap-3">
+                                    <CheckSquare className="h-4 w-4 text-green-600 dark:text-green-400 mt-0.5 flex-shrink-0" />
+                                    <span className="text-sm text-muted-foreground leading-relaxed">{item}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            </AccordionContent>
+                          </AccordionItem>
+                        )}
+                      </Accordion>
                     </TabsContent>
                   ))}
                 </div>
