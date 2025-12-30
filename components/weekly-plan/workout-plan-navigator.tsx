@@ -144,18 +144,42 @@ export function WorkoutPlanNavigator({ workoutPlan }: WorkoutPlanNavigatorProps)
 
       <CardContent className="space-y-6">
         {/* Day Navigation */}
-        <div className="flex items-center justify-between gap-4">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
+          {/* Navigation Buttons - Side by side on mobile, flanking tabs on desktop */}
+          <div className="flex gap-2 sm:hidden">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handlePrevDay}
+              disabled={selectedDayIndex === 0}
+              className="flex-1"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleNextDay}
+              disabled={selectedDayIndex === 6}
+              className="flex-1"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+
+          {/* Desktop Previous Button */}
           <Button
             variant="outline"
             size="sm"
             onClick={handlePrevDay}
             disabled={selectedDayIndex === 0}
-            className="gap-2"
+            className="gap-2 hidden sm:flex"
           >
             <ChevronLeft className="h-4 w-4" />
             Anterior
           </Button>
 
+          {/* Day Tabs */}
           <div className="flex-1">
             <Tabs
               value={selectedDayIndex.toString()}
@@ -167,21 +191,24 @@ export function WorkoutPlanNavigator({ workoutPlan }: WorkoutPlanNavigatorProps)
                   <TabsTrigger
                     key={index}
                     value={index.toString()}
-                    className="text-xs data-[state=active]:bg-emerald-600 data-[state=active]:text-white"
+                    className="text-xs sm:text-sm data-[state=active]:bg-emerald-600 data-[state=active]:text-white px-1"
                   >
-                    {day}
+                    {/* Show 1 letter on mobile, full abbreviation on desktop */}
+                    <span className="sm:hidden">{day.charAt(0)}</span>
+                    <span className="hidden sm:inline">{day}</span>
                   </TabsTrigger>
                 ))}
               </TabsList>
             </Tabs>
           </div>
 
+          {/* Desktop Next Button */}
           <Button
             variant="outline"
             size="sm"
             onClick={handleNextDay}
             disabled={selectedDayIndex === 6}
-            className="gap-2"
+            className="gap-2 hidden sm:flex"
           >
             Próximo
             <ChevronRight className="h-4 w-4" />

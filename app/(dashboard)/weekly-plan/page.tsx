@@ -206,11 +206,11 @@ export default function WeeklyPlanPage() {
 
       {/* Plans List & Detail View */}
       {selectedPlan && (
-        <div className="space-y-6">
+        <div className="space-y-4">
           {/* Plan Selector - Only show if multiple plans */}
           {plans.length > 1 && (
             <Card>
-              <CardContent className="pt-6">
+              <CardContent className="pt-0 pb-1 flex items-center justify-between gap-4">
                 <div className="flex flex-col sm:flex-row sm:items-center gap-3">
                   <label className="text-sm font-medium text-muted-foreground whitespace-nowrap">
                     Selecionar Plano:
@@ -250,7 +250,7 @@ export default function WeeklyPlanPage() {
           <div>
             {/* Plan Info Card */}
             <Card className="mb-6 hover:shadow-md transition-shadow">
-              <CardHeader className="pb-4">
+              <CardHeader className="pb-0">
                 <CardTitle className="text-base sm:text-lg font-semibold text-foreground">
                   Semana de {format(new Date(selectedPlan.weekStartDate), "dd 'de' MMMM", { locale: ptBR })}
                 </CardTitle>

@@ -99,14 +99,14 @@ export function MealPlanNavigator({ mealPlan }: MealPlanNavigatorProps) {
           {mealPlan.overview}
         </CardDescription>
         {(mealPlan.dailyCalories || mealPlan.macros) && (
-          <div className="mt-3 p-3 bg-orange-50 border border-orange-200 rounded-lg space-y-2">
+          <div className="mt-3 p-3 bg-orange-50 border border-orange-200 rounded-lg space-y-2 dark:bg-orange-900/30 dark:border-orange-600">
             {mealPlan.dailyCalories && (
-              <p className="text-sm text-orange-900 font-medium">
+              <p className="text-sm text-orange-900 font-medium dark:text-orange-300">
                 {mealPlan.dailyCalories} calorias/dia
               </p>
             )}
             {mealPlan.macros && (
-              <div className="flex gap-3 flex-wrap text-sm text-orange-900">
+              <div className="flex gap-3 flex-wrap text-sm text-orange-900 dark:text-orange-300">
                 {mealPlan.macros.protein && (
                   <span>Proteína: {mealPlan.macros.protein}</span>
                 )}
@@ -124,18 +124,42 @@ export function MealPlanNavigator({ mealPlan }: MealPlanNavigatorProps) {
 
       <CardContent className="space-y-6">
         {/* Day Navigation */}
-        <div className="flex items-center justify-between gap-4">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
+          {/* Navigation Buttons - Side by side on mobile, flanking tabs on desktop */}
+          <div className="flex gap-2 sm:hidden">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handlePrevDay}
+              disabled={selectedDayIndex === 0}
+              className="flex-1"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleNextDay}
+              disabled={selectedDayIndex === mealPlan.meals.length - 1}
+              className="flex-1"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+
+          {/* Desktop Previous Button */}
           <Button
             variant="outline"
             size="sm"
             onClick={handlePrevDay}
             disabled={selectedDayIndex === 0}
-            className="gap-2"
+            className="gap-2 hidden sm:flex"
           >
             <ChevronLeft className="h-4 w-4" />
             Anterior
           </Button>
 
+          {/* Day Tabs */}
           <div className="flex-1">
             <Tabs
               value={selectedDayIndex.toString()}
@@ -147,21 +171,24 @@ export function MealPlanNavigator({ mealPlan }: MealPlanNavigatorProps) {
                   <TabsTrigger
                     key={index}
                     value={index.toString()}
-                    className="text-xs data-[state=active]:bg-orange-600 data-[state=active]:text-white"
+                    className="text-xs sm:text-sm data-[state=active]:bg-orange-600 data-[state=active]:text-white px-1"
                   >
-                    {day.day.split('-')[0].substring(0, 3)}
+                    {/* Show 1 letter on mobile, 3 letters on desktop */}
+                    <span className="sm:hidden">{day.day.charAt(0)}</span>
+                    <span className="hidden sm:inline">{day.day.split('-')[0].substring(0, 3)}</span>
                   </TabsTrigger>
                 ))}
               </TabsList>
             </Tabs>
           </div>
 
+          {/* Desktop Next Button */}
           <Button
             variant="outline"
             size="sm"
             onClick={handleNextDay}
             disabled={selectedDayIndex === mealPlan.meals.length - 1}
-            className="gap-2"
+            className="gap-2 hidden sm:flex"
           >
             Próximo
             <ChevronRight className="h-4 w-4" />
