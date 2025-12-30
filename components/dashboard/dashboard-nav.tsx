@@ -79,8 +79,8 @@ export function DashboardNav({ userName, userRole }: DashboardNavProps) {
   const isActive = (href: string) => pathname === href
 
   return (
-    <header className="border-b bg-card sticky top-0 z-50 shadow-sm">
-      <div className="container mx-auto flex h-16 items-center justify-between px-4">
+    <header className="border-b bg-card/95 backdrop-blur-sm sticky top-0 z-50 shadow-sm">
+      <div className="container mx-auto flex h-16 items-center justify-between px-6">
         {/* Logo */}
         <div className="flex items-center gap-6">
           <Link href={userRole === 'admin' ? '/admin' : '/dashboard'} className="flex items-center gap-2 group">
@@ -91,17 +91,17 @@ export function DashboardNav({ userName, userRole }: DashboardNavProps) {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex gap-1">
+          <nav className="hidden lg:flex gap-2">
             {desktopNavLinks.map((link) => {
               const Icon = link.icon
               return (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                     isActive(link.href)
-                      ? 'bg-accent text-accent-foreground'
-                      : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                      ? 'bg-primary text-primary-foreground shadow-sm'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-accent'
                   }`}
                 >
                   <Icon className="h-4 w-4" />
@@ -113,7 +113,7 @@ export function DashboardNav({ userName, userRole }: DashboardNavProps) {
         </div>
 
         {/* Right Side - User & Actions */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-4">
           {/* Credits Badge */}
           {userRole !== 'admin' && (
             <div className="hidden sm:block">
@@ -121,12 +121,17 @@ export function DashboardNav({ userName, userRole }: DashboardNavProps) {
             </div>
           )}
 
+          {/* Divider */}
+          <div className="hidden lg:block h-8 w-px bg-border" />
+
           {/* User Info */}
-          <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-muted">
-            <User className="h-4 w-4 text-muted-foreground" />
+          <div className="hidden sm:flex items-center gap-2.5 px-3 py-2 rounded-lg bg-accent/50 border border-border/50">
+            <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+              <User className="h-4 w-4 text-primary" />
+            </div>
             <div className="flex flex-col">
-              <span className="text-sm font-medium text-foreground">{userName}</span>
-              <span className="text-xs text-muted-foreground capitalize">{userRole}</span>
+              <span className="text-sm font-semibold text-foreground leading-tight">{userName}</span>
+              <span className="text-xs text-muted-foreground capitalize leading-tight">{userRole}</span>
             </div>
           </div>
 
@@ -139,10 +144,11 @@ export function DashboardNav({ userName, userRole }: DashboardNavProps) {
           <form action={handleSignOut} className="hidden lg:block">
             <Button
               type="submit"
-              variant="ghost"
+              variant="outline"
               size="sm"
+              className="gap-2"
             >
-              <LogOut className="h-4 w-4 mr-2" />
+              <LogOut className="h-4 w-4" />
               Sair
             </Button>
           </form>
