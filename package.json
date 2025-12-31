@@ -12,6 +12,7 @@
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
     "db:seed": "tsx --env-file=.env.local scripts/seed-agents.ts && tsx --env-file=.env.local scripts/seed-credit-packages.ts",
+    "db:seed-test-users": "tsx --env-file=.env.local lib/db/seed/seed-test-users.ts",
     "db:setup": "pnpm db:generate && pnpm db:migrate && pnpm db:seed",
     "embeddings:fix": "tsx --env-file=.env.local scripts/fix-embedding-dimensions.ts",
     "embeddings:migrate": "tsx --env-file=.env.local scripts/migrate-embeddings-to-google.ts"

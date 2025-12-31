@@ -72,6 +72,7 @@ export function WorkoutPlanNavigator({ workoutPlan }: WorkoutPlanNavigatorProps)
 
   // Map workouts to days
   const getDayWorkout = (dayName: string) => {
+    if (!workoutPlan?.workouts) return undefined
     return workoutPlan.workouts.find((workout) => workout.day.startsWith(dayName))
   }
 

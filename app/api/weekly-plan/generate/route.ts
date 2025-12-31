@@ -123,12 +123,13 @@ export async function POST(request: NextRequest) {
     console.log(`   - TOTAL: ${totalTokens} tokens`)
     console.log(`⏱️ [WEEKLY-PLAN] Processing time: ${processingTimeMs}ms`)
 
-    // Calculate week start date (next Monday)
+    // Calculate week start date (current week's Monday)
     const today = new Date()
-    const dayOfWeek = today.getDay()
-    const daysUntilMonday = dayOfWeek === 0 ? 1 : 8 - dayOfWeek
+    const dayOfWeek = today.getDay() // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+    // Calculate days back to Monday (if today is Sunday, go back 6 days; if Monday, go back 0 days)
+    const daysBackToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1
     const weekStartDate = new Date(today)
-    weekStartDate.setDate(today.getDate() + daysUntilMonday)
+    weekStartDate.setDate(today.getDate() - daysBackToMonday)
     const weekStartDateString = weekStartDate.toISOString().split('T')[0]
 
     console.log(`💾 [WEEKLY-PLAN] Saving to database...`)

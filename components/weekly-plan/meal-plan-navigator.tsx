@@ -65,6 +65,11 @@ interface MealPlanNavigatorProps {
 export function MealPlanNavigator({ mealPlan }: MealPlanNavigatorProps) {
   // Get current day of week and pre-select it (0 = Monday, 6 = Sunday)
   const getCurrentDayIndex = () => {
+    // Safety check: ensure meals array exists and has items
+    if (!mealPlan?.meals || mealPlan.meals.length === 0) {
+      return 0
+    }
+
     const today = new Date().getDay() // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
     // Convert to Monday-based index (0 = Monday, 6 = Sunday)
     const mondayBasedIndex = today === 0 ? 6 : today - 1
@@ -84,6 +89,25 @@ export function MealPlanNavigator({ mealPlan }: MealPlanNavigatorProps) {
     if (selectedDayIndex < mealPlan.meals.length - 1) {
       setSelectedDayIndex(selectedDayIndex + 1)
     }
+  }
+
+  // Safety check: ensure we have meals and selected index is valid
+  if (!mealPlan?.meals || mealPlan.meals.length === 0) {
+    return (
+      <Card className="hover:shadow-md transition-shadow">
+        <CardHeader>
+          <CardTitle className="text-lg font-semibold text-foreground flex items-center gap-2">
+            <UtensilsCrossed className="h-5 w-5 text-orange-600" />
+            Plano de Refeições
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-muted-foreground text-center py-8">
+            Nenhum plano de refeições disponível
+          </p>
+        </CardContent>
+      </Card>
+    )
   }
 
   const selectedDay = mealPlan.meals[selectedDayIndex]

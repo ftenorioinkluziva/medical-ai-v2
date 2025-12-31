@@ -35,7 +35,7 @@ export async function generateSynthesis(
   analyses: AgentAnalysis[],
   options: GenerateSynthesisOptions = {}
 ): Promise<Synthesis> {
-  const { structuredDocuments = [], enableValidation = true } = options
+  const { structuredDocuments = [], enableValidation = false } = options
 
   console.log(`🧠 [SYNTHESIS] Generating synthesis from ${analyses.length} analyses...`)
   console.log(`🧠 [SYNTHESIS] Structured documents: ${structuredDocuments.length}`)
@@ -86,13 +86,22 @@ REGRAS CRÍTICAS:
 7. ✅ FOQUE em insights acionáveis e relevantes clinicamente
 
 🚨 REGRAS DE VALIDAÇÃO DE DADOS - EXTREMAMENTE IMPORTANTE:
-1. ❌ NUNCA mencione parâmetros que NÃO estão na lista "PARÂMETROS DISPONÍVEIS" acima
-2. ❌ NUNCA invente ou infira valores de exames que não foram realizados
-3. ❌ Se um parâmetro não foi testado, escreva explicitamente "não testado" ou "não disponível"
-4. ❌ NÃO confunda substrings de palavras (ex: "BASTOS" não é "AST", "BASTONETES" não é "TGO")
-5. ✅ CITE valores EXATOS como aparecem nos parâmetros disponíveis
-6. ✅ Se múltiplos agentes mencionaram um parâmetro que NÃO está disponível, QUESTIONE e ignore
-7. ✅ Prefira dizer "dados insuficientes" a fazer suposições
+
+**O QUE É PROIBIDO:**
+1. ❌ NUNCA invente valores de parâmetros que NÃO estão na lista "PARÂMETROS DISPONÍVEIS"
+2. ❌ NUNCA afirme que um parâmetro está alto/baixo/normal se ele não foi testado
+3. ❌ NÃO confunda substrings de palavras (ex: "BASTOS" não é "AST", "BASTONETES" não é "TGO")
+4. ❌ NUNCA infira valores aproximados de exames não realizados
+
+**O QUE É PERMITIDO:**
+1. ✅ Mencionar parâmetros NÃO disponíveis para RECOMENDAR exames futuros
+   - Exemplo: "Recomenda-se solicitar T3 Livre e T3 Reverso no próximo ciclo"
+2. ✅ Mencionar parâmetros NÃO disponíveis explicitando que NÃO foram testados
+   - Exemplo: "(T3 Livre e T3 Reverso: não disponíveis)"
+   - Exemplo: "T4 Livre foi medido, porém T3 Livre não foi testado"
+3. ✅ Citar valores EXATOS como aparecem nos parâmetros disponíveis
+4. ✅ Se múltiplos agentes mencionaram um parâmetro que NÃO está disponível, QUESTIONE e ignore
+5. ✅ Prefira dizer "dados insuficientes" a fazer suposições
 
 **ATENÇÃO ESPECIAL:** Se você encontrar menções a TGO, AST, ou outros marcadores nas análises dos especialistas,
 VERIFIQUE na lista de parâmetros disponíveis se esses exames foram realmente realizados.

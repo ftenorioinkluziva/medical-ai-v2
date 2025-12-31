@@ -12,6 +12,7 @@ import { generateRecommendationsFromMultipleAnalyses } from '@/lib/ai/recommenda
 import { generateCompleteWeeklyPlan } from '@/lib/ai/weekly-plans/multi-analysis-orchestrator'
 import { buildKnowledgeContext } from '@/lib/ai/knowledge'
 import { getKnowledgeConfig } from '@/lib/db/settings'
+import { debitCredits, calculateCreditsFromTokens } from '@/lib/billing/credits'
 
 /**
  * Run complete multi-agent analysis workflow
@@ -275,6 +276,23 @@ ${integrativeKnowledge ? `## Base de Conhecimento Médico (Referências)\n${inte
 
     console.log(`✅ [COMPLETE-ANALYSIS] Integrative analysis saved: ${savedIntegrative.id}`)
 
+    // Debit credits for integrative analysis
+    try {
+      const tokensUsed = integrativeAnalysis.usage?.totalTokens || 0
+      if (tokensUsed > 0) {
+        await debitCredits(userId, tokensUsed, {
+          analysisId: savedIntegrative.id,
+          operation: 'complete_analysis_integrative',
+          modelName: integrativeAgent.modelName || 'gemini-2.5-flash',
+          promptTokens: integrativeAnalysis.usage?.promptTokens || 0,
+          completionTokens: integrativeAnalysis.usage?.completionTokens || 0,
+        })
+        console.log(`💰 [COMPLETE-ANALYSIS] Debited ${calculateCreditsFromTokens(tokensUsed)} credits for integrative analysis`)
+      }
+    } catch (creditError) {
+      console.error('⚠️ [COMPLETE-ANALYSIS] Failed to debit credits for integrative:', creditError)
+    }
+
     // ================================================================
     // FASE 2: ANÁLISES ESPECIALIZADAS (Paralelo com Contexto)
     // ================================================================
@@ -509,6 +527,35 @@ ${exerciseKnowledge ? `## Base de Conhecimento Médico (Referências)\n${exercis
     console.log(`   - Nutrition: ${savedNutrition.id}`)
     console.log(`   - Exercise: ${savedExercise.id}`)
 
+    // Debit credits for specialized analyses
+    try {
+      const nutritionTokens = nutritionAnalysis.usage?.totalTokens || 0
+      if (nutritionTokens > 0) {
+        await debitCredits(userId, nutritionTokens, {
+          analysisId: savedNutrition.id,
+          operation: 'complete_analysis_nutrition',
+          modelName: nutritionAgent.modelName || 'gemini-2.5-flash',
+          promptTokens: nutritionAnalysis.usage?.promptTokens || 0,
+          completionTokens: nutritionAnalysis.usage?.completionTokens || 0,
+        })
+        console.log(`💰 [COMPLETE-ANALYSIS] Debited ${calculateCreditsFromTokens(nutritionTokens)} credits for nutrition analysis`)
+      }
+
+      const exerciseTokens = exerciseAnalysis.usage?.totalTokens || 0
+      if (exerciseTokens > 0) {
+        await debitCredits(userId, exerciseTokens, {
+          analysisId: savedExercise.id,
+          operation: 'complete_analysis_exercise',
+          modelName: exerciseAgent.modelName || 'gemini-2.5-flash',
+          promptTokens: exerciseAnalysis.usage?.promptTokens || 0,
+          completionTokens: exerciseAnalysis.usage?.completionTokens || 0,
+        })
+        console.log(`💰 [COMPLETE-ANALYSIS] Debited ${calculateCreditsFromTokens(exerciseTokens)} credits for exercise analysis`)
+      }
+    } catch (creditError) {
+      console.error('⚠️ [COMPLETE-ANALYSIS] Failed to debit credits for specialized analyses:', creditError)
+    }
+
     // ================================================================
     // FASE 3: SÍNTESE CONSOLIDADA
     // ================================================================
@@ -563,6 +610,40 @@ ${exerciseKnowledge ? `## Base de Conhecimento Médico (Referências)\n${exercis
     ])
 
     console.log('✅ [COMPLETE-ANALYSIS] Recommendations and Weekly Plan generated')
+
+    // Debit credits for recommendations
+    try {
+      const recTokens = recommendations.usage?.totalTokens || 0
+      if (recTokens > 0) {
+        await debitCredits(userId, recTokens, {
+          operation: 'complete_analysis_recommendations',
+          modelName: 'gemini-2.5-flash',
+          promptTokens: recommendations.usage?.promptTokens || 0,
+          completionTokens: recommendations.usage?.completionTokens || 0,
+          description: `Recommendations for complete analysis ${analysisRecord.id}`,
+        })
+        console.log(`💰 [COMPLETE-ANALYSIS] Debited ${calculateCreditsFromTokens(recTokens)} credits for recommendations`)
+      }
+    } catch (creditError) {
+      console.error('⚠️ [COMPLETE-ANALYSIS] Failed to debit credits for recommendations:', creditError)
+    }
+
+    // Debit credits for weekly plan (sum of all 4 components)
+    try {
+      const planTokens = weeklyPlan.usage?.totalTokens || 0
+      if (planTokens > 0) {
+        await debitCredits(userId, planTokens, {
+          operation: 'complete_analysis_weekly_plan',
+          modelName: 'gemini-2.5-flash',
+          promptTokens: weeklyPlan.usage?.promptTokens || 0,
+          completionTokens: weeklyPlan.usage?.completionTokens || 0,
+          description: `Weekly plan (Supp: ${weeklyPlan.usage?.supplementation || 0}, Shop: ${weeklyPlan.usage?.shopping || 0}, Meals: ${weeklyPlan.usage?.meals || 0}, Workout: ${weeklyPlan.usage?.workout || 0})`,
+        })
+        console.log(`💰 [COMPLETE-ANALYSIS] Debited ${calculateCreditsFromTokens(planTokens)} credits for weekly plan (${planTokens} tokens)`)
+      }
+    } catch (creditError) {
+      console.error('⚠️ [COMPLETE-ANALYSIS] Failed to debit credits for weekly plan:', creditError)
+    }
 
     // ================================================================
     // FINALIZAÇÃO: Atualizar registro com todos os IDs

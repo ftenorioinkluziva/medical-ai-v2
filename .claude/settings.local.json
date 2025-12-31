@@ -60,7 +60,9 @@
       "Bash(npx tsc:*)",
       "Bash(npx eslint:*)",
       "Bash(find:*)",
-      "Bash(npx shadcn@latest add:*)"
+      "Bash(npx shadcn@latest add:*)",
+      "Bash(pnpm build)",
+      "Bash(pnpm db:seed-test-users:*)"
     ],
     "deny": [],
     "ask": []

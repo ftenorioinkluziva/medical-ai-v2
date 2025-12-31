@@ -234,31 +234,27 @@ export function AnalysisInterface({
             ) : (
               <div className="space-y-2 max-h-64 overflow-y-auto border rounded-md p-3">
                 {documents.map((doc) => (
-                  <div
+                  <label
                     key={doc.id}
-                    className="flex items-start space-x-2 p-2 hover:bg-muted/50 rounded-md cursor-pointer"
-                    onClick={() => toggleDocument(doc.id)}
+                    htmlFor={`doc-${doc.id}`}
+                    className="flex items-start space-x-3 p-3 hover:bg-muted/50 rounded-md cursor-pointer transition-colors"
                   >
                     <Checkbox
                       id={`doc-${doc.id}`}
                       checked={selectedDocumentIds.includes(doc.id)}
                       onCheckedChange={() => toggleDocument(doc.id)}
+                      className="mt-0.5"
                     />
-                    <Label
-                      htmlFor={`doc-${doc.id}`}
-                      className="text-sm font-normal cursor-pointer flex-1"
-                    >
-                      <div className="flex items-center gap-2">
-                        <File className="h-4 w-4 flex-shrink-0" />
-                        <div className="flex-1 min-w-0">
-                          <p className="truncate">{doc.fileName}</p>
-                          <p className="text-xs text-muted-foreground">
-                            {new Date(doc.createdAt).toLocaleDateString('pt-BR')}
-                          </p>
-                        </div>
+                    <div className="flex items-center gap-2 flex-1 min-w-0">
+                      <File className="h-4 w-4 flex-shrink-0 text-muted-foreground" />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium truncate">{doc.fileName}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {new Date(doc.createdAt).toLocaleDateString('pt-BR')}
+                        </p>
                       </div>
-                    </Label>
-                  </div>
+                    </div>
+                  </label>
                 ))}
               </div>
             )}
@@ -282,38 +278,34 @@ export function AnalysisInterface({
               ) : (
                 <div className="space-y-2 max-h-48 overflow-y-auto border rounded-md p-3">
                   {previousAnalyses.map((analysis) => (
-                    <div
+                    <label
                       key={analysis.id}
-                      className="flex items-start space-x-2 p-2 hover:bg-muted/50 rounded-md cursor-pointer"
-                      onClick={() => togglePreviousAnalysis(analysis.id)}
+                      htmlFor={`analysis-${analysis.id}`}
+                      className="flex items-start space-x-3 p-3 hover:bg-muted/50 rounded-md cursor-pointer transition-colors"
                     >
                       <Checkbox
                         id={`analysis-${analysis.id}`}
                         checked={selectedPreviousAnalysisIds.includes(analysis.id)}
                         onCheckedChange={() => togglePreviousAnalysis(analysis.id)}
+                        className="mt-0.5"
                       />
-                      <Label
-                        htmlFor={`analysis-${analysis.id}`}
-                        className="text-sm font-normal cursor-pointer flex-1"
-                      >
-                        <div className="flex items-center gap-2">
-                          <div
-                            className="h-2 w-2 rounded-full flex-shrink-0"
-                            style={{ backgroundColor: analysis.agentColor }}
-                          />
-                          <div className="flex-1 min-w-0">
-                            <p className="font-medium truncate">{analysis.agentName}</p>
-                            <p className="text-xs text-muted-foreground">
-                              {new Date(analysis.createdAt).toLocaleDateString('pt-BR', {
-                                day: '2-digit',
-                                month: 'short',
-                                year: 'numeric',
-                              })}
-                            </p>
-                          </div>
+                      <div className="flex items-center gap-2 flex-1 min-w-0">
+                        <div
+                          className="h-2 w-2 rounded-full flex-shrink-0"
+                          style={{ backgroundColor: analysis.agentColor }}
+                        />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium truncate">{analysis.agentName}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {new Date(analysis.createdAt).toLocaleDateString('pt-BR', {
+                              day: '2-digit',
+                              month: 'short',
+                              year: 'numeric',
+                            })}
+                          </p>
                         </div>
-                      </Label>
-                    </div>
+                      </div>
+                    </label>
                   ))}
                 </div>
               )}

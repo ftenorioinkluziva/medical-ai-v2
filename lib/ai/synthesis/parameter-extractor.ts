@@ -270,15 +270,24 @@ export function validateMentionedParameters(
       if (!available) {
         // Check if the mention is in an acceptable context (not analyzing, just suggesting)
         const contextPatterns = [
-          // Patterns for "not available" context
-          new RegExp(`${paramLower}[^.]{0,50}(não (está |estão )?(disponível|testado|medido|avaliado)|não foi (testado|medido|avaliado))`, 'i'),
-          new RegExp(`(dados|valores|informações)[^.]{0,50}${paramLower}[^.]{0,50}não (disponível|testado|medido|avaliado)`, 'i'),
-          new RegExp(`${paramLower}[^.]{0,50}(ausente|faltando|pendente)`, 'i'),
+          // Patterns for "not available" context (with plural support)
+          new RegExp(`${paramLower}[^.]{0,100}(não (está |estão )?(disponíveis?|testados?|medidos?|avaliados?)|não foi (testado|medido|avaliado))`, 'i'),
+          new RegExp(`(dados|valores|informações)[^.]{0,80}${paramLower}[^.]{0,80}não (disponíveis?|testados?|medidos?|avaliados?)`, 'i'),
+          new RegExp(`${paramLower}[^.]{0,80}(ausentes?|faltando|pendentes?)`, 'i'),
+
+          // Pattern for parenthetical "not available" like: (T3 Livre: não disponível)
+          new RegExp(`\\(.*${paramLower}[^)]{0,100}(não |sem )(disponíveis?|testados?|dados?)`, 'i'),
+
+          // Pattern for colon-separated lists like: T3 Livre e T3 Reverso: não disponíveis
+          new RegExp(`${paramLower}[^:]{0,50}:[^.]{0,50}não (disponíveis?|testados?)`, 'i'),
 
           // Patterns for "suggested for next evaluation" context
-          new RegExp(`(marcadores|exames|testes)[^.]{0,100}(sugerid|recomendad|indicad)[^.]{0,100}${paramLower}`, 'i'),
-          new RegExp(`${paramLower}[^.]{0,50}(próxima|futuro|seguinte).{0,30}avaliação`, 'i'),
-          new RegExp(`(solicitar|pedir|incluir|adicionar)[^.]{0,50}${paramLower}`, 'i'),
+          new RegExp(`(marcadores|exames|testes|parâmetros)[^.]{0,100}(sugerid|recomendad|indicad|solicitad)[^.]{0,100}${paramLower}`, 'i'),
+          new RegExp(`${paramLower}[^.]{0,80}(próxim|futur|seguinte)[ao]s?.{0,30}(avaliação|exame|ciclo)`, 'i'),
+          new RegExp(`(solicitar|pedir|incluir|adicionar|recomendar)[^.]{0,80}${paramLower}`, 'i'),
+
+          // Pattern for "not tested" context
+          new RegExp(`${paramLower}[^.]{0,50}(não (testado|realizado|feito)|sem (dados|valores))`, 'i'),
         ]
 
         // Check if ANY pattern matches (acceptable context)

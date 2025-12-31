@@ -71,7 +71,16 @@ interface CompleteAnalysisResultViewProps {
 }
 
 export function CompleteAnalysisResultView({ analysis }: CompleteAnalysisResultViewProps) {
-  const { synthesis, analyses, recommendations, weeklyPlan } = analysis
+  const { synthesis, analyses, recommendations, weeklyPlan: rawWeeklyPlan } = analysis
+
+  // Normalize weekly plan data (handle old format with {object, usage})
+  const weeklyPlan = rawWeeklyPlan ? {
+    ...rawWeeklyPlan,
+    supplementationStrategy: rawWeeklyPlan.supplementationStrategy?.object || rawWeeklyPlan.supplementationStrategy,
+    shoppingList: rawWeeklyPlan.shoppingList?.object || rawWeeklyPlan.shoppingList,
+    mealPlan: rawWeeklyPlan.mealPlan?.object || rawWeeklyPlan.mealPlan,
+    workoutPlan: rawWeeklyPlan.workoutPlan?.object || rawWeeklyPlan.workoutPlan,
+  } : null
 
   const formatDate = (dateString: string) => {
     return format(new Date(dateString), "dd 'de' MMMM, yyyy 'às' HH:mm", { locale: ptBR })
@@ -456,17 +465,32 @@ export function CompleteAnalysisResultView({ analysis }: CompleteAnalysisResultV
 
         {/* Plan Tab (ex-Weekly Plan) */}
         <TabsContent value="plan" className="mt-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Calendar className="h-5 w-5 text-teal-600 dark:text-teal-400" />
-                Plano Semanal Integrado
-              </CardTitle>
-              <CardDescription>
-                Um guia prático para sua semana, integrando suplementação, compras, refeições e treinos.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
+          {!weeklyPlan ? (
+            <Card>
+              <CardContent className="p-8">
+                <div className="text-center space-y-3">
+                  <div className="bg-muted rounded-lg p-4 inline-block">
+                    <Calendar className="h-12 w-12 text-muted-foreground" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-foreground">Plano Semanal Não Disponível</h3>
+                  <p className="text-sm text-muted-foreground">
+                    O plano semanal não foi gerado para esta análise.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          ) : (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Calendar className="h-5 w-5 text-teal-600 dark:text-teal-400" />
+                  Plano Semanal Integrado
+                </CardTitle>
+                <CardDescription>
+                  Um guia prático para sua semana, integrando suplementação, compras, refeições e treinos.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
               <Tabs defaultValue="supplements" className="w-full">
                 <TabsList className="grid w-full grid-cols-4 bg-muted">
                   <TabsTrigger value="supplements" className="gap-1.5 sm:gap-2 data-[state=active]:!bg-purple-600 dark:data-[state=active]:!bg-purple-500 data-[state=active]:!text-white">
@@ -656,6 +680,7 @@ export function CompleteAnalysisResultView({ analysis }: CompleteAnalysisResultV
               </Tabs>
             </CardContent>
           </Card>
+          )}
         </TabsContent>
       </Tabs>
 

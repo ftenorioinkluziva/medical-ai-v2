@@ -102,7 +102,7 @@ export async function generateRecommendationsFromMultipleAnalyses(
   console.log('🤖 [MULTI-RECOMMENDATIONS] Generating integrated recommendations...')
 
   // Gerar recomendações integradas
-  const { object: recommendations } = await generateObject({
+  const result = await generateObject({
     model: google('gemini-2.5-flash'),
     schema: recommendationsSchema,
     prompt: `Você é um coordenador médico especializado em medicina integrativa.
@@ -183,6 +183,8 @@ DIRETRIZES IMPORTANTES:
 Gere as recomendações consolidadas.`,
   })
 
+  const recommendations = result.object
+
   console.log(`✅ [MULTI-RECOMMENDATIONS] Generated:`)
   console.log(`   - ${recommendations.examRecommendations.length} exam recommendations`)
   console.log(`   - ${recommendations.lifestyleRecommendations.length} lifestyle recommendations`)
@@ -209,5 +211,6 @@ Gere as recomendações consolidadas.`,
     recommendations,
     analysisIds,
     createdAt: savedRec.createdAt,
+    usage: result.usage, // Return usage for credit debit
   }
 }

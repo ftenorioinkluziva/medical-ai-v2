@@ -87,7 +87,7 @@ IMPORTANTE: Seu plano semanal deve IMPLEMENTAR estas recomendações.
   console.log('🤖 [MULTI-WEEKLY-PLAN] Generating all components in parallel...')
 
   // Gerar todos os componentes em paralelo
-  const [supplementation, shopping, meals, workout] = await Promise.all([
+  const [suppResult, shopResult, mealResult, workoutResult] = await Promise.all([
     // Suplementação - com contexto integrado
     generateSupplementationStrategy(consolidatedContext),
 
@@ -102,6 +102,12 @@ IMPORTANTE: Seu plano semanal deve IMPLEMENTAR estas recomendações.
   ])
 
   console.log('✅ [MULTI-WEEKLY-PLAN] All components generated')
+
+  // Extract objects from results (discard usage metadata)
+  const supplementation = suppResult.object
+  const shopping = shopResult.object
+  const meals = mealResult.object
+  const workout = workoutResult.object
 
   // Calcular data de início (próxima segunda-feira)
   const today = new Date()
@@ -129,6 +135,12 @@ IMPORTANTE: Seu plano semanal deve IMPLEMENTAR estas recomendações.
 
   console.log(`✅ [MULTI-WEEKLY-PLAN] Plan saved: ${savedPlan.id}`)
 
+  // Calculate total usage from all generators
+  const totalTokens = (suppResult.usage?.totalTokens || 0) +
+                     (shopResult.usage?.totalTokens || 0) +
+                     (mealResult.usage?.totalTokens || 0) +
+                     (workoutResult.usage?.totalTokens || 0)
+
   return {
     id: savedPlan.id,
     weekStartDate: savedPlan.weekStartDate,
@@ -137,5 +149,20 @@ IMPORTANTE: Seu plano semanal deve IMPLEMENTAR estas recomendações.
     mealPlan: savedPlan.mealPlan,
     workoutPlan: savedPlan.workoutPlan,
     createdAt: savedPlan.createdAt,
+    usage: {
+      totalTokens,
+      supplementation: suppResult.usage?.totalTokens || 0,
+      shopping: shopResult.usage?.totalTokens || 0,
+      meals: mealResult.usage?.totalTokens || 0,
+      workout: workoutResult.usage?.totalTokens || 0,
+      promptTokens: (suppResult.usage?.promptTokens || 0) +
+                    (shopResult.usage?.promptTokens || 0) +
+                    (mealResult.usage?.promptTokens || 0) +
+                    (workoutResult.usage?.promptTokens || 0),
+      completionTokens: (suppResult.usage?.completionTokens || 0) +
+                       (shopResult.usage?.completionTokens || 0) +
+                       (mealResult.usage?.completionTokens || 0) +
+                       (workoutResult.usage?.completionTokens || 0),
+    },
   }
 }
