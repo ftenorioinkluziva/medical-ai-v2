@@ -10,6 +10,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Separator } from '@/components/ui/separator'
+import { MealPlanNavigator } from './meal-plan-navigator'
+import { WorkoutPlanNavigator } from './workout-plan-navigator'
 import {
   Loader2,
   Calendar,
@@ -18,6 +21,8 @@ import {
   UtensilsCrossed,
   Dumbbell,
   AlertCircle,
+  Clock,
+  Target,
 } from 'lucide-react'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
@@ -180,7 +185,7 @@ export function WeeklyPlanWidget({ patientId }: WeeklyPlanWidgetProps = {}) {
               <Pill className="h-4 w-4" />
               <span className="hidden sm:inline">Suplementação</span>
             </TabsTrigger>
-            <TabsTrigger value="shopping" className="gap-1.5 sm:gap-2 data-[state=active]:!bg-emerald-600 dark:data-[state=active]:!bg-emerald-500 data-[state=active]:!text-white">
+            <TabsTrigger value="shopping" className="gap-1.5 sm:gap-2 data-[state=active]:!bg-sky-600 dark:data-[state=active]:!bg-sky-500 data-[state=active]:!text-white">
               <ShoppingCart className="h-4 w-4" />
               <span className="hidden sm:inline">Compras</span>
             </TabsTrigger>
@@ -188,7 +193,7 @@ export function WeeklyPlanWidget({ patientId }: WeeklyPlanWidgetProps = {}) {
               <UtensilsCrossed className="h-4 w-4" />
               <span className="hidden sm:inline">Refeições</span>
             </TabsTrigger>
-            <TabsTrigger value="workouts" className="gap-1.5 sm:gap-2 data-[state=active]:!bg-sky-600 dark:data-[state=active]:!bg-sky-500 data-[state=active]:!text-white">
+            <TabsTrigger value="workouts" className="gap-1.5 sm:gap-2 data-[state=active]:!bg-emerald-600 dark:data-[state=active]:!bg-emerald-500 data-[state=active]:!text-white">
               <Dumbbell className="h-4 w-4" />
               <span className="hidden sm:inline">Treinos</span>
             </TabsTrigger>
@@ -254,188 +259,158 @@ export function WeeklyPlanWidget({ patientId }: WeeklyPlanWidgetProps = {}) {
           {/* Supplements Tab */}
           <TabsContent value="supplements" className="mt-4 sm:mt-6">
             <div className="mb-4">
-              <p className="text-sm text-muted-foreground">{plan.supplementationStrategy.overview}</p>
+              <p className="text-sm text-muted-foreground leading-relaxed">{plan.supplementationStrategy.overview}</p>
             </div>
-            <div className="space-y-3">
-              {plan.supplementationStrategy.supplements.map((supplement, index) => (
-                <div key={index} className="p-3 border border-border rounded-lg hover:border-purple-300 hover:bg-purple-50/30 dark:hover:bg-purple-950/30 transition-all">
-                  <div className="flex items-start gap-2">
-                    <div className="bg-purple-100 dark:bg-purple-900/20 p-1.5 rounded shrink-0">
-                      <Pill className="h-3 w-3 text-purple-700 dark:text-purple-400" />
+            <div className="space-y-4">
+              {plan.supplementationStrategy.supplements.map((supplement: any, index: number) => (
+                <div key={index} className="p-4 border border-border rounded-lg bg-card hover:border-purple-300 dark:hover:border-purple-700 hover:bg-purple-50/30 dark:hover:bg-purple-950/30 transition-all">
+                  <h4 className="font-semibold text-base text-foreground mb-3">{supplement.name}</h4>
+                  <div className="space-y-2.5 text-sm">
+                    <div className="flex items-center gap-2">
+                      <Pill className="h-4 w-4 text-muted-foreground shrink-0" />
+                      <p className="text-muted-foreground">{supplement.dosage}</p>
                     </div>
-                    <div className="flex-1">
-                      <h4 className="font-semibold text-foreground">{supplement.name}</h4>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        {supplement.dosage} - {supplement.timing}
-                      </p>
-                      <p className="text-xs text-muted-foreground mt-1">{supplement.purpose}</p>
+                    <div className="flex items-center gap-2">
+                      <Clock className="h-4 w-4 text-muted-foreground shrink-0" />
+                      <p className="text-muted-foreground">{supplement.timing}</p>
                     </div>
+                    <div className="flex items-start gap-2">
+                      <Target className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
+                      <p className="text-muted-foreground leading-relaxed">{supplement.purpose}</p>
+                    </div>
+                    {supplement.duration && (
+                      <p className="text-xs text-muted-foreground mt-2">Duração: {supplement.duration}</p>
+                    )}
                   </div>
                 </div>
               ))}
+
+              {plan.supplementationStrategy.hormonalSupport &&
+               plan.supplementationStrategy.hormonalSupport.length > 0 && (
+                <>
+                  <Separator className="my-6" />
+                  <div>
+                    <h4 className="font-semibold text-base text-foreground mb-4">Suporte Hormonal</h4>
+                    <div className="space-y-3">
+                      {plan.supplementationStrategy.hormonalSupport.map((hormone: any, index: number) => (
+                        <div key={index} className="p-4 border border-purple-200 dark:border-purple-700 rounded-lg bg-card hover:bg-purple-50/30 dark:hover:bg-purple-950/30 transition-colors">
+                          <h5 className="font-semibold text-sm text-foreground">{hormone.hormone}</h5>
+                          <p className="text-sm text-foreground mt-2 leading-relaxed">{hormone.strategy}</p>
+                          <p className="text-xs text-muted-foreground mt-2">
+                            Monitoramento: {hormone.monitoring}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {plan.supplementationStrategy.nextExamRecommendations &&
+               plan.supplementationStrategy.nextExamRecommendations.length > 0 && (
+                <>
+                  <Separator className="my-6" />
+                  <div>
+                    <h4 className="font-semibold text-base text-foreground mb-4">Exames Recomendados para o Próximo Ciclo</h4>
+                    <ul className="space-y-2.5">
+                      {plan.supplementationStrategy.nextExamRecommendations.map((exam: string, index: number) => (
+                        <li key={index} className="flex items-start gap-2.5 text-sm">
+                          <span className="text-teal-600 mt-0.5">•</span>
+                          <span className="text-foreground leading-relaxed">{exam}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </>
+              )}
             </div>
           </TabsContent>
 
           {/* Shopping Tab */}
           <TabsContent value="shopping" className="mt-4 sm:mt-6">
             <div className="mb-4">
-              <p className="text-sm text-muted-foreground">{plan.shoppingList.overview}</p>
-            </div>
-            <div className="space-y-3">
-              {plan.shoppingList.categories.map((category, index) => (
-                <div key={index} className="p-3 border border-border rounded-lg hover:border-emerald-300 hover:bg-emerald-50/30 dark:hover:bg-emerald-950/30 transition-all">
-                  <h4 className="font-semibold text-foreground mb-2">{category.category}</h4>
-                  <div className="flex flex-wrap gap-1">
-                    {category.items.map((item, idx) => (
-                      <Badge key={idx} variant="outline">
-                        {item.item}
-                      </Badge>
-                    ))}
-                  </div>
+              <p className="text-sm text-muted-foreground leading-relaxed">{plan.shoppingList.overview}</p>
+              {plan.shoppingList.estimatedCost && (
+                <div className="mt-3 p-3 bg-sky-50 dark:bg-sky-950/20 border border-sky-200 dark:border-sky-800 rounded-lg space-y-2">
+                  <p className="text-sm text-sky-900 dark:text-sky-100 leading-relaxed font-medium">
+                    {plan.shoppingList.estimatedCost}
+                  </p>
                 </div>
-              ))}
+              )}
             </div>
-          </TabsContent>
-
-          {/* Meals Tab */}
-          <TabsContent value="meals" className="mt-4 sm:mt-6">
-            <div className="mb-4">
-              <p className="text-sm text-muted-foreground">{plan.mealPlan.overview}</p>
-            </div>
-            <div className="space-y-4">
-              {plan.mealPlan.meals.map((day: any, index: number) => (
-                <div key={index} className="border border-border rounded-lg p-4 bg-card hover:border-orange-300 hover:bg-orange-50/20 dark:hover:bg-orange-950/20 transition-all">
-                  <h4 className="font-semibold text-foreground mb-4">{day.day}</h4>
-
-                  <div className="space-y-4">
-                    {/* Breakfast */}
-                    {day.breakfast && (
-                      <div>
-                        <h5 className="font-semibold text-sm text-orange-600 dark:text-orange-400 mb-2">☀️ Café da Manhã</h5>
-                        <div className="pl-4 space-y-1">
-                          <p className="font-semibold text-sm text-foreground">{day.breakfast.name}</p>
-                          <ul className="text-xs text-muted-foreground space-y-0.5 mt-1">
-                            {day.breakfast.ingredients?.map((ing: string, i: number) => (
-                              <li key={i}>• {ing}</li>
-                            ))}
-                          </ul>
+            <div className="space-y-6">
+              {plan.shoppingList.categories?.map((category: any, index: number) => (
+                <div key={index}>
+                  <h4 className="font-semibold text-base text-foreground mb-4 flex items-center gap-2">
+                    <ShoppingCart className="h-5 w-5 text-sky-600 dark:text-sky-400" />
+                    {category.category}
+                  </h4>
+                  <div className="grid gap-3 md:grid-cols-2">
+                    {category.items.map((item: any, itemIndex: number) => (
+                      <div
+                        key={itemIndex}
+                        className={`p-4 border rounded-lg transition-all ${
+                          item.priority === 'high'
+                            ? 'border-red-200 dark:border-red-800 bg-card hover:bg-red-50/30 dark:hover:bg-red-950/30'
+                            : item.priority === 'medium'
+                            ? 'border-amber-200 dark:border-amber-800 bg-card hover:bg-amber-50/30 dark:hover:bg-amber-950/30'
+                            : 'border-border bg-card hover:border-sky-300 dark:hover:border-sky-700 hover:bg-sky-50/30 dark:hover:bg-sky-950/30'
+                        }`}
+                      >
+                        <div className="flex items-start justify-between mb-2">
+                          <p className="font-semibold text-sm text-foreground">{item.item}</p>
+                          {item.priority && (
+                            <Badge
+                              className={`text-xs ${
+                                item.priority === 'high'
+                                  ? 'bg-red-100 dark:bg-red-950/30 text-red-700 dark:text-red-300 border-red-200 dark:border-red-700'
+                                  : 'bg-amber-100 dark:bg-amber-950/30 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-700'
+                              }`}
+                            >
+                              {item.priority}
+                            </Badge>
+                          )}
                         </div>
-                      </div>
-                    )}
-
-                    {/* Lunch */}
-                    {day.lunch && (
-                      <div>
-                        <h5 className="font-semibold text-sm text-emerald-600 dark:text-emerald-400 mb-2">🌞 Almoço</h5>
-                        <div className="pl-4 space-y-1">
-                          <p className="font-semibold text-sm text-foreground">{day.lunch.name}</p>
-                          <ul className="text-xs text-muted-foreground space-y-0.5 mt-1">
-                            {day.lunch.ingredients?.map((ing: string, i: number) => (
-                              <li key={i}>• {ing}</li>
-                            ))}
-                          </ul>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Dinner */}
-                    {day.dinner && (
-                      <div>
-                        <h5 className="font-semibold text-sm text-sky-600 dark:text-sky-400 mb-2">🌙 Jantar</h5>
-                        <div className="pl-4 space-y-1">
-                          <p className="font-semibold text-sm text-foreground">{day.dinner.name}</p>
-                          <ul className="text-xs text-muted-foreground space-y-0.5 mt-1">
-                            {day.dinner.ingredients?.map((ing: string, i: number) => (
-                              <li key={i}>• {ing}</li>
-                            ))}
-                          </ul>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Snacks */}
-                    {day.snacks && day.snacks.length > 0 && (
-                      <div>
-                        <h5 className="font-semibold text-sm text-purple-600 dark:text-purple-400 mb-2">🍎 Lanches</h5>
-                        <div className="pl-4 space-y-1">
-                          {day.snacks.map((snack: any, i: number) => (
-                            <div key={i} className="text-xs">
-                              <span className="font-semibold text-foreground">{snack.name}</span>
-                              <span className="text-muted-foreground"> ({snack.timing})</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </TabsContent>
-
-          {/* Workouts Tab */}
-          <TabsContent value="workouts" className="mt-4 sm:mt-6">
-            <div className="mb-4">
-              <p className="text-sm text-muted-foreground">{plan.workoutPlan.overview}</p>
-            </div>
-            <div className="space-y-4">
-              {plan.workoutPlan.workouts.map((workout: any, index: number) => (
-                <div key={index} className="border border-border rounded-lg p-4 bg-card hover:border-sky-300 hover:bg-sky-50/20 dark:hover:bg-sky-950/20 transition-all">
-                  <div className="flex items-start justify-between mb-4">
-                    <div>
-                      <h4 className="font-semibold text-foreground">{workout.day}</h4>
-                      <p className="text-sm text-muted-foreground mt-1">{workout.type}</p>
-                    </div>
-                    <div className="flex gap-2">
-                      {workout.duration && (
-                        <Badge className="bg-sky-100 dark:bg-sky-900/30 text-sky-700 dark:text-sky-300 border-sky-200 dark:border-sky-800">{workout.duration}</Badge>
-                      )}
-                      {workout.intensity && (
-                        <Badge
-                          className={
-                            workout.intensity === 'high'
-                              ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 border-red-200 dark:border-red-800'
-                              : workout.intensity === 'medium'
-                              ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800'
-                              : 'bg-accent text-foreground border-border'
-                          }
-                        >
-                          {workout.intensity === 'high' ? 'Alta' : workout.intensity === 'medium' ? 'Média' : 'Baixa'}
-                        </Badge>
-                      )}
-                    </div>
-                  </div>
-
-                  {workout.warmup && (
-                    <div className="mb-3 p-2 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded text-xs">
-                      <strong>Aquecimento:</strong> {workout.warmup}
-                    </div>
-                  )}
-
-                  <div className="space-y-2">
-                    {workout.exercises?.map((exercise: any, exIndex: number) => (
-                      <div key={exIndex} className="p-3 bg-muted rounded border border-border hover:border-sky-300 hover:bg-sky-50/30 dark:hover:bg-sky-950/30 transition-all">
-                        <p className="font-semibold text-sm text-foreground">{exercise.name}</p>
-                        <div className="flex gap-3 text-xs text-muted-foreground mt-1">
-                          {exercise.sets && <span>Séries: {exercise.sets}</span>}
-                          {exercise.reps && <span>Reps: {exercise.reps}</span>}
-                          {exercise.duration && <span>Duração: {exercise.duration}</span>}
-                        </div>
-                        {exercise.notes && (
-                          <p className="text-xs text-muted-foreground mt-1 italic">{exercise.notes}</p>
+                        {item.quantity && (
+                          <p className="text-sm text-muted-foreground mt-1">{item.quantity}</p>
+                        )}
+                        {item.notes && (
+                          <p className="text-xs text-muted-foreground mt-2 italic leading-relaxed">{item.notes}</p>
                         )}
                       </div>
                     ))}
                   </div>
-
-                  {workout.cooldown && (
-                    <div className="mt-3 p-2 bg-sky-50 dark:bg-sky-950/20 border border-sky-200 dark:border-sky-800 rounded text-xs">
-                      <strong>Alongamento:</strong> {workout.cooldown}
-                    </div>
-                  )}
+                  {index < plan.shoppingList.categories.length - 1 && <Separator className="mt-6" />}
                 </div>
               ))}
+
+              {plan.shoppingList.tips && plan.shoppingList.tips.length > 0 && (
+                <>
+                  <Separator className="my-6" />
+                  <div className="border border-sky-200 dark:border-sky-800 rounded-lg p-4 bg-card hover:bg-sky-50/30 dark:hover:bg-sky-950/30 transition-colors">
+                    <h4 className="font-semibold text-base text-foreground mb-3">Dicas de Compra</h4>
+                    <ul className="space-y-2">
+                      {plan.shoppingList.tips.map((tip: string, index: number) => (
+                        <li key={index} className="text-sm text-foreground flex items-start gap-2.5 leading-relaxed">
+                          <span className="text-sky-600 mt-0.5">•</span>
+                          {tip}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </>
+              )}
             </div>
+          </TabsContent>
+
+          {/* Meals Tab */}
+          <TabsContent value="meals" className="mt-0">
+            <MealPlanNavigator mealPlan={plan.mealPlan} />
+          </TabsContent>
+
+          {/* Workouts Tab */}
+          <TabsContent value="workouts" className="mt-0">
+            <WorkoutPlanNavigator workoutPlan={plan.workoutPlan} />
           </TabsContent>
         </Tabs>
 
