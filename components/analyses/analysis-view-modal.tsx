@@ -5,13 +5,14 @@
  * Display full details of a saved analysis
  */
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
-import { Brain, Calendar, Clock, FileText, Zap, Hash, Lightbulb, CalendarDays, Loader2, AlertTriangle, TrendingUp } from 'lucide-react'
+import { Brain, Calendar, Clock, FileText, Zap, Hash, Lightbulb, CalendarDays, Loader2, AlertTriangle, TrendingUp, Eye } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
 import { toast } from 'sonner'
 
@@ -37,8 +38,52 @@ interface AnalysisViewModalProps {
 }
 
 export function AnalysisViewModal({ analysis, isOpen, onClose }: AnalysisViewModalProps) {
+  const router = useRouter()
   const [isGeneratingRec, setIsGeneratingRec] = useState(false)
   const [isGeneratingPlan, setIsGeneratingPlan] = useState(false)
+  const [hasRecommendation, setHasRecommendation] = useState(false)
+  const [hasWeeklyPlan, setHasWeeklyPlan] = useState(false)
+  const [isCheckingExistence, setIsCheckingExistence] = useState(true)
+
+  // Check if recommendation and weekly plan exist for this analysis
+  useEffect(() => {
+    const checkExistence = async () => {
+      if (!analysis?.id || !isOpen) {
+        setIsCheckingExistence(false)
+        return
+      }
+
+      setIsCheckingExistence(true)
+
+      try {
+        // Check for recommendation
+        const recResponse = await fetch('/api/recommendations/history')
+        if (recResponse.ok) {
+          const recData = await recResponse.json()
+          const hasRec = recData.recommendations?.some(
+            (rec: any) => rec.analysisId === analysis.id
+          )
+          setHasRecommendation(hasRec)
+        }
+
+        // Check for weekly plan
+        const planResponse = await fetch('/api/weekly-plan')
+        if (planResponse.ok) {
+          const planData = await planResponse.json()
+          const hasPlan = planData.plans?.some(
+            (plan: any) => plan.analysisId === analysis.id
+          )
+          setHasWeeklyPlan(hasPlan)
+        }
+      } catch (error) {
+        console.error('Error checking existence:', error)
+      } finally {
+        setIsCheckingExistence(false)
+      }
+    }
+
+    checkExistence()
+  }, [analysis?.id, isOpen])
 
   if (!analysis) return null
 
@@ -74,12 +119,18 @@ export function AnalysisViewModal({ analysis, isOpen, onClose }: AnalysisViewMod
       }
 
       toast.success('Recomendações geradas com sucesso!')
+      setHasRecommendation(true) // Update state to show "View" button
     } catch (error) {
       console.error('Error generating recommendations:', error)
       toast.error(error instanceof Error ? error.message : 'Erro ao gerar recomendações')
     } finally {
       setIsGeneratingRec(false)
     }
+  }
+
+  const handleViewRecommendations = () => {
+    router.push('/recommendations')
+    onClose()
   }
 
   const handleGenerateWeeklyPlan = async () => {
@@ -114,12 +165,18 @@ export function AnalysisViewModal({ analysis, isOpen, onClose }: AnalysisViewMod
       }
 
       toast.success('Plano semanal gerado com sucesso!')
+      setHasWeeklyPlan(true) // Update state to show "View" button
     } catch (error) {
       console.error('Error generating weekly plan:', error)
       toast.error(error instanceof Error ? error.message : 'Erro ao gerar plano semanal')
     } finally {
       setIsGeneratingPlan(false)
     }
+  }
+
+  const handleViewWeeklyPlan = () => {
+    router.push('/weekly-plan')
+    onClose()
   }
 
   return (
@@ -297,11 +354,12 @@ export function AnalysisViewModal({ analysis, isOpen, onClose }: AnalysisViewMod
                 AÇÕES
               </h3>
               <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+                {/* Recommendations Button */}
                 <Button
-                  onClick={handleGenerateRecommendations}
-                  disabled={isGeneratingRec}
+                  onClick={hasRecommendation ? handleViewRecommendations : handleGenerateRecommendations}
+                  disabled={isGeneratingRec || isCheckingExistence}
                   className="flex-1"
-                  variant="outline"
+                  variant={hasRecommendation ? "default" : "outline"}
                   size="sm"
                 >
                   {isGeneratingRec ? (
@@ -309,6 +367,12 @@ export function AnalysisViewModal({ analysis, isOpen, onClose }: AnalysisViewMod
                       <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                       <span className="hidden sm:inline">Gerando...</span>
                       <span className="sm:hidden">Gerando</span>
+                    </>
+                  ) : hasRecommendation ? (
+                    <>
+                      <Eye className="h-4 w-4 mr-2" />
+                      <span className="hidden sm:inline">Visualizar Recomendações</span>
+                      <span className="sm:hidden">Ver Recomendações</span>
                     </>
                   ) : (
                     <>
@@ -318,11 +382,13 @@ export function AnalysisViewModal({ analysis, isOpen, onClose }: AnalysisViewMod
                     </>
                   )}
                 </Button>
+
+                {/* Weekly Plan Button */}
                 <Button
-                  onClick={handleGenerateWeeklyPlan}
-                  disabled={isGeneratingPlan}
+                  onClick={hasWeeklyPlan ? handleViewWeeklyPlan : handleGenerateWeeklyPlan}
+                  disabled={isGeneratingPlan || isCheckingExistence}
                   className="flex-1"
-                  variant="outline"
+                  variant={hasWeeklyPlan ? "default" : "outline"}
                   size="sm"
                 >
                   {isGeneratingPlan ? (
@@ -330,6 +396,12 @@ export function AnalysisViewModal({ analysis, isOpen, onClose }: AnalysisViewMod
                       <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                       <span className="hidden sm:inline">Gerando...</span>
                       <span className="sm:hidden">Gerando</span>
+                    </>
+                  ) : hasWeeklyPlan ? (
+                    <>
+                      <Eye className="h-4 w-4 mr-2" />
+                      <span className="hidden sm:inline">Visualizar Plano Semanal</span>
+                      <span className="sm:hidden">Ver Plano</span>
                     </>
                   ) : (
                     <>

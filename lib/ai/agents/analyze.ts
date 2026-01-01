@@ -134,14 +134,11 @@ export async function analyzeWithAgent(
 
   const userPrompt = parts.join('\n')
 
-  // ✅ Enable thinking mode for complex agents (better reasoning)
-  const useThinkingMode =
-    agent.agentKey === 'integrativa' ||
-    agent.agentKey === 'endocrinologia' ||
-    agent.agentKey === 'cardiologia'
+  // ✅ Use agent-configured thinking mode (from database)
+  const useThinkingMode = agent.useThinkingMode
 
   if (useThinkingMode) {
-    console.log(`🧠 [AGENT] Enabling thinking mode for complex analysis`)
+    console.log(`🧠 [AGENT] Enabling thinking mode for ${agent.name}`)
   }
 
   // Generate structured analysis using AI SDK with system_prompt from agent

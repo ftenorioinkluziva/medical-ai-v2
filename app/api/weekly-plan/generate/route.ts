@@ -92,12 +92,24 @@ export async function POST(request: NextRequest) {
     const startTime = Date.now()
 
     // Generate all plans in parallel for speed
-    const [suppResult, shopResult, mealResult, workoutResult] = await Promise.all([
-      generateSupplementationStrategy(analysis.analysis),
-      generateShoppingList(analysis.analysis),
-      generateMealPlan(analysis.analysis),
-      generateWorkoutPlan(analysis.analysis),
-    ])
+    let suppResult, shopResult, mealResult, workoutResult
+    try {
+      [suppResult, shopResult, mealResult, workoutResult] = await Promise.all([
+        generateSupplementationStrategy(analysis.analysis),
+        generateShoppingList(analysis.analysis),
+        generateMealPlan(analysis.analysis),
+        generateWorkoutPlan(analysis.analysis),
+      ])
+    } catch (genError) {
+      console.error('❌ [WEEKLY-PLAN] Generation error:', genError)
+      throw new Error(
+        genError instanceof Error && genError.message.includes('JSON')
+          ? 'Erro ao processar resposta da IA. A resposta foi muito longa ou malformada. Tente novamente.'
+          : genError instanceof Error
+          ? genError.message
+          : 'Erro ao gerar plano semanal'
+      )
+    }
 
     const processingTimeMs = Date.now() - startTime
 

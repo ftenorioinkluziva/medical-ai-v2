@@ -78,6 +78,13 @@
       "when": 1767044390691,
       "tag": "0010_panoramic_lady_mastermind",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1767272044462,
+      "tag": "0011_ambitious_shockwave",
+      "breakpoints": true
     }
   ]
 }

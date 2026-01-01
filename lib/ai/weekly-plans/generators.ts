@@ -125,7 +125,7 @@ export async function generateSupplementationStrategy(analysisText: string) {
   const result = await generateObject({
     model: google('gemini-2.5-flash'),
     schema: supplementationSchema,
-    maxTokens: 3000, // Limit output to prevent infinite generation
+    maxTokens: 2000, // Reduced limit to prevent JSON truncation
     prompt: `Você é um médico especialista em medicina integrativa e nutrição funcional.
 
 Baseado na análise médica abaixo, elabore uma estratégia completa de suplementação e reposição hormonal para a próxima semana/mês até o próximo exame.
@@ -160,7 +160,7 @@ export async function generateShoppingList(analysisText: string) {
   const result = await generateObject({
     model: google('gemini-2.5-flash'),
     schema: shoppingListSchema,
-    maxTokens: 2000, // Limit output to prevent infinite generation
+    maxTokens: 1500, // Reduced limit to prevent JSON truncation
     prompt: `Você é um nutricionista brasileiro especializado em alimentação funcional.
 
 Baseado na análise médica abaixo, elabore uma lista de compras semanal completa com alimentos BRASILEIROS facilmente encontrados em supermercados como Carrefour, Pão de Açúcar, Extra, ou mercados locais.
@@ -206,7 +206,7 @@ export async function generateMealPlan(analysisText: string) {
   const result = await generateObject({
     model: google('gemini-2.5-flash'),
     schema: mealPlanSchema,
-    maxTokens: 4000, // Limit output to prevent infinite generation
+    maxTokens: 3000, // Reduced limit to prevent JSON truncation
     prompt: `Você é um nutricionista brasileiro especializado em medicina funcional e culinária brasileira.
 
 Baseado na análise médica abaixo, crie um plano alimentar completo para a semana (7 dias) com café da manhã, almoço, jantar e lanches, usando PRATOS E INGREDIENTES DA CULINÁRIA BRASILEIRA.
@@ -256,7 +256,8 @@ export async function generateWorkoutPlan(analysisText: string) {
   const result = await generateObject({
     model: google('gemini-2.5-flash'),
     schema: workoutPlanSchema,
-    maxTokens: 4000, // Limit output to prevent infinite generation
+    maxTokens: 2500, // Reduced limit to prevent JSON truncation and excessive text
+    temperature: 0.3, // Lower temperature for more focused and deterministic output
     prompt: `Você é um fisiologista do exercício e personal trainer especializado em saúde integrativa.
 
 Baseado na análise médica abaixo, crie um plano de treinamento semanal personalizado.
@@ -267,23 +268,25 @@ ${analysisText}
 ${knowledgeContext ? `\nBASE DE CONHECIMENTO:\n${knowledgeContext}` : ''}
 
 INSTRUÇÕES IMPORTANTES:
-1. Crie treinos para 3-5 dias da semana (considere nível de condicionamento)
+1. Crie treinos adequados ao nível de condicionamento do paciente
 2. Inclua variedade: cardio, força, flexibilidade
-3. Especifique exercícios, séries, repetições, duração de forma CONCISA
-4. Adapte à condição física e objetivos do paciente
-5. Inclua aquecimento e alongamento
-6. Respeite limitações e contraindicações mencionadas
-7. Adicione dicas de progressão BREVES (1-2 frases por exercício)
-8. Defina dias de descanso adequados
+3. Descrições CURTAS: máximo 30 palavras por campo 'notes'
+4. NÃO adicione texto motivacional
+5. NÃO repita informações
+6. Seja EXTREMAMENTE CONCISO
 
-REGRAS DE FORMATAÇÃO:
-- Seja CONCISO e OBJETIVO
-- Máximo 100 palavras por descrição de exercício
-- Use frases curtas e diretas
-- NÃO repita instruções
-- NÃO adicione texto motivacional excessivo
+FORMATO OBRIGATÓRIO:
+- Exercício: nome simples
+- Sets/Reps/Duration: números apenas (ex: "3x12" ou "20min")
+- Notes: máximo 1 frase curta
+- Warmup/Cooldown: máximo 2 frases
 
-Crie um plano SEGURO, PROGRESSIVO e PRÁTICO.`,
+PROIBIDO:
+- Textos longos ou motivacionais
+- Repetições desnecessárias
+- Mais de 30 palavras em qualquer campo de texto
+
+Crie um plano CONCISO, DIRETO e PRÁTICO.`,
   })
 
   console.log('✅ [WEEKLY-PLAN] Workout plan generated')

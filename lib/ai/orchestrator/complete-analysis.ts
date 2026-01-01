@@ -5,7 +5,7 @@
 
 import { db } from '@/lib/db/client'
 import { completeAnalyses, analyses, documents, healthAgents, medicalProfiles } from '@/lib/db/schema'
-import { eq, inArray } from 'drizzle-orm'
+import { eq, inArray, and, ne } from 'drizzle-orm'
 import { analyzeWithAgent } from '@/lib/ai/agents/analyze'
 import { generateSynthesis } from '@/lib/ai/synthesis/generator'
 import { generateRecommendationsFromMultipleAnalyses } from '@/lib/ai/recommendations/multi-analysis-generator'
@@ -177,58 +177,76 @@ export async function runCompleteAnalysis(
     const knowledgeConfig = await getKnowledgeConfig()
     console.log(`✅ [COMPLETE-ANALYSIS] Knowledge config: maxChunks=${knowledgeConfig.maxChunks}, threshold=${knowledgeConfig.similarityThreshold}`)
 
-    // 4. Buscar agentes necessários
-    const agents = await db.select().from(healthAgents)
-    const integrativeAgent = agents.find(a => a.agentKey === 'integrativa')
-    const nutritionAgent = agents.find(a => a.agentKey === 'nutricao')
-    const exerciseAgent = agents.find(a => a.agentKey === 'exercicio')
+    // 4. Load agents for complete analysis workflow (dynamic based on DB config)
+    const allAgents = await db
+      .select()
+      .from(healthAgents)
+      .where(
+        and(
+          eq(healthAgents.isActive, true),
+          ne(healthAgents.analysisRole, 'none')
+        )
+      )
+      .orderBy(healthAgents.analysisOrder)
 
-    if (!integrativeAgent || !nutritionAgent || !exerciseAgent) {
-      throw new Error('Required agents not found in database')
+    // Separate foundation and specialized agents
+    const foundationAgents = allAgents.filter(a => a.analysisRole === 'foundation')
+    const specializedAgents = allAgents.filter(a => a.analysisRole === 'specialized')
+
+    if (foundationAgents.length === 0) {
+      throw new Error('No foundation agent configured for complete analysis. Please configure at least one agent with analysisRole=foundation in admin panel.')
     }
 
-    console.log('✅ [COMPLETE-ANALYSIS] All required agents found')
+    if (specializedAgents.length === 0) {
+      throw new Error('No specialized agents configured for complete analysis. Please configure at least one agent with analysisRole=specialized in admin panel.')
+    }
+
+    console.log(`✅ [COMPLETE-ANALYSIS] Loaded ${foundationAgents.length} foundation + ${specializedAgents.length} specialized agents`)
 
     // ================================================================
-    // FASE 1: ANÁLISE DE MEDICINA INTEGRATIVA (Fundação)
+    // FASE 1: ANÁLISE DE FUNDAÇÃO (Foundation Agents - Sequential)
     // ================================================================
     await db
       .update(completeAnalyses)
-      .set({ status: 'analyzing_integrative' })
+      .set({ status: 'analyzing_foundation' })
       .where(eq(completeAnalyses.id, analysisRecord.id))
 
-    console.log('📋 [COMPLETE-ANALYSIS] Phase 1: Integrative Medicine Analysis')
+    const foundationAnalyses = []
 
-    // ✅ RAG HABILITADO: Fornece contexto médico geral para interpretação
-    // Validação informacional monitora menções sem bloquear análise
-    console.log('🧠 [COMPLETE-ANALYSIS] Searching knowledge base for integrative medicine...')
-    let integrativeKnowledge = ''
-    try {
-      integrativeKnowledge = await buildKnowledgeContext(
-        integrativeAgent.analysisPrompt + '\n\n' + documentsContext.substring(0, 500),
-        {
-          maxChunks: knowledgeConfig.maxChunks,
-          maxCharsPerChunk: knowledgeConfig.maxCharsPerChunk,
-          agentId: integrativeAgent.id,
+    // Run foundation agents sequentially (in case there are multiple)
+    for (const foundationAgent of foundationAgents) {
+      console.log(`📋 [COMPLETE-ANALYSIS] Phase 1: ${foundationAgent.name} Analysis`)
+
+      // ✅ RAG HABILITADO: Fornece contexto médico geral para interpretação
+      // Validação informacional monitora menções sem bloquear análise
+      console.log(`🧠 [COMPLETE-ANALYSIS] Searching knowledge base for ${foundationAgent.name}...`)
+      let foundationKnowledge = ''
+      try {
+        foundationKnowledge = await buildKnowledgeContext(
+          foundationAgent.analysisPrompt + '\n\n' + documentsContext.substring(0, 500),
+          {
+            maxChunks: knowledgeConfig.maxChunks,
+            maxCharsPerChunk: knowledgeConfig.maxCharsPerChunk,
+            agentId: foundationAgent.id,
+          }
+        )
+        if (foundationKnowledge) {
+          console.log(`✅ [COMPLETE-ANALYSIS] Found knowledge: ${foundationKnowledge.length} chars`)
         }
-      )
-      if (integrativeKnowledge) {
-        console.log(`✅ [COMPLETE-ANALYSIS] Found integrative knowledge: ${integrativeKnowledge.length} chars`)
+      } catch (error) {
+        console.warn('⚠️ [COMPLETE-ANALYSIS] Knowledge search failed:', error)
       }
-    } catch (error) {
-      console.warn('⚠️ [COMPLETE-ANALYSIS] Knowledge search failed:', error)
-    }
 
-    const integrativeAnalysis = await analyzeWithAgent(
-      integrativeAgent,
-      integrativeAgent.analysisPrompt,
-      {
-        documentsContext: '',  // ❌ REMOVIDO temporariamente - Gemini estava alucinando mesmo sem RAG
-        medicalProfileContext,
-        knowledgeContext: integrativeKnowledge,
-        structuredDocuments: structuredDocuments || [],
-        documentIds: docs.map(d => d.id),
-        instruction: `Esta é a ANÁLISE FUNDACIONAL que será usada por outros especialistas.
+      const foundationAnalysisResult = await analyzeWithAgent(
+        foundationAgent,
+        foundationAgent.analysisPrompt,
+        {
+          documentsContext: '',  // ❌ REMOVIDO temporariamente - Gemini estava alucinando mesmo sem RAG
+          medicalProfileContext,
+          knowledgeContext: foundationKnowledge,
+          structuredDocuments: structuredDocuments || [],
+          documentIds: docs.map(d => d.id),
+          instruction: `Esta é a ANÁLISE FUNDACIONAL que será usada por outros especialistas.
 
 ⚠️ REGRA CRÍTICA: Analise APENAS os dados e parâmetros que estão EFETIVAMENTE DISPONÍVEIS nos documentos.
 Se um sistema não tiver dados disponíveis, diga explicitamente "Dados não disponíveis para avaliar [sistema]".
@@ -236,11 +254,11 @@ NUNCA mencione parâmetros que não foram testados.
 
 ℹ️ IMPORTANTE: Você receberá dados do CÉREBRO LÓGICO com todos os parâmetros estruturados e validados.
 Use APENAS esses dados estruturados para sua análise.`,
-      }
-    )
+        }
+      )
 
-    // Build the prompt that was used for integrative analysis
-    const integrativePromptUsed = `${integrativeAgent.analysisPrompt}
+      // Build the prompt that was used for foundation analysis
+      const foundationPromptUsed = `${foundationAgent.analysisPrompt}
 
 Realize uma análise médica COMPLETA e HOLÍSTICA deste paciente.
 
@@ -252,45 +270,65 @@ ${documentsContext}
 
 ${medicalProfileContext ? `## Perfil Médico do Paciente\n${medicalProfileContext}` : ''}
 
-${integrativeKnowledge ? `## Base de Conhecimento Médico (Referências)\n${integrativeKnowledge}` : ''}`
+${foundationKnowledge ? `## Base de Conhecimento Médico (Referências)\n${foundationKnowledge}` : ''}`
 
-    // Salvar análise integrativa
-    const [savedIntegrative] = await db
-      .insert(analyses)
-      .values({
-        userId,
-        agentId: integrativeAgent.id,
-        documentId: docs[0].id,
-        documentIds: docs.map(d => d.id),
-        prompt: integrativePromptUsed,
-        medicalProfileSnapshot: profile || null,
-        analysis: integrativeAnalysis.analysis,
-        insights: integrativeAnalysis.insights as any,
-        actionItems: integrativeAnalysis.actionItems as any,
-        modelUsed: integrativeAnalysis.model,
-        tokensUsed: integrativeAnalysis.usage?.totalTokens || null,
-        processingTimeMs: integrativeAnalysis.metadata?.processingTimeMs || null,
-        ragUsed: !!integrativeKnowledge,
-      })
-      .returning()
-
-    console.log(`✅ [COMPLETE-ANALYSIS] Integrative analysis saved: ${savedIntegrative.id}`)
-
-    // Debit credits for integrative analysis
-    try {
-      const tokensUsed = integrativeAnalysis.usage?.totalTokens || 0
-      if (tokensUsed > 0) {
-        await debitCredits(userId, tokensUsed, {
-          analysisId: savedIntegrative.id,
-          operation: 'complete_analysis_integrative',
-          modelName: integrativeAgent.modelName || 'gemini-2.5-flash',
-          promptTokens: integrativeAnalysis.usage?.promptTokens || 0,
-          completionTokens: integrativeAnalysis.usage?.completionTokens || 0,
+      // Salvar análise fundacional
+      const [savedFoundation] = await db
+        .insert(analyses)
+        .values({
+          userId,
+          agentId: foundationAgent.id,
+          documentId: docs[0].id,
+          documentIds: docs.map(d => d.id),
+          prompt: foundationPromptUsed,
+          medicalProfileSnapshot: profile || null,
+          analysis: foundationAnalysisResult.analysis,
+          insights: foundationAnalysisResult.insights as any,
+          actionItems: foundationAnalysisResult.actionItems as any,
+          modelUsed: foundationAnalysisResult.model,
+          tokensUsed: foundationAnalysisResult.usage?.totalTokens || null,
+          processingTimeMs: foundationAnalysisResult.metadata?.processingTimeMs || null,
+          ragUsed: !!foundationKnowledge,
         })
-        console.log(`💰 [COMPLETE-ANALYSIS] Debited ${calculateCreditsFromTokens(tokensUsed)} credits for integrative analysis`)
+        .returning()
+
+      console.log(`✅ [COMPLETE-ANALYSIS] ${foundationAgent.name} analysis saved: ${savedFoundation.id}`)
+
+      // Debit credits for foundation analysis
+      try {
+        const tokensUsed = foundationAnalysisResult.usage?.totalTokens || 0
+        if (tokensUsed > 0) {
+          await debitCredits(userId, tokensUsed, {
+            analysisId: savedFoundation.id,
+            operation: `complete_analysis_foundation_${foundationAgent.agentKey}`,
+            modelName: foundationAgent.modelName || 'gemini-2.5-flash',
+            promptTokens: foundationAnalysisResult.usage?.promptTokens || 0,
+            completionTokens: foundationAnalysisResult.usage?.completionTokens || 0,
+          })
+          console.log(`💰 [COMPLETE-ANALYSIS] Debited ${calculateCreditsFromTokens(tokensUsed)} credits for ${foundationAgent.name} analysis`)
+        }
+      } catch (creditError) {
+        console.error('⚠️ [COMPLETE-ANALYSIS] Failed to debit credits:', creditError)
       }
-    } catch (creditError) {
-      console.error('⚠️ [COMPLETE-ANALYSIS] Failed to debit credits for integrative:', creditError)
+
+      foundationAnalyses.push(savedFoundation)
+    }
+
+    // Use first foundation analysis for backward compatibility variable naming
+    const savedIntegrative = foundationAnalyses[0]
+    const integrativeAnalysis = {
+      analysis: savedIntegrative.analysis,
+      insights: savedIntegrative.insights,
+      actionItems: savedIntegrative.actionItems,
+      model: savedIntegrative.modelUsed,
+      usage: {
+        totalTokens: savedIntegrative.tokensUsed,
+        promptTokens: 0,
+        completionTokens: savedIntegrative.tokensUsed,
+      },
+      metadata: {
+        processingTimeMs: savedIntegrative.processingTimeMs,
+      },
     }
 
     // ================================================================
@@ -301,45 +339,46 @@ ${integrativeKnowledge ? `## Base de Conhecimento Médico (Referências)\n${inte
       .set({ status: 'analyzing_specialized' })
       .where(eq(completeAnalyses.id, analysisRecord.id))
 
-    console.log('📋 [COMPLETE-ANALYSIS] Phase 2: Specialized Analyses (Parallel)')
+    console.log(`📋 [COMPLETE-ANALYSIS] Phase 2: Running ${specializedAgents.length} Specialized Analyses (Parallel)`)
 
-    // Buscar conhecimento para Nutrição e Exercício em paralelo
-    console.log('🧠 [COMPLETE-ANALYSIS] Searching knowledge base for nutrition and exercise...')
-    const [nutritionKnowledge, exerciseKnowledge] = await Promise.all([
+    // Build context from ALL foundation analyses
+    const foundationContext = foundationAnalyses
+      .map(a => `## ${a.agentName || a.agentId}\n\n${a.analysis}`)
+      .join('\n\n---\n\n')
+
+    // Buscar conhecimento para todos agentes especializados em paralelo
+    console.log(`🧠 [COMPLETE-ANALYSIS] Searching knowledge base for ${specializedAgents.length} specialized agents...`)
+    const specializedKnowledgePromises = specializedAgents.map(agent =>
       buildKnowledgeContext(
-        nutritionAgent.analysisPrompt + '\n\n' + documentsContext.substring(0, 500),
+        agent.analysisPrompt + '\n\n' + documentsContext.substring(0, 500),
         {
           maxChunks: knowledgeConfig.maxChunks,
           maxCharsPerChunk: knowledgeConfig.maxCharsPerChunk,
-          agentId: nutritionAgent.id,
+          agentId: agent.id,
         }
       ).catch(err => {
-        console.warn('⚠️ [COMPLETE-ANALYSIS] Nutrition knowledge search failed:', err)
+        console.warn(`⚠️ [COMPLETE-ANALYSIS] ${agent.name} knowledge search failed:`, err)
         return ''
-      }),
-      buildKnowledgeContext(
-        exerciseAgent.analysisPrompt + '\n\n' + documentsContext.substring(0, 500),
-        {
-          maxChunks: knowledgeConfig.maxChunks,
-          maxCharsPerChunk: knowledgeConfig.maxCharsPerChunk,
-          agentId: exerciseAgent.id,
-        }
-      ).catch(err => {
-        console.warn('⚠️ [COMPLETE-ANALYSIS] Exercise knowledge search failed:', err)
-        return ''
-      }),
-    ])
+      })
+    )
 
-    if (nutritionKnowledge) {
-      console.log(`✅ [COMPLETE-ANALYSIS] Found nutrition knowledge: ${nutritionKnowledge.length} chars`)
-    }
-    if (exerciseKnowledge) {
-      console.log(`✅ [COMPLETE-ANALYSIS] Found exercise knowledge: ${exerciseKnowledge.length} chars`)
-    }
+    const specializedKnowledgeResults = await Promise.all(specializedKnowledgePromises)
 
-    const nutritionInstruction = `CONTEXTO: Você tem acesso à análise de Medicina Integrativa realizada anteriormente.
+    specializedKnowledgeResults.forEach((knowledge, idx) => {
+      if (knowledge) {
+        console.log(`✅ [COMPLETE-ANALYSIS] Found ${specializedAgents[idx].name} knowledge: ${knowledge.length} chars`)
+      }
+    })
 
-SUA MISSÃO: Adicionar insights COMPLEMENTARES focados EXCLUSIVAMENTE em metabolismo e nutrição.
+    // For backward compatibility - map first two specialized agents
+    const nutritionAgent = specializedAgents.find(a => a.agentKey === 'nutricao') || specializedAgents[0]
+    const exerciseAgent = specializedAgents.find(a => a.agentKey === 'exercicio') || specializedAgents[1]
+    const nutritionKnowledge = specializedKnowledgeResults[specializedAgents.indexOf(nutritionAgent)] || ''
+    const exerciseKnowledge = specializedKnowledgeResults[specializedAgents.indexOf(exerciseAgent)] || ''
+
+    const nutritionInstruction = `CONTEXTO: Você tem acesso às análises de fundação realizadas anteriormente.
+
+SUA MISSÃO: Adicionar insights COMPLEMENTARES focados em sua especialidade.
 
 🎯 REGRAS CRÍTICAS - SIGA RIGOROSAMENTE:
 
@@ -374,16 +413,16 @@ SUA MISSÃO: Adicionar insights COMPLEMENTARES focados EXCLUSIVAMENTE em metabol
    - NUNCA mencione parâmetros que não foram testados
    - Se um dado não estiver disponível, diga "não disponível" ou "não testado"
 
-ANÁLISE ANTERIOR (Medicina Integrativa):
-${integrativeAnalysis.analysis}
+ANÁLISES ANTERIORES (FUNDAÇÃO):
+${foundationContext}
 
 ---
 
-Agora, analise os documentos sob a perspectiva EXCLUSIVA de um nutricionista funcional especializado.`
+Agora, analise os documentos sob sua perspectiva especializada.`
 
-    const exerciseInstruction = `CONTEXTO: Você tem acesso à análise de Medicina Integrativa realizada anteriormente.
+    const exerciseInstruction = `CONTEXTO: Você tem acesso às análises de fundação realizadas anteriormente.
 
-SUA MISSÃO: Adicionar insights COMPLEMENTARES focados EXCLUSIVAMENTE em fisiologia do exercício e performance.
+SUA MISSÃO: Adicionar insights COMPLEMENTARES focados em sua especialidade.
 
 🎯 REGRAS CRÍTICAS - SIGA RIGOROSAMENTE:
 
@@ -420,12 +459,12 @@ SUA MISSÃO: Adicionar insights COMPLEMENTARES focados EXCLUSIVAMENTE em fisiolo
    - NUNCA mencione parâmetros que não foram testados
    - Se um dado não estiver disponível, diga "não disponível" ou "não testado"
 
-ANÁLISE ANTERIOR (Medicina Integrativa):
-${integrativeAnalysis.analysis}
+ANÁLISES ANTERIORES (FUNDAÇÃO):
+${foundationContext}
 
 ---
 
-Agora, analise os documentos sob a perspectiva EXCLUSIVA de um fisiologista do exercício.`
+Agora, analise os documentos sob sua perspectiva especializada.`
 
     const [nutritionAnalysis, exerciseAnalysis] = await Promise.all([
       // Agente de Nutrição - Análise Complementar

@@ -62,7 +62,8 @@
       "Bash(find:*)",
       "Bash(npx shadcn@latest add:*)",
       "Bash(pnpm build)",
-      "Bash(pnpm db:seed-test-users:*)"
+      "Bash(pnpm db:seed-test-users:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nfeat: Make health agents fully configurable via database\n\nMigrate from hardcoded agent behavior to database-driven configuration,\nenabling dynamic agent management without code changes.\n\nChanges:\n- Add useThinkingMode field to control extended reasoning per agent\n- Add analysisRole field \\(foundation/specialized/none\\) for complete analysis workflow\n- Add analysisOrder field to define execution sequence\n- Remove hardcoded thinking mode check in analyze.ts\n- Refactor complete-analysis.ts to dynamically load agents based on role\n- Update seed script with new field values for default agents\n- Add admin UI controls for new configuration fields\n- Generate and apply database migration \\(0011_ambitious_shockwave\\)\n\nMigration:\nALTER TABLE health_agents:\n  - ADD COLUMN use_thinking_mode boolean DEFAULT false NOT NULL\n  - ADD COLUMN analysis_role varchar\\(50\\) DEFAULT ''none'' NOT NULL\n  - ADD COLUMN analysis_order integer DEFAULT null\n\nComplete Analysis Workflow:\n- Foundation agents execute sequentially first \\(provide context\\)\n- Specialized agents execute in parallel after \\(add specific insights\\)\n- Agents with role=''none'' are excluded from complete analysis\n\n🤖 Generated with [Claude Code]\\(https://claude.com/claude-code\\)\n\nCo-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>\nEOF\n\\)\")"
     ],
     "deny": [],
     "ask": []

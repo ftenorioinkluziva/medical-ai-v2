@@ -81,6 +81,9 @@ export function AgentForm({ agent, onSuccess, onCancel }: AgentFormProps) {
     isActive: true,
     requiresApproval: false,
     tags: '',
+    useThinkingMode: false,
+    analysisRole: 'none' as 'foundation' | 'specialized' | 'none',
+    analysisOrder: null as number | null,
     knowledgeAccessType: 'full' as 'full' | 'restricted',
     allowedAuthors: [] as string[],
     allowedCategories: [] as string[],
@@ -147,6 +150,9 @@ export function AgentForm({ agent, onSuccess, onCancel }: AgentFormProps) {
         isActive: agent.isActive !== undefined ? agent.isActive : true,
         requiresApproval: agent.requiresApproval || false,
         tags: agent.tags ? agent.tags.join(', ') : '',
+        useThinkingMode: agent.useThinkingMode || false,
+        analysisRole: agent.analysisRole || 'none',
+        analysisOrder: agent.analysisOrder || null,
         knowledgeAccessType: agent.knowledgeAccessType || 'full',
         allowedAuthors: agent.allowedAuthors || [],
         allowedCategories: agent.allowedCategories || [],
@@ -331,6 +337,9 @@ export function AgentForm({ agent, onSuccess, onCancel }: AgentFormProps) {
           ...(formData.presencePenalty !== 0 && { presencePenalty: parseFloat(formData.presencePenalty.toString()) }),
           ...(formData.frequencyPenalty !== 0 && { frequencyPenalty: parseFloat(formData.frequencyPenalty.toString()) }),
         },
+        useThinkingMode: formData.useThinkingMode,
+        analysisRole: formData.analysisRole,
+        analysisOrder: formData.analysisOrder,
         isActive: formData.isActive,
         requiresApproval: formData.requiresApproval,
         tags: formData.tags
@@ -866,6 +875,71 @@ export function AgentForm({ agent, onSuccess, onCancel }: AgentFormProps) {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Analysis Workflow Configuration */}
+      <div className="space-y-4">
+        <h3 className="font-semibold text-lg">Configuração de Análise</h3>
+
+        {/* Thinking Mode */}
+        <div className="flex items-center justify-between p-4 border rounded-lg">
+          <div className="space-y-0.5">
+            <Label htmlFor="useThinkingMode">Modo de Pensamento Estendido</Label>
+            <p className="text-sm text-muted-foreground">
+              Ativa raciocínio estendido para análises complexas (mais tokens, melhor qualidade)
+            </p>
+          </div>
+          <Switch
+            id="useThinkingMode"
+            checked={formData.useThinkingMode || false}
+            onCheckedChange={(checked) =>
+              setFormData({ ...formData, useThinkingMode: checked })
+            }
+          />
+        </div>
+
+        {/* Analysis Role */}
+        <div className="space-y-2">
+          <Label htmlFor="analysisRole">Papel na Análise Completa</Label>
+          <Select
+            value={formData.analysisRole || 'none'}
+            onValueChange={(value) =>
+              setFormData({ ...formData, analysisRole: value as 'foundation' | 'specialized' | 'none' })
+            }
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Selecione o papel" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="none">Não participa da análise completa</SelectItem>
+              <SelectItem value="foundation">Fundação (executa primeiro, fornece contexto base)</SelectItem>
+              <SelectItem value="specialized">Especializado (executa em paralelo após fundação)</SelectItem>
+            </SelectContent>
+          </Select>
+          <p className="text-xs text-muted-foreground">
+            Define como este agente participa do workflow de análise completa
+          </p>
+        </div>
+
+        {/* Analysis Order (conditional) */}
+        {formData.analysisRole && formData.analysisRole !== 'none' && (
+          <div className="space-y-2">
+            <Label htmlFor="analysisOrder">Ordem de Execução</Label>
+            <Input
+              id="analysisOrder"
+              type="number"
+              min="1"
+              value={formData.analysisOrder || ''}
+              onChange={(e) =>
+                setFormData({ ...formData, analysisOrder: parseInt(e.target.value) || null })
+              }
+              placeholder="Ex: 1, 2, 3..."
+            />
+            <p className="text-xs text-muted-foreground">
+              Ordem de execução dentro do grupo (menor = executa antes)
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Knowledge Configuration */}

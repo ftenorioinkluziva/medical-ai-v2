@@ -36,6 +36,16 @@ export const healthAgents = pgTable('health_agents', {
     seed?: number              // For reproducibility in testing
   }>(),
 
+  // Extended Reasoning
+  useThinkingMode: boolean('use_thinking_mode').notNull().default(false),
+
+  // Complete Analysis Workflow
+  analysisRole: varchar('analysis_role', { length: 50 })
+    .$type<'foundation' | 'specialized' | 'none'>()
+    .notNull()
+    .default('none'),
+  analysisOrder: integer('analysis_order').default(null),
+
   // Access Control
   allowedRoles: json('allowed_roles').$type<string[]>().notNull(), // ['patient', 'doctor', 'admin']
 
