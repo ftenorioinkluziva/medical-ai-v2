@@ -86,8 +86,8 @@ export default async function MedicalKnowledgePage() {
       <div className="grid gap-4 md:grid-cols-3">
         <Card className="p-6">
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-blue-100 dark:bg-blue-900 rounded-lg">
-              <Activity className="h-6 w-6 text-blue-600 dark:text-blue-300" />
+            <div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+              <Activity className="h-6 w-6 text-blue-600 dark:text-blue-400" />
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Biomarcadores</p>
@@ -98,8 +98,8 @@ export default async function MedicalKnowledgePage() {
 
         <Card className="p-6">
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-purple-100 dark:bg-purple-900 rounded-lg">
-              <Calculator className="h-6 w-6 text-purple-600 dark:text-purple-300" />
+            <div className="p-3 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
+              <Calculator className="h-6 w-6 text-purple-600 dark:text-purple-400" />
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Métricas Calculadas</p>
@@ -110,8 +110,8 @@ export default async function MedicalKnowledgePage() {
 
         <Card className="p-6">
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-green-100 dark:bg-green-900 rounded-lg">
-              <FileText className="h-6 w-6 text-green-600 dark:text-green-300" />
+            <div className="p-3 bg-green-100 dark:bg-green-900/30 rounded-lg">
+              <FileText className="h-6 w-6 text-green-600 dark:text-green-400" />
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Protocolos</p>
@@ -163,7 +163,7 @@ export default async function MedicalKnowledgePage() {
                   )}
 
                   {bio.metaphor && (
-                    <p className="text-xs bg-blue-50 dark:bg-blue-950 p-2 rounded">
+                    <p className="text-xs bg-blue-50 dark:bg-blue-950/20 text-blue-900 dark:text-blue-100 p-2 rounded">
                       💡 {bio.metaphor}
                     </p>
                   )}
@@ -243,7 +243,7 @@ export default async function MedicalKnowledgePage() {
                   </div>
 
                   <div className="space-y-2">
-                    <div className="text-sm bg-yellow-50 dark:bg-yellow-950 p-2 rounded">
+                    <div className="text-sm bg-yellow-50 dark:bg-yellow-950/20 text-yellow-900 dark:text-yellow-100 p-2 rounded">
                       <span className="font-medium">Condição de Ativação:</span>{' '}
                       <code className="text-xs">{proto.triggerCondition}</code>
                     </div>

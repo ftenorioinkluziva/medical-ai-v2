@@ -155,9 +155,9 @@ export default function KnowledgeAnalyzePage() {
             Voltar
           </Button>
         </Link>
-        <Card className="border-red-200 bg-red-50">
+        <Card className="border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950/20">
           <CardContent className="p-6">
-            <p className="text-red-600">{error || 'Erro ao carregar dados'}</p>
+            <p className="text-red-600 dark:text-red-400">{error || 'Erro ao carregar dados'}</p>
           </CardContent>
         </Card>
       </div>
@@ -252,19 +252,19 @@ export default function KnowledgeAnalyzePage() {
       {/* Current Configuration Alert */}
       <Card className={
         data.recommendations.estimatedArticlesWithCurrent < 3
-          ? 'border-red-200 bg-red-50'
+          ? 'border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950/20'
           : data.recommendations.estimatedArticlesWithCurrent < 5
-          ? 'border-yellow-200 bg-yellow-50'
-          : 'border-green-200 bg-green-50'
+          ? 'border-yellow-200 dark:border-yellow-800 bg-yellow-50 dark:bg-yellow-950/20'
+          : 'border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-950/20'
       }>
         <CardContent className="p-6">
           <div className="flex items-start gap-3">
             <AlertCircle className={`h-5 w-5 flex-shrink-0 mt-0.5 ${
               data.recommendations.estimatedArticlesWithCurrent < 3
-                ? 'text-red-600'
+                ? 'text-red-600 dark:text-red-400'
                 : data.recommendations.estimatedArticlesWithCurrent < 5
-                ? 'text-yellow-600'
-                : 'text-green-600'
+                ? 'text-yellow-600 dark:text-yellow-400'
+                : 'text-green-600 dark:text-green-400'
             }`} />
             <div>
               <p className="font-semibold mb-1">
@@ -308,10 +308,10 @@ export default function KnowledgeAnalyzePage() {
           </CardContent>
         </Card>
 
-        <Card className="border-green-200 bg-green-50">
+        <Card className="border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-950/20">
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
-              <Check className="h-5 w-5 text-green-600" />
+              <Check className="h-5 w-5 text-green-600 dark:text-green-400" />
               Balanceado (Recomendado)
             </CardTitle>
             <CardDescription>Melhor custo-benefício</CardDescription>
@@ -319,7 +319,7 @@ export default function KnowledgeAnalyzePage() {
           <CardContent>
             <div className="space-y-3">
               <div>
-                <p className="text-3xl font-bold text-green-600">{data.recommendations.balanced}</p>
+                <p className="text-3xl font-bold text-green-600 dark:text-green-400">{data.recommendations.balanced}</p>
                 <p className="text-sm text-muted-foreground">chunks recomendados</p>
               </div>
               <div className="text-sm space-y-1">
@@ -444,8 +444,8 @@ export default function KnowledgeAnalyzePage() {
             </div>
           </div>
 
-          <div className="flex items-center justify-between p-4 bg-blue-50 border border-blue-200 rounded-lg">
-            <div className="text-sm text-blue-900">
+          <div className="flex items-center justify-between p-4 bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+            <div className="text-sm text-blue-900 dark:text-blue-100">
               <p className="font-semibold mb-1">
                 💡 Valor Atual na Configuração: <strong>{data.recommendations.current} chunks</strong>
               </p>
