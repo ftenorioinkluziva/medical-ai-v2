@@ -5,7 +5,7 @@
  */
 
 import { extractTextFromPDF } from './pdf-processor'
-import { analyzeImageWithVision, isImageFile } from './vision-processor'
+import { analyzeImageWithVision, analyzePDFWithVision, isImageFile } from './vision-processor'
 import { structureMedicalDocument } from './structuring'
 import { db } from '@/lib/db/client'
 import { documents } from '@/lib/db/schema'
@@ -66,11 +66,15 @@ export async function processDocument(
   options: {
     documentType?: string
     structureData?: boolean
+    forceVision?: boolean // Force Vision AI even for PDFs with native text
+    preferVision?: boolean // Prefer Vision but allow pdf-parse fallback
   } = {}
 ): Promise<ProcessingResult> {
   const {
     documentType = 'medical_report',
     structureData = true, // Enable by default
+    forceVision = false, // Don't force Vision by default
+    preferVision = false, // Don't prefer Vision by default
   } = options
 
   const startTime = Date.now()
@@ -95,8 +99,56 @@ export async function processDocument(
     let processedDoc
 
     if (fileType === 'pdf') {
-      console.log('📄 [PROCESSOR] Processing as PDF...')
-      processedDoc = await extractTextFromPDF(fileBuffer, metadata)
+      console.log('📄 [PROCESSOR] Processing PDF...')
+
+      // 🧠 HYBRID STRATEGY: Intelligent PDF processing
+      if (forceVision) {
+        // User explicitly requested Vision AI
+        console.log('🎯 [PROCESSOR] Force Vision mode enabled - using Vision AI')
+        processedDoc = await analyzePDFWithVision(fileBuffer, metadata)
+      } else if (preferVision) {
+        // Try Vision first, fallback to pdf-parse if it fails
+        console.log('🔄 [PROCESSOR] Prefer Vision mode - trying Vision AI first')
+        try {
+          processedDoc = await analyzePDFWithVision(fileBuffer, metadata)
+        } catch (error) {
+          console.warn('⚠️ [PROCESSOR] Vision AI failed, falling back to pdf-parse')
+          console.warn(`   Error: ${error instanceof Error ? error.message : 'Unknown error'}`)
+          processedDoc = await extractTextFromPDF(fileBuffer, metadata)
+        }
+      } else {
+        // Default: Try pdf-parse first (fast & free), fallback to Vision if needed
+        console.log('⚡ [PROCESSOR] Using hybrid strategy: pdf-parse first, Vision fallback')
+        processedDoc = await extractTextFromPDF(fileBuffer, metadata)
+
+        // Check if pdf-parse extraction was successful
+        const needsVisionFallback =
+          processedDoc.metadata.needsOCR || // PDF flagged as needing OCR
+          processedDoc.text.length < 200 || // Very little text extracted
+          processedDoc.confidence < 0.5     // Low confidence in extraction
+
+        if (needsVisionFallback) {
+          console.log('🔄 [PROCESSOR] pdf-parse extraction insufficient, switching to Vision AI')
+          console.log(`   Reason: ${
+            processedDoc.metadata.needsOCR ? 'PDF needs OCR' :
+            processedDoc.text.length < 200 ? `Too little text (${processedDoc.text.length} chars)` :
+            'Low confidence'
+          }`)
+
+          try {
+            processedDoc = await analyzePDFWithVision(fileBuffer, metadata)
+            console.log('✅ [PROCESSOR] Vision AI fallback successful')
+          } catch (visionError) {
+            console.warn('⚠️ [PROCESSOR] Vision AI fallback failed, keeping pdf-parse result')
+            console.warn(`   Vision error: ${visionError instanceof Error ? visionError.message : 'Unknown error'}`)
+            // Keep the pdf-parse result even if it's not great
+          }
+        } else {
+          console.log('✅ [PROCESSOR] pdf-parse extraction successful, skipping Vision AI')
+          console.log(`   Text length: ${processedDoc.text.length} chars, Confidence: ${processedDoc.confidence}`)
+          console.log(`   💰 Cost saved: ~$0.0015 USD (no Vision API call)`)
+        }
+      }
     } else if (fileType === 'image') {
       console.log('🖼️ [PROCESSOR] Processing as image with Vision AI...')
       processedDoc = await analyzeImageWithVision(fileBuffer, metadata)
@@ -159,11 +211,18 @@ export async function processDocument(
 
     const totalTime = Date.now() - startTime
 
+    const visionTokens = processedDoc.metadata.visionTokens
+    const visionCostUSD = processedDoc.metadata.visionCostUSD
+
     console.log(`\n✅ [PROCESSOR] Document processing completed in ${totalTime}ms`)
     console.log(`📊 [PROCESSOR] Stats:`)
     console.log(`   - Document ID: ${doc.id}`)
     console.log(`   - Text length: ${text.length} chars`)
     console.log(`   - Processed by: ${processedDoc.processedBy}`)
+    if (visionTokens) {
+      console.log(`   - Vision tokens: ${visionTokens.toLocaleString()}`)
+      console.log(`   - Vision cost: ~$${visionCostUSD?.toFixed(4)} USD (~R$ ${(visionCostUSD! * 5).toFixed(4)})`)
+    }
     if (structuredData) {
       console.log(`   - Structured: ${structuredData.modules.length} modules`)
       console.log(`   - Document type: ${structuredData.documentType}`)
@@ -182,6 +241,8 @@ export async function processDocument(
         chunksCount: 0,
         processingTimeMs: totalTime,
         embeddingTimeMs: 0,
+        visionTokens,
+        visionCostUSD,
       },
     }
   } catch (error) {

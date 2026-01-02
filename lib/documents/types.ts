@@ -66,6 +66,8 @@ export interface ProcessingResult {
     chunksCount: number
     processingTimeMs: number
     embeddingTimeMs: number
+    visionTokens?: number // Tokens used by Vision AI (if applicable)
+    visionCostUSD?: number // Estimated cost in USD (if Vision AI was used)
   }
   error?: string
 }
