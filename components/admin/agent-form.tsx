@@ -893,7 +893,7 @@ export function AgentForm({ agent, onSuccess, onCancel }: AgentFormProps) {
             id="useThinkingMode"
             checked={formData.useThinkingMode || false}
             onCheckedChange={(checked) =>
-              setFormData({ ...formData, useThinkingMode: checked })
+              handleChange('useThinkingMode', checked)
             }
           />
         </div>
@@ -904,7 +904,7 @@ export function AgentForm({ agent, onSuccess, onCancel }: AgentFormProps) {
           <Select
             value={formData.analysisRole || 'none'}
             onValueChange={(value) =>
-              setFormData({ ...formData, analysisRole: value as 'foundation' | 'specialized' | 'none' })
+              handleChange('analysisRole', value as 'foundation' | 'specialized' | 'none')
             }
           >
             <SelectTrigger>
@@ -931,7 +931,12 @@ export function AgentForm({ agent, onSuccess, onCancel }: AgentFormProps) {
               min="1"
               value={formData.analysisOrder || ''}
               onChange={(e) =>
-                setFormData({ ...formData, analysisOrder: parseInt(e.target.value) || null })
+                handleChange(
+                  'analysisOrder',
+                  e.target.value === '0'
+                    ? 0
+                    : parseInt(e.target.value, 10) || null
+                )
               }
               placeholder="Ex: 1, 2, 3..."
             />

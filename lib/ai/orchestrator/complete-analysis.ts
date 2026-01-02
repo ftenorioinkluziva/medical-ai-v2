@@ -587,7 +587,37 @@ ${agentKnowledge ? `## Base de Conhecimento Médico (Referências)\n${agentKnowl
     }
 
     // ================================================================
-    // FINALIZAÇÃO: Atualizar registro com todos os IDs
+    // INTEGRITY VALIDATION: Verify all analysis IDs exist before saving
+    // ================================================================
+    console.log(
+      `🛡️ [COMPLETE-ANALYSIS] Validating referential integrity of ${allAnalysisIds.length} analysis IDs...`
+    )
+    if (allAnalysisIds.length > 0) {
+      const existingAnalyses = await db
+        .select({ id: analyses.id })
+        .from(analyses)
+        .where(inArray(analyses.id, allAnalysisIds))
+
+      if (existingAnalyses.length !== allAnalysisIds.length) {
+        const missingIds = allAnalysisIds.filter(
+          (id) => !existingAnalyses.some((e) => e.id === id)
+        )
+        console.error(
+          `❌ [COMPLETE-ANALYSIS] Integrity check failed! Missing analysis IDs: ${missingIds.join(
+            ', '
+          )}`
+        )
+        throw new Error(
+          `Data integrity error: The following analysis IDs could not be found: ${missingIds.join(
+            ', '
+          )}`
+        )
+      }
+      console.log(`✅ [COMPLETE-ANALYSIS] All analysis IDs are valid.`)
+    }
+
+    // ================================================================
+    // FINALIZATION: Update record with all generated IDs
     // ================================================================
     await db
       .update(completeAnalyses)

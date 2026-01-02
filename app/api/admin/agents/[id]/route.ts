@@ -96,7 +96,15 @@ export async function PUT(
     if (body.useThinkingMode !== undefined) updateData.useThinkingMode = body.useThinkingMode
     if (body.analysisRole !== undefined) updateData.analysisRole = body.analysisRole
     if (body.analysisOrder !== undefined) updateData.analysisOrder = body.analysisOrder
-    if (body.allowedRoles !== undefined) updateData.allowedRoles = body.allowedRoles
+    if (body.allowedRoles !== undefined) {
+      if (!Array.isArray(body.allowedRoles) || body.allowedRoles.length === 0) {
+        return NextResponse.json(
+          { success: false, error: 'O campo "allowedRoles" deve conter pelo menos uma função.' },
+          { status: 400 }
+        )
+      }
+      updateData.allowedRoles = body.allowedRoles
+    }
     if (body.displayOrder !== undefined) updateData.displayOrder = body.displayOrder
     if (body.isActive !== undefined) updateData.isActive = body.isActive
     if (body.requiresApproval !== undefined) updateData.requiresApproval = body.requiresApproval

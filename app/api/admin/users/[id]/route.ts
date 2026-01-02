@@ -6,7 +6,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth/config'
 import { db } from '@/lib/db/client'
-import { users } from '@/lib/db/schema'
+import { users, analyses, completeAnalyses } from '@/lib/db/schema'
 import { eq } from 'drizzle-orm'
 
 /**
@@ -186,13 +186,55 @@ export async function DELETE(
 
     console.log(`👥 [ADMIN-USER-API] Deleting user: ${id}`)
 
-    const [deletedUser] = await db
-      .delete(users)
-      .where(eq(users.id, id))
-      .returning({
-        id: users.id,
-        email: users.email,
-      })
+    const [deletedUser] = await db.transaction(async (tx) => {
+      // 1. Find all analysis IDs associated with the user
+      const userAnalysisIds = await tx
+        .select({ id: analyses.id })
+        .from(analyses)
+        .where(eq(analyses.userId, id))
+
+      const analysisIdsToDelete = userAnalysisIds.map((a) => a.id)
+
+      // 2. If the user has analyses, clean them up from complete_analyses
+      if (analysisIdsToDelete.length > 0) {
+        console.log(
+          `🧹 [ADMIN-USER-API] Found ${analysisIdsToDelete.length} analyses to clean up from complete_analyses.`
+        )
+        // This is inefficient but safe. For large scale, consider a raw SQL query with a GIN index on analysis_ids.
+        const allCompleteAnalyses = await tx.select().from(completeAnalyses)
+
+        const referencingCompleteAnalyses = allCompleteAnalyses.filter((ca) =>
+          ca.analysisIds.some((aid) => analysisIdsToDelete.includes(aid))
+        )
+
+        if (referencingCompleteAnalyses.length > 0) {
+          console.log(
+            `Found ${referencingCompleteAnalyses.length} complete_analyses to update.`
+          )
+          // For each, remove the analysis IDs
+          await Promise.all(
+            referencingCompleteAnalyses.map(async (ca) => {
+              const newAnalysisIds = ca.analysisIds.filter(
+                (aid) => !analysisIdsToDelete.includes(aid)
+              )
+              await tx
+                .update(completeAnalyses)
+                .set({ analysisIds: newAnalysisIds })
+                .where(eq(completeAnalyses.id, ca.id))
+            })
+          )
+        }
+      }
+
+      // 3. Now, delete the user. The database will cascade-delete their analyses.
+      return tx
+        .delete(users)
+        .where(eq(users.id, id))
+        .returning({
+          id: users.id,
+          email: users.email,
+        })
+    })
 
     if (!deletedUser) {
       return NextResponse.json(

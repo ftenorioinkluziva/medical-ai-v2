@@ -15,13 +15,13 @@ export const completeAnalyses = pgTable('complete_analyses', {
     .notNull()
     .references(() => users.id, { onDelete: 'cascade' }),
 
-  // Documentos analisados
+  // Analyzed documents
   documentIds: jsonb('document_ids').notNull().$type<string[]>(),
 
-  // IDs das análises individuais dos agentes (dinâmico - suporta N agentes)
+  // IDs of individual agent analyses (dynamic - supports N agents)
   analysisIds: jsonb('analysis_ids').notNull().default('[]').$type<string[]>(),
 
-  // Síntese consolidada (gerada por IA)
+  // Consolidated synthesis (AI-generated)
   synthesis: jsonb('synthesis').$type<{
     executiveSummary: string
     keyFindings: string[]
@@ -29,19 +29,19 @@ export const completeAnalyses = pgTable('complete_analyses', {
     mainRecommendations: string[]
   }>(),
 
-  // IDs dos produtos gerados
+  // IDs of generated products
   recommendationsId: uuid('recommendations_id')
     .references(() => recommendations.id, { onDelete: 'cascade' }),
   weeklyPlanId: uuid('weekly_plan_id')
     .references(() => weeklyPlans.id, { onDelete: 'cascade' }),
 
-  // Status do workflow
+  // Workflow status
   status: text('status')
     .$type<'pending' | 'analyzing_integrative' | 'analyzing_specialized' | 'generating_synthesis' | 'generating_products' | 'completed' | 'failed'>()
     .notNull()
     .default('pending'),
 
-  // Mensagem de erro (se falhar)
+  // Error message (if it fails)
   errorMessage: text('error_message'),
 
   createdAt: timestamp('created_at').defaultNow().notNull(),

@@ -49,7 +49,7 @@ export function CompleteAnalysisView({ userId }: CompleteAnalysisViewProps) {
         // API already returns only active agents that participate in complete analysis, sorted by role and order
         setAgents(data.agents || [])
       } catch (error) {
-        console.error('Error fetching agents:', error)
+        console.error('[COMPLETE-ANALYSIS] Error fetching agents:', error)
         toast.error('Erro ao carregar agentes')
       } finally {
         setLoadingAgents(false)
@@ -95,7 +95,7 @@ export function CompleteAnalysisView({ userId }: CompleteAnalysisViewProps) {
         setCurrentAnalysisId(null)
       }, 60000) // Estimativa de 60s para completar
     } catch (error) {
-      console.error('Error starting analysis:', error)
+      console.error('[COMPLETE-ANALYSIS] Error starting analysis:', error)
       toast.error('Erro ao iniciar análise', {
         description: error instanceof Error ? error.message : 'Erro desconhecido',
       })

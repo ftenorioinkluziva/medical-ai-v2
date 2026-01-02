@@ -117,6 +117,14 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Validate allowedRoles
+    if (!allowedRoles || !Array.isArray(allowedRoles) || allowedRoles.length === 0) {
+      return NextResponse.json(
+        { success: false, error: 'O campo "allowedRoles" é obrigatório e deve conter pelo menos uma função.' },
+        { status: 400 }
+      )
+    }
+
     console.log(`🔧 [ADMIN-AGENTS-API] Creating new agent: ${agentKey}`)
 
     // Create agent
@@ -139,7 +147,7 @@ export async function POST(request: NextRequest) {
         useThinkingMode: useThinkingMode !== undefined ? useThinkingMode : false,
         analysisRole: analysisRole || 'none',
         analysisOrder: analysisOrder !== undefined ? analysisOrder : null,
-        allowedRoles: allowedRoles || ['patient', 'doctor', 'admin'], // Default: all roles
+        allowedRoles: allowedRoles,
         displayOrder: displayOrder !== undefined ? displayOrder : 0,
         isActive: isActive !== undefined ? isActive : true,
         requiresApproval: requiresApproval || false,
