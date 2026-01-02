@@ -44,9 +44,7 @@ async function investigate() {
   console.log(`- Completed at: ${completeAnalysis.completedAt}`)
 
   console.log('\n- Análises individuais:')
-  console.log(`  Integrativa: ${completeAnalysis.integrativeAnalysisId}`)
-  console.log(`  Nutrição: ${completeAnalysis.nutritionAnalysisId}`)
-  console.log(`  Exercício: ${completeAnalysis.exerciseAnalysisId}`)
+  console.log(`  IDs: ${JSON.stringify(completeAnalysis.analysisIds)}`)
 
   if (!completeAnalysis.synthesis) {
     console.log('\n- ⚠️  SYNTHESIS: null/undefined')
@@ -121,11 +119,7 @@ async function investigate() {
 
   // 3. Buscar análises individuais referenciadas
   console.log('\n\n3. ANÁLISES INDIVIDUAIS REFERENCIADAS:')
-  const individualAnalysisIds = [
-    completeAnalysis.integrativeAnalysisId,
-    completeAnalysis.nutritionAnalysisId,
-    completeAnalysis.exerciseAnalysisId
-  ].filter(id => id !== null)
+  const individualAnalysisIds = (completeAnalysis.analysisIds || []) as string[]
 
   for (const id of individualAnalysisIds) {
     const [indAnalysis] = await db

@@ -1,33 +1,24 @@
 /**
- * Health Agents API
- * List available health agents
+ * Public Health Agents API
+ * Returns agents that participate in complete analysis
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '@/lib/auth/config'
 import { db } from '@/lib/db/client'
 import { healthAgents } from '@/lib/db/schema'
-import { eq, sql } from 'drizzle-orm'
+import { and, eq, ne } from 'drizzle-orm'
 
 /**
  * GET /api/agents
- * List all available health agents for the current user
+ * List active health agents that participate in complete analysis
+ * Public endpoint - no admin required
  */
 export async function GET(request: NextRequest) {
   try {
-    // Authenticate user
-    const session = await auth()
-    if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: 'Não autenticado' },
-        { status: 401 }
-      )
-    }
+    console.log(`🔧 [AGENTS-API] Fetching active agents for complete analysis`)
 
-    const userRole = session.user.role || 'patient'
-
-    // Get all active agents that the user has permission to access
-    const agents = await db
+    // Get all active agents that participate in complete analysis
+    const allAgents = await db
       .select({
         id: healthAgents.id,
         agentKey: healthAgents.agentKey,
@@ -36,26 +27,33 @@ export async function GET(request: NextRequest) {
         description: healthAgents.description,
         color: healthAgents.color,
         icon: healthAgents.icon,
-        modelName: healthAgents.modelName,
-        allowedRoles: healthAgents.allowedRoles,
-        isActive: healthAgents.isActive,
-        createdAt: healthAgents.createdAt,
+        analysisRole: healthAgents.analysisRole,
+        analysisOrder: healthAgents.analysisOrder,
+        displayOrder: healthAgents.displayOrder,
       })
       .from(healthAgents)
-      .where(eq(healthAgents.isActive, true))
+      .where(
+        and(
+          eq(healthAgents.isActive, true),
+          ne(healthAgents.analysisRole, 'none')
+        )
+      )
 
-    // Filter agents based on user role
-    const availableAgents = agents.filter(agent =>
-      agent.allowedRoles.includes(userRole)
-    )
+    // Sort: foundation first, then specialized, both ordered by analysisOrder
+    const agents = allAgents.sort((a, b) => {
+      // Foundation agents come before specialized
+      if (a.analysisRole === 'foundation' && b.analysisRole === 'specialized') return -1
+      if (a.analysisRole === 'specialized' && b.analysisRole === 'foundation') return 1
+      // Within same role, order by analysisOrder
+      return (a.analysisOrder || 0) - (b.analysisOrder || 0)
+    })
 
-    console.log(`✅ [AGENTS-API] Listed ${availableAgents.length} agents for role: ${userRole}`)
+    console.log(`✅ [AGENTS-API] Found ${agents.length} active agents`)
 
     return NextResponse.json({
       success: true,
-      agents: availableAgents,
-      userRole,
-      timestamp: new Date().toISOString(),
+      agents,
+      total: agents.length,
     })
   } catch (error) {
     console.error('❌ [AGENTS-API] Error:', error)
@@ -63,7 +61,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(
       {
         success: false,
-        error: error instanceof Error ? error.message : 'Erro desconhecido',
+        error: error instanceof Error ? error.message : 'Erro ao buscar agentes',
       },
       { status: 500 }
     )

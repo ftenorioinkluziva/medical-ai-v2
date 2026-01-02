@@ -93,6 +93,11 @@ export async function PUT(
     if (body.analysisPrompt !== undefined) updateData.analysisPrompt = body.analysisPrompt
     if (body.modelName !== undefined) updateData.modelName = body.modelName
     if (body.modelConfig !== undefined) updateData.modelConfig = body.modelConfig
+    if (body.useThinkingMode !== undefined) updateData.useThinkingMode = body.useThinkingMode
+    if (body.analysisRole !== undefined) updateData.analysisRole = body.analysisRole
+    if (body.analysisOrder !== undefined) updateData.analysisOrder = body.analysisOrder
+    if (body.allowedRoles !== undefined) updateData.allowedRoles = body.allowedRoles
+    if (body.displayOrder !== undefined) updateData.displayOrder = body.displayOrder
     if (body.isActive !== undefined) updateData.isActive = body.isActive
     if (body.requiresApproval !== undefined) updateData.requiresApproval = body.requiresApproval
     if (body.tags !== undefined) updateData.tags = body.tags

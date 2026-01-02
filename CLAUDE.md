@@ -47,7 +47,7 @@ The core architecture is built around specialized health agents that analyze med
 
 - **Stored in database** (`health_agents` table) - not hardcoded
 - **Configurable** - has own system prompt, analysis prompt, and model config
-- **Specialized** - Medicina Integrativa, Endocrinologia, Nutrição, Exercício
+- **Fully Dynamic** - system adapts automatically to any number/type of agents
 - **Loaded from DB** - agents are queried at runtime, not imported
 
 **Agent Configuration:**
@@ -55,6 +55,26 @@ The core architecture is built around specialized health agents that analyze med
 - `analysisPrompt`: Template for structured analysis output
 - `modelName`: AI model to use (default: `gemini-2.5-flash`)
 - `modelConfig`: Temperature, topP, topK, maxOutputTokens
+- `analysisRole`: `foundation` | `specialized` | `none`
+- `analysisOrder`: Order of execution within role group (nullable)
+
+**Agent Roles:**
+
+1. **Foundation Agents** (`analysisRole: 'foundation'`)
+   - Execute **sequentially** (one after another)
+   - Provide base context for specialized agents
+   - Example: Medicina Integrativa, Endocrinologia
+   - Order matters: lower `analysisOrder` = executes first
+
+2. **Specialized Agents** (`analysisRole: 'specialized'`)
+   - Execute **in parallel** (all at once)
+   - Receive context from all foundation agents
+   - Example: Nutrição, Exercício, Cardiologia, Suplementação
+   - Order only affects presentation, not execution
+
+3. **Standalone Agents** (`analysisRole: 'none'`)
+   - Not part of complete analysis workflow
+   - Can still be used for individual analyses
 
 **Agent Analysis Flow:**
 1. Agent selected by user → `lib/ai/agents/analyze.ts::analyzeWithAgent()`
@@ -62,6 +82,13 @@ The core architecture is built around specialized health agents that analyze med
 3. Prompts combined: systemPrompt + analysisPrompt + contexts
 4. AI generates analysis → `lib/ai/core/generate.ts::generateMedicalAnalysis()`
 5. Results stored in `analyses` table
+
+**Complete Analysis Workflow:** `lib/ai/orchestrator/complete-analysis.ts`
+1. **Validation**: Check ≥1 foundation AND ≥1 specialized agents exist
+2. **Phase 1 - Foundation**: Execute foundation agents sequentially
+3. **Phase 2 - Specialized**: Execute specialized agents in parallel
+4. **Phase 3 - Synthesis**: Consolidate all analyses into unified summary
+5. **Phase 4 - Products**: Generate recommendations + weekly plan
 
 ### Document Processing Pipeline
 
@@ -107,8 +134,9 @@ The core architecture is built around specialized health agents that analyze med
 - `users` - User accounts with role (patient/doctor/admin)
 - `profiles` - Extended medical profiles (height, weight, allergies, etc.)
 - `documents` - Uploaded medical documents with `extractedText` and `structuredData`
-- `health_agents` - AI agent configurations (prompts, models, display info)
+- `health_agents` - AI agent configurations (prompts, models, display info, roles)
 - `analyses` - Analysis results linking user + agent + document
+- `complete_analyses` - Multi-agent workflow results with dynamic `analysisIds` array
 - `knowledge_base` - Medical articles for RAG
 - `knowledge_embeddings` - Vector embeddings for knowledge base (pgvector)
 - `recommendations` - Personalized health recommendations
@@ -195,6 +223,80 @@ OPENAI_API_KEY="..."         # Legacy support only - not required for system ope
 - **Path alias:** `@/*` maps to project root
 - **Module resolution:** `bundler` (Next.js 16 requirement)
 - **React compiler enabled** in next.config.ts
+
+## Creating and Managing Dynamic Agents
+
+### Adding a New Agent
+
+The system is fully dynamic - you can add any type of health agent through the admin panel without code changes:
+
+**Example: Adding a Cardiology Agent**
+
+1. Navigate to Admin → Health Agents → Create New Agent
+2. Configure agent properties:
+   ```typescript
+   {
+     agentKey: 'cardiologia',
+     name: 'Cardiologia',
+     title: 'Especialista em Saúde Cardiovascular',
+     description: 'Análise especializada de saúde cardíaca...',
+     color: 'red',
+     icon: 'heart',
+
+     // Define role in complete analysis
+     analysisRole: 'specialized',  // or 'foundation' or 'none'
+     analysisOrder: 4,              // execution/presentation order
+
+     // AI Configuration
+     systemPrompt: 'Você é um cardiologista especializado...',
+     analysisPrompt: 'Analise os seguintes dados cardiovasculares...',
+     modelName: 'gemini-2.5-flash',
+     modelConfig: {
+       temperature: 0.3,
+       topP: 0.95,
+       maxOutputTokens: 4000
+     },
+
+     // Access control
+     allowedRoles: ['doctor', 'admin'],
+     isActive: true,
+     displayOrder: 4
+   }
+   ```
+
+3. **That's it!** The agent is now:
+   - ✅ Available for individual analyses
+   - ✅ Included in complete analysis workflow automatically
+   - ✅ Integrated into synthesis generation
+   - ✅ Used for recommendations and weekly plans
+
+### Agent Role Best Practices
+
+**Foundation Agents:**
+- Use for: Broad, integrative analyses that provide base context
+- Examples: Medicina Integrativa, Endocrinologia, Geriatria
+- Characteristics: Holistic view, identify patterns across systems
+- Execution: Sequential (order matters for context building)
+
+**Specialized Agents:**
+- Use for: Deep-dive analyses in specific domains
+- Examples: Nutrição, Exercício, Cardiologia, Suplementação
+- Characteristics: Technical depth, actionable recommendations
+- Execution: Parallel (all receive foundation context simultaneously)
+
+**Standalone Agents:**
+- Use for: Optional analyses not part of standard workflow
+- Examples: Experimental agents, research-specific analyses
+- Set `analysisRole: 'none'`
+
+### System Validation Rules
+
+**Complete Analysis requires:**
+- At least 1 foundation agent with `analysisRole: 'foundation'`
+- At least 1 specialized agent with `analysisRole: 'specialized'`
+- Both agents must have `isActive: true`
+
+If these conditions aren't met, the system throws clear error messages directing admins to configure the missing agents.
 
 ## Important Patterns
 

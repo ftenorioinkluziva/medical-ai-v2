@@ -27,11 +27,7 @@ async function testAPI() {
     console.log('✅ Complete analysis found')
 
     // Fetch related analyses
-    const analysisIds = [
-      completeAnalysis.integrativeAnalysisId,
-      completeAnalysis.nutritionAnalysisId,
-      completeAnalysis.exerciseAnalysisId,
-    ].filter(Boolean) as string[]
+    const analysisIds = (completeAnalysis.analysisIds || []) as string[]
 
     console.log(`\nFetching ${analysisIds.length} related analyses...\n`)
 

@@ -18,13 +18,8 @@ export const completeAnalyses = pgTable('complete_analyses', {
   // Documentos analisados
   documentIds: jsonb('document_ids').notNull().$type<string[]>(),
 
-  // IDs das análises individuais dos agentes
-  integrativeAnalysisId: uuid('integrative_analysis_id')
-    .references(() => analyses.id, { onDelete: 'cascade' }),
-  nutritionAnalysisId: uuid('nutrition_analysis_id')
-    .references(() => analyses.id, { onDelete: 'cascade' }),
-  exerciseAnalysisId: uuid('exercise_analysis_id')
-    .references(() => analyses.id, { onDelete: 'cascade' }),
+  // IDs das análises individuais dos agentes (dinâmico - suporta N agentes)
+  analysisIds: jsonb('analysis_ids').notNull().default('[]').$type<string[]>(),
 
   // Síntese consolidada (gerada por IA)
   synthesis: jsonb('synthesis').$type<{

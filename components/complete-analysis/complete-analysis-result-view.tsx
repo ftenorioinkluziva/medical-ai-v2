@@ -247,106 +247,141 @@ export function CompleteAnalysisResultView({ analysis }: CompleteAnalysisResultV
 
         {/* Analyses Tab (NOVO) */}
         <TabsContent value="analyses" className="mt-6">
-          <Card>
-            <CardContent className="p-0">
-              <Tabs defaultValue={analyses[0]?.agentKey || 'integrative'} className="w-full">
-                <TabsList className="grid w-full grid-cols-3 rounded-t-lg rounded-b-none bg-muted-foreground/10">
-                  {analyses.map(analysis => (
-                    <TabsTrigger
-                      key={analysis.id}
-                      value={analysis.agentKey}
-                      className={`gap-1.5 sm:gap-2 data-[state=active]:!text-white ${
-                        analysis.agentKey === 'integrative' ? 'data-[state=active]:!bg-teal-600 dark:data-[state=active]:!bg-teal-500' :
-                        analysis.agentKey === 'nutrition' ? 'data-[state=active]:!bg-orange-600 dark:data-[state=active]:!bg-orange-500' :
-                        'data-[state=active]:!bg-sky-600 dark:data-[state=active]:!bg-sky-500'
-                      }`}
-                    >
-                      <Brain className="h-4 w-4" />
-                      <span className="hidden sm:inline">{analysis.agentName}</span>
-                    </TabsTrigger>
-                  ))}
-                </TabsList>
+          <Accordion type="multiple" className="w-full space-y-4">
+            {analyses.map((analysis, index) => {
+              // Map agent color to border and background classes
+              const colorClasses = {
+                green: {
+                  border: 'border-green-200 dark:border-green-800',
+                  bg: 'bg-green-50/50 dark:bg-green-950/20',
+                  icon: 'text-green-600 dark:text-green-400',
+                  badge: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300',
+                },
+                purple: {
+                  border: 'border-purple-200 dark:border-purple-800',
+                  bg: 'bg-purple-50/50 dark:bg-purple-950/20',
+                  icon: 'text-purple-600 dark:text-purple-400',
+                  badge: 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300',
+                },
+                orange: {
+                  border: 'border-orange-200 dark:border-orange-800',
+                  bg: 'bg-orange-50/50 dark:bg-orange-950/20',
+                  icon: 'text-orange-600 dark:text-orange-400',
+                  badge: 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300',
+                },
+                blue: {
+                  border: 'border-blue-200 dark:border-blue-800',
+                  bg: 'bg-blue-50/50 dark:bg-blue-950/20',
+                  icon: 'text-blue-600 dark:text-blue-400',
+                  badge: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300',
+                },
+                teal: {
+                  border: 'border-teal-200 dark:border-teal-800',
+                  bg: 'bg-teal-50/50 dark:bg-teal-950/20',
+                  icon: 'text-teal-600 dark:text-teal-400',
+                  badge: 'bg-teal-100 dark:bg-teal-900/30 text-teal-700 dark:text-teal-300',
+                },
+                red: {
+                  border: 'border-red-200 dark:border-red-800',
+                  bg: 'bg-red-50/50 dark:bg-red-950/20',
+                  icon: 'text-red-600 dark:text-red-400',
+                  badge: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300',
+                },
+                yellow: {
+                  border: 'border-yellow-200 dark:border-yellow-800',
+                  bg: 'bg-yellow-50/50 dark:bg-yellow-950/20',
+                  icon: 'text-yellow-600 dark:text-yellow-400',
+                  badge: 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300',
+                },
+                sky: {
+                  border: 'border-sky-200 dark:border-sky-800',
+                  bg: 'bg-sky-50/50 dark:bg-sky-950/20',
+                  icon: 'text-sky-600 dark:text-sky-400',
+                  badge: 'bg-sky-100 dark:bg-sky-900/30 text-sky-700 dark:text-sky-300',
+                },
+              }
 
-                <div className="p-4 sm:p-6">
-                  {analyses.map(analysis => (
-                    <TabsContent key={analysis.id} value={analysis.agentKey} className="mt-0">
-                      {/* Header do agente */}
-                      <div className="flex items-start justify-between gap-3 mb-4">
-                        <div>
-                          <h3 className="text-base sm:text-lg font-semibold">{analysis.agentTitle}</h3>
-                          <p className="text-xs sm:text-sm text-muted-foreground mt-1">
-                            {format(new Date(analysis.createdAt), "dd 'de' MMMM, yyyy", { locale: ptBR })}
+              const colors = colorClasses[analysis.agentColor as keyof typeof colorClasses] || colorClasses.blue
+
+              return (
+                <Card key={analysis.id} className={`border-2 ${colors.border} ${colors.bg}`}>
+                  <AccordionItem value={analysis.id} className="border-0">
+                    <AccordionTrigger className="hover:no-underline px-4 sm:px-6 pt-4 sm:pt-6">
+                      <div className="flex items-center gap-3 text-left w-full">
+                        <div className={`p-2 rounded-lg ${colors.badge}`}>
+                          <Brain className={`h-5 w-5 ${colors.icon}`} />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h3 className="text-base sm:text-lg font-semibold text-foreground truncate">
+                            {index + 1}. {analysis.agentName}
+                          </h3>
+                          <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
+                            {analysis.agentTitle}
                           </p>
                         </div>
                       </div>
+                    </AccordionTrigger>
+                    <AccordionContent className="px-4 sm:px-6 pb-4 sm:pb-6">
+                      <div className="pt-4 space-y-4">
+                        {/* Data da análise */}
+                        <p className="text-xs text-muted-foreground flex items-center gap-2">
+                          <Clock className="h-3 w-3" />
+                          {format(new Date(analysis.createdAt), "dd 'de' MMMM, yyyy 'às' HH:mm", { locale: ptBR })}
+                        </p>
 
-                      {/* Accordion para cada seção da análise */}
-                      <Accordion type="multiple" className="w-full">
-                        {/* Item 1: Análise Detalhada */}
-                        <AccordionItem value="detailed-analysis">
-                          <AccordionTrigger className="hover:no-underline">
-                            <div className="flex items-center gap-2 text-base sm:text-lg">
-                              <FileText className="h-4 w-4" />
-                              <span>Análise Detalhada</span>
-                            </div>
-                          </AccordionTrigger>
-                          <AccordionContent className="pt-4">
-                            <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">
-                              {analysis.analysis}
-                            </p>
-                          </AccordionContent>
-                        </AccordionItem>
+                        {/* Análise Detalhada */}
+                        <div className="space-y-2">
+                          <h4 className="font-semibold text-sm flex items-center gap-2">
+                            <FileText className="h-4 w-4" />
+                            Análise Detalhada
+                          </h4>
+                          <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap pl-6">
+                            {analysis.analysis}
+                          </p>
+                        </div>
 
-                        {/* Item 2: Insights-Chave (se existir) */}
+                        {/* Insights-Chave (se existir) */}
                         {analysis.insights && analysis.insights.length > 0 && (
-                          <AccordionItem value="insights">
-                            <AccordionTrigger className="hover:no-underline">
-                              <div className="flex items-center gap-2 text-base sm:text-lg">
-                                <Lightbulb className="h-4 w-4 text-amber-600 dark:text-amber-400" />
-                                <span>Insights-Chave</span>
-                              </div>
-                            </AccordionTrigger>
-                            <AccordionContent className="pt-4">
-                              <ul className="space-y-2">
-                                {analysis.insights.map((insight: string, idx: number) => (
-                                  <li key={idx} className="flex items-start gap-2">
-                                    <span className="text-teal-600 dark:text-teal-400 mt-1">•</span>
-                                    <span className="text-sm text-muted-foreground leading-relaxed">{insight}</span>
-                                  </li>
-                                ))}
-                              </ul>
-                            </AccordionContent>
-                          </AccordionItem>
+                          <div className="space-y-2">
+                            <h4 className="font-semibold text-sm flex items-center gap-2">
+                              <Lightbulb className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+                              Insights-Chave
+                            </h4>
+                            <ul className="space-y-2 pl-6">
+                              {analysis.insights.map((insight: string, idx: number) => (
+                                <li key={idx} className="flex items-start gap-2">
+                                  <span className={`${colors.icon} mt-1`}>•</span>
+                                  <span className="text-sm text-muted-foreground leading-relaxed">{insight}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
                         )}
 
-                        {/* Item 3: Ações Recomendadas (se existir) */}
+                        {/* Ações Recomendadas (se existir) */}
                         {analysis.actionItems && analysis.actionItems.length > 0 && (
-                          <AccordionItem value="action-items">
-                            <AccordionTrigger className="hover:no-underline">
-                              <div className="flex items-center gap-2 text-base sm:text-lg">
-                                <CheckSquare className="h-4 w-4 text-green-600 dark:text-green-400" />
-                                <span>Ações Recomendadas</span>
-                              </div>
-                            </AccordionTrigger>
-                            <AccordionContent className="pt-4">
-                              <ul className="space-y-2">
-                                {analysis.actionItems.map((item: string, idx: number) => (
-                                  <li key={idx} className="flex items-start gap-3">
-                                    <CheckSquare className="h-4 w-4 text-green-600 dark:text-green-400 mt-0.5 flex-shrink-0" />
-                                    <span className="text-sm text-muted-foreground leading-relaxed">{item}</span>
-                                  </li>
-                                ))}
-                              </ul>
-                            </AccordionContent>
-                          </AccordionItem>
+                          <div className="space-y-2">
+                            <h4 className="font-semibold text-sm flex items-center gap-2">
+                              <CheckSquare className="h-4 w-4 text-green-600 dark:text-green-400" />
+                              Ações Recomendadas
+                            </h4>
+                            <ul className="space-y-2 pl-6">
+                              {analysis.actionItems.map((item: string, idx: number) => (
+                                <li key={idx} className="flex items-start gap-3">
+                                  <CheckSquare className="h-4 w-4 text-green-600 dark:text-green-400 mt-0.5 flex-shrink-0" />
+                                  <span className="text-sm text-muted-foreground leading-relaxed">{item}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
                         )}
-                      </Accordion>
-                    </TabsContent>
-                  ))}
-                </div>
-              </Tabs>
-            </CardContent>
-          </Card>
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                </Card>
+              )
+            })}
+          </Accordion>
         </TabsContent>
 
         {/* Goals Tab (ex-Recommendations) */}

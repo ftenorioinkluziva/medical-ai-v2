@@ -65,11 +65,7 @@ export default async function CompleteAnalysisResultPage({ params }: PageProps) 
     }
 
     // Fetch related analyses with agent info
-    const analysisIds = [
-      completeAnalysis.integrativeAnalysisId,
-      completeAnalysis.nutritionAnalysisId,
-      completeAnalysis.exerciseAnalysisId,
-    ].filter(Boolean) as string[]
+    const analysisIds = (completeAnalysis.analysisIds || []) as string[]
 
     const relatedAnalyses = analysisIds.length > 0
       ? await db
@@ -83,11 +79,22 @@ export default async function CompleteAnalysisResultPage({ params }: PageProps) 
             agentKey: healthAgents.agentKey,
             agentTitle: healthAgents.title,
             agentColor: healthAgents.color,
+            analysisRole: healthAgents.analysisRole,
+            analysisOrder: healthAgents.analysisOrder,
           })
           .from(analyses)
           .innerJoin(healthAgents, eq(analyses.agentId, healthAgents.id))
           .where(inArray(analyses.id, analysisIds))
       : []
+
+    // Sort analyses: foundation first, then specialized, both ordered by analysisOrder
+    const sortedAnalyses = relatedAnalyses.sort((a, b) => {
+      // Foundation agents come before specialized
+      if (a.analysisRole === 'foundation' && b.analysisRole === 'specialized') return -1
+      if (a.analysisRole === 'specialized' && b.analysisRole === 'foundation') return 1
+      // Within same role, order by analysisOrder
+      return (a.analysisOrder || 0) - (b.analysisOrder || 0)
+    })
 
     // Fetch recommendations if available
     let recommendationsData = null
@@ -140,7 +147,7 @@ export default async function CompleteAnalysisResultPage({ params }: PageProps) 
       errorMessage: completeAnalysis.errorMessage,
       createdAt: completeAnalysis.createdAt,
       completedAt: completeAnalysis.completedAt,
-      analyses: relatedAnalyses, // Passing individual analyses (Integrative, Nutrition, Exercise)
+      analyses: sortedAnalyses, // Passing individual analyses sorted by role and order
       recommendations: recommendationsData,
       weeklyPlan: weeklyPlanData,
     }

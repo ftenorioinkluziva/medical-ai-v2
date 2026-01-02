@@ -60,11 +60,7 @@ export async function GET(
     }
 
     // Fetch related analyses with agent info
-    const analysisIds = [
-      completeAnalysis.integrativeAnalysisId,
-      completeAnalysis.nutritionAnalysisId,
-      completeAnalysis.exerciseAnalysisId,
-    ].filter(Boolean) as string[]
+    const analysisIds = (completeAnalysis.analysisIds || []) as string[]
 
     // Use inArray for cleaner query that avoids JSON comparison issues
     const relatedAnalyses = analysisIds.length > 0

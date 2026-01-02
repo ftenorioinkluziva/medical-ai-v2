@@ -193,15 +193,26 @@ export async function runCompleteAnalysis(
     const foundationAgents = allAgents.filter(a => a.analysisRole === 'foundation')
     const specializedAgents = allAgents.filter(a => a.analysisRole === 'specialized')
 
+    // ================================================================
+    // VALIDAÇÃO: Garantir que há agentes suficientes configurados
+    // ================================================================
     if (foundationAgents.length === 0) {
-      throw new Error('No foundation agent configured for complete analysis. Please configure at least one agent with analysisRole=foundation in admin panel.')
+      throw new Error(
+        'Nenhum agente de fundação configurado. ' +
+        'Configure pelo menos um agente com "Papel na Análise Completa" = "Fundação" no painel admin.'
+      )
     }
 
     if (specializedAgents.length === 0) {
-      throw new Error('No specialized agents configured for complete analysis. Please configure at least one agent with analysisRole=specialized in admin panel.')
+      throw new Error(
+        'Nenhum agente especializado configurado. ' +
+        'Configure pelo menos um agente com "Papel na Análise Completa" = "Especializado" no painel admin.'
+      )
     }
 
-    console.log(`✅ [COMPLETE-ANALYSIS] Loaded ${foundationAgents.length} foundation + ${specializedAgents.length} specialized agents`)
+    console.log(`✅ [COMPLETE-ANALYSIS] Validation passed:`)
+    console.log(`   - Foundation agents: ${foundationAgents.map(a => a.name).join(', ')}`)
+    console.log(`   - Specialized agents: ${specializedAgents.map(a => a.name).join(', ')}`)
 
     // ================================================================
     // FASE 1: ANÁLISE DE FUNDAÇÃO (Foundation Agents - Sequential)
@@ -314,23 +325,6 @@ ${foundationKnowledge ? `## Base de Conhecimento Médico (Referências)\n${found
       foundationAnalyses.push(savedFoundation)
     }
 
-    // Use first foundation analysis for backward compatibility variable naming
-    const savedIntegrative = foundationAnalyses[0]
-    const integrativeAnalysis = {
-      analysis: savedIntegrative.analysis,
-      insights: savedIntegrative.insights,
-      actionItems: savedIntegrative.actionItems,
-      model: savedIntegrative.modelUsed,
-      usage: {
-        totalTokens: savedIntegrative.tokensUsed,
-        promptTokens: 0,
-        completionTokens: savedIntegrative.tokensUsed,
-      },
-      metadata: {
-        processingTimeMs: savedIntegrative.processingTimeMs,
-      },
-    }
-
     // ================================================================
     // FASE 2: ANÁLISES ESPECIALIZADAS (Paralelo com Contexto)
     // ================================================================
@@ -370,43 +364,32 @@ ${foundationKnowledge ? `## Base de Conhecimento Médico (Referências)\n${found
       }
     })
 
-    // For backward compatibility - map first two specialized agents
-    const nutritionAgent = specializedAgents.find(a => a.agentKey === 'nutricao') || specializedAgents[0]
-    const exerciseAgent = specializedAgents.find(a => a.agentKey === 'exercicio') || specializedAgents[1]
-    const nutritionKnowledge = specializedKnowledgeResults[specializedAgents.indexOf(nutritionAgent)] || ''
-    const exerciseKnowledge = specializedKnowledgeResults[specializedAgents.indexOf(exerciseAgent)] || ''
-
-    const nutritionInstruction = `CONTEXTO: Você tem acesso às análises de fundação realizadas anteriormente.
+    // Build generic instruction for all specialized agents
+    const buildSpecializedInstruction = () => `CONTEXTO: Você tem acesso às análises de fundação realizadas anteriormente.
 
 SUA MISSÃO: Adicionar insights COMPLEMENTARES focados em sua especialidade.
 
 🎯 REGRAS CRÍTICAS - SIGA RIGOROSAMENTE:
 
-1. **ESPECIALIZAÇÃO TOTAL**: Você é um NUTRICIONISTA FUNCIONAL. Foque APENAS em:
-   - Metabolismo de macronutrientes e micronutrientes
-   - Status vitamínico e mineral (B12, D, ferro, magnésio, zinco, selênio)
-   - Saúde digestiva, absorção intestinal, microbiota
-   - Perfil lipídico e ácidos graxos essenciais
-   - Metabolismo proteico e aminoácidos
+1. **ESPECIALIZAÇÃO TOTAL**: Foque APENAS na sua área de especialidade conforme definido no seu perfil.
+   - Aprofunde nos aspectos técnicos da sua especialidade
+   - Analise marcadores e parâmetros relevantes à sua área
+   - Forneça perspectiva única que apenas um especialista da sua área identificaria
 
-2. **INSIGHTS ÚNICOS**: Seus insights devem ser coisas que APENAS um nutricionista identificaria:
-   - Deficiências nutricionais específicas
-   - Interações entre nutrientes
-   - Impacto de padrões alimentares em marcadores bioquímicos
-   - Status de cofatores enzimáticos
-   - NÃO mencione: exercício, hormônios (a menos que relacionados à nutrição), stress geral
+2. **INSIGHTS ÚNICOS**: Seus insights devem ser específicos da sua especialidade:
+   - Identifique padrões e correlações na sua área de atuação
+   - Conecte marcadores bioquímicos aos aspectos da sua especialidade
+   - NÃO invada o território de outras especialidades
 
-3. **ACTION ITEMS ESPECÍFICOS**: Suas recomendações devem ser 100% nutricionais:
-   - Alimentos terapêuticos ESPECÍFICOS (não genéricos)
-   - Protocolos de suplementação com dosagens
-   - Timing nutricional e combinações de alimentos
-   - Estratégias para otimizar absorção
-   - NÃO mencione: exercício, meditação, consultas médicas gerais
+3. **ACTION ITEMS ESPECÍFICOS**: Suas recomendações devem ser 100% da sua área:
+   - Recomendações específicas e acionáveis
+   - Protocolos detalhados quando aplicável
+   - Estratégias práticas de implementação
 
-4. **EVITE REPETIÇÃO**: NÃO repita o que a Medicina Integrativa já disse
-   - Se ela mencionou vitamina D baixa, você APROFUNDA: metabolismo, cofatores, absorção
-   - Se ela mencionou inflamação, você CONECTA: ácidos graxos ômega-3, antioxidantes alimentares
-   - Adicione camadas de profundidade técnica NUTRICIONAL
+4. **EVITE REPETIÇÃO**: NÃO repita o que as análises de fundação já disseram
+   - Se a fundação mencionou algo, você APROFUNDA tecnicamente
+   - Adicione camadas de profundidade específicas da sua especialidade
+   - Complemente, não duplique
 
 ⚠️ REGRA CRÍTICA DE VALIDAÇÃO:
    - Mencione APENAS parâmetros que estão na lista "PARÂMETROS DISPONÍVEIS NOS DOCUMENTOS"
@@ -420,177 +403,92 @@ ${foundationContext}
 
 Agora, analise os documentos sob sua perspectiva especializada.`
 
-    const exerciseInstruction = `CONTEXTO: Você tem acesso às análises de fundação realizadas anteriormente.
+    // Execute all specialized analyses in parallel
+    const specializedAnalysisPromises = specializedAgents.map((agent, idx) => {
+      const agentKnowledge = specializedKnowledgeResults[idx] || ''
+      const instruction = buildSpecializedInstruction()
 
-SUA MISSÃO: Adicionar insights COMPLEMENTARES focados em sua especialidade.
-
-🎯 REGRAS CRÍTICAS - SIGA RIGOROSAMENTE:
-
-1. **ESPECIALIZAÇÃO TOTAL**: Você é um FISIOLOGISTA DO EXERCÍCIO. Foque APENAS em:
-   - Composição corporal (massa magra, gordura, bioimpedância)
-   - Taxa metabólica basal e gasto energético
-   - Capacidade aeróbica e anaeróbica
-   - Força muscular, potência e resistência
-   - Marcadores de performance física (VO2max, força de preensão, teste sentar-levantar)
-
-2. **INSIGHTS ÚNICOS**: Seus insights devem ser coisas que APENAS um fisiologista identificaria:
-   - Análise de composição corporal detalhada
-   - Capacidade funcional e risco de sarcopenia
-   - Eficiência metabólica durante exercício
-   - Marcadores de overtraining ou subtreinamento
-   - Relação músculo-metabolismo
-   - NÃO mencione: dieta detalhada, suplementos (exceto peri-treino), gestão de stress geral
-
-3. **ACTION ITEMS ESPECÍFICOS**: Suas recomendações devem ser 100% sobre EXERCÍCIO:
-   - Tipos de exercício ESPECÍFICOS (resistido, aeróbico, HIIT, Zona 2, etc)
-   - Protocolos de treinamento com volume, intensidade e frequência
-   - Periodização e progressão
-   - Estratégias de recuperação FÍSICA (foam rolling, mobilidade, etc)
-   - Nutrição PERI-TREINO específica (timing e macros)
-   - NÃO mencione: dieta geral, suplementos não relacionados a exercício, terapias alternativas
-
-4. **EVITE REPETIÇÃO**: NÃO repita o que a Medicina Integrativa já disse
-   - Se ela mencionou sedentarismo, você DETALHA: protocolos progressivos, testes de aptidão
-   - Se ela mencionou composição corporal, você APROFUNDA: distribuição segmentar, índice músculo-esquelético
-   - Adicione camadas de profundidade técnica sobre EXERCÍCIO E PERFORMANCE
-
-⚠️ REGRA CRÍTICA DE VALIDAÇÃO:
-   - Mencione APENAS parâmetros que estão na lista "PARÂMETROS DISPONÍVEIS NOS DOCUMENTOS"
-   - NUNCA mencione parâmetros que não foram testados
-   - Se um dado não estiver disponível, diga "não disponível" ou "não testado"
-
-ANÁLISES ANTERIORES (FUNDAÇÃO):
-${foundationContext}
-
----
-
-Agora, analise os documentos sob sua perspectiva especializada.`
-
-    const [nutritionAnalysis, exerciseAnalysis] = await Promise.all([
-      // Agente de Nutrição - Análise Complementar
-      analyzeWithAgent(
-        nutritionAgent,
-        nutritionAgent.analysisPrompt,
+      return analyzeWithAgent(
+        agent,
+        agent.analysisPrompt,
         {
-          documentsContext: '',  // ❌ REMOVIDO - usar apenas Logical Brain
+          documentsContext: '',  // Using Logical Brain only
           medicalProfileContext,
-          knowledgeContext: nutritionKnowledge,
+          knowledgeContext: agentKnowledge,
           structuredDocuments: structuredDocuments || [],
           documentIds: docs.map(d => d.id),
-          instruction: nutritionInstruction,
+          instruction,
         }
-      ),
+      ).then(analysisResult => ({
+        agent,
+        analysisResult,
+        agentKnowledge,
+        instruction,
+      }))
+    })
 
-      // Agente de Exercício - Análise Complementar
-      analyzeWithAgent(
-        exerciseAgent,
-        exerciseAgent.analysisPrompt,
-        {
-          documentsContext: '',  // ❌ REMOVIDO - usar apenas Logical Brain
-          medicalProfileContext,
-          knowledgeContext: exerciseKnowledge,
-          structuredDocuments: structuredDocuments || [],
-          documentIds: docs.map(d => d.id),
-          instruction: exerciseInstruction,
-        }
-      ),
-    ])
+    const specializedAnalysesData = await Promise.all(specializedAnalysisPromises)
 
-    // Build the prompts that were used
-    const nutritionPromptUsed = `${nutritionAgent.analysisPrompt}
+    console.log(`✅ [COMPLETE-ANALYSIS] All ${specializedAnalysesData.length} specialized analyses completed`)
 
-${nutritionInstruction}
+    // Save all specialized analyses to database in parallel
+    const savedSpecializedPromises = specializedAnalysesData.map(({ agent, analysisResult, agentKnowledge, instruction }) => {
+      const promptUsed = `${agent.analysisPrompt}
+
+${instruction}
 
 ## Documentos Médicos do Paciente
 ${documentsContext}
 
 ${medicalProfileContext ? `## Perfil Médico do Paciente\n${medicalProfileContext}` : ''}
 
-${nutritionKnowledge ? `## Base de Conhecimento Médico (Referências)\n${nutritionKnowledge}` : ''}`
+${agentKnowledge ? `## Base de Conhecimento Médico (Referências)\n${agentKnowledge}` : ''}`
 
-    const exercisePromptUsed = `${exerciseAgent.analysisPrompt}
-
-${exerciseInstruction}
-
-## Documentos Médicos do Paciente
-${documentsContext}
-
-${medicalProfileContext ? `## Perfil Médico do Paciente\n${medicalProfileContext}` : ''}
-
-${exerciseKnowledge ? `## Base de Conhecimento Médico (Referências)\n${exerciseKnowledge}` : ''}`
-
-    // Salvar análises especializadas
-    const [savedNutrition, savedExercise] = await Promise.all([
-      db
+      return db
         .insert(analyses)
         .values({
           userId,
-          agentId: nutritionAgent.id,
+          agentId: agent.id,
           documentId: docs[0].id,
           documentIds: docs.map(d => d.id),
-          prompt: nutritionPromptUsed,
+          prompt: promptUsed,
           medicalProfileSnapshot: profile || null,
-          analysis: nutritionAnalysis.analysis,
-          insights: nutritionAnalysis.insights as any,
-          actionItems: nutritionAnalysis.actionItems as any,
-          modelUsed: nutritionAnalysis.model,
-          tokensUsed: nutritionAnalysis.usage?.totalTokens || null,
-          processingTimeMs: nutritionAnalysis.metadata?.processingTimeMs || null,
-          ragUsed: !!nutritionKnowledge,
+          analysis: analysisResult.analysis,
+          insights: analysisResult.insights as any,
+          actionItems: analysisResult.actionItems as any,
+          modelUsed: analysisResult.model,
+          tokensUsed: analysisResult.usage?.totalTokens || null,
+          processingTimeMs: analysisResult.metadata?.processingTimeMs || null,
+          ragUsed: !!agentKnowledge,
         })
         .returning()
-        .then(r => r[0]),
+        .then(r => ({ savedAnalysis: r[0], agent, analysisResult }))
+    })
 
-      db
-        .insert(analyses)
-        .values({
-          userId,
-          agentId: exerciseAgent.id,
-          documentId: docs[0].id,
-          documentIds: docs.map(d => d.id),
-          prompt: exercisePromptUsed,
-          medicalProfileSnapshot: profile || null,
-          analysis: exerciseAnalysis.analysis,
-          insights: exerciseAnalysis.insights as any,
-          actionItems: exerciseAnalysis.actionItems as any,
-          modelUsed: exerciseAnalysis.model,
-          tokensUsed: exerciseAnalysis.usage?.totalTokens || null,
-          processingTimeMs: exerciseAnalysis.metadata?.processingTimeMs || null,
-          ragUsed: !!exerciseKnowledge,
-        })
-        .returning()
-        .then(r => r[0]),
-    ])
+    const savedSpecializedAnalyses = await Promise.all(savedSpecializedPromises)
 
     console.log(`✅ [COMPLETE-ANALYSIS] Specialized analyses saved:`)
-    console.log(`   - Nutrition: ${savedNutrition.id}`)
-    console.log(`   - Exercise: ${savedExercise.id}`)
+    savedSpecializedAnalyses.forEach(({ savedAnalysis, agent }) => {
+      console.log(`   - ${agent.name}: ${savedAnalysis.id}`)
+    })
 
-    // Debit credits for specialized analyses
+    // Debit credits for all specialized analyses
     try {
-      const nutritionTokens = nutritionAnalysis.usage?.totalTokens || 0
-      if (nutritionTokens > 0) {
-        await debitCredits(userId, nutritionTokens, {
-          analysisId: savedNutrition.id,
-          operation: 'complete_analysis_nutrition',
-          modelName: nutritionAgent.modelName || 'gemini-2.5-flash',
-          promptTokens: nutritionAnalysis.usage?.promptTokens || 0,
-          completionTokens: nutritionAnalysis.usage?.completionTokens || 0,
+      await Promise.all(
+        savedSpecializedAnalyses.map(async ({ savedAnalysis, agent, analysisResult }) => {
+          const tokens = analysisResult.usage?.totalTokens || 0
+          if (tokens > 0) {
+            await debitCredits(userId, tokens, {
+              analysisId: savedAnalysis.id,
+              operation: `complete_analysis_${agent.agentKey}`,
+              modelName: agent.modelName || 'gemini-2.5-flash',
+              promptTokens: analysisResult.usage?.promptTokens || 0,
+              completionTokens: analysisResult.usage?.completionTokens || 0,
+            })
+            console.log(`💰 [COMPLETE-ANALYSIS] Debited ${calculateCreditsFromTokens(tokens)} credits for ${agent.name} analysis`)
+          }
         })
-        console.log(`💰 [COMPLETE-ANALYSIS] Debited ${calculateCreditsFromTokens(nutritionTokens)} credits for nutrition analysis`)
-      }
-
-      const exerciseTokens = exerciseAnalysis.usage?.totalTokens || 0
-      if (exerciseTokens > 0) {
-        await debitCredits(userId, exerciseTokens, {
-          analysisId: savedExercise.id,
-          operation: 'complete_analysis_exercise',
-          modelName: exerciseAgent.modelName || 'gemini-2.5-flash',
-          promptTokens: exerciseAnalysis.usage?.promptTokens || 0,
-          completionTokens: exerciseAnalysis.usage?.completionTokens || 0,
-        })
-        console.log(`💰 [COMPLETE-ANALYSIS] Debited ${calculateCreditsFromTokens(exerciseTokens)} credits for exercise analysis`)
-      }
+      )
     } catch (creditError) {
       console.error('⚠️ [COMPLETE-ANALYSIS] Failed to debit credits for specialized analyses:', creditError)
     }
@@ -605,24 +503,24 @@ ${exerciseKnowledge ? `## Base de Conhecimento Médico (Referências)\n${exercis
 
     console.log('🧠 [COMPLETE-ANALYSIS] Phase 3: Generating Synthesis')
 
+    // Build synthesis input from all analyses (foundation + specialized)
+    const allAnalysesForSynthesis = [
+      // Foundation analyses
+      ...foundationAnalyses.map(fa => ({
+        agent: fa.agentName || 'Foundation Agent',
+        agentKey: fa.agentKey || 'foundation',
+        analysis: fa.analysis,
+      })),
+      // Specialized analyses
+      ...savedSpecializedAnalyses.map(({ savedAnalysis, agent }) => ({
+        agent: agent.name,
+        agentKey: agent.agentKey,
+        analysis: savedAnalysis.analysis,
+      })),
+    ]
+
     const synthesis = await generateSynthesis(
-      [
-        {
-          agent: integrativeAgent.name,
-          agentKey: integrativeAgent.agentKey,
-          analysis: integrativeAnalysis.analysis,
-        },
-        {
-          agent: nutritionAgent.name,
-          agentKey: nutritionAgent.agentKey,
-          analysis: nutritionAnalysis.analysis,
-        },
-        {
-          agent: exerciseAgent.name,
-          agentKey: exerciseAgent.agentKey,
-          analysis: exerciseAnalysis.analysis,
-        },
-      ],
+      allAnalysesForSynthesis,
       {
         structuredDocuments,
         enableValidation: true, // Enable validation to prevent hallucinations
@@ -641,11 +539,15 @@ ${exerciseKnowledge ? `## Base de Conhecimento Médico (Referências)\n${exercis
 
     console.log('💡 [COMPLETE-ANALYSIS] Phase 4: Generating Recommendations & Weekly Plan')
 
-    const analysisIds = [savedIntegrative.id, savedNutrition.id, savedExercise.id]
+    // Collect all analysis IDs (foundation + specialized)
+    const allAnalysisIds = [
+      ...foundationAnalyses.map(fa => fa.id),
+      ...savedSpecializedAnalyses.map(({ savedAnalysis }) => savedAnalysis.id),
+    ]
 
     const [recommendations, weeklyPlan] = await Promise.all([
-      generateRecommendationsFromMultipleAnalyses(userId, analysisIds),
-      generateCompleteWeeklyPlan(userId, analysisIds),
+      generateRecommendationsFromMultipleAnalyses(userId, allAnalysisIds),
+      generateCompleteWeeklyPlan(userId, allAnalysisIds),
     ])
 
     console.log('✅ [COMPLETE-ANALYSIS] Recommendations and Weekly Plan generated')
@@ -690,9 +592,7 @@ ${exerciseKnowledge ? `## Base de Conhecimento Médico (Referências)\n${exercis
     await db
       .update(completeAnalyses)
       .set({
-        integrativeAnalysisId: savedIntegrative.id,
-        nutritionAnalysisId: savedNutrition.id,
-        exerciseAnalysisId: savedExercise.id,
+        analysisIds: allAnalysisIds,
         synthesis: synthesis as any,
         recommendationsId: recommendations.id,
         weeklyPlanId: weeklyPlan.id,
@@ -703,13 +603,16 @@ ${exerciseKnowledge ? `## Base de Conhecimento Médico (Referências)\n${exercis
 
     console.log('✅ [COMPLETE-ANALYSIS] Complete analysis workflow finished successfully')
 
+    // Build dynamic analyses object for return
+    const analysesObject = Object.fromEntries([
+      ...foundationAnalyses.map((fa, idx) => [`foundation_${idx}`, fa]),
+      ...savedSpecializedAnalyses.map(({ savedAnalysis, agent }) => [agent.agentKey, savedAnalysis]),
+    ])
+
     return {
       id: analysisRecord.id,
-      analyses: {
-        integrative: savedIntegrative,
-        nutrition: savedNutrition,
-        exercise: savedExercise,
-      },
+      analyses: analysesObject,
+      analysisIds: allAnalysisIds,
       synthesis,
       recommendations,
       weeklyPlan,

@@ -45,11 +45,7 @@ export async function POST(request: NextRequest) {
       completeAnalysis: {
         id: result.id,
         status: result.status,
-        analyses: {
-          integrativeId: result.analyses.integrative.id,
-          nutritionId: result.analyses.nutrition.id,
-          exerciseId: result.analyses.exercise.id,
-        },
+        analysisIds: result.analysisIds,
         synthesis: result.synthesis,
         recommendationsId: result.recommendations.id,
         weeklyPlanId: result.weeklyPlan.id,
@@ -92,9 +88,7 @@ export async function GET(request: NextRequest) {
         documentIds: completeAnalyses.documentIds,
         status: completeAnalyses.status,
         synthesis: completeAnalyses.synthesis,
-        integrativeAnalysisId: completeAnalyses.integrativeAnalysisId,
-        nutritionAnalysisId: completeAnalyses.nutritionAnalysisId,
-        exerciseAnalysisId: completeAnalyses.exerciseAnalysisId,
+        analysisIds: completeAnalyses.analysisIds,
         recommendationsId: completeAnalyses.recommendationsId,
         weeklyPlanId: completeAnalyses.weeklyPlanId,
         errorMessage: completeAnalyses.errorMessage,

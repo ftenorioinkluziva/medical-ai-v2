@@ -32,11 +32,7 @@ async function testAPI() {
 
     // Step 2: Fetch related analyses
     console.log('\nStep 2: Fetching related analyses...')
-    const analysisIds = [
-      completeAnalysis.integrativeAnalysisId,
-      completeAnalysis.nutritionAnalysisId,
-      completeAnalysis.exerciseAnalysisId,
-    ].filter(Boolean) as string[]
+    const analysisIds = (completeAnalysis.analysisIds || []) as string[]
 
     console.log(`   Analysis IDs: ${analysisIds.join(', ')}`)
 
