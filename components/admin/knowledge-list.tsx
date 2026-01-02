@@ -54,17 +54,17 @@ const VERIFICATION_CONFIG = {
   verified: {
     label: 'Verificado',
     icon: CheckCircle2,
-    color: 'bg-green-100 text-green-800 border-green-200',
+    color: 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 border-green-200 dark:border-green-800',
   },
   pending: {
     label: 'Pendente',
     icon: Clock,
-    color: 'bg-yellow-100 text-yellow-800 border-yellow-200',
+    color: 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300 border-yellow-200 dark:border-yellow-800',
   },
   rejected: {
     label: 'Rejeitado',
     icon: XCircle,
-    color: 'bg-red-100 text-red-800 border-red-200',
+    color: 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300 border-red-200 dark:border-red-800',
   },
 }
 
@@ -133,8 +133,8 @@ export function KnowledgeList({ refreshTrigger }: KnowledgeListProps) {
 
   if (error) {
     return (
-      <Card className="p-12 border-red-200 bg-red-50">
-        <div className="flex flex-col items-center gap-3 text-red-600">
+      <Card className="p-12 border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950/20">
+        <div className="flex flex-col items-center gap-3 text-red-600 dark:text-red-400">
           <AlertCircle className="h-8 w-8" />
           <p className="font-medium">Erro ao carregar artigos</p>
           <p className="text-sm">{error}</p>
@@ -168,12 +168,15 @@ export function KnowledgeList({ refreshTrigger }: KnowledgeListProps) {
           return (
             <Card key={article.id} className="hover:shadow-md transition-shadow">
               <CardHeader className="pb-3">
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex-1 min-w-0">
-                    <CardTitle className="text-lg mb-2 truncate">
-                      {article.title}
-                    </CardTitle>
-                    <div className="flex flex-wrap gap-2">
+                <div className="space-y-3">
+                  {/* Title */}
+                  <CardTitle className="text-lg line-clamp-2 pr-2">
+                    {article.title}
+                  </CardTitle>
+
+                  {/* Badges and Actions */}
+                  <div className="flex items-start justify-between gap-3 flex-wrap">
+                    <div className="flex flex-wrap gap-2 flex-1 min-w-0">
                       <Badge variant="outline" className="shrink-0">
                         {CATEGORY_LABELS[article.category] || article.category}
                       </Badge>
@@ -192,25 +195,25 @@ export function KnowledgeList({ refreshTrigger }: KnowledgeListProps) {
                         </Badge>
                       )}
                     </div>
-                  </div>
 
-                  <div className="flex gap-2 shrink-0">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setViewingArticle(article)}
-                    >
-                      <Eye className="h-4 w-4 mr-1" />
-                      Ver
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleDelete(article.id)}
-                      className="text-red-600 hover:text-red-700"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                    <div className="flex gap-2 shrink-0">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setViewingArticle(article)}
+                      >
+                        <Eye className="h-4 w-4 mr-1" />
+                        Ver
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleDelete(article.id)}
+                        className="text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </CardHeader>
