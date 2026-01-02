@@ -186,9 +186,9 @@ export default function UsersManagementPage() {
   const getRoleBadge = (role: string) => {
     switch (role) {
       case 'admin':
-        return <Badge className="bg-red-600">Admin</Badge>
+        return <Badge className="bg-red-600 dark:bg-red-500">Admin</Badge>
       case 'doctor':
-        return <Badge className="bg-blue-600">Médico</Badge>
+        return <Badge className="bg-blue-600 dark:bg-blue-500">Médico</Badge>
       default:
         return <Badge variant="secondary">Paciente</Badge>
     }
@@ -376,7 +376,7 @@ export default function UsersManagementPage() {
                       size="icon"
                       onClick={() => handleDeleteUser(user)}
                       title="Deletar usuário"
-                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                      className="text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-950/20"
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
@@ -450,7 +450,7 @@ export default function UsersManagementPage() {
             <AlertDialogAction
               onClick={confirmDelete}
               disabled={isDeleting}
-              className="bg-red-600 hover:bg-red-700"
+              className="bg-red-600 dark:bg-red-500 hover:bg-red-700 dark:hover:bg-red-600"
             >
               {isDeleting ? (
                 <>

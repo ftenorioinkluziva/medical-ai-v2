@@ -27,45 +27,45 @@ export default function AdminPage() {
       description: 'Gerenciar agentes de IA especializados',
       icon: Bot,
       href: '/admin/agents',
-      color: 'text-blue-600',
-      bgColor: 'bg-blue-50',
-      borderColor: 'border-blue-200',
+      color: 'text-blue-600 dark:text-blue-400',
+      bgColor: 'bg-blue-50/50 dark:bg-blue-950/20',
+      borderColor: 'border-blue-200 dark:border-blue-800',
     },
     {
       title: 'Usuários',
       description: 'Gerenciar usuários e permissões',
       icon: Users,
       href: '/admin/users',
-      color: 'text-green-600',
-      bgColor: 'bg-green-50',
-      borderColor: 'border-green-200',
+      color: 'text-green-600 dark:text-green-400',
+      bgColor: 'bg-green-50/50 dark:bg-green-950/20',
+      borderColor: 'border-green-200 dark:border-green-800',
     },
     {
       title: 'Base de Conhecimento',
       description: 'Gerenciar artigos médicos e conteúdo',
       icon: BookOpen,
       href: '/admin/knowledge',
-      color: 'text-purple-600',
-      bgColor: 'bg-purple-50',
-      borderColor: 'border-purple-200',
+      color: 'text-purple-600 dark:text-purple-400',
+      bgColor: 'bg-purple-50/50 dark:bg-purple-950/20',
+      borderColor: 'border-purple-200 dark:border-purple-800',
     },
     {
       title: 'Cérebro Lógico',
       description: 'Gerenciar biomarcadores e protocolos',
       icon: Brain,
       href: '/admin/medical-knowledge',
-      color: 'text-cyan-600',
-      bgColor: 'bg-cyan-50',
-      borderColor: 'border-cyan-200',
+      color: 'text-cyan-600 dark:text-cyan-400',
+      bgColor: 'bg-cyan-50/50 dark:bg-cyan-950/20',
+      borderColor: 'border-cyan-200 dark:border-cyan-800',
     },
     {
       title: 'Estatísticas',
       description: 'Visualizar métricas e relatórios',
       icon: BarChart3,
       href: '/admin/stats',
-      color: 'text-orange-600',
-      bgColor: 'bg-orange-50',
-      borderColor: 'border-orange-200',
+      color: 'text-orange-600 dark:text-orange-400',
+      bgColor: 'bg-orange-50/50 dark:bg-orange-950/20',
+      borderColor: 'border-orange-200 dark:border-orange-800',
       disabled: true,
     },
     {
@@ -73,9 +73,9 @@ export default function AdminPage() {
       description: 'Acompanhar atividades do sistema',
       icon: Activity,
       href: '/admin/logs',
-      color: 'text-red-600',
-      bgColor: 'bg-red-50',
-      borderColor: 'border-red-200',
+      color: 'text-red-600 dark:text-red-400',
+      bgColor: 'bg-red-50/50 dark:bg-red-950/20',
+      borderColor: 'border-red-200 dark:border-red-800',
       disabled: true,
     },
     {
@@ -83,9 +83,9 @@ export default function AdminPage() {
       description: 'Configurações gerais do sistema',
       icon: Settings,
       href: '/admin/settings',
-      color: 'text-gray-600',
-      bgColor: 'bg-gray-50',
-      borderColor: 'border-gray-200',
+      color: 'text-gray-600 dark:text-gray-400',
+      bgColor: 'bg-gray-50/50 dark:bg-gray-950/20',
+      borderColor: 'border-gray-200 dark:border-gray-800',
       disabled: true,
     },
   ]
@@ -169,7 +169,7 @@ export default function AdminPage() {
                       <CardDescription>{section.description}</CardDescription>
                     </div>
                     {isDisabled && (
-                      <span className="text-xs bg-gray-200 text-gray-600 px-2 py-1 rounded">
+                      <span className="text-xs bg-gray-200 dark:bg-gray-800 text-gray-600 dark:text-gray-300 px-2 py-1 rounded">
                         Em breve
                       </span>
                     )}
@@ -210,39 +210,39 @@ export default function AdminPage() {
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
-            <div className="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-lg">
+            <div className="flex items-center justify-between p-3 bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 rounded-lg">
               <div className="flex items-center gap-2">
-                <div className="h-2 w-2 bg-green-500 rounded-full animate-pulse" />
+                <div className="h-2 w-2 bg-green-500 dark:bg-green-400 rounded-full animate-pulse" />
                 <span className="font-medium">API de IA</span>
               </div>
-              <span className="text-sm text-green-700">Operacional</span>
+              <span className="text-sm text-green-700 dark:text-green-300">Operacional</span>
             </div>
-            <div className="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-lg">
+            <div className="flex items-center justify-between p-3 bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 rounded-lg">
               <div className="flex items-center gap-2">
-                <div className="h-2 w-2 bg-green-500 rounded-full animate-pulse" />
+                <div className="h-2 w-2 bg-green-500 dark:bg-green-400 rounded-full animate-pulse" />
                 <span className="font-medium">Banco de Dados</span>
               </div>
-              <span className="text-sm text-green-700">Operacional</span>
+              <span className="text-sm text-green-700 dark:text-green-300">Operacional</span>
             </div>
-            <div className="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-lg">
+            <div className="flex items-center justify-between p-3 bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 rounded-lg">
               <div className="flex items-center gap-2">
-                <div className="h-2 w-2 bg-green-500 rounded-full animate-pulse" />
+                <div className="h-2 w-2 bg-green-500 dark:bg-green-400 rounded-full animate-pulse" />
                 <span className="font-medium">Base de Conhecimento</span>
               </div>
-              <span className="text-sm text-green-700">Operacional</span>
+              <span className="text-sm text-green-700 dark:text-green-300">Operacional</span>
             </div>
           </div>
         </CardContent>
       </Card>
 
       {/* Warning */}
-      <Card className="bg-yellow-50 border-yellow-200">
+      <Card className="bg-yellow-50 dark:bg-yellow-950/20 border-yellow-200 dark:border-yellow-800">
         <CardContent className="p-4">
           <div className="flex items-start gap-3">
-            <Shield className="h-5 w-5 text-yellow-600 mt-0.5" />
+            <Shield className="h-5 w-5 text-yellow-600 dark:text-yellow-400 mt-0.5" />
             <div>
-              <p className="font-medium text-yellow-900">Acesso Administrativo</p>
-              <p className="text-sm text-yellow-800 mt-1">
+              <p className="font-medium text-yellow-900 dark:text-yellow-100">Acesso Administrativo</p>
+              <p className="text-sm text-yellow-800 dark:text-yellow-200 mt-1">
                 Você está acessando o painel administrativo. Todas as ações são registradas nos logs de auditoria.
               </p>
             </div>

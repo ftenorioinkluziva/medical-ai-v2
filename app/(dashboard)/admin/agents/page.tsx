@@ -238,7 +238,7 @@ export default function AgentsManagementPage() {
         <Card>
           <CardHeader className="pb-3">
             <CardDescription>Agentes Ativos</CardDescription>
-            <CardTitle className="text-3xl text-green-600">
+            <CardTitle className="text-3xl text-green-600 dark:text-green-400">
               {agents.filter((a) => a.isActive).length}
             </CardTitle>
           </CardHeader>
@@ -246,7 +246,7 @@ export default function AgentsManagementPage() {
         <Card>
           <CardHeader className="pb-3">
             <CardDescription>Agentes Inativos</CardDescription>
-            <CardTitle className="text-3xl text-gray-600">
+            <CardTitle className="text-3xl text-gray-600 dark:text-gray-400">
               {agents.filter((a) => !a.isActive).length}
             </CardTitle>
           </CardHeader>
@@ -299,16 +299,23 @@ export default function AgentsManagementPage() {
               <CardContent className="p-6">
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex items-start gap-4 flex-1">
-                    <div
-                      className={`p-3 rounded-lg bg-${agent.color}-100 text-${agent.color}-600`}
-                    >
+                    <div className={`p-3 rounded-lg ${
+                      agent.color === 'green' ? 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400' :
+                      agent.color === 'purple' ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400' :
+                      agent.color === 'orange' ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400' :
+                      agent.color === 'blue' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400' :
+                      agent.color === 'teal' ? 'bg-teal-100 dark:bg-teal-900/30 text-teal-600 dark:text-teal-400' :
+                      agent.color === 'red' ? 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400' :
+                      agent.color === 'yellow' ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400' :
+                      'bg-sky-100 dark:bg-sky-900/30 text-sky-600 dark:text-sky-400'
+                    }`}>
                       <Bot className="h-6 w-6" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-2">
                         <h3 className="font-semibold text-lg">{agent.name}</h3>
                         {agent.isActive ? (
-                          <Badge variant="default" className="bg-green-600">
+                          <Badge variant="default" className="bg-green-600 dark:bg-green-500">
                             <CheckCircle2 className="h-3 w-3 mr-1" />
                             Ativo
                           </Badge>
@@ -362,7 +369,7 @@ export default function AgentsManagementPage() {
                       size="icon"
                       onClick={() => handleDeleteAgent(agent)}
                       title="Deletar"
-                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                      className="text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-950/20"
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
@@ -389,7 +396,7 @@ export default function AgentsManagementPage() {
             <AlertDialogAction
               onClick={confirmDelete}
               disabled={isDeleting}
-              className="bg-red-600 hover:bg-red-700"
+              className="bg-red-600 dark:bg-red-500 hover:bg-red-700 dark:hover:bg-red-600"
             >
               {isDeleting ? (
                 <>
