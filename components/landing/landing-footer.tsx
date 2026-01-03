@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Heart } from 'lucide-react'
+import { HeartIcon } from '@/components/ui/animated-icon'
 
 export function LandingFooter() {
   return (
@@ -7,7 +7,7 @@ export function LandingFooter() {
       <div className="container mx-auto px-4 text-center">
         <Link href="/" className="inline-flex items-center justify-center gap-2 mb-4">
           <div className="h-8 w-8 rounded-lg bg-gray-900 flex items-center justify-center">
-            <Heart className="h-4 w-4 text-white" />
+            <HeartIcon size={16} color="white" />
           </div>
           <span className="text-lg font-semibold text-gray-900">Medical AI</span>
         </Link>

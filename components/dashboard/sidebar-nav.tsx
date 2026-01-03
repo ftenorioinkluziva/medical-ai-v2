@@ -22,6 +22,7 @@ import {
   User,
   ChevronLeft,
   ChevronRight,
+  ArrowLeftRight,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -44,7 +45,8 @@ export function SidebarNav({ userRole }: SidebarNavProps) {
         { href: '/analyze-complete', label: 'Análise Completa', icon: Sparkles },
         { href: '/recommendations', label: 'Recomendações', icon: TrendingUp },
         { href: '/weekly-plan', label: 'Plano Semanal', icon: Calendar },
-        { href: '/compare', label: 'Comparar', icon: GitCompare },
+        { href: '/analyses/compare', label: 'Comparar Análises', icon: ArrowLeftRight },
+        { href: '/compare', label: 'Comparar Exames', icon: GitCompare },
         { href: '/documents', label: 'Documentos', icon: FolderOpen },
         { href: '/dashboard/credits', label: 'Créditos', icon: Coins },
         { href: '/profile', label: 'Perfil', icon: User },
@@ -54,8 +56,8 @@ export function SidebarNav({ userRole }: SidebarNavProps) {
 
   // Group navigation links
   const mainLinks = navLinks.slice(0, 3) // Dashboard, Análise, Análise Completa
-  const toolLinks = navLinks.slice(3, 7) // Recomendações, Plano Semanal, Comparar, Documentos
-  const settingsLinks = navLinks.slice(7) // Créditos, Perfil
+  const toolLinks = navLinks.slice(3, 8) // Recomendações, Plano Semanal, Comparar Análises, Comparar Exames, Documentos
+  const settingsLinks = navLinks.slice(8) // Créditos, Perfil
 
   return (
     <aside

@@ -48,6 +48,7 @@ export default function RecommendationsHistoryPage() {
   const [error, setError] = useState<string | null>(null)
   const [selectedRec, setSelectedRec] = useState<RecommendationHistory | null>(null)
   const [isGenerating, setIsGenerating] = useState(false)
+  const [activeTab, setActiveTab] = useState('exams')
 
   useEffect(() => {
     loadHistory()
@@ -175,6 +176,22 @@ export default function RecommendationsHistoryPage() {
         return <Target className="h-4 w-4" />
       default:
         return <CheckCircle2 className="h-4 w-4" />
+    }
+  }
+
+  const getSectionTitle = (tab: string) => {
+    if (!selectedRec) return ''
+    switch (tab) {
+      case 'exams':
+        return `Exames (${selectedRec.examRecommendations.length})`
+      case 'lifestyle':
+        return `Lifestyle (${selectedRec.lifestyleRecommendations.length})`
+      case 'goals':
+        return `Metas (${selectedRec.healthGoals.length})`
+      case 'alerts':
+        return `Alertas (${selectedRec.alerts.length})`
+      default:
+        return ''
     }
   }
 
@@ -329,36 +346,29 @@ export default function RecommendationsHistoryPage() {
                 </div>
               </CardHeader>
               <CardContent>
-                <Tabs defaultValue="exams" className="w-full">
+                <Tabs defaultValue="exams" value={activeTab} onValueChange={setActiveTab} className="w-full">
                   <TabsList className="grid w-full grid-cols-4 bg-muted">
-                    <TabsTrigger value="exams" className="gap-1.5 sm:gap-2 data-[state=active]:!bg-sky-600 dark:data-[state=active]:!bg-sky-500 data-[state=active]:!text-white">
+                    <TabsTrigger value="exams" className="data-[state=active]:!bg-sky-600 dark:data-[state=active]:!bg-sky-500 data-[state=active]:!text-white">
                       <ClipboardList className="h-4 w-4" />
-                      <span className="hidden sm:inline">Exames</span>
-                      <span className="sm:hidden">({selectedRec.examRecommendations.length})</span>
-                      <span className="hidden sm:inline">({selectedRec.examRecommendations.length})</span>
                     </TabsTrigger>
-                    <TabsTrigger value="lifestyle" className="gap-1.5 sm:gap-2 data-[state=active]:!bg-teal-600 dark:data-[state=active]:!bg-teal-500 data-[state=active]:!text-white">
+                    <TabsTrigger value="lifestyle" className="data-[state=active]:!bg-teal-600 dark:data-[state=active]:!bg-teal-500 data-[state=active]:!text-white">
                       <Activity className="h-4 w-4" />
-                      <span className="hidden sm:inline">Lifestyle</span>
-                      <span className="sm:hidden">({selectedRec.lifestyleRecommendations.length})</span>
-                      <span className="hidden sm:inline">({selectedRec.lifestyleRecommendations.length})</span>
                     </TabsTrigger>
-                    <TabsTrigger value="goals" className="gap-1.5 sm:gap-2 data-[state=active]:!bg-purple-600 dark:data-[state=active]:!bg-purple-500 data-[state=active]:!text-white">
+                    <TabsTrigger value="goals" className="data-[state=active]:!bg-purple-600 dark:data-[state=active]:!bg-purple-500 data-[state=active]:!text-white">
                       <Target className="h-4 w-4" />
-                      <span className="hidden sm:inline">Metas</span>
-                      <span className="sm:hidden">({selectedRec.healthGoals.length})</span>
-                      <span className="hidden sm:inline">({selectedRec.healthGoals.length})</span>
                     </TabsTrigger>
-                    <TabsTrigger value="alerts" className="gap-1.5 sm:gap-2 data-[state=active]:!bg-amber-600 dark:data-[state=active]:!bg-amber-500 data-[state=active]:!text-white">
+                    <TabsTrigger value="alerts" className="data-[state=active]:!bg-amber-600 dark:data-[state=active]:!bg-amber-500 data-[state=active]:!text-white">
                       <AlertCircle className="h-4 w-4" />
-                      <span className="hidden sm:inline">Alertas</span>
-                      <span className="sm:hidden">({selectedRec.alerts.length})</span>
-                      <span className="hidden sm:inline">({selectedRec.alerts.length})</span>
                     </TabsTrigger>
                   </TabsList>
 
+                  {/* Section Title */}
+                  <div className="mt-4 mb-2">
+                    <h3 className="text-lg font-semibold text-foreground">{getSectionTitle(activeTab)}</h3>
+                  </div>
+
                   {/* Exams Tab */}
-                  <TabsContent value="exams" className="mt-6 space-y-3">
+                  <TabsContent value="exams" className="mt-0 space-y-3">
                     {selectedRec.examRecommendations.length === 0 ? (
                       <p className="text-sm text-muted-foreground text-center py-8">
                         Nenhum exame recomendado
@@ -385,7 +395,7 @@ export default function RecommendationsHistoryPage() {
                   </TabsContent>
 
                   {/* Lifestyle Tab */}
-                  <TabsContent value="lifestyle" className="mt-6 space-y-3">
+                  <TabsContent value="lifestyle" className="mt-0 space-y-3">
                     {selectedRec.lifestyleRecommendations.length === 0 ? (
                       <p className="text-sm text-muted-foreground text-center py-8">
                         Nenhuma recomendação de lifestyle
@@ -415,7 +425,7 @@ export default function RecommendationsHistoryPage() {
                   </TabsContent>
 
                   {/* Goals Tab */}
-                  <TabsContent value="goals" className="mt-6 space-y-3">
+                  <TabsContent value="goals" className="mt-0 space-y-3">
                     {selectedRec.healthGoals.length === 0 ? (
                       <p className="text-sm text-muted-foreground text-center py-8">
                         Nenhuma meta de saúde definida
@@ -458,7 +468,7 @@ export default function RecommendationsHistoryPage() {
                   </TabsContent>
 
                   {/* Alerts Tab */}
-                  <TabsContent value="alerts" className="mt-6 space-y-3">
+                  <TabsContent value="alerts" className="mt-0 space-y-3">
                     {selectedRec.alerts.length === 0 ? (
                       <p className="text-sm text-muted-foreground text-center py-8">
                         Nenhum alerta

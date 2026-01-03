@@ -6,15 +6,13 @@
  */
 
 import { useState, useEffect } from 'react'
-import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { AgentSelector } from '@/components/agents/agent-selector'
 import { AnalysisInterface } from '@/components/analysis/analysis-interface'
 import { AnalysisHistory } from '@/components/analyses/analysis-history'
 import { AnalysisViewModal } from '@/components/analyses/analysis-view-modal'
-import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { History, FileText, Upload, Sparkles, TrendingUp } from 'lucide-react'
+import { History, FileText, Sparkles } from 'lucide-react'
 
 interface HealthAgent {
   id: string
@@ -76,29 +74,11 @@ export default function AnalyzePage() {
   return (
     <div className="container mx-auto px-4 py-4 sm:px-6 sm:py-6 space-y-4 sm:space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-        <div>
-          <h1 className="text-xl sm:text-2xl font-semibold text-foreground">Análise Médica com IA</h1>
-          <p className="text-sm sm:text-base text-muted-foreground mt-1">
-            Consulte especialistas em IA e visualize suas análises anteriores
-          </p>
-        </div>
-        <div className="flex gap-2 flex-wrap">
-          <Link href="/documents">
-            <Button variant="outline" className="gap-2">
-              <Upload className="h-4 w-4" />
-              <span className="hidden sm:inline">Enviar Documentos</span>
-              <span className="sm:hidden">Enviar</span>
-            </Button>
-          </Link>
-          <Link href="/analyses/compare">
-            <Button variant="outline" className="gap-2">
-              <TrendingUp className="h-4 w-4" />
-              <span className="hidden sm:inline">Comparar Análises</span>
-              <span className="sm:hidden">Comparar</span>
-            </Button>
-          </Link>
-        </div>
+      <div>
+        <h1 className="text-xl sm:text-2xl font-semibold text-foreground">Análise Médica com IA</h1>
+        <p className="text-sm sm:text-base text-muted-foreground mt-1">
+          Consulte especialistas em IA e visualize suas análises anteriores
+        </p>
       </div>
 
       {/* Tabs */}

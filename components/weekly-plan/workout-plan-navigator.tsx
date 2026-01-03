@@ -5,12 +5,13 @@
  * Tabbed interface for browsing weekly workouts by day
  */
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Separator } from '@/components/ui/separator'
 import { Badge } from '@/components/ui/badge'
+import { Checkbox } from '@/components/ui/checkbox'
 import {
   Dumbbell,
   ChevronLeft,
@@ -21,6 +22,7 @@ import {
   Wind,
   Coffee,
   CalendarX,
+  RotateCcw,
 } from 'lucide-react'
 
 interface WorkoutPlanNavigatorProps {
@@ -69,6 +71,42 @@ export function WorkoutPlanNavigator({ workoutPlan }: WorkoutPlanNavigatorProps)
   }
 
   const [selectedDayIndex, setSelectedDayIndex] = useState(getCurrentDayIndex())
+  const [completedExercises, setCompletedExercises] = useState<Set<string>>(new Set())
+
+  // Load completed exercises from localStorage on mount
+  useEffect(() => {
+    const stored = localStorage.getItem('workout-completed-exercises')
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored)
+        setCompletedExercises(new Set(parsed))
+      } catch (e) {
+        console.error('Error loading completed exercises:', e)
+      }
+    }
+  }, [])
+
+  // Save completed exercises to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('workout-completed-exercises', JSON.stringify(Array.from(completedExercises)))
+  }, [completedExercises])
+
+  const toggleExerciseCompleted = (exerciseKey: string) => {
+    setCompletedExercises((prev) => {
+      const newSet = new Set(prev)
+      if (newSet.has(exerciseKey)) {
+        newSet.delete(exerciseKey)
+      } else {
+        newSet.add(exerciseKey)
+      }
+      return newSet
+    })
+  }
+
+  const resetCompletedExercises = () => {
+    setCompletedExercises(new Set())
+    localStorage.removeItem('workout-completed-exercises')
+  }
 
   // Map workouts to days
   const getDayWorkout = (dayName: string) => {
@@ -297,43 +335,80 @@ export function WorkoutPlanNavigator({ workoutPlan }: WorkoutPlanNavigatorProps)
               {/* Exercises */}
               <Card className="border-2 border-emerald-200 bg-card hover:shadow-md transition-shadow">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-base font-semibold text-emerald-600 flex items-center gap-2">
-                    <Dumbbell className="h-5 w-5" />
-                    Exercícios
-                  </CardTitle>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-base font-semibold text-emerald-600 flex items-center gap-2">
+                      <Dumbbell className="h-5 w-5" />
+                      Exercícios
+                    </CardTitle>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={resetCompletedExercises}
+                      className="gap-2 text-muted-foreground hover:text-foreground h-8"
+                    >
+                      <RotateCcw className="h-3.5 w-3.5" />
+                      <span className="hidden sm:inline text-xs">Resetar</span>
+                    </Button>
+                  </div>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  {selectedWorkout.exercises.map((exercise, index) => (
-                    <div
-                      key={index}
-                      className="p-4 bg-muted rounded-lg border border-border hover:border-emerald-300 dark:hover:border-emerald-700 hover:bg-emerald-50/30 dark:hover:bg-emerald-950/30 transition-all"
-                    >
-                      <p className="font-semibold text-sm text-foreground mb-2">{exercise.name}</p>
-                      <div className="flex gap-4 text-xs text-muted-foreground">
-                        {exercise.sets && (
-                          <span className="flex items-center gap-1">
-                            <Activity className="h-3 w-3" />
-                            {exercise.sets} séries
-                          </span>
-                        )}
-                        {exercise.reps && (
-                          <span className="flex items-center gap-1">
-                            <Activity className="h-3 w-3" />
-                            {exercise.reps} reps
-                          </span>
-                        )}
-                        {exercise.duration && (
-                          <span className="flex items-center gap-1">
-                            <Clock className="h-3 w-3" />
-                            {exercise.duration}
-                          </span>
-                        )}
+                  {selectedWorkout.exercises.map((exercise, index) => {
+                    const exerciseKey = `${selectedDayName}-${index}-${exercise.name}`
+                    const isCompleted = completedExercises.has(exerciseKey)
+
+                    return (
+                      <div
+                        key={index}
+                        className={`p-4 bg-muted rounded-lg border transition-all ${
+                          isCompleted
+                            ? 'border-emerald-500 bg-emerald-50/50 dark:bg-emerald-950/30 opacity-75'
+                            : 'border-border hover:border-emerald-300 dark:hover:border-emerald-700 hover:bg-emerald-50/30 dark:hover:bg-emerald-950/30'
+                        }`}
+                      >
+                        <div className="flex items-start gap-3">
+                          <Checkbox
+                            id={exerciseKey}
+                            checked={isCompleted}
+                            onCheckedChange={() => toggleExerciseCompleted(exerciseKey)}
+                            className="mt-0.5"
+                          />
+                          <div className="flex-1">
+                            <label
+                              htmlFor={exerciseKey}
+                              className={`font-semibold text-sm cursor-pointer ${
+                                isCompleted ? 'line-through text-muted-foreground' : 'text-foreground'
+                              }`}
+                            >
+                              {exercise.name}
+                            </label>
+                            <div className="flex gap-4 text-xs text-muted-foreground mt-2">
+                              {exercise.sets && (
+                                <span className="flex items-center gap-1">
+                                  <Activity className="h-3 w-3" />
+                                  {exercise.sets} séries
+                                </span>
+                              )}
+                              {exercise.reps && (
+                                <span className="flex items-center gap-1">
+                                  <Activity className="h-3 w-3" />
+                                  {exercise.reps} reps
+                                </span>
+                              )}
+                              {exercise.duration && (
+                                <span className="flex items-center gap-1">
+                                  <Clock className="h-3 w-3" />
+                                  {exercise.duration}
+                                </span>
+                              )}
+                            </div>
+                            {exercise.notes && (
+                              <p className="text-xs text-muted-foreground mt-2 italic leading-relaxed">{exercise.notes}</p>
+                            )}
+                          </div>
+                        </div>
                       </div>
-                      {exercise.notes && (
-                        <p className="text-xs text-muted-foreground mt-2 italic leading-relaxed">{exercise.notes}</p>
-                      )}
-                    </div>
-                  ))}
+                    )
+                  })}
                 </CardContent>
               </Card>
 

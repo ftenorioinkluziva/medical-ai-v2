@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Separator } from '@/components/ui/separator'
+import { Checkbox } from '@/components/ui/checkbox'
 import { MealPlanNavigator } from './meal-plan-navigator'
 import { WorkoutPlanNavigator } from './workout-plan-navigator'
 import {
@@ -23,6 +24,7 @@ import {
   AlertCircle,
   Clock,
   Target,
+  RotateCcw,
 } from 'lucide-react'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
@@ -65,6 +67,43 @@ export function WeeklyPlanWidget({ patientId }: WeeklyPlanWidgetProps = {}) {
   const [plan, setPlan] = useState<WeeklyPlan | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [activeTab, setActiveTab] = useState('supplements')
+  const [completedShoppingItems, setCompletedShoppingItems] = useState<Set<string>>(new Set())
+
+  // Load completed shopping items from localStorage on mount
+  useEffect(() => {
+    const stored = localStorage.getItem('shopping-completed-items')
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored)
+        setCompletedShoppingItems(new Set(parsed))
+      } catch (e) {
+        console.error('Error loading completed shopping items:', e)
+      }
+    }
+  }, [])
+
+  // Save completed shopping items to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('shopping-completed-items', JSON.stringify(Array.from(completedShoppingItems)))
+  }, [completedShoppingItems])
+
+  const toggleShoppingItemCompleted = (itemKey: string) => {
+    setCompletedShoppingItems((prev) => {
+      const newSet = new Set(prev)
+      if (newSet.has(itemKey)) {
+        newSet.delete(itemKey)
+      } else {
+        newSet.add(itemKey)
+      }
+      return newSet
+    })
+  }
+
+  const resetCompletedShoppingItems = () => {
+    setCompletedShoppingItems(new Set())
+    localStorage.removeItem('shopping-completed-items')
+  }
 
   useEffect(() => {
     loadPlan()
@@ -158,6 +197,21 @@ export function WeeklyPlanWidget({ patientId }: WeeklyPlanWidgetProps = {}) {
   const totalMeals = plan.mealPlan?.meals?.length || 0
   const totalWorkouts = plan.workoutPlan?.workouts?.length || 0
 
+  const getSectionTitle = (tab: string) => {
+    switch (tab) {
+      case 'supplements':
+        return 'Suplementação'
+      case 'shopping':
+        return 'Compras'
+      case 'meals':
+        return 'Refeições'
+      case 'workouts':
+        return 'Treinos'
+      default:
+        return ''
+    }
+  }
+
   return (
     <Card className="hover:shadow-md transition-shadow">
       <CardHeader>
@@ -176,28 +230,26 @@ export function WeeklyPlanWidget({ patientId }: WeeklyPlanWidgetProps = {}) {
         </div>
       </CardHeader>
       <CardContent>
-        <Tabs defaultValue="supplements" className="w-full">
+        <Tabs defaultValue="supplements" value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-4 bg-muted">
-            {/* <TabsTrigger value="overview" className="data-[state=active]:!bg-teal-600 dark:data-[state=active]:!bg-teal-500 data-[state=active]:!text-white">
-              Visão Geral
-            </TabsTrigger> */}
-            <TabsTrigger value="supplements" className="gap-1.5 sm:gap-2 data-[state=active]:!bg-purple-600 dark:data-[state=active]:!bg-purple-500 data-[state=active]:!text-white">
+            <TabsTrigger value="supplements" className="data-[state=active]:!bg-purple-600 dark:data-[state=active]:!bg-purple-500 data-[state=active]:!text-white">
               <Pill className="h-4 w-4" />
-              <span className="hidden sm:inline">Suplementação</span>
             </TabsTrigger>
-            <TabsTrigger value="shopping" className="gap-1.5 sm:gap-2 data-[state=active]:!bg-sky-600 dark:data-[state=active]:!bg-sky-500 data-[state=active]:!text-white">
+            <TabsTrigger value="shopping" className="data-[state=active]:!bg-sky-600 dark:data-[state=active]:!bg-sky-500 data-[state=active]:!text-white">
               <ShoppingCart className="h-4 w-4" />
-              <span className="hidden sm:inline">Compras</span>
             </TabsTrigger>
-            <TabsTrigger value="meals" className="gap-1.5 sm:gap-2 data-[state=active]:!bg-orange-600 dark:data-[state=active]:!bg-orange-500 data-[state=active]:!text-white">
+            <TabsTrigger value="meals" className="data-[state=active]:!bg-orange-600 dark:data-[state=active]:!bg-orange-500 data-[state=active]:!text-white">
               <UtensilsCrossed className="h-4 w-4" />
-              <span className="hidden sm:inline">Refeições</span>
             </TabsTrigger>
-            <TabsTrigger value="workouts" className="gap-1.5 sm:gap-2 data-[state=active]:!bg-emerald-600 dark:data-[state=active]:!bg-emerald-500 data-[state=active]:!text-white">
+            <TabsTrigger value="workouts" className="data-[state=active]:!bg-emerald-600 dark:data-[state=active]:!bg-emerald-500 data-[state=active]:!text-white">
               <Dumbbell className="h-4 w-4" />
-              <span className="hidden sm:inline">Treinos</span>
             </TabsTrigger>
           </TabsList>
+
+          {/* Section Title */}
+          <div className="mt-4 mb-2">
+            <h3 className="text-lg font-semibold text-foreground">{getSectionTitle(activeTab)}</h3>
+          </div>
 
           {/* Overview Tab 
           <TabsContent value="overview" className="mt-6 space-y-4">
@@ -257,7 +309,7 @@ export function WeeklyPlanWidget({ patientId }: WeeklyPlanWidgetProps = {}) {
           </TabsContent>
 */}
           {/* Supplements Tab */}
-          <TabsContent value="supplements" className="mt-4 sm:mt-6">
+          <TabsContent value="supplements" className="mt-0">
             <div className="mb-4">
               <p className="text-sm text-muted-foreground leading-relaxed">{plan.supplementationStrategy?.overview}</p>
             </div>
@@ -327,7 +379,7 @@ export function WeeklyPlanWidget({ patientId }: WeeklyPlanWidgetProps = {}) {
           </TabsContent>
 
           {/* Shopping Tab */}
-          <TabsContent value="shopping" className="mt-4 sm:mt-6">
+          <TabsContent value="shopping" className="mt-0">
             <div className="mb-4">
               <p className="text-sm text-muted-foreground leading-relaxed">{plan.shoppingList?.overview}</p>
               {plan.shoppingList?.estimatedCost && (
@@ -338,6 +390,18 @@ export function WeeklyPlanWidget({ patientId }: WeeklyPlanWidgetProps = {}) {
                 </div>
               )}
             </div>
+            <div className="flex items-center justify-between mb-4">
+              <h4 className="text-sm font-semibold text-foreground">Lista de Compras</h4>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={resetCompletedShoppingItems}
+                className="gap-2 text-muted-foreground hover:text-foreground h-8"
+              >
+                <RotateCcw className="h-3.5 w-3.5" />
+                <span className="hidden sm:inline text-xs">Resetar</span>
+              </Button>
+            </div>
             <div className="space-y-6">
               {plan.shoppingList?.categories?.map((category: any, index: number) => (
                 <div key={index}>
@@ -346,39 +410,63 @@ export function WeeklyPlanWidget({ patientId }: WeeklyPlanWidgetProps = {}) {
                     {category.category}
                   </h4>
                   <div className="grid gap-3 md:grid-cols-2">
-                    {category.items.map((item: any, itemIndex: number) => (
-                      <div
-                        key={itemIndex}
-                        className={`p-4 border rounded-lg transition-all ${
-                          item.priority === 'high'
-                            ? 'border-red-200 dark:border-red-800 bg-card hover:bg-red-50/30 dark:hover:bg-red-950/30'
-                            : item.priority === 'medium'
-                            ? 'border-amber-200 dark:border-amber-800 bg-card hover:bg-amber-50/30 dark:hover:bg-amber-950/30'
-                            : 'border-border bg-card hover:border-sky-300 dark:hover:border-sky-700 hover:bg-sky-50/30 dark:hover:bg-sky-950/30'
-                        }`}
-                      >
-                        <div className="flex items-start justify-between mb-2">
-                          <p className="font-semibold text-sm text-foreground">{item.item}</p>
-                          {item.priority && (
-                            <Badge
-                              className={`text-xs ${
-                                item.priority === 'high'
-                                  ? 'bg-red-100 dark:bg-red-950/30 text-red-700 dark:text-red-300 border-red-200 dark:border-red-700'
-                                  : 'bg-amber-100 dark:bg-amber-950/30 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-700'
-                              }`}
-                            >
-                              {item.priority}
-                            </Badge>
-                          )}
+                    {category.items.map((item: any, itemIndex: number) => {
+                      const itemKey = `${category.category}-${itemIndex}-${item.item}`
+                      const isCompleted = completedShoppingItems.has(itemKey)
+
+                      return (
+                        <div
+                          key={itemIndex}
+                          className={`p-4 border rounded-lg transition-all ${
+                            isCompleted
+                              ? 'border-sky-500 bg-sky-50/50 dark:bg-sky-950/30 opacity-75'
+                              : item.priority === 'high'
+                              ? 'border-red-200 dark:border-red-800 bg-card hover:bg-red-50/30 dark:hover:bg-red-950/30'
+                              : item.priority === 'medium'
+                              ? 'border-amber-200 dark:border-amber-800 bg-card hover:bg-amber-50/30 dark:hover:bg-amber-950/30'
+                              : 'border-border bg-card hover:border-sky-300 dark:hover:border-sky-700 hover:bg-sky-50/30 dark:hover:bg-sky-950/30'
+                          }`}
+                        >
+                          <div className="flex items-start gap-3">
+                            <Checkbox
+                              id={itemKey}
+                              checked={isCompleted}
+                              onCheckedChange={() => toggleShoppingItemCompleted(itemKey)}
+                              className="mt-0.5"
+                            />
+                            <div className="flex-1">
+                              <div className="flex items-start justify-between mb-2">
+                                <label
+                                  htmlFor={itemKey}
+                                  className={`font-semibold text-sm cursor-pointer ${
+                                    isCompleted ? 'line-through text-muted-foreground' : 'text-foreground'
+                                  }`}
+                                >
+                                  {item.item}
+                                </label>
+                                {item.priority && !isCompleted && (
+                                  <Badge
+                                    className={`text-xs ml-2 ${
+                                      item.priority === 'high'
+                                        ? 'bg-red-100 dark:bg-red-950/30 text-red-700 dark:text-red-300 border-red-200 dark:border-red-700'
+                                        : 'bg-amber-100 dark:bg-amber-950/30 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-700'
+                                    }`}
+                                  >
+                                    {item.priority}
+                                  </Badge>
+                                )}
+                              </div>
+                              {item.quantity && (
+                                <p className="text-sm text-muted-foreground mt-1">{item.quantity}</p>
+                              )}
+                              {item.notes && (
+                                <p className="text-xs text-muted-foreground mt-2 italic leading-relaxed">{item.notes}</p>
+                              )}
+                            </div>
+                          </div>
                         </div>
-                        {item.quantity && (
-                          <p className="text-sm text-muted-foreground mt-1">{item.quantity}</p>
-                        )}
-                        {item.notes && (
-                          <p className="text-xs text-muted-foreground mt-2 italic leading-relaxed">{item.notes}</p>
-                        )}
-                      </div>
-                    ))}
+                      )
+                    })}
                   </div>
                   {index < (plan.shoppingList?.categories?.length || 0) - 1 && <Separator className="mt-6" />}
                 </div>

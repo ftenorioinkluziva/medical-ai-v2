@@ -11,7 +11,6 @@ import { usePathname } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import {
   Menu,
-  Heart,
   LogOut,
   User,
   Home,
@@ -22,7 +21,9 @@ import {
   GitCompare,
   Coins,
   Sparkles,
+  ArrowLeftRight,
 } from 'lucide-react'
+import { HeartIcon } from '@/components/ui/animated-icon'
 import { handleSignOut } from '@/app/actions/auth'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
 import { CreditBadge } from '@/components/credits/credit-badge'
@@ -51,12 +52,13 @@ export function DashboardNav({ userName, userRole }: DashboardNavProps) {
       ]
     : [
         { href: '/dashboard', label: 'Dashboard', icon: Home },
+        { href: '/documents', label: 'Documentos', icon: FolderOpen },
         { href: '/analyze', label: 'Análise', icon: FileText },
         { href: '/analyze-complete', label: 'Análise Completa', icon: Sparkles },
         { href: '/recommendations', label: 'Recomendações', icon: TrendingUp },
         { href: '/weekly-plan', label: 'Plano Semanal', icon: Calendar },
-        { href: '/compare', label: 'Comparar', icon: GitCompare },
-        { href: '/documents', label: 'Documentos', icon: FolderOpen },
+        { href: '/analyses/compare', label: 'Comparar Análises', icon: ArrowLeftRight },
+        { href: '/compare', label: 'Comparar Exames', icon: GitCompare },
         { href: '/dashboard/credits', label: 'Créditos', icon: Coins },
         { href: '/profile', label: 'Perfil', icon: User },
       ]
@@ -69,12 +71,13 @@ export function DashboardNav({ userName, userRole }: DashboardNavProps) {
       ]
     : [
         { href: '/dashboard', label: 'Dashboard', icon: Home },
+        { href: '/documents', label: 'Documentos', icon: FolderOpen },
         { href: '/analyze', label: 'Análise', icon: FileText },
         { href: '/analyze-complete', label: 'Análise Completa', icon: Sparkles },
         { href: '/recommendations', label: 'Recomendações', icon: TrendingUp },
         { href: '/weekly-plan', label: 'Plano Semanal', icon: Calendar },
-        { href: '/compare', label: 'Comparar', icon: GitCompare },
-        { href: '/documents', label: 'Documentos', icon: FolderOpen },
+        { href: '/analyses/compare', label: 'Comparar Análises', icon: ArrowLeftRight },
+        { href: '/compare', label: 'Comparar Exames', icon: GitCompare },
         { href: '/dashboard/credits', label: 'Créditos', icon: Coins },
         { href: '/profile', label: 'Perfil', icon: User },
       ]
@@ -87,7 +90,7 @@ export function DashboardNav({ userName, userRole }: DashboardNavProps) {
         {/* Logo */}
         <Link href={userRole === 'admin' ? '/admin' : '/dashboard'} className="flex items-center gap-2 group">
           <div className="h-9 w-9 rounded-lg bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-sm">
-            <Heart className="h-5 w-5 text-white" />
+            <HeartIcon size={20} color="white" />
           </div>
           <span className="text-lg font-semibold text-foreground">Medical AI</span>
         </Link>
@@ -144,7 +147,7 @@ export function DashboardNav({ userName, userRole }: DashboardNavProps) {
             <SheetContent side="right" className="w-80">
               <SheetHeader>
                 <SheetTitle className="flex items-center gap-2">
-                  <Heart className="h-5 w-5 text-primary" />
+                  <HeartIcon size={20} className="text-primary" />
                   Menu
                 </SheetTitle>
               </SheetHeader>

@@ -70,6 +70,7 @@ export function RecommendationsWidget({ patientId }: RecommendationsWidgetProps 
   const [error, setError] = useState<string | null>(null)
   const [generatedAt, setGeneratedAt] = useState<string | null>(null)
   const [analysisDate, setAnalysisDate] = useState<string | null>(null)
+  const [activeTab, setActiveTab] = useState('exams')
 
   useEffect(() => {
     loadRecommendations()
@@ -131,6 +132,21 @@ export function RecommendationsWidget({ patientId }: RecommendationsWidgetProps 
         return 'secondary'
       default:
         return 'outline'
+    }
+  }
+
+  const getSectionTitle = (tab: string) => {
+    switch (tab) {
+      case 'exams':
+        return `Exames (${recommendations?.examRecommendations.length || 0})`
+      case 'lifestyle':
+        return `Lifestyle (${recommendations?.lifestyleRecommendations.length || 0})`
+      case 'goals':
+        return `Metas (${recommendations?.healthGoals.length || 0})`
+      case 'alerts':
+        return `Alertas (${recommendations?.alerts.length || 0})`
+      default:
+        return ''
     }
   }
 
@@ -229,36 +245,29 @@ export function RecommendationsWidget({ patientId }: RecommendationsWidgetProps 
         </div>
       </CardHeader>
       <CardContent>
-        <Tabs defaultValue="exams" className="w-full">
+        <Tabs defaultValue="exams" value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-4 bg-muted">
-            <TabsTrigger value="exams" className="gap-1.5 sm:gap-2 data-[state=active]:!bg-sky-600 dark:data-[state=active]:!bg-sky-500 data-[state=active]:!text-white">
+            <TabsTrigger value="exams" className="data-[state=active]:!bg-sky-600 dark:data-[state=active]:!bg-sky-500 data-[state=active]:!text-white">
               <ClipboardList className="h-4 w-4" />
-              <span className="hidden sm:inline">Exames</span>
-              <span className="sm:hidden">({recommendations.examRecommendations.length})</span>
-              <span className="hidden sm:inline">({recommendations.examRecommendations.length})</span>
             </TabsTrigger>
-            <TabsTrigger value="lifestyle" className="gap-1.5 sm:gap-2 data-[state=active]:!bg-teal-600 dark:data-[state=active]:!bg-teal-500 data-[state=active]:!text-white">
+            <TabsTrigger value="lifestyle" className="data-[state=active]:!bg-teal-600 dark:data-[state=active]:!bg-teal-500 data-[state=active]:!text-white">
               <Activity className="h-4 w-4" />
-              <span className="hidden sm:inline">Lifestyle</span>
-              <span className="sm:hidden">({recommendations.lifestyleRecommendations.length})</span>
-              <span className="hidden sm:inline">({recommendations.lifestyleRecommendations.length})</span>
             </TabsTrigger>
-            <TabsTrigger value="goals" className="gap-1.5 sm:gap-2 data-[state=active]:!bg-purple-600 dark:data-[state=active]:!bg-purple-500 data-[state=active]:!text-white">
+            <TabsTrigger value="goals" className="data-[state=active]:!bg-purple-600 dark:data-[state=active]:!bg-purple-500 data-[state=active]:!text-white">
               <Target className="h-4 w-4" />
-              <span className="hidden sm:inline">Metas</span>
-              <span className="sm:hidden">({recommendations.healthGoals.length})</span>
-              <span className="hidden sm:inline">({recommendations.healthGoals.length})</span>
             </TabsTrigger>
-            <TabsTrigger value="alerts" className="gap-1.5 sm:gap-2 data-[state=active]:!bg-amber-600 dark:data-[state=active]:!bg-amber-500 data-[state=active]:!text-white">
+            <TabsTrigger value="alerts" className="data-[state=active]:!bg-amber-600 dark:data-[state=active]:!bg-amber-500 data-[state=active]:!text-white">
               <AlertCircle className="h-4 w-4" />
-              <span className="hidden sm:inline">Alertas</span>
-              <span className="sm:hidden">({recommendations.alerts.length})</span>
-              <span className="hidden sm:inline">({recommendations.alerts.length})</span>
             </TabsTrigger>
           </TabsList>
 
+          {/* Section Title */}
+          <div className="mt-4 mb-2">
+            <h3 className="text-lg font-semibold text-foreground">{getSectionTitle(activeTab)}</h3>
+          </div>
+
           {/* Exams Tab */}
-          <TabsContent value="exams" className="mt-4 sm:mt-6 space-y-2.5 sm:space-y-3">
+          <TabsContent value="exams" className="mt-0 space-y-2.5 sm:space-y-3">
             {recommendations.examRecommendations.length === 0 ? (
               <p className="text-sm text-muted-foreground text-center py-8">
                 Nenhum exame recomendado no momento
@@ -293,7 +302,7 @@ export function RecommendationsWidget({ patientId }: RecommendationsWidgetProps 
           </TabsContent>
 
           {/* Lifestyle Tab */}
-          <TabsContent value="lifestyle" className="mt-4 sm:mt-6 space-y-2.5 sm:space-y-3">
+          <TabsContent value="lifestyle" className="mt-0 space-y-2.5 sm:space-y-3">
             {recommendations.lifestyleRecommendations.length === 0 ? (
               <p className="text-sm text-muted-foreground text-center py-8">
                 Nenhuma recomendação de lifestyle no momento
@@ -330,7 +339,7 @@ export function RecommendationsWidget({ patientId }: RecommendationsWidgetProps 
           </TabsContent>
 
           {/* Goals Tab */}
-          <TabsContent value="goals" className="mt-4 sm:mt-6 space-y-2.5 sm:space-y-3">
+          <TabsContent value="goals" className="mt-0 space-y-2.5 sm:space-y-3">
             {recommendations.healthGoals.length === 0 ? (
               <p className="text-sm text-muted-foreground text-center py-8">
                 Nenhuma meta definida no momento
@@ -383,7 +392,7 @@ export function RecommendationsWidget({ patientId }: RecommendationsWidgetProps 
           </TabsContent>
 
           {/* Alerts Tab */}
-          <TabsContent value="alerts" className="mt-4 sm:mt-6 space-y-2.5 sm:space-y-3">
+          <TabsContent value="alerts" className="mt-0 space-y-2.5 sm:space-y-3">
             {recommendations.alerts.length === 0 ? (
               <div className="text-center py-8">
                 <div className="bg-emerald-50 dark:bg-emerald-950/20 rounded-lg p-4 mb-4 inline-block">

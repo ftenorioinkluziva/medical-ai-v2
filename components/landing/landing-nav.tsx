@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import { Heart } from 'lucide-react'
+import { HeartIcon } from '@/components/ui/animated-icon'
 
 interface LandingNavProps {
   activePage?: 'recursos' | 'especialistas' | 'como-funciona'
@@ -13,7 +13,7 @@ export function LandingNav({ activePage }: LandingNavProps) {
         <div className="flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
             <div className="h-9 w-9 rounded-lg bg-gray-900 flex items-center justify-center">
-              <Heart className="h-5 w-5 text-white" />
+              <HeartIcon size={20} color="white" />
             </div>
             <span className="text-xl font-semibold text-gray-900">Medical AI</span>
           </Link>
