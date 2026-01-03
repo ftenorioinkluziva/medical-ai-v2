@@ -245,7 +245,7 @@ export function RecommendationsWidget({ patientId }: RecommendationsWidgetProps 
         </div>
       </CardHeader>
       <CardContent>
-        <Tabs defaultValue="exams" value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-4 bg-muted">
             <TabsTrigger value="exams" className="data-[state=active]:!bg-sky-600 dark:data-[state=active]:!bg-sky-500 data-[state=active]:!text-white">
               <ClipboardList className="h-4 w-4" />

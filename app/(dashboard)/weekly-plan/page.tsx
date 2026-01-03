@@ -71,7 +71,11 @@ export default function WeeklyPlanPage() {
 
   // Save completed shopping items to localStorage whenever it changes
   useEffect(() => {
-    localStorage.setItem('shopping-completed-items', JSON.stringify(Array.from(completedShoppingItems)))
+    try {
+      localStorage.setItem('shopping-completed-items', JSON.stringify(Array.from(completedShoppingItems)))
+    } catch (e) {
+      console.error('[WEEKLY-PLAN] Error saving completed shopping items:', e)
+    }
   }, [completedShoppingItems])
 
   const toggleShoppingItemCompleted = (itemKey: string) => {
@@ -445,13 +449,13 @@ export default function WeeklyPlanPage() {
                           {category.category}
                         </h4>
                         <div className="grid gap-3 md:grid-cols-2">
-                          {category.items.map((item: any, itemIndex: number) => {
-                            const itemKey = `${category.category}-${itemIndex}-${item.item}`
+                          {category.items.map((item: any) => {
+                            const itemKey = `${category.category}-${item.item}-${item.quantity || ''}`
                             const isCompleted = completedShoppingItems.has(itemKey)
 
                             return (
                               <div
-                                key={itemIndex}
+                                key={itemKey}
                                 className={`p-4 border rounded-lg transition-all ${
                                   isCompleted
                                     ? 'border-sky-500 bg-sky-50/50 dark:bg-sky-950/30 opacity-75'

@@ -70,23 +70,36 @@ export function WeeklyPlanWidget({ patientId }: WeeklyPlanWidgetProps = {}) {
   const [activeTab, setActiveTab] = useState('supplements')
   const [completedShoppingItems, setCompletedShoppingItems] = useState<Set<string>>(new Set())
 
-  // Load completed shopping items from localStorage on mount
+  // Load completed shopping items from localStorage when plan changes
   useEffect(() => {
-    const stored = localStorage.getItem('shopping-completed-items')
+    // Reset completed items when the plan changes
+    setCompletedShoppingItems(new Set())
+
+    if (!plan?.id) return
+
+    const key = `shopping-completed-${plan.id}`
+    const stored = localStorage.getItem(key)
     if (stored) {
       try {
         const parsed = JSON.parse(stored)
         setCompletedShoppingItems(new Set(parsed))
       } catch (e) {
-        console.error('Error loading completed shopping items:', e)
+        console.error('[WEEKLY-PLAN] Error loading completed shopping items:', e)
       }
     }
-  }, [])
+  }, [plan?.id])
 
   // Save completed shopping items to localStorage whenever it changes
   useEffect(() => {
-    localStorage.setItem('shopping-completed-items', JSON.stringify(Array.from(completedShoppingItems)))
-  }, [completedShoppingItems])
+    if (!plan?.id) return
+
+    try {
+      const key = `shopping-completed-${plan.id}`
+      localStorage.setItem(key, JSON.stringify(Array.from(completedShoppingItems)))
+    } catch (e) {
+      console.error('[WEEKLY-PLAN] Error saving completed shopping items:', e)
+    }
+  }, [completedShoppingItems, plan?.id])
 
   const toggleShoppingItemCompleted = (itemKey: string) => {
     setCompletedShoppingItems((prev) => {
@@ -102,7 +115,9 @@ export function WeeklyPlanWidget({ patientId }: WeeklyPlanWidgetProps = {}) {
 
   const resetCompletedShoppingItems = () => {
     setCompletedShoppingItems(new Set())
-    localStorage.removeItem('shopping-completed-items')
+    if (plan?.id) {
+      localStorage.removeItem(`shopping-completed-${plan.id}`)
+    }
   }
 
   useEffect(() => {
@@ -410,13 +425,13 @@ export function WeeklyPlanWidget({ patientId }: WeeklyPlanWidgetProps = {}) {
                     {category.category}
                   </h4>
                   <div className="grid gap-3 md:grid-cols-2">
-                    {category.items.map((item: any, itemIndex: number) => {
-                      const itemKey = `${category.category}-${itemIndex}-${item.item}`
+                    {category.items.map((item: any) => {
+                      const itemKey = `${category.category}-${item.item}-${item.quantity || ''}`
                       const isCompleted = completedShoppingItems.has(itemKey)
 
                       return (
                         <div
-                          key={itemIndex}
+                          key={itemKey}
                           className={`p-4 border rounded-lg transition-all ${
                             isCompleted
                               ? 'border-sky-500 bg-sky-50/50 dark:bg-sky-950/30 opacity-75'

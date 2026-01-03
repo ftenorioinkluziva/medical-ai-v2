@@ -9,6 +9,29 @@ import { motion, type Variants } from 'framer-motion'
 import { type LucideIcon } from 'lucide-react'
 import { type HTMLAttributes, forwardRef } from 'react'
 import { cn } from '@/lib/utils'
+import {
+  Heart,
+  Sparkles,
+  Home,
+  Target,
+  TrendingUp,
+  ShoppingCart,
+  Clock,
+  Send,
+  Eye,
+  Users,
+  FileText,
+  FolderOpen,
+  Calendar,
+  GitCompare,
+  Coins,
+  ArrowLeftRight,
+  User,
+  Brain,
+  Lightbulb,
+  Upload,
+  ArrowRight,
+} from 'lucide-react'
 
 // Animation variants
 const animations = {
@@ -32,8 +55,7 @@ const animations = {
       scale: [1, 1.15, 1, 1.25, 1],
       transition: {
         duration: 0.6,
-        times: [0, 0.2, 0.4, 0.6, 1],
-        type: 'spring'
+        times: [0, 0.2, 0.4, 0.6, 1]
       }
     }
   } as Variants,
@@ -43,7 +65,7 @@ const animations = {
     rest: { scale: 1, rotate: 0 },
     hover: {
       scale: [1, 1.2, 1],
-      rotate: [0, 5, -5, 0],
+      rotate: [0, 5, 0],
       transition: {
         duration: 0.5,
         times: [0, 0.5, 1]
@@ -156,127 +178,106 @@ AnimatedIcon.displayName = 'AnimatedIcon'
 
 // Convenience exports for common icon animations
 export const HeartIcon = forwardRef<HTMLDivElement, Omit<AnimatedIconProps, 'icon' | 'animation'>>((props, ref) => {
-  const { Heart } = require('lucide-react')
   return <AnimatedIcon ref={ref} icon={Heart} animation="pulse" {...props} />
 })
 HeartIcon.displayName = 'HeartIcon'
 
 export const SparklesIcon = forwardRef<HTMLDivElement, Omit<AnimatedIconProps, 'icon' | 'animation'>>((props, ref) => {
-  const { Sparkles } = require('lucide-react')
   return <AnimatedIcon ref={ref} icon={Sparkles} animation="glow" {...props} />
 })
 SparklesIcon.displayName = 'SparklesIcon'
 
 export const HomeIcon = forwardRef<HTMLDivElement, Omit<AnimatedIconProps, 'icon' | 'animation'>>((props, ref) => {
-  const { Home } = require('lucide-react')
   return <AnimatedIcon ref={ref} icon={Home} animation="hover-scale" {...props} />
 })
 HomeIcon.displayName = 'HomeIcon'
 
 export const TargetIcon = forwardRef<HTMLDivElement, Omit<AnimatedIconProps, 'icon' | 'animation'>>((props, ref) => {
-  const { Target } = require('lucide-react')
   return <AnimatedIcon ref={ref} icon={Target} animation="pulse" {...props} />
 })
 TargetIcon.displayName = 'TargetIcon'
 
 export const TrendingUpIcon = forwardRef<HTMLDivElement, Omit<AnimatedIconProps, 'icon' | 'animation'>>((props, ref) => {
-  const { TrendingUp } = require('lucide-react')
   return <AnimatedIcon ref={ref} icon={TrendingUp} animation="bounce" {...props} />
 })
 TrendingUpIcon.displayName = 'TrendingUpIcon'
 
 export const ShoppingCartIcon = forwardRef<HTMLDivElement, Omit<AnimatedIconProps, 'icon' | 'animation'>>((props, ref) => {
-  const { ShoppingCart } = require('lucide-react')
   return <AnimatedIcon ref={ref} icon={ShoppingCart} animation="bounce" {...props} />
 })
 ShoppingCartIcon.displayName = 'ShoppingCartIcon'
 
 export const ClockIcon = forwardRef<HTMLDivElement, Omit<AnimatedIconProps, 'icon' | 'animation'>>((props, ref) => {
-  const { Clock } = require('lucide-react')
   return <AnimatedIcon ref={ref} icon={Clock} animation="spin" {...props} />
 })
 ClockIcon.displayName = 'ClockIcon'
 
 export const SendIcon = forwardRef<HTMLDivElement, Omit<AnimatedIconProps, 'icon' | 'animation'>>((props, ref) => {
-  const { Send } = require('lucide-react')
   return <AnimatedIcon ref={ref} icon={Send} animation="hover-scale" {...props} />
 })
 SendIcon.displayName = 'SendIcon'
 
 export const EyeIcon = forwardRef<HTMLDivElement, Omit<AnimatedIconProps, 'icon' | 'animation'>>((props, ref) => {
-  const { Eye } = require('lucide-react')
   return <AnimatedIcon ref={ref} icon={Eye} animation="hover-scale" {...props} />
 })
 EyeIcon.displayName = 'EyeIcon'
 
 export const UsersIcon = forwardRef<HTMLDivElement, Omit<AnimatedIconProps, 'icon' | 'animation'>>((props, ref) => {
-  const { Users } = require('lucide-react')
   return <AnimatedIcon ref={ref} icon={Users} animation="hover-scale" {...props} />
 })
 UsersIcon.displayName = 'UsersIcon'
 
 export const FileTextIcon = forwardRef<HTMLDivElement, Omit<AnimatedIconProps, 'icon' | 'animation'>>((props, ref) => {
-  const { FileText } = require('lucide-react')
   return <AnimatedIcon ref={ref} icon={FileText} animation="hover-scale" {...props} />
 })
 FileTextIcon.displayName = 'FileTextIcon'
 
 export const FolderOpenIcon = forwardRef<HTMLDivElement, Omit<AnimatedIconProps, 'icon' | 'animation'>>((props, ref) => {
-  const { FolderOpen } = require('lucide-react')
   return <AnimatedIcon ref={ref} icon={FolderOpen} animation="hover-scale" {...props} />
 })
 FolderOpenIcon.displayName = 'FolderOpenIcon'
 
 export const CalendarIcon = forwardRef<HTMLDivElement, Omit<AnimatedIconProps, 'icon' | 'animation'>>((props, ref) => {
-  const { Calendar } = require('lucide-react')
   return <AnimatedIcon ref={ref} icon={Calendar} animation="hover-scale" {...props} />
 })
 CalendarIcon.displayName = 'CalendarIcon'
 
 export const GitCompareIcon = forwardRef<HTMLDivElement, Omit<AnimatedIconProps, 'icon' | 'animation'>>((props, ref) => {
-  const { GitCompare } = require('lucide-react')
   return <AnimatedIcon ref={ref} icon={GitCompare} animation="hover-scale" {...props} />
 })
 GitCompareIcon.displayName = 'GitCompareIcon'
 
 export const CoinsIcon = forwardRef<HTMLDivElement, Omit<AnimatedIconProps, 'icon' | 'animation'>>((props, ref) => {
-  const { Coins } = require('lucide-react')
   return <AnimatedIcon ref={ref} icon={Coins} animation="glow" {...props} />
 })
 CoinsIcon.displayName = 'CoinsIcon'
 
 export const ArrowLeftRightIcon = forwardRef<HTMLDivElement, Omit<AnimatedIconProps, 'icon' | 'animation'>>((props, ref) => {
-  const { ArrowLeftRight } = require('lucide-react')
   return <AnimatedIcon ref={ref} icon={ArrowLeftRight} animation="shake" {...props} />
 })
 ArrowLeftRightIcon.displayName = 'ArrowLeftRightIcon'
 
 export const UserIcon = forwardRef<HTMLDivElement, Omit<AnimatedIconProps, 'icon' | 'animation'>>((props, ref) => {
-  const { User } = require('lucide-react')
   return <AnimatedIcon ref={ref} icon={User} animation="hover-scale" {...props} />
 })
 UserIcon.displayName = 'UserIcon'
 
 export const BrainIcon = forwardRef<HTMLDivElement, Omit<AnimatedIconProps, 'icon' | 'animation'>>((props, ref) => {
-  const { Brain } = require('lucide-react')
   return <AnimatedIcon ref={ref} icon={Brain} animation="glow" {...props} />
 })
 BrainIcon.displayName = 'BrainIcon'
 
 export const LightbulbIcon = forwardRef<HTMLDivElement, Omit<AnimatedIconProps, 'icon' | 'animation'>>((props, ref) => {
-  const { Lightbulb } = require('lucide-react')
   return <AnimatedIcon ref={ref} icon={Lightbulb} animation="glow" {...props} />
 })
 LightbulbIcon.displayName = 'LightbulbIcon'
 
 export const UploadIcon = forwardRef<HTMLDivElement, Omit<AnimatedIconProps, 'icon' | 'animation'>>((props, ref) => {
-  const { Upload } = require('lucide-react')
   return <AnimatedIcon ref={ref} icon={Upload} animation="bounce" {...props} />
 })
 UploadIcon.displayName = 'UploadIcon'
 
 export const ArrowRightIcon = forwardRef<HTMLDivElement, Omit<AnimatedIconProps, 'icon' | 'animation'>>((props, ref) => {
-  const { ArrowRight } = require('lucide-react')
   return <AnimatedIcon ref={ref} icon={ArrowRight} animation="hover-scale" {...props} />
 })
 ArrowRightIcon.displayName = 'ArrowRightIcon'
