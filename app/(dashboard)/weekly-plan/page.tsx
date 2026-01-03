@@ -56,27 +56,36 @@ export default function WeeklyPlanPage() {
   const [activeTab, setActiveTab] = useState('supplements')
   const [completedShoppingItems, setCompletedShoppingItems] = useState<Set<string>>(new Set())
 
-  // Load completed shopping items from localStorage on mount
+  // Load completed shopping items from localStorage when plan changes
   useEffect(() => {
-    const stored = localStorage.getItem('shopping-completed-items')
+    // Reset completed items when the plan changes to avoid state leakage
+    setCompletedShoppingItems(new Set())
+
+    if (!selectedPlan?.id) return
+
+    const key = `shopping-completed-${selectedPlan.id}`
+    const stored = localStorage.getItem(key)
     if (stored) {
       try {
         const parsed = JSON.parse(stored)
         setCompletedShoppingItems(new Set(parsed))
       } catch (e) {
-        console.error('Error loading completed shopping items:', e)
+        console.error('[WEEKLY-PLAN] Error loading completed shopping items:', e)
       }
     }
-  }, [])
+  }, [selectedPlan?.id])
 
   // Save completed shopping items to localStorage whenever it changes
   useEffect(() => {
+    if (!selectedPlan?.id) return
+
     try {
-      localStorage.setItem('shopping-completed-items', JSON.stringify(Array.from(completedShoppingItems)))
+      const key = `shopping-completed-${selectedPlan.id}`
+      localStorage.setItem(key, JSON.stringify(Array.from(completedShoppingItems)))
     } catch (e) {
       console.error('[WEEKLY-PLAN] Error saving completed shopping items:', e)
     }
-  }, [completedShoppingItems])
+  }, [completedShoppingItems, selectedPlan?.id])
 
   const toggleShoppingItemCompleted = (itemKey: string) => {
     setCompletedShoppingItems((prev) => {
@@ -92,7 +101,9 @@ export default function WeeklyPlanPage() {
 
   const resetCompletedShoppingItems = () => {
     setCompletedShoppingItems(new Set())
-    localStorage.removeItem('shopping-completed-items')
+    if (selectedPlan?.id) {
+      localStorage.removeItem(`shopping-completed-${selectedPlan.id}`)
+    }
   }
 
   useEffect(() => {
