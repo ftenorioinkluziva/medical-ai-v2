@@ -425,8 +425,8 @@ export function WeeklyPlanWidget({ patientId }: WeeklyPlanWidgetProps = {}) {
                     {category.category}
                   </h4>
                   <div className="grid gap-3 md:grid-cols-2">
-                    {category.items.map((item: any) => {
-                      const itemKey = `${category.category}-${item.item}-${item.quantity || ''}`
+                    {category.items.map((item: any, itemIndex: number) => {
+                      const itemKey = `${category.category}-${itemIndex}-${item.item}-${item.quantity || ''}`
                       const isCompleted = completedShoppingItems.has(itemKey)
 
                       return (
