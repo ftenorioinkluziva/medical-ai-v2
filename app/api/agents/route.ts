@@ -30,21 +30,27 @@ export async function GET(request: NextRequest) {
         analysisRole: healthAgents.analysisRole,
         analysisOrder: healthAgents.analysisOrder,
         displayOrder: healthAgents.displayOrder,
+        isActive: healthAgents.isActive,
+        modelName: healthAgents.modelName,
       })
       .from(healthAgents)
-      .where(
-        and(
-          eq(healthAgents.isActive, true),
-          ne(healthAgents.analysisRole, 'none')
-        )
-      )
+      .where(eq(healthAgents.isActive, true))
 
-    // Sort: foundation first, then specialized, both ordered by analysisOrder
+    // Sort agents: foundation first, then specialized, then others.
+    // Within each role group, sort by analysisOrder.
+    const roleOrderValue = (role: string) => {
+      if (role === 'foundation') return 1
+      if (role === 'specialized') return 2
+      return 99 // Other roles (like 'none') go to the end
+    }
+
     const agents = allAgents.sort((a, b) => {
-      // Foundation agents come before specialized
-      if (a.analysisRole === 'foundation' && b.analysisRole === 'specialized') return -1
-      if (a.analysisRole === 'specialized' && b.analysisRole === 'foundation') return 1
-      // Within same role, order by analysisOrder
+      const roleCompare =
+        roleOrderValue(a.analysisRole) - roleOrderValue(b.analysisRole)
+      if (roleCompare !== 0) {
+        return roleCompare
+      }
+      // Within the same role, sort by analysisOrder
       return (a.analysisOrder || 0) - (b.analysisOrder || 0)
     })
 
