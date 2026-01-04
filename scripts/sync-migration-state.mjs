@@ -30,24 +30,30 @@ async function syncMigrationState() {
   })
 
   try {
-    // Check if __drizzle_migrations table exists
-    const tableCheck = await pool.query(`
-      SELECT EXISTS (
-        SELECT FROM information_schema.tables 
-        WHERE table_name = '__drizzle_migrations'
+    // Ensure __drizzle_migrations table exists
+    console.log('📋 Ensuring __drizzle_migrations table exists...')
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS "__drizzle_migrations" (
+        id SERIAL PRIMARY KEY,
+        hash text NOT NULL,
+        created_at bigint
       );
     `)
 
+    // Verify table was created
+    const tableCheck = await pool.query(`
+      SELECT EXISTS (
+        SELECT FROM information_schema.tables
+        WHERE table_schema = 'public'
+        AND table_name = '__drizzle_migrations'
+      ) as exists;
+    `)
+
     if (!tableCheck.rows[0].exists) {
-      console.log('📋 Creating __drizzle_migrations table...')
-      await pool.query(`
-        CREATE TABLE IF NOT EXISTS "__drizzle_migrations" (
-          id SERIAL PRIMARY KEY,
-          hash text NOT NULL,
-          created_at bigint
-        );
-      `)
+      throw new Error('Failed to create __drizzle_migrations table')
     }
+
+    console.log('✅ Migration tracking table ready\n')
 
     // Get all migration files
     const migrationsFolder = resolve(__dirname, '..', 'lib', 'db', 'migrations')
