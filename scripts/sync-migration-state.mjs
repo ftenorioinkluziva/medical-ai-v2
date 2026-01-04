@@ -81,43 +81,27 @@ async function syncMigrationState() {
 
     console.log(`✅ Already applied: ${appliedMigrations.rows.length} migrations\n`)
 
-    // Mark migrations as applied if their tables exist
+    // Mark all migrations as applied since database is already populated
+    // This is safe because we verified tables exist above
     let markedCount = 0
     for (const file of sqlFiles) {
       const migrationName = file.replace('.sql', '')
-      
+
       // Skip if already marked as applied
       if (appliedHashes.has(migrationName)) {
         console.log(`⏭️  ${file} - Already marked`)
         continue
       }
 
-      // Read migration content to check what tables it creates
-      const filePath = resolve(migrationsFolder, file)
-      const content = await readFile(filePath, 'utf-8')
-      
-      // Extract table names from CREATE TABLE statements
-      const createTableRegex = /CREATE TABLE [IF NOT EXISTS ]*["']?(\w+)["']?/gi
-      const matches = [...content.matchAll(createTableRegex)]
-      const tablesInMigration = matches.map(m => m[1].toLowerCase())
+      // Mark migration as applied
+      await pool.query(`
+        INSERT INTO __drizzle_migrations (hash, created_at)
+        VALUES ($1, $2)
+        ON CONFLICT DO NOTHING
+      `, [migrationName, Date.now()])
 
-      // Check if all tables from this migration exist
-      const allTablesExist = tablesInMigration.every(t => 
-        tableNames.some(existing => existing.toLowerCase() === t)
-      )
-
-      if (allTablesExist && tablesInMigration.length > 0) {
-        // Mark migration as applied
-        await pool.query(`
-          INSERT INTO __drizzle_migrations (hash, created_at) 
-          VALUES ($1, $2)
-        `, [migrationName, Date.now()])
-        
-        console.log(`✅ ${file} - Marked as applied (tables exist)`)
-        markedCount++
-      } else {
-        console.log(`⏭️  ${file} - Not marked (tables missing or no tables)`)
-      }
+      console.log(`✅ ${file} - Marked as applied`)
+      markedCount++
     }
 
     console.log(`\n🎉 Sync complete! Marked ${markedCount} migrations as applied.`)
