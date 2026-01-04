@@ -25,6 +25,11 @@ pool.query('SELECT NOW()')
   });
 "
 
+echo "🔄 Syncing migration state (one-time check)..."
+# First sync: mark existing migrations as applied
+node scripts/sync-migration-state.mjs
+
+echo ""
 echo "🔄 Running database migrations..."
 # Run migrations using production script (doesn't require drizzle-kit)
 node scripts/migrate-production.mjs
