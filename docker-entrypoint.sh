@@ -28,16 +28,24 @@ pool.query('SELECT NOW()')
 echo "🔄 Syncing migration state (one-time check)..."
 # First sync: mark existing migrations as applied
 node scripts/sync-migration-state.mjs
+SYNC_EXIT_CODE=$?
 
-echo ""
-echo "🔄 Running database migrations..."
-# Run migrations using production script (doesn't require drizzle-kit)
-node scripts/migrate-production.mjs
+if [ $SYNC_EXIT_CODE -eq 10 ]; then
+  echo "⏭️  Skipping migrations - all already applied"
+elif [ $SYNC_EXIT_CODE -eq 0 ]; then
+  echo ""
+  echo "🔄 Running database migrations..."
+  # Run migrations using production script (doesn't require drizzle-kit)
+  node scripts/migrate-production.mjs
 
-if [ $? -eq 0 ]; then
-  echo "✅ Migrations completed successfully"
+  if [ $? -eq 0 ]; then
+    echo "✅ Migrations completed successfully"
+  else
+    echo "❌ Migrations failed!"
+    exit 1
+  fi
 else
-  echo "❌ Migrations failed!"
+  echo "❌ Sync failed!"
   exit 1
 fi
 

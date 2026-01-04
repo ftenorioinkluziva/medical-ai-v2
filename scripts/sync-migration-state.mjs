@@ -105,7 +105,19 @@ async function syncMigrationState() {
     }
 
     console.log(`\n🎉 Sync complete! Marked ${markedCount} migrations as applied.`)
-    process.exit(0)
+
+    // Exit with special code if all migrations are already applied
+    // This signals to the entrypoint script to skip running migrations
+    const totalMigrations = sqlFiles.length
+    const totalApplied = appliedMigrations.rows.length + markedCount
+
+    if (totalApplied >= totalMigrations) {
+      console.log('✅ All migrations already applied - no need to run migrate\n')
+      process.exit(10) // Special exit code: all migrations applied
+    } else {
+      console.log(`⚠️  ${totalMigrations - totalApplied} migrations pending\n`)
+      process.exit(0) // Normal exit: proceed with migrations
+    }
 
   } catch (error) {
     console.error('❌ Sync failed:', error.message)
