@@ -30,6 +30,7 @@ interface AgentFormProps {
 
 export function AgentForm({ agent, onSuccess, onCancel }: AgentFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isFormReady, setIsFormReady] = useState(false)
   const [authors, setAuthors] = useState<Array<{ author: string; count: number }>>([])
   const [categories, setCategories] = useState<Array<{ category: string; label: string; count: number }>>([])
   const [subcategories, setSubcategories] = useState<Array<{ subcategory: string; count: number }>>([])
@@ -130,8 +131,14 @@ export function AgentForm({ agent, onSuccess, onCancel }: AgentFormProps) {
   }, [])
 
   useEffect(() => {
+    // Reset ready state when agent changes
+    setIsFormReady(false)
+
     if (agent) {
-      setFormData({
+      // Ensure modelConfig has default values if missing
+      const modelConfig = agent.modelConfig || {}
+
+      const newFormData = {
         agentKey: agent.agentKey || '',
         name: agent.name || '',
         title: agent.title || '',
@@ -141,25 +148,35 @@ export function AgentForm({ agent, onSuccess, onCancel }: AgentFormProps) {
         systemPrompt: agent.systemPrompt || '',
         analysisPrompt: agent.analysisPrompt || '',
         modelName: agent.modelName || 'gemini-2.5-flash',
-        temperature: agent.modelConfig?.temperature || 0.7,
-        maxOutputTokens: agent.modelConfig?.maxOutputTokens || 8192,
-        topP: agent.modelConfig?.topP,
-        topK: agent.modelConfig?.topK,
-        presencePenalty: agent.modelConfig?.presencePenalty || 0,
-        frequencyPenalty: agent.modelConfig?.frequencyPenalty || 0,
+        temperature: modelConfig.temperature !== undefined ? modelConfig.temperature : 0.7,
+        maxOutputTokens: modelConfig.maxOutputTokens !== undefined ? modelConfig.maxOutputTokens : 8192,
+        topP: modelConfig.topP,
+        topK: modelConfig.topK,
+        presencePenalty: modelConfig.presencePenalty !== undefined ? modelConfig.presencePenalty : 0,
+        frequencyPenalty: modelConfig.frequencyPenalty !== undefined ? modelConfig.frequencyPenalty : 0,
         isActive: agent.isActive !== undefined ? agent.isActive : true,
-        requiresApproval: agent.requiresApproval || false,
-        tags: agent.tags ? agent.tags.join(', ') : '',
-        useThinkingMode: agent.useThinkingMode || false,
+        requiresApproval: agent.requiresApproval !== undefined ? agent.requiresApproval : false,
+        tags: Array.isArray(agent.tags) ? agent.tags.join(', ') : '',
+        useThinkingMode: agent.useThinkingMode !== undefined ? agent.useThinkingMode : false,
         analysisRole: agent.analysisRole || 'none',
-        analysisOrder: agent.analysisOrder || null,
+        analysisOrder: agent.analysisOrder !== undefined && agent.analysisOrder !== null ? agent.analysisOrder : null,
         knowledgeAccessType: agent.knowledgeAccessType || 'full',
-        allowedAuthors: agent.allowedAuthors || [],
-        allowedCategories: agent.allowedCategories || [],
-        allowedSubcategories: agent.allowedSubcategories || [],
-        excludedArticleIds: agent.excludedArticleIds || [],
-        includedArticleIds: agent.includedArticleIds || [],
-      })
+        allowedAuthors: Array.isArray(agent.allowedAuthors) ? agent.allowedAuthors : [],
+        allowedCategories: Array.isArray(agent.allowedCategories) ? agent.allowedCategories : [],
+        allowedSubcategories: Array.isArray(agent.allowedSubcategories) ? agent.allowedSubcategories : [],
+        excludedArticleIds: Array.isArray(agent.excludedArticleIds) ? agent.excludedArticleIds : [],
+        includedArticleIds: Array.isArray(agent.includedArticleIds) ? agent.includedArticleIds : [],
+      }
+
+      setFormData(newFormData)
+
+      // Mark form as ready after a small delay to ensure state is updated
+      setTimeout(() => {
+        setIsFormReady(true)
+      }, 50)
+    } else {
+      // New agent form
+      setIsFormReady(true)
     }
   }, [agent])
 
@@ -377,6 +394,18 @@ export function AgentForm({ agent, onSuccess, onCancel }: AgentFormProps) {
     } finally {
       setIsSubmitting(false)
     }
+  }
+
+  // Show loading state while form is not ready
+  if (!isFormReady && agent) {
+    return (
+      <div className="flex items-center justify-center p-12">
+        <div className="text-center space-y-3">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" />
+          <p className="text-sm text-muted-foreground">Carregando dados do agente...</p>
+        </div>
+      </div>
+    )
   }
 
   return (

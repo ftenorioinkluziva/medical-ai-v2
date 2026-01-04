@@ -85,6 +85,20 @@
       "when": 1767272044462,
       "tag": "0011_ambitious_shockwave",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1767368400000,
+      "tag": "0012_dynamic_agents",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1735934400000,
+      "tag": "0013_profile_enhancements",
+      "breakpoints": true
     }
   ]
 }

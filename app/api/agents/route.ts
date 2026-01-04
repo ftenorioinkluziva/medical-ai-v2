@@ -10,14 +10,21 @@ import { and, eq, ne } from 'drizzle-orm'
 
 /**
  * GET /api/agents
- * List active health agents that participate in complete analysis
+ * List active health agents
+ * Query params:
+ *   - completeAnalysisOnly: true/false (default: false)
+ *     If true, returns only agents that participate in complete analysis (analysisRole != 'none')
+ *     If false, returns all active agents
  * Public endpoint - no admin required
  */
 export async function GET(request: NextRequest) {
   try {
-    console.log(`🔧 [AGENTS-API] Fetching active agents for complete analysis`)
+    const { searchParams } = new URL(request.url)
+    const completeAnalysisOnly = searchParams.get('completeAnalysisOnly') === 'true'
 
-    // Get all active agents that participate in complete analysis
+    console.log(`🔧 [AGENTS-API] Fetching active agents (completeAnalysisOnly: ${completeAnalysisOnly})`)
+
+    // Get all active agents
     const allAgents = await db
       .select({
         id: healthAgents.id,
@@ -36,6 +43,11 @@ export async function GET(request: NextRequest) {
       .from(healthAgents)
       .where(eq(healthAgents.isActive, true))
 
+    // Filter by complete analysis participation if requested
+    const filteredAgents = completeAnalysisOnly
+      ? allAgents.filter(agent => agent.analysisRole !== 'none')
+      : allAgents
+
     // Sort agents: foundation first, then specialized, then others.
     // Within each role group, sort by analysisOrder.
     const roleOrderValue = (role: string) => {
@@ -44,7 +56,7 @@ export async function GET(request: NextRequest) {
       return 99 // Other roles (like 'none') go to the end
     }
 
-    const agents = allAgents.sort((a, b) => {
+    const agents = filteredAgents.sort((a, b) => {
       const roleCompare =
         roleOrderValue(a.analysisRole) - roleOrderValue(b.analysisRole)
       if (roleCompare !== 0) {
@@ -54,7 +66,7 @@ export async function GET(request: NextRequest) {
       return (a.analysisOrder || 0) - (b.analysisOrder || 0)
     })
 
-    console.log(`✅ [AGENTS-API] Found ${agents.length} active agents`)
+    console.log(`✅ [AGENTS-API] Found ${agents.length} active agents (completeAnalysisOnly: ${completeAnalysisOnly})`)
 
     return NextResponse.json({
       success: true,

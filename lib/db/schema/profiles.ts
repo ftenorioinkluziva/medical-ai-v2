@@ -22,26 +22,34 @@ export const medicalProfiles = pgTable('medical_profiles', {
 
   // Lifestyle - Sleep
   sleepHours: real('sleep_hours'),
+  napTime: integer('nap_time'), // minutes
   sleepQuality: integer('sleep_quality'), // 1-10
   sleepIssues: text('sleep_issues'),
 
   // Lifestyle - Stress
   stressLevel: integer('stress_level'), // 1-10
   stressManagement: text('stress_management'),
+  morningSunlightExposure: varchar('morning_sunlight_exposure', { length: 10 }), // 'yes' or 'no'
 
   // Exercise
-  exerciseTypes: json('exercise_types').$type<string[]>(),
-  exerciseFrequency: integer('exercise_frequency'), // times per week
-  exerciseDuration: integer('exercise_duration'), // minutes
-  exerciseIntensity: varchar('exercise_intensity', { length: 50 }),
+  exerciseActivities: json('exercise_activities').$type<Array<{
+    type: string
+    frequency: number // times per week
+    duration: number // minutes
+    intensity: string // 'low', 'moderate', 'high'
+  }>>(),
   physicalLimitations: text('physical_limitations'),
 
   // Functional Tests (Biomarcadores Funcionais)
   handgripStrength: real('handgrip_strength'), // kg - Força de Preensão Manual (dinamômetro)
   sitToStandTime: real('sit_to_stand_time'), // seconds - Teste Sentar-Levantar 5x
+  co2ToleranceTest: real('co2_tolerance_test'), // seconds - Teste de Tolerância ao CO2
+  vo2Max: real('vo2_max'), // ml/kg/min - Capacidade Aeróbica Máxima
+  bodyFatPercentage: real('body_fat_percentage'), // % - Percentual de Gordura Corporal (para calcular FFMI)
 
   // Nutrition
   currentDiet: text('current_diet'),
+  supplementation: text('supplementation'),
   dailyWaterIntake: real('daily_water_intake'), // liters
 
   // Health

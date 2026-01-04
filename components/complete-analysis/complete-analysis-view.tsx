@@ -41,12 +41,12 @@ export function CompleteAnalysisView({ userId }: CompleteAnalysisViewProps) {
   useEffect(() => {
     const fetchAgents = async () => {
       try {
-        const response = await fetch('/api/agents')
+        const response = await fetch('/api/agents?completeAnalysisOnly=true')
         if (!response.ok) throw new Error('Failed to fetch agents')
 
         const data = await response.json()
 
-        // API already returns only active agents that participate in complete analysis, sorted by role and order
+        // API returns only active agents that participate in complete analysis (analysisRole != 'none'), sorted by role and order
         setAgents(data.agents || [])
       } catch (error) {
         console.error('[COMPLETE-ANALYSIS] Error fetching agents:', error)

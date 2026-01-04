@@ -14,6 +14,8 @@ import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Separator } from '@/components/ui/separator'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Progress } from '@/components/ui/progress'
 import {
   User,
   Heart,
@@ -30,8 +32,18 @@ import {
   Utensils,
   Cigarette,
   Target,
+  Edit,
+  Trash2,
+  Check,
 } from 'lucide-react'
 import { toast } from 'sonner'
+
+interface ExerciseActivity {
+  type: string
+  frequency: number
+  duration: number
+  intensity: string
+}
 
 interface MedicalProfile {
   id?: string
@@ -47,22 +59,30 @@ interface MedicalProfile {
   restingHeartRate: number | null
   // Lifestyle - Sleep
   sleepHours: number | null
+  napTime: number | null
   sleepQuality: number | null
   sleepIssues: string | null
   // Lifestyle - Stress
   stressLevel: number | null
   stressManagement: string | null
-  // Exercise
+  morningSunlightExposure: string | null
+  // Exercise (old fields for backward compatibility)
   exerciseTypes: string[] | null
   exerciseFrequency: number | null
   exerciseDuration: number | null
   exerciseIntensity: string | null
+  // Exercise (new structure)
+  exerciseActivities: ExerciseActivity[] | null
   physicalLimitations: string | null
   // Functional Tests
   handgripStrength: number | null
   sitToStandTime: number | null
+  co2ToleranceTest: number | null
+  vo2Max: number | null
+  bodyFatPercentage: number | null
   // Nutrition
   currentDiet: string | null
+  supplementation: string | null
   dailyWaterIntake: number | null
   // Health
   medicalConditions: string[] | null
@@ -84,9 +104,66 @@ interface MedicalProfileFormProps {
   onProfileSaved?: (profile: MedicalProfile) => void
 }
 
+// Helper function to calculate FFMI
+function calculateFFMI(weight: number | null, height: number | null, bodyFatPercentage: number | null): number | null {
+  if (!weight || !height || bodyFatPercentage === null) return null
+
+  const fatMass = weight * (bodyFatPercentage / 100)
+  const leanMass = weight - fatMass
+  const heightInMeters = height / 100
+  const ffmi = leanMass / (heightInMeters * heightInMeters)
+
+  return Number(ffmi.toFixed(1))
+}
+
+// Helper function to calculate profile completion
+function calculateProfileCompletion(profile: MedicalProfile): number {
+  const fields = [
+    // Basic Info (20%)
+    profile.age,
+    profile.gender,
+    profile.weight,
+    profile.height,
+
+    // Vital Signs (15%)
+    profile.systolicPressure,
+    profile.diastolicPressure,
+    profile.restingHeartRate,
+
+    // Lifestyle (30%)
+    profile.sleepHours,
+    profile.sleepQuality,
+    profile.stressLevel,
+    profile.exerciseActivities && profile.exerciseActivities.length > 0,
+    profile.currentDiet,
+
+    // Health (20%)
+    profile.medicalConditions && profile.medicalConditions.length > 0,
+    profile.medications && profile.medications.length > 0,
+    profile.allergies && profile.allergies.length > 0,
+
+    // Functional Tests (10%)
+    profile.handgripStrength,
+    profile.sitToStandTime,
+
+    // Goals (5%)
+    profile.healthObjectives,
+  ]
+
+  const filledFields = fields.filter(field => {
+    if (typeof field === 'boolean') return field
+    return field !== null && field !== undefined && field !== ''
+  }).length
+
+  return Math.round((filledFields / fields.length) * 100)
+}
+
 export function MedicalProfileForm({ userId, onProfileSaved }: MedicalProfileFormProps) {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [autoSaving, setAutoSaving] = useState(false)
+  const [lastSaved, setLastSaved] = useState<Date | null>(null)
+  const [activeTab, setActiveTab] = useState('basic')
   const [profile, setProfile] = useState<MedicalProfile>({
     userId,
     age: null,
@@ -97,18 +174,25 @@ export function MedicalProfileForm({ userId, onProfileSaved }: MedicalProfileFor
     diastolicPressure: null,
     restingHeartRate: null,
     sleepHours: null,
+    napTime: null,
     sleepQuality: 5,
     sleepIssues: null,
     stressLevel: 5,
     stressManagement: null,
+    morningSunlightExposure: null,
     exerciseTypes: [],
     exerciseFrequency: null,
     exerciseDuration: null,
     exerciseIntensity: null,
+    exerciseActivities: [],
     physicalLimitations: null,
     handgripStrength: null,
     sitToStandTime: null,
+    co2ToleranceTest: null,
+    vo2Max: null,
+    bodyFatPercentage: null,
     currentDiet: null,
+    supplementation: null,
     dailyWaterIntake: null,
     medicalConditions: [],
     medications: [],
@@ -128,6 +212,15 @@ export function MedicalProfileForm({ userId, onProfileSaved }: MedicalProfileFor
   const [newCondition, setNewCondition] = useState('')
   const [newExerciseType, setNewExerciseType] = useState('')
   const [newSurgery, setNewSurgery] = useState('')
+
+  // Estados para nova atividade física
+  const [newActivity, setNewActivity] = useState({
+    type: '',
+    frequency: 1,
+    duration: 30,
+    intensity: 'moderada' as string,
+  })
+  const [editingActivityIndex, setEditingActivityIndex] = useState<number | null>(null)
 
   // Carregar perfil existente
   useEffect(() => {
@@ -152,6 +245,7 @@ export function MedicalProfileForm({ userId, onProfileSaved }: MedicalProfileFor
             medications: data.profile.medications || [],
             medicalConditions: data.profile.medicalConditions || [],
             exerciseTypes: data.profile.exerciseTypes || [],
+            exerciseActivities: data.profile.exerciseActivities || [],
             surgeries: data.profile.surgeries || [],
           })
         }
@@ -165,6 +259,37 @@ export function MedicalProfileForm({ userId, onProfileSaved }: MedicalProfileFor
 
     loadProfile()
   }, [userId])
+
+  // Auto-save with debounce
+  useEffect(() => {
+    if (loading) return // Don't auto-save while loading initial data
+
+    const timer = setTimeout(async () => {
+      try {
+        setAutoSaving(true)
+        const response = await fetch('/api/profile', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            ...profile,
+            patientId: userId,
+          }),
+        })
+
+        if (response.ok) {
+          setLastSaved(new Date())
+        }
+      } catch (error) {
+        console.error('Auto-save error:', error)
+      } finally {
+        setAutoSaving(false)
+      }
+    }, 2000) // 2 second debounce
+
+    return () => clearTimeout(timer)
+  }, [profile, userId, loading])
 
   const handleInputChange = (field: keyof MedicalProfile, value: any) => {
     setProfile((prev) => ({
@@ -200,6 +325,81 @@ export function MedicalProfileForm({ userId, onProfileSaved }: MedicalProfileFor
       ...prev,
       [field]: (prev[field] || []).filter((_, i) => i !== index),
     }))
+  }
+
+  // Funções para gerenciar atividades físicas
+  const addActivity = () => {
+    if (!newActivity.type.trim()) {
+      toast.error('Digite o tipo de atividade')
+      return
+    }
+
+    setProfile((prev) => ({
+      ...prev,
+      exerciseActivities: [...(prev.exerciseActivities || []), { ...newActivity }],
+    }))
+
+    // Reset form
+    setNewActivity({
+      type: '',
+      frequency: 1,
+      duration: 30,
+      intensity: 'moderada',
+    })
+    toast.success('Atividade adicionada')
+  }
+
+  const removeActivity = (index: number) => {
+    setProfile((prev) => ({
+      ...prev,
+      exerciseActivities: (prev.exerciseActivities || []).filter((_, i) => i !== index),
+    }))
+    toast.success('Atividade removida')
+  }
+
+  const startEditActivity = (index: number) => {
+    const activity = profile.exerciseActivities?.[index]
+    if (activity) {
+      setNewActivity({ ...activity })
+      setEditingActivityIndex(index)
+    }
+  }
+
+  const saveEditActivity = () => {
+    if (editingActivityIndex === null) return
+    if (!newActivity.type.trim()) {
+      toast.error('Digite o tipo de atividade')
+      return
+    }
+
+    setProfile((prev) => {
+      const activities = [...(prev.exerciseActivities || [])]
+      activities[editingActivityIndex] = { ...newActivity }
+      return {
+        ...prev,
+        exerciseActivities: activities,
+      }
+    })
+
+    // Reset form
+    setNewActivity({
+      type: '',
+      frequency: 1,
+      duration: 30,
+      intensity: 'moderada',
+    })
+    setEditingActivityIndex(null)
+    toast.success('Atividade atualizada')
+  }
+
+  const cancelEditActivity = () => {
+    setNewActivity({
+      type: '',
+      frequency: 1,
+      duration: 30,
+      intensity: 'moderada',
+    })
+    setEditingActivityIndex(null)
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -246,26 +446,84 @@ export function MedicalProfileForm({ userId, onProfileSaved }: MedicalProfileFor
     )
   }
 
+  const completion = calculateProfileCompletion(profile)
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <User className="h-5 w-5" />
-          Perfil Médico Completo
-        </CardTitle>
-        <CardDescription>
-          Mantenha suas informações atualizadas para análises médicas mais precisas e personalizadas
-        </CardDescription>
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle className="flex items-center gap-2">
+              <User className="h-5 w-5" />
+              Perfil Médico Completo
+            </CardTitle>
+            <CardDescription>
+              Mantenha suas informações atualizadas para análises médicas mais precisas
+            </CardDescription>
+          </div>
+          <div className="text-right space-y-1">
+            <div className="text-sm font-medium">
+              {completion}% completo
+            </div>
+            {autoSaving && (
+              <div className="text-xs text-muted-foreground flex items-center gap-1">
+                <Loader2 className="h-3 w-3 animate-spin" />
+                Salvando...
+              </div>
+            )}
+            {!autoSaving && lastSaved && (
+              <div className="text-xs text-muted-foreground">
+                Salvo {new Date(lastSaved).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+              </div>
+            )}
+          </div>
+        </div>
+        <Progress value={completion} className="mt-4" />
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-8">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid w-full grid-cols-5 h-auto p-1">
+            <TabsTrigger
+              value="basic"
+              className="data-[state=active]:bg-blue-100 data-[state=active]:text-blue-900 dark:data-[state=active]:bg-blue-900/30 dark:data-[state=active]:text-blue-100"
+            >
+              Básico
+            </TabsTrigger>
+            <TabsTrigger
+              value="health"
+              className="data-[state=active]:bg-red-100 data-[state=active]:text-red-900 dark:data-[state=active]:bg-red-900/30 dark:data-[state=active]:text-red-100"
+            >
+              Saúde
+            </TabsTrigger>
+            <TabsTrigger
+              value="lifestyle"
+              className="data-[state=active]:bg-green-100 data-[state=active]:text-green-900 dark:data-[state=active]:bg-green-900/30 dark:data-[state=active]:text-green-100"
+            >
+              Estilo de Vida
+            </TabsTrigger>
+            <TabsTrigger
+              value="tests"
+              className="data-[state=active]:bg-purple-100 data-[state=active]:text-purple-900 dark:data-[state=active]:bg-purple-900/30 dark:data-[state=active]:text-purple-100"
+            >
+              Testes
+            </TabsTrigger>
+            <TabsTrigger
+              value="goals"
+              className="data-[state=active]:bg-amber-100 data-[state=active]:text-amber-900 dark:data-[state=active]:bg-amber-900/30 dark:data-[state=active]:text-amber-100"
+            >
+              Objetivos
+            </TabsTrigger>
+          </TabsList>
+
+          <form onSubmit={handleSubmit}>
+            <TabsContent value="basic" className="space-y-6 mt-6">
           {/* Informações Básicas */}
           <div className="space-y-4">
             <h3 className="text-lg font-semibold flex items-center gap-2">
               <User className="h-5 w-5" />
               Informações Básicas
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <div>
                 <Label htmlFor="age">Idade</Label>
                 <Input
@@ -273,7 +531,8 @@ export function MedicalProfileForm({ userId, onProfileSaved }: MedicalProfileFor
                   type="number"
                   value={profile.age || ''}
                   onChange={(e) => handleInputChange('age', parseInt(e.target.value) || null)}
-                  placeholder="Ex: 35"
+                  placeholder="35"
+                  className="max-w-[120px]"
                 />
               </div>
 
@@ -300,7 +559,8 @@ export function MedicalProfileForm({ userId, onProfileSaved }: MedicalProfileFor
                   step="0.1"
                   value={profile.weight || ''}
                   onChange={(e) => handleInputChange('weight', parseFloat(e.target.value) || null)}
-                  placeholder="Ex: 70.5"
+                  placeholder="70.5"
+                  className="max-w-[140px]"
                 />
               </div>
 
@@ -311,7 +571,8 @@ export function MedicalProfileForm({ userId, onProfileSaved }: MedicalProfileFor
                   type="number"
                   value={profile.height || ''}
                   onChange={(e) => handleInputChange('height', parseInt(e.target.value) || null)}
-                  placeholder="Ex: 175"
+                  placeholder="175"
+                  className="max-w-[140px]"
                 />
               </div>
             </div>
@@ -331,38 +592,50 @@ export function MedicalProfileForm({ userId, onProfileSaved }: MedicalProfileFor
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <div>
-                <Label htmlFor="systolicPressure">Pressão Sistólica (mmHg)</Label>
-                <Input
-                  id="systolicPressure"
-                  type="number"
-                  value={profile.systolicPressure || ''}
-                  onChange={(e) => handleInputChange('systolicPressure', parseInt(e.target.value) || null)}
-                  placeholder="Ex: 120"
-                />
+                <Label htmlFor="systolicPressure">Pressão Sistólica</Label>
+                <div className="flex items-center gap-2">
+                  <Input
+                    id="systolicPressure"
+                    type="number"
+                    value={profile.systolicPressure || ''}
+                    onChange={(e) => handleInputChange('systolicPressure', parseInt(e.target.value) || null)}
+                    placeholder="120"
+                    className="max-w-[140px]"
+                  />
+                  <span className="text-sm text-muted-foreground">mmHg</span>
+                </div>
               </div>
 
               <div>
-                <Label htmlFor="diastolicPressure">Pressão Diastólica (mmHg)</Label>
-                <Input
-                  id="diastolicPressure"
-                  type="number"
-                  value={profile.diastolicPressure || ''}
-                  onChange={(e) => handleInputChange('diastolicPressure', parseInt(e.target.value) || null)}
-                  placeholder="Ex: 80"
-                />
+                <Label htmlFor="diastolicPressure">Pressão Diastólica</Label>
+                <div className="flex items-center gap-2">
+                  <Input
+                    id="diastolicPressure"
+                    type="number"
+                    value={profile.diastolicPressure || ''}
+                    onChange={(e) => handleInputChange('diastolicPressure', parseInt(e.target.value) || null)}
+                    placeholder="80"
+                    className="max-w-[140px]"
+                  />
+                  <span className="text-sm text-muted-foreground">mmHg</span>
+                </div>
               </div>
 
               <div>
-                <Label htmlFor="restingHeartRate">Frequência Cardíaca em Repouso</Label>
-                <Input
-                  id="restingHeartRate"
-                  type="number"
-                  value={profile.restingHeartRate || ''}
-                  onChange={(e) => handleInputChange('restingHeartRate', parseInt(e.target.value) || null)}
-                  placeholder="Ex: 70"
-                />
+                <Label htmlFor="restingHeartRate">Frequência Cardíaca</Label>
+                <div className="flex items-center gap-2">
+                  <Input
+                    id="restingHeartRate"
+                    type="number"
+                    value={profile.restingHeartRate || ''}
+                    onChange={(e) => handleInputChange('restingHeartRate', parseInt(e.target.value) || null)}
+                    placeholder="70"
+                    className="max-w-[140px]"
+                  />
+                  <span className="text-sm text-muted-foreground">bpm</span>
+                </div>
               </div>
             </div>
             {/* Ajustar o dark mode */}
@@ -376,9 +649,9 @@ export function MedicalProfileForm({ userId, onProfileSaved }: MedicalProfileFor
               </p>
             </div>
           </div>
+            </TabsContent>
 
-          <Separator />
-
+            <TabsContent value="health" className="space-y-6 mt-6">
           {/* Saúde */}
           <div className="space-y-4">
             <h3 className="text-lg font-semibold flex items-center gap-2">
@@ -507,9 +780,9 @@ export function MedicalProfileForm({ userId, onProfileSaved }: MedicalProfileFor
               />
             </div>
           </div>
+            </TabsContent>
 
-          <Separator />
-
+            <TabsContent value="lifestyle" className="space-y-6 mt-6">
           {/* Estilo de Vida - Sono */}
           <div className="space-y-4">
             <div className="flex items-start gap-3">
@@ -522,21 +795,40 @@ export function MedicalProfileForm({ userId, onProfileSaved }: MedicalProfileFor
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <div>
-                <Label htmlFor="sleepHours">Horas de Sono/Noite</Label>
-                <Input
-                  id="sleepHours"
-                  type="number"
-                  step="0.5"
-                  value={profile.sleepHours || ''}
-                  onChange={(e) => handleInputChange('sleepHours', parseFloat(e.target.value) || null)}
-                  placeholder="Ex: 7.5"
-                />
+                <Label htmlFor="sleepHours">Horas de Sono</Label>
+                <div className="flex items-center gap-2">
+                  <Input
+                    id="sleepHours"
+                    type="number"
+                    step="0.5"
+                    value={profile.sleepHours || ''}
+                    onChange={(e) => handleInputChange('sleepHours', parseFloat(e.target.value) || null)}
+                    placeholder="7.5"
+                    className="max-w-[120px]"
+                  />
+                  <span className="text-sm text-muted-foreground">h/noite</span>
+                </div>
               </div>
 
               <div>
-                <Label htmlFor="sleepQuality">Qualidade do Sono (1-10)</Label>
+                <Label htmlFor="napTime">Tempo de Soneca</Label>
+                <div className="flex items-center gap-2">
+                  <Input
+                    id="napTime"
+                    type="number"
+                    value={profile.napTime || ''}
+                    onChange={(e) => handleInputChange('napTime', parseInt(e.target.value) || null)}
+                    placeholder="30"
+                    className="max-w-[120px]"
+                  />
+                  <span className="text-sm text-muted-foreground">min</span>
+                </div>
+              </div>
+
+              <div>
+                <Label htmlFor="sleepQuality">Qualidade do Sono</Label>
                 <Select
                   value={String(profile.sleepQuality || 5)}
                   onValueChange={(value) => handleInputChange('sleepQuality', parseInt(value))}
@@ -555,18 +847,19 @@ export function MedicalProfileForm({ userId, onProfileSaved }: MedicalProfileFor
               </div>
 
               <div>
-                <Label htmlFor="dailyWaterIntake" className="flex items-center gap-2">
-                  <Droplets className="h-4 w-4" />
-                  Hidratação (L/dia)
-                </Label>
-                <Input
-                  id="dailyWaterIntake"
-                  type="number"
-                  step="0.1"
-                  value={profile.dailyWaterIntake || ''}
-                  onChange={(e) => handleInputChange('dailyWaterIntake', parseFloat(e.target.value) || null)}
-                  placeholder="Ex: 2.5"
-                />
+                <Label htmlFor="dailyWaterIntake">Hidratação</Label>
+                <div className="flex items-center gap-2">
+                  <Input
+                    id="dailyWaterIntake"
+                    type="number"
+                    step="0.1"
+                    value={profile.dailyWaterIntake || ''}
+                    onChange={(e) => handleInputChange('dailyWaterIntake', parseFloat(e.target.value) || null)}
+                    placeholder="2.5"
+                    className="max-w-[120px]"
+                  />
+                  <span className="text-sm text-muted-foreground">L/dia</span>
+                </div>
               </div>
             </div>
 
@@ -605,9 +898,9 @@ export function MedicalProfileForm({ userId, onProfileSaved }: MedicalProfileFor
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <div>
-                <Label htmlFor="stressLevel">Nível de Estresse (1-10)</Label>
+                <Label htmlFor="stressLevel">Nível de Estresse</Label>
                 <Select
                   value={String(profile.stressLevel || 5)}
                   onValueChange={(value) => handleInputChange('stressLevel', parseInt(value))}
@@ -633,6 +926,22 @@ export function MedicalProfileForm({ userId, onProfileSaved }: MedicalProfileFor
                   onChange={(e) => handleInputChange('stressManagement', e.target.value)}
                   placeholder="Ex: Meditação, yoga, terapia..."
                 />
+              </div>
+
+              <div>
+                <Label htmlFor="morningSunlightExposure">Luz Solar Matinal</Label>
+                <Select
+                  value={profile.morningSunlightExposure || ''}
+                  onValueChange={(value) => handleInputChange('morningSunlightExposure', value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="yes">Sim (primeiros 60min)</SelectItem>
+                    <SelectItem value="no">Não</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
 
@@ -661,71 +970,167 @@ export function MedicalProfileForm({ userId, onProfileSaved }: MedicalProfileFor
               </div>
             </div>
 
-            <div>
-              <Label className="mb-2">Exercícios Praticados</Label>
-              <div className="flex gap-2 mb-3">
-                <Input
-                  value={newExerciseType}
-                  onChange={(e) => setNewExerciseType(e.target.value)}
-                  placeholder="Digite um tipo de exercício"
-                  onKeyPress={(e) =>
-                    e.key === 'Enter' && (e.preventDefault(), addItem('exerciseTypes', newExerciseType))
-                  }
-                />
-                <Button type="button" onClick={() => addItem('exerciseTypes', newExerciseType)} size="sm">
-                  <Plus className="h-4 w-4" />
-                </Button>
+            {/* Nova Atividade Form */}
+            <div className="border border-border rounded-lg p-4 space-y-4 bg-muted/30">
+              <Label className="text-base font-medium">
+                {editingActivityIndex !== null ? 'Editar Atividade' : 'Adicionar Nova Atividade'}
+              </Label>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div>
+                  <Label htmlFor="activityType">Tipo</Label>
+                  <Input
+                    id="activityType"
+                    value={newActivity.type}
+                    onChange={(e) => setNewActivity({ ...newActivity, type: e.target.value })}
+                    placeholder="Musculação, Corrida..."
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault()
+                        editingActivityIndex !== null ? saveEditActivity() : addActivity()
+                      }
+                    }}
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="activityFrequency">Frequência</Label>
+                  <div className="flex items-center gap-2">
+                    <Input
+                      id="activityFrequency"
+                      type="number"
+                      min="1"
+                      max="7"
+                      value={newActivity.frequency}
+                      onChange={(e) =>
+                        setNewActivity({ ...newActivity, frequency: parseInt(e.target.value) || 1 })
+                      }
+                      placeholder="3"
+                      className="max-w-[100px]"
+                    />
+                    <span className="text-sm text-muted-foreground whitespace-nowrap">x/sem</span>
+                  </div>
+                </div>
+
+                <div>
+                  <Label htmlFor="activityDuration">Duração</Label>
+                  <div className="flex items-center gap-2">
+                    <Input
+                      id="activityDuration"
+                      type="number"
+                      min="1"
+                      value={newActivity.duration}
+                      onChange={(e) =>
+                        setNewActivity({ ...newActivity, duration: parseInt(e.target.value) || 30 })
+                      }
+                      placeholder="45"
+                      className="max-w-[100px]"
+                    />
+                    <span className="text-sm text-muted-foreground">min</span>
+                  </div>
+                </div>
+
+                <div>
+                  <Label htmlFor="activityIntensity">Intensidade</Label>
+                  <Select
+                    value={newActivity.intensity}
+                    onValueChange={(value) => setNewActivity({ ...newActivity, intensity: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="leve">Leve</SelectItem>
+                      <SelectItem value="moderada">Moderada</SelectItem>
+                      <SelectItem value="intensa">Intensa</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
-              <div className="flex flex-wrap gap-2 mb-4">
-                {profile.exerciseTypes?.map((exercise, index) => (
-                  <Badge key={index} variant="outline" className="flex items-center gap-1">
-                    {exercise}
-                    <X className="h-3 w-3 cursor-pointer" onClick={() => removeItem('exerciseTypes', index)} />
-                  </Badge>
-                ))}
+
+              <div className="flex gap-2">
+                {editingActivityIndex !== null ? (
+                  <>
+                    <Button type="button" onClick={saveEditActivity} size="sm" variant="default">
+                      <Check className="h-4 w-4 mr-1" />
+                      Salvar Alterações
+                    </Button>
+                    <Button type="button" onClick={cancelEditActivity} size="sm" variant="outline">
+                      <X className="h-4 w-4 mr-1" />
+                      Cancelar
+                    </Button>
+                  </>
+                ) : (
+                  <Button type="button" onClick={addActivity} size="sm">
+                    <Plus className="h-4 w-4 mr-1" />
+                    Adicionar Atividade
+                  </Button>
+                )}
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <Label htmlFor="exerciseFrequency">Frequência (vezes/semana)</Label>
-                <Input
-                  id="exerciseFrequency"
-                  type="number"
-                  value={profile.exerciseFrequency || ''}
-                  onChange={(e) => handleInputChange('exerciseFrequency', parseInt(e.target.value) || null)}
-                  placeholder="Ex: 3"
-                />
+            {/* Lista de Atividades */}
+            {profile.exerciseActivities && profile.exerciseActivities.length > 0 && (
+              <div className="space-y-2">
+                <Label className="text-base font-medium">Atividades Cadastradas</Label>
+                <div className="grid gap-3">
+                  {profile.exerciseActivities.map((activity, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center justify-between p-3 border border-border rounded-lg bg-background hover:bg-muted/50 transition-colors"
+                    >
+                      <div className="flex-1 grid grid-cols-1 md:grid-cols-4 gap-2">
+                        <div>
+                          <p className="text-sm font-medium">{activity.type}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-muted-foreground">Frequência</p>
+                          <p className="text-sm">{activity.frequency}x/semana</p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-muted-foreground">Duração</p>
+                          <p className="text-sm">{activity.duration} min</p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-muted-foreground">Intensidade</p>
+                          <Badge
+                            variant={
+                              activity.intensity === 'intensa'
+                                ? 'destructive'
+                                : activity.intensity === 'moderada'
+                                  ? 'default'
+                                  : 'secondary'
+                            }
+                          >
+                            {activity.intensity}
+                          </Badge>
+                        </div>
+                      </div>
+                      <div className="flex gap-1 ml-2">
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => startEditActivity(index)}
+                          className="h-8 w-8"
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => removeActivity(index)}
+                          className="h-8 w-8 text-destructive hover:text-destructive"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
-
-              <div>
-                <Label htmlFor="exerciseDuration">Duração (minutos)</Label>
-                <Input
-                  id="exerciseDuration"
-                  type="number"
-                  value={profile.exerciseDuration || ''}
-                  onChange={(e) => handleInputChange('exerciseDuration', parseInt(e.target.value) || null)}
-                  placeholder="Ex: 45"
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="exerciseIntensity">Intensidade</Label>
-                <Select
-                  value={profile.exerciseIntensity || ''}
-                  onValueChange={(value) => handleInputChange('exerciseIntensity', value)}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecione" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="leve">Leve</SelectItem>
-                    <SelectItem value="moderada">Moderada</SelectItem>
-                    <SelectItem value="intensa">Intensa</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
+            )}
 
             <div>
               <Label htmlFor="physicalLimitations">Limitações Físicas ou Restrições</Label>
@@ -751,78 +1156,6 @@ export function MedicalProfileForm({ userId, onProfileSaved }: MedicalProfileFor
 
           <Separator />
 
-          {/* Testes Funcionais */}
-          <div className="space-y-4">
-            <div className="flex items-start gap-3">
-              <Target className="h-5 w-5 mt-1 text-primary" />
-              <div className="flex-1">
-                <h3 className="text-lg font-semibold mb-1">Biomarcadores Funcionais</h3>
-                <p className="text-sm text-muted-foreground">
-                  Testes que avaliam a integridade neuromuscular e predizem risco de sarcopenia e mortalidade
-                </p>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Força de Preensão Manual */}
-              <div className="space-y-2">
-                <Label htmlFor="handgripStrength" className="text-base font-medium">
-                  Força de Preensão Manual (kg)
-                </Label>
-                <Input
-                  id="handgripStrength"
-                  type="number"
-                  step="0.1"
-                  value={profile.handgripStrength || ''}
-                  onChange={(e) => handleInputChange('handgripStrength', parseFloat(e.target.value) || null)}
-                  placeholder="Ex: 35.5"
-                />
-                <div className="bg-blue-50 border border-blue-200 rounded-md p-3 text-sm space-y-2 dark:bg-blue-900/10 dark:border-blue-900/20">
-                  <p className="font-medium text-blue-900 dark:text-blue-400">📊 Sobre este teste:</p>
-                  <p className="text-blue-800 dark:text-blue-600">
-                    Biomarcador funcional que reflete a integridade do sistema neuromuscular geral.
-                    Estudos mostram que baixa força de preensão é um preditor de mortalidade mais forte
-                    que a massa muscular isoladamente.
-                  </p>
-                  <p className="text-blue-800 dark:text-blue-600">
-                    <strong>Como fazer:</strong> Use um dinamômetro manual. Compare seus resultados
-                    com valores normativos para sua idade e sexo. Quedas anuais são um sinal de alerta.
-                  </p>
-                </div>
-              </div>
-
-              {/* Teste de Sentar-Levantar */}
-              <div className="space-y-2">
-                <Label htmlFor="sitToStandTime" className="text-base font-medium">
-                  Teste Sentar-Levantar 5x (segundos)
-                </Label>
-                <Input
-                  id="sitToStandTime"
-                  type="number"
-                  step="0.1"
-                  value={profile.sitToStandTime || ''}
-                  onChange={(e) => handleInputChange('sitToStandTime', parseFloat(e.target.value) || null)}
-                  placeholder="Ex: 12.5"
-                />
-                <div className="bg-orange-50 border border-orange-200 rounded-md p-3 text-sm space-y-2 dark:bg-orange-900/10 dark:border-orange-900/20">
-                  <p className="font-medium text-orange-900 dark:text-orange-400">📊 Sobre este teste:</p>
-                  <p className="text-orange-800 dark:text-orange-600">
-                    Mede a potência dos membros inferiores (Força x Velocidade). A perda de potência é
-                    uma das primeiras manifestações de sarcopenia, ligada ao risco de quedas e perda de
-                    independência.
-                  </p>
-                  <p className="text-orange-800 dark:text-orange-600">
-                    <strong>Como fazer:</strong> Sente em uma cadeira (joelhos a 90°), braços cruzados
-                    no peito. Levante e sente 5 vezes o mais rápido possível.
-                    <strong> Alerta:</strong> Tempo &gt; 15s indica alto risco de sarcopenia.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <Separator />
-
           {/* Nutrição */}
           <div className="space-y-4">
             <div className="flex items-start gap-3">
@@ -837,11 +1170,23 @@ export function MedicalProfileForm({ userId, onProfileSaved }: MedicalProfileFor
 
             <div>
               <Label htmlFor="currentDiet">Dieta Atual</Label>
-              <Input
+              <Textarea
                 id="currentDiet"
                 value={profile.currentDiet || ''}
                 onChange={(e) => handleInputChange('currentDiet', e.target.value)}
-                placeholder="Ex: Mediterrânea, Vegana, Low-carb, Cetogênica..."
+                placeholder="Descreva sua dieta atual: tipo de alimentação, padrões alimentares, restrições, etc. (Ex: Mediterrânea com foco em vegetais e peixes, redução de carboidratos refinados...)"
+                rows={3}
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="supplementation">Suplementação</Label>
+              <Textarea
+                id="supplementation"
+                value={profile.supplementation || ''}
+                onChange={(e) => handleInputChange('supplementation', e.target.value)}
+                placeholder="Liste os suplementos que você toma, dosagens e frequência (Ex: Vitamina D 5000 UI/dia, Ômega 3 1g 2x/dia, Magnésio 400mg antes de dormir...)"
+                rows={3}
               />
             </div>
 
@@ -914,9 +1259,189 @@ export function MedicalProfileForm({ userId, onProfileSaved }: MedicalProfileFor
               </div>
             )}
           </div>
+            </TabsContent>
 
-          <Separator />
+            <TabsContent value="tests" className="space-y-6 mt-6">
+          {/* Testes Funcionais */}
+          <div className="space-y-4">
+            <div className="flex items-start gap-3">
+              <Target className="h-5 w-5 mt-1 text-primary" />
+              <div className="flex-1">
+                <h3 className="text-lg font-semibold mb-1">Biomarcadores Funcionais</h3>
+                <p className="text-sm text-muted-foreground">
+                  Testes que avaliam capacidade cardiorrespiratória, integridade neuromuscular e composição corporal
+                </p>
+              </div>
+            </div>
 
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <Label htmlFor="handgripStrength" className="text-base font-medium">
+                  Força de Preensão Manual
+                </Label>
+                <div className="flex items-center gap-2">
+                  <Input
+                    id="handgripStrength"
+                    type="number"
+                    step="0.1"
+                    value={profile.handgripStrength || ''}
+                    onChange={(e) => handleInputChange('handgripStrength', parseFloat(e.target.value) || null)}
+                    placeholder="35.5"
+                    className="max-w-[140px]"
+                  />
+                  <span className="text-sm text-muted-foreground">kg</span>
+                </div>
+                <div className="bg-blue-50 border border-blue-200 rounded-md p-3 text-sm space-y-2 dark:bg-blue-900/10 dark:border-blue-900/20">
+                  <p className="font-medium text-blue-900 dark:text-blue-400">📊 Sobre este teste:</p>
+                  <p className="text-blue-800 dark:text-blue-600">
+                    Biomarcador funcional que reflete a integridade do sistema neuromuscular geral.
+                    Estudos mostram que baixa força de preensão é um preditor de mortalidade mais forte
+                    que a massa muscular isoladamente.
+                  </p>
+                  <p className="text-blue-800 dark:text-blue-600">
+                    <strong>Como fazer:</strong> Use um dinamômetro manual. Compare seus resultados
+                    com valores normativos para sua idade e sexo. Quedas anuais são um sinal de alerta.
+                  </p>
+                </div>
+              </div>
+
+              {/* Teste de Sentar-Levantar */}
+              <div className="space-y-2">
+                <Label htmlFor="sitToStandTime" className="text-base font-medium">
+                  Teste Sentar-Levantar 5x
+                </Label>
+                <div className="flex items-center gap-2">
+                  <Input
+                    id="sitToStandTime"
+                    type="number"
+                    step="0.1"
+                    value={profile.sitToStandTime || ''}
+                    onChange={(e) => handleInputChange('sitToStandTime', parseFloat(e.target.value) || null)}
+                    placeholder="12.5"
+                    className="max-w-[140px]"
+                  />
+                  <span className="text-sm text-muted-foreground">seg</span>
+                </div>
+                <div className="bg-orange-50 border border-orange-200 rounded-md p-3 text-sm space-y-2 dark:bg-orange-900/10 dark:border-orange-900/20">
+                  <p className="font-medium text-orange-900 dark:text-orange-400">📊 Sobre este teste:</p>
+                  <p className="text-orange-800 dark:text-orange-600">
+                    Mede a potência dos membros inferiores (Força x Velocidade). A perda de potência é
+                    uma das primeiras manifestações de sarcopenia, ligada ao risco de quedas e perda de
+                    independência.
+                  </p>
+                  <p className="text-orange-800 dark:text-orange-600">
+                    <strong>Como fazer:</strong> Sente em uma cadeira (joelhos a 90°), braços cruzados
+                    no peito. Levante e sente 5 vezes o mais rápido possível.
+                    <strong> Alerta:</strong> Tempo &gt; 15s indica alto risco de sarcopenia.
+                  </p>
+                </div>
+              </div>
+
+              {/* Teste de Tolerância ao CO2 */}
+              <div className="space-y-2">
+                <Label htmlFor="co2ToleranceTest" className="text-base font-medium">
+                  Teste de Tolerância ao CO2
+                </Label>
+                <div className="flex items-center gap-2">
+                  <Input
+                    id="co2ToleranceTest"
+                    type="number"
+                    step="0.1"
+                    value={profile.co2ToleranceTest || ''}
+                    onChange={(e) => handleInputChange('co2ToleranceTest', parseFloat(e.target.value) || null)}
+                    placeholder="40"
+                    className="max-w-[140px]"
+                  />
+                  <span className="text-sm text-muted-foreground">seg</span>
+                </div>
+                <div className="bg-cyan-50 border border-cyan-200 rounded-md p-3 text-sm space-y-2 dark:bg-cyan-900/10 dark:border-cyan-900/20">
+                  <p className="font-medium text-cyan-900 dark:text-cyan-400">📊 Sobre este teste:</p>
+                  <p className="text-cyan-800 dark:text-cyan-600">
+                    Avalia a tolerância ao CO2 e controle autonômico. Maior tolerância indica melhor
+                    controle da respiração e menor estresse no sistema nervoso.
+                  </p>
+                  <p className="text-cyan-800 dark:text-cyan-600">
+                    <strong>Como fazer:</strong> Inspire ao máximo, expire o mais lentamente possível.
+                    Cronometre. <strong>Referência:</strong> &lt;25s (Recuperação ruim/Estresse alto) | &gt;65s (Excelente controle)
+                  </p>
+                </div>
+              </div>
+
+              {/* VO2 Máx */}
+              <div className="space-y-2">
+                <Label htmlFor="vo2Max" className="text-base font-medium">
+                  VO2 Máx
+                </Label>
+                <div className="flex items-center gap-2">
+                  <Input
+                    id="vo2Max"
+                    type="number"
+                    step="0.1"
+                    value={profile.vo2Max || ''}
+                    onChange={(e) => handleInputChange('vo2Max', parseFloat(e.target.value) || null)}
+                    placeholder="45"
+                    className="max-w-[140px]"
+                  />
+                  <span className="text-sm text-muted-foreground">ml/kg/min</span>
+                </div>
+                <div className="bg-emerald-50 border border-emerald-200 rounded-md p-3 text-sm space-y-2 dark:bg-emerald-900/10 dark:border-emerald-900/20">
+                  <p className="font-medium text-emerald-900 dark:text-emerald-400">📊 Sobre este teste:</p>
+                  <p className="text-emerald-800 dark:text-emerald-600">
+                    Capacidade aeróbica máxima - forte preditor de longevidade. Quanto maior, melhor
+                    sua resistência e saúde cardiovascular.
+                  </p>
+                  <p className="text-emerald-800 dark:text-emerald-600">
+                    <strong>Teste:</strong> Teste de esforço máximo ou teste de Cooper (12 min).
+                    <strong>Ideal:</strong> Homens &gt;50 | Mulheres &gt;45
+                  </p>
+                </div>
+              </div>
+
+              {/* Percentual de Gordura Corporal e FFMI */}
+              <div className="space-y-2">
+                <Label htmlFor="bodyFatPercentage" className="text-base font-medium">
+                  Percentual de Gordura Corporal
+                </Label>
+                <div className="flex items-center gap-2">
+                  <Input
+                    id="bodyFatPercentage"
+                    type="number"
+                    step="0.1"
+                    value={profile.bodyFatPercentage || ''}
+                    onChange={(e) => handleInputChange('bodyFatPercentage', parseFloat(e.target.value) || null)}
+                    placeholder="18.5"
+                    className="max-w-[140px]"
+                  />
+                  <span className="text-sm text-muted-foreground">%</span>
+                </div>
+                {profile.bodyFatPercentage !== null && profile.weight && profile.height && (
+                  <div className="mt-2 p-3 bg-indigo-50 border border-indigo-200 rounded-md dark:bg-indigo-900/10 dark:border-indigo-900/20">
+                    <p className="text-sm font-medium text-indigo-900 dark:text-indigo-400">
+                      FFMI Calculado: {calculateFFMI(profile.weight, profile.height, profile.bodyFatPercentage)}
+                    </p>
+                    <p className="text-xs text-indigo-700 dark:text-indigo-500 mt-1">
+                      {profile.gender === 'masculino'
+                        ? 'Ideal: >20 | Sinal de Alerta: <17'
+                        : 'Ideal: >18 | Sinal de Alerta: <15'}
+                    </p>
+                  </div>
+                )}
+                <div className="bg-violet-50 border border-violet-200 rounded-md p-3 text-sm space-y-2 dark:bg-violet-900/10 dark:border-violet-900/20">
+                  <p className="font-medium text-violet-900 dark:text-violet-400">📊 FFMI (Índice de Massa Livre de Gordura):</p>
+                  <p className="text-violet-800 dark:text-violet-600">
+                    Avalia a quantidade de massa magra em relação à altura. Mais importante que IMC
+                    para avaliação de saúde e longevidade.
+                  </p>
+                  <p className="text-violet-800 dark:text-violet-600">
+                    <strong>Medição:</strong> Bioimpedância, dobras cutâneas ou DEXA scan.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+            </TabsContent>
+
+            <TabsContent value="goals" className="space-y-6 mt-6">
           {/* Objetivos */}
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">Objetivos de Saúde</h3>
@@ -942,22 +1467,26 @@ export function MedicalProfileForm({ userId, onProfileSaved }: MedicalProfileFor
               />
             </div>
           </div>
+            </TabsContent>
 
-          {/* Botão de Salvar */}
-          <Button type="submit" className="w-full" size="lg" disabled={saving}>
-            {saving ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Salvando...
-              </>
-            ) : (
-              <>
-                <Save className="mr-2 h-4 w-4" />
-                Salvar Perfil Médico
-              </>
-            )}
-          </Button>
-        </form>
+            {/* Botão de Salvar */}
+            <div className="mt-6">
+              <Button type="submit" className="w-full" size="lg" disabled={saving}>
+                {saving ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Salvando...
+                  </>
+                ) : (
+                  <>
+                    <Save className="mr-2 h-4 w-4" />
+                    Salvar Perfil Médico
+                  </>
+                )}
+              </Button>
+            </div>
+          </form>
+        </Tabs>
       </CardContent>
     </Card>
   )

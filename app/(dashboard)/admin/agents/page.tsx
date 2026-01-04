@@ -99,9 +99,21 @@ export default function AgentsManagementPage() {
     setIsFormOpen(true)
   }
 
-  const handleEditAgent = (agent: HealthAgent) => {
-    setSelectedAgent(agent)
-    setIsFormOpen(true)
+  const handleEditAgent = async (agent: HealthAgent) => {
+    try {
+      // Fetch complete agent data before editing
+      const response = await fetch(`/api/admin/agents/${agent.id}`)
+      if (!response.ok) {
+        throw new Error('Erro ao carregar dados do agente')
+      }
+
+      const data = await response.json()
+      setSelectedAgent(data.agent)
+      setIsFormOpen(true)
+    } catch (error) {
+      console.error('Error loading agent for edit:', error)
+      alert('Erro ao carregar dados do agente para edição')
+    }
   }
 
   const handleDeleteAgent = (agent: HealthAgent) => {
@@ -219,6 +231,7 @@ export default function AgentsManagementPage() {
               </DialogDescription>
             </DialogHeader>
             <AgentForm
+              key={selectedAgent?.id || 'new'}
               agent={selectedAgent}
               onSuccess={handleFormSuccess}
               onCancel={() => setIsFormOpen(false)}
