@@ -66,26 +66,12 @@ COPY --from=builder /app/next.config.ts ./next.config.ts
 # Copy test data directory needed by pdf-parse library
 COPY --from=builder /app/test ./test
 
-# Copy and setup entrypoint script (must be done before USER directive)
-COPY docker-entrypoint.sh /usr/local/bin/
-RUN chmod +x /usr/local/bin/docker-entrypoint.sh
-
-# Copy database migrations and scripts (needed for startup migrations)
-COPY --from=builder /app/lib/db/migrations ./lib/db/migrations
-COPY --from=builder /app/lib/db/schema ./lib/db/schema
-COPY --from=builder /app/lib/db/client.ts ./lib/db/client.ts
-COPY --from=builder /app/scripts ./scripts
-COPY --from=builder /app/drizzle.config.ts ./drizzle.config.ts
-
 USER nextjs
 
 EXPOSE 3000
 
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
-
-# Use entrypoint script to run migrations before starting app
-ENTRYPOINT ["docker-entrypoint.sh"]
 
 # Start the application with next start
 CMD ["npx", "next", "start"]
