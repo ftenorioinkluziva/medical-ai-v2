@@ -26,8 +26,8 @@ pool.query('SELECT NOW()')
 "
 
 echo "🔄 Running database migrations..."
-# Run migrations using the migrate script
-node scripts/migrate.mjs
+# Run migrations using production script (doesn't require drizzle-kit)
+node scripts/migrate-production.mjs
 
 if [ $? -eq 0 ]; then
   echo "✅ Migrations completed successfully"

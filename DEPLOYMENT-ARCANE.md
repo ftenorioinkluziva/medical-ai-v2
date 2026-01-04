@@ -262,7 +262,7 @@ docker exec medical-ai-app ping -c 3 your-db-host
 ```bash
 # Container agora executa migrações automaticamente no startup!
 # Mas se precisar executar manualmente:
-docker exec medical-ai-app node scripts/migrate.mjs
+docker exec medical-ai-app node scripts/migrate-production.mjs
 
 # Verificar quais migrações foram aplicadas
 docker exec medical-ai-app node scripts/check-db-status.mjs

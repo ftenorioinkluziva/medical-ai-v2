@@ -2,33 +2,56 @@
 
 /**
  * Production Migration Script
- *
- * Run database migrations against production database
- *
- * Usage:
- *   node scripts/migrate-production.mjs
- *
- * Make sure .env.local has the production DATABASE_URL
+ * Uses Drizzle ORM's migrate() function instead of drizzle-kit CLI
+ * This works in production environments where drizzle-kit is not installed
  */
 
-import { config } from 'dotenv'
-import { resolve } from 'path'
-import { execSync } from 'child_process'
+import { drizzle } from 'drizzle-orm/node-postgres'
+import { migrate } from 'drizzle-orm/node-postgres/migrator'
+import { Pool } from 'pg'
+import { fileURLToPath } from 'url'
+import { dirname, resolve } from 'path'
 
-// Load .env.local
-config({ path: resolve(process.cwd(), '.env.local') })
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
 
-console.log('🚀 Running migrations against production database...')
-console.log(`📍 Database: ${process.env.DATABASE_URL?.split('@')[1] || 'unknown'}`)
+async function runMigrations() {
+  // Check if DATABASE_URL is set
+  if (!process.env.DATABASE_URL) {
+    console.error('❌ ERROR: DATABASE_URL environment variable is not set!')
+    process.exit(1)
+  }
 
-try {
-  execSync('pnpm exec drizzle-kit migrate', {
-    stdio: 'inherit',
-    env: process.env,
+  console.log('🔄 Running database migrations...')
+
+  // Create PostgreSQL connection pool
+  const pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    max: 1, // Only need 1 connection for migrations
+    connectionTimeoutMillis: 20000,
+    ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : undefined,
   })
 
-  console.log('✅ Migrations completed successfully!')
-} catch (error) {
-  console.error('❌ Migration failed:', error.message)
-  process.exit(1)
+  try {
+    // Create Drizzle instance
+    const db = drizzle(pool)
+
+    // Get migrations folder path
+    const migrationsFolder = resolve(__dirname, '..', 'lib', 'db', 'migrations')
+    console.log(`📁 Migrations folder: ${migrationsFolder}`)
+
+    // Run migrations
+    await migrate(db, { migrationsFolder })
+
+    console.log('✅ Migrations completed successfully!')
+    process.exit(0)
+  } catch (error) {
+    console.error('❌ Migration failed:', error.message)
+    console.error(error)
+    process.exit(1)
+  } finally {
+    await pool.end()
+  }
 }
+
+runMigrations()
