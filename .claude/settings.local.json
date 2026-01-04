@@ -67,7 +67,8 @@
       "Bash(git commit -m \"$\\(cat <<''EOF''\nfeat: Complete dynamic agent system with accordion UI\n\n- Refactored complete analysis to be fully dynamic \\(no hardcoded agents\\)\n- Changed database schema: replaced individual agent columns with analysisIds array\n- Added analysisRole \\(foundation/specialized/none\\) and analysisOrder fields\n- Foundation agents execute sequentially, specialized agents in parallel\n- Updated all API routes to work with dynamic agents\n- Created public /api/agents endpoint for non-admin users\n- Replaced tabs navigation with accordion for better UX with long agent names\n- Agents displayed in correct order \\(foundation first, then specialized\\)\n- Fixed synthesis validation to allow parameters mentioned as absent\n- Updated CLAUDE.md with comprehensive dynamic agent documentation\n\nDatabase migration: lib/db/migrations/0012_dynamic_agents.sql\n\n🤖 Generated with [Claude Code]\\(https://claude.com/claude-code\\)\n\nCo-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
       "WebFetch(domain:github.com)",
       "WebFetch(domain:itshover.com)",
-      "WebFetch(domain:raw.githubusercontent.com)"
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:getarcane.app)"
     ],
     "deny": [],
     "ask": []

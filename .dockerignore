@@ -62,5 +62,8 @@ README.md
 CLAUDE.md
 *.md
 
-# Drizzle
+# Drizzle (keep migrations and schema)
 drizzle/
+!lib/db/migrations/
+!lib/db/schema/
+!scripts/migrate.mjs

@@ -1,0 +1,40 @@
+#!/bin/sh
+set -e
+
+echo "🔍 Starting Medical AI V2..."
+
+# Check if DATABASE_URL is set
+if [ -z "$DATABASE_URL" ]; then
+  echo "❌ ERROR: DATABASE_URL environment variable is not set!"
+  exit 1
+fi
+
+echo "📊 Checking database connectivity..."
+# Simple connectivity test using node
+node -e "
+const { Pool } = require('pg');
+const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+pool.query('SELECT NOW()')
+  .then(() => {
+    console.log('✅ Database connection successful');
+    pool.end();
+  })
+  .catch(err => {
+    console.error('❌ Database connection failed:', err.message);
+    process.exit(1);
+  });
+"
+
+echo "🔄 Running database migrations..."
+# Run migrations using the migrate script
+node scripts/migrate.mjs
+
+if [ $? -eq 0 ]; then
+  echo "✅ Migrations completed successfully"
+else
+  echo "❌ Migrations failed!"
+  exit 1
+fi
+
+echo "🚀 Starting Next.js application..."
+exec "$@"

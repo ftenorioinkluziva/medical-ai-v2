@@ -11,6 +11,7 @@
     "db:migrate": "node scripts/migrate.mjs",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
+    "db:check": "node scripts/check-db-status.mjs",
     "db:seed": "tsx --env-file=.env.local scripts/seed-agents.ts && tsx --env-file=.env.local scripts/seed-credit-packages.ts",
     "db:seed-test-users": "tsx --env-file=.env.local lib/db/seed/seed-test-users.ts",
     "db:setup": "pnpm db:generate && pnpm db:migrate && pnpm db:seed",
