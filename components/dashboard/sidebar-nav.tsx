@@ -23,6 +23,7 @@ import {
   ChevronLeft,
   ChevronRight,
   ArrowLeftRight,
+  MessageCircle,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -42,6 +43,7 @@ export function SidebarNav({ userRole }: SidebarNavProps) {
     : [
         { href: '/dashboard', label: 'Dashboard', icon: Home },
         { href: '/analyze', label: 'Análise', icon: FileText },
+        { href: '/chat', label: 'Chat com Agente', icon: MessageCircle },
         { href: '/analyze-complete', label: 'Análise Completa', icon: Sparkles },
         { href: '/recommendations', label: 'Recomendações', icon: TrendingUp },
         { href: '/weekly-plan', label: 'Plano Semanal', icon: Calendar },
@@ -55,9 +57,9 @@ export function SidebarNav({ userRole }: SidebarNavProps) {
   const isActive = (href: string) => pathname === href
 
   // Group navigation links
-  const mainLinks = navLinks.slice(0, 3) // Dashboard, Análise, Análise Completa
-  const toolLinks = navLinks.slice(3, 8) // Recomendações, Plano Semanal, Comparar Análises, Comparar Exames, Documentos
-  const settingsLinks = navLinks.slice(8) // Créditos, Perfil
+  const mainLinks = navLinks.slice(0, 4) // Dashboard, Análise, Chat com Agente, Análise Completa
+  const toolLinks = navLinks.slice(4, 9) // Recomendações, Plano Semanal, Comparar Análises, Comparar Exames, Documentos
+  const settingsLinks = navLinks.slice(9) // Créditos, Perfil
 
   return (
     <aside

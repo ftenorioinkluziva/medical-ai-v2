@@ -22,6 +22,7 @@ import {
   Coins,
   Sparkles,
   ArrowLeftRight,
+  MessageCircle,
 } from 'lucide-react'
 import { HeartIcon } from '@/components/ui/animated-icon'
 import { handleSignOut } from '@/app/actions/auth'
@@ -54,6 +55,7 @@ export function DashboardNav({ userName, userRole }: DashboardNavProps) {
         { href: '/dashboard', label: 'Dashboard', icon: Home },
         { href: '/documents', label: 'Documentos', icon: FolderOpen },
         { href: '/analyze', label: 'Análise', icon: FileText },
+        { href: '/chat', label: 'Chat com Agente', icon: MessageCircle },
         { href: '/analyze-complete', label: 'Análise Completa', icon: Sparkles },
         { href: '/recommendations', label: 'Recomendações', icon: TrendingUp },
         { href: '/weekly-plan', label: 'Plano Semanal', icon: Calendar },
@@ -73,6 +75,7 @@ export function DashboardNav({ userName, userRole }: DashboardNavProps) {
         { href: '/dashboard', label: 'Dashboard', icon: Home },
         { href: '/documents', label: 'Documentos', icon: FolderOpen },
         { href: '/analyze', label: 'Análise', icon: FileText },
+        { href: '/chat', label: 'Chat com Agente', icon: MessageCircle },
         { href: '/analyze-complete', label: 'Análise Completa', icon: Sparkles },
         { href: '/recommendations', label: 'Recomendações', icon: TrendingUp },
         { href: '/weekly-plan', label: 'Plano Semanal', icon: Calendar },

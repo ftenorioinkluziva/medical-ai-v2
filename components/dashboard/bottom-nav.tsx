@@ -7,7 +7,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Home, FileText, FolderOpen, User } from 'lucide-react'
+import { Home, FileText, FolderOpen, User, MessageCircle } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 interface BottomNavProps {
@@ -26,6 +26,7 @@ export function BottomNav({ userRole }: BottomNavProps) {
     : [
         { href: '/dashboard', label: 'Início', icon: Home },
         { href: '/analyze', label: 'Análise', icon: FileText },
+        { href: '/chat', label: 'Chat', icon: MessageCircle },
         { href: '/documents', label: 'Docs', icon: FolderOpen },
         { href: '/profile', label: 'Perfil', icon: User },
       ]
