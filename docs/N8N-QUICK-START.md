@@ -4,6 +4,10 @@
 
 Automatizar o upload de artigos PDF para a base de conhecimento do Medical AI V2 usando N8N.
 
+## ⚠️ Troubleshooting
+
+Se você receber o erro **"source.on is not a function"**, consulte: [N8N-TROUBLESHOOTING.md](./N8N-TROUBLESHOOTING.md)
+
 ## 📋 Pré-requisitos
 
 1. Medical AI V2 rodando (dev ou produção)
@@ -47,10 +51,12 @@ Value: authjs.session-token=<SEU-TOKEN-AQUI>
 
 ```
 Type: Form-Data (Multipart)
-Fields:
-  - Name: file
-  - Value: {{ $binary.data }}  (ou selecione o campo binário do nó anterior)
+Specify Body: Using Binary Property  ← IMPORTANTE!
+Parameter Name: file
+Input Data Field Name: data  ← Nome da propriedade binária
 ```
+
+**⚠️ IMPORTANTE**: NÃO use "Using Fields" com `{{ $binary.data }}` - isso causa erro! Use "Using Binary Property".
 
 ## 📊 Exemplo Completo de Workflow
 
@@ -134,11 +140,11 @@ Fields:
 
 - Ativar **Send Body**
 - **Body Content Type**: Form-Data (Multipart)
-- **Specify Body**: Using Fields
-- **Add Field**:
-  - **Name**: `file`
-  - **Type**: Auto-detect
-  - **Value**: `={{ $binary.data }}`
+- **Specify Body**: Using Binary Property ⚠️
+- **Parameter Name**: `file`
+- **Input Data Field Name**: `data`
+
+**⚠️ ATENÇÃO**: Se você usar "Using Fields" com `{{ $binary.data }}`, receberá o erro "source.on is not a function". A configuração correta é "Using Binary Property"!
 
 ## ✅ Resposta de Sucesso
 
@@ -245,12 +251,13 @@ Você pode importar este workflow diretamente no N8N:
         },
         "sendBody": true,
         "contentType": "multipart-form-data",
-        "specifyBody": "keypair",
+        "specifyBody": "binaryData",
         "bodyParameters": {
           "parameters": [
             {
               "name": "file",
-              "value": "={{ $binary.data }}"
+              "inputDataFieldName": "data",
+              "parameterType": "formBinaryData"
             }
           ]
         }

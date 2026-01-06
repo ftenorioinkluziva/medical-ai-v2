@@ -30,7 +30,7 @@ No N8N, configure o nó HTTP Request:
 2. **Send Headers**: Sim
 3. Adicione o header:
    - Name: `Cookie`
-   - Value: `authjs.session-token=<seu-token-aqui>`
+   - Value: `authjs.session-token=372a2dc25486ff0db99be6ff0cd09ce49eb06390f2c539974cd3f191c75eec0d`
 
 ### Opção 2: API Key (Futuro)
 

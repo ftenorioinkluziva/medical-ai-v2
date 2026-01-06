@@ -2,10 +2,14 @@
  * Auto Upload API - Complete automation for N8N
  * Combines metadata generation + upload in a single request
  * Perfect for automation workflows
+ *
+ * Authentication: Supports both session cookies and API keys
+ * - Session: Cookie header with authjs.session-token
+ * - API Key: Authorization header with Bearer token
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '@/lib/auth/config'
+import { authenticateRequest, isAdmin } from '@/lib/api-keys/auth-middleware'
 import { addKnowledgeArticle } from '@/lib/ai/knowledge'
 import { generateText } from 'ai'
 import { googleModels } from '@/lib/ai/providers'
@@ -13,16 +17,18 @@ import pdf from 'pdf-parse'
 
 export async function POST(request: NextRequest) {
   try {
-    // Authenticate and check admin role
-    const session = await auth()
-    if (!session?.user?.id) {
+    // Authenticate - supports both session and API key
+    const authResult = await authenticateRequest(request)
+
+    if (!authResult.authenticated) {
       return NextResponse.json(
-        { success: false, error: 'Não autenticado' },
+        { success: false, error: authResult.error || 'Não autenticado' },
         { status: 401 }
       )
     }
 
-    if (session.user.role !== 'admin') {
+    // Check admin role
+    if (!isAdmin(authResult)) {
       return NextResponse.json(
         { success: false, error: 'Acesso negado. Apenas administradores podem adicionar artigos.' },
         { status: 403 }
@@ -30,6 +36,8 @@ export async function POST(request: NextRequest) {
     }
 
     console.log('🤖 [AUTO-UPLOAD] Starting automated upload process...')
+    console.log(`   User: ${authResult.user?.email}`)
+    console.log(`   Auth method: ${authResult.authMethod}`)
 
     // Parse form data
     const formData = await request.formData()
