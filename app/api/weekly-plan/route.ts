@@ -23,6 +23,7 @@ export async function GET(request: NextRequest) {
     // Support patientId for doctors
     const { searchParams } = new URL(request.url)
     const patientId = searchParams.get('patientId')
+    const includeConfig = searchParams.get('includeConfig') === 'true'
     const userId = patientId && session.user.role === 'doctor' ? patientId : session.user.id
 
     console.log(`📋 [WEEKLY-PLAN-API] Fetching plans for user: ${userId}${patientId ? ' (doctor view)' : ''}`)
@@ -52,10 +53,34 @@ export async function GET(request: NextRequest) {
 
     console.log(`✅ [WEEKLY-PLAN-API] Found ${userPlans.length} plans`)
 
+    // If includeConfig=true, fetch display configs for generators
+    let displayConfigs = null
+    if (includeConfig) {
+      console.log('🎨 [WEEKLY-PLAN-API] Fetching display configs...')
+
+      const generators = await db
+        .select({
+          generatorKey: healthAgents.generatorKey,
+          displayConfig: healthAgents.displayConfig,
+        })
+        .from(healthAgents)
+        .where(eq(healthAgents.agentType, 'product_generator'))
+
+      displayConfigs = generators.reduce((acc, gen) => {
+        if (gen.generatorKey) {
+          acc[gen.generatorKey] = gen.displayConfig
+        }
+        return acc
+      }, {} as Record<string, any>)
+
+      console.log(`✅ [WEEKLY-PLAN-API] Loaded ${Object.keys(displayConfigs).length} display configs`)
+    }
+
     return NextResponse.json({
       success: true,
       plans: userPlans,
       total: userPlans.length,
+      ...(displayConfigs && { displayConfigs }),
     })
   } catch (error) {
     console.error('❌ [WEEKLY-PLAN-API] Error:', error)

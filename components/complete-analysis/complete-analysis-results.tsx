@@ -283,40 +283,38 @@ function RecommendationsView({ recommendations }: RecommendationsViewProps) {
             <CardContent>
               <div className="grid gap-3 md:grid-cols-2">
                 {recommendations.examRecommendations.map((exam, index) => (
-                <div
-                  key={index}
-                  className={`p-4 border rounded-lg transition-all ${
-                    exam.urgency === 'high'
-                      ? 'border-red-200 bg-card hover:bg-red-50/30'
-                      : exam.urgency === 'medium'
-                      ? 'border-amber-200 bg-card hover:bg-amber-50/30'
-                      : 'border-border bg-card hover:border-sky-300 hover:bg-sky-50/30'
-                  }`}
-                >
-                  <div className="flex items-start justify-between mb-2">
-                    <h4 className="font-semibold text-sm text-foreground">{exam.exam}</h4>
-                    <Badge
-                      className={`text-xs ${
-                        exam.urgency === 'high'
-                          ? 'bg-red-100 text-red-700 border-red-200'
-                          : exam.urgency === 'medium'
-                          ? 'bg-amber-100 text-amber-700 border-amber-200'
-                          : 'bg-accent text-foreground border-border'
+                  <div
+                    key={index}
+                    className={`p-4 border rounded-lg transition-all ${exam.urgency === 'high'
+                        ? 'border-red-200 bg-card hover:bg-red-50/30'
+                        : exam.urgency === 'medium'
+                          ? 'border-amber-200 bg-card hover:bg-amber-50/30'
+                          : 'border-border bg-card hover:border-sky-300 hover:bg-sky-50/30'
                       }`}
-                    >
-                      {exam.urgency === 'high' ? 'Urgente' : exam.urgency === 'medium' ? 'Moderado' : 'Baixo'}
-                    </Badge>
+                  >
+                    <div className="flex items-start justify-between mb-2">
+                      <h4 className="font-semibold text-sm text-foreground">{exam.exam}</h4>
+                      <Badge
+                        className={`text-xs ${exam.urgency === 'high'
+                            ? 'bg-red-100 text-red-700 border-red-200'
+                            : exam.urgency === 'medium'
+                              ? 'bg-amber-100 text-amber-700 border-amber-200'
+                              : 'bg-accent text-foreground border-border'
+                          }`}
+                      >
+                        {exam.urgency === 'high' ? 'Urgente' : exam.urgency === 'medium' ? 'Moderado' : 'Baixo'}
+                      </Badge>
+                    </div>
+                    <p className="text-sm text-muted-foreground mt-2 leading-relaxed">{exam.reason}</p>
+                    <p className="text-xs text-muted-foreground mt-3 flex items-center gap-1">
+                      <CalendarIcon className="h-3 w-3" />
+                      {exam.suggestedTimeframe}
+                    </p>
                   </div>
-                  <p className="text-sm text-muted-foreground mt-2 leading-relaxed">{exam.reason}</p>
-                  <p className="text-xs text-muted-foreground mt-3 flex items-center gap-1">
-                    <CalendarIcon className="h-3 w-3" />
-                    {exam.suggestedTimeframe}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
 
         {/* Estilo de Vida Tab */}
@@ -334,42 +332,40 @@ function RecommendationsView({ recommendations }: RecommendationsViewProps) {
             <CardContent>
               <div className="grid gap-3 md:grid-cols-2">
                 {recommendations.lifestyleRecommendations.map((lifestyle, index) => (
-                <div
-                  key={index}
-                  className={`p-4 border rounded-lg transition-all ${
-                    lifestyle.priority === 'high'
-                      ? 'border-teal-300 bg-card hover:bg-teal-50/30'
-                      : lifestyle.priority === 'medium'
-                      ? 'border-amber-200 bg-card hover:bg-amber-50/30'
-                      : 'border-border bg-card hover:border-teal-300 hover:bg-teal-50/30'
-                  }`}
-                >
-                  <div className="flex items-start justify-between mb-2">
-                    <h4 className="font-semibold text-sm capitalize text-foreground">{lifestyle.category}</h4>
-                    <Badge
-                      className={`text-xs ${
-                        lifestyle.priority === 'high'
-                          ? 'bg-teal-100 text-teal-700 border-teal-200'
-                          : lifestyle.priority === 'medium'
-                          ? 'bg-amber-100 text-amber-700 border-amber-200'
-                          : 'bg-accent text-foreground border-border'
+                  <div
+                    key={index}
+                    className={`p-4 border rounded-lg transition-all ${lifestyle.priority === 'high'
+                        ? 'border-teal-300 bg-card hover:bg-teal-50/30'
+                        : lifestyle.priority === 'medium'
+                          ? 'border-amber-200 bg-card hover:bg-amber-50/30'
+                          : 'border-border bg-card hover:border-teal-300 hover:bg-teal-50/30'
                       }`}
-                    >
-                      {lifestyle.priority === 'high' ? 'Alta Prioridade' : lifestyle.priority === 'medium' ? 'Média' : 'Baixa'}
-                    </Badge>
+                  >
+                    <div className="flex items-start justify-between mb-2">
+                      <h4 className="font-semibold text-sm capitalize text-foreground">{lifestyle.category}</h4>
+                      <Badge
+                        className={`text-xs ${lifestyle.priority === 'high'
+                            ? 'bg-teal-100 text-teal-700 border-teal-200'
+                            : lifestyle.priority === 'medium'
+                              ? 'bg-amber-100 text-amber-700 border-amber-200'
+                              : 'bg-accent text-foreground border-border'
+                          }`}
+                      >
+                        {lifestyle.priority === 'high' ? 'Alta Prioridade' : lifestyle.priority === 'medium' ? 'Média' : 'Baixa'}
+                      </Badge>
+                    </div>
+                    <p className="text-sm text-muted-foreground mt-2 leading-relaxed">{lifestyle.recommendation}</p>
+                    <div className="mt-3 pt-3 border-t border-border">
+                      <p className="text-xs text-emerald-600 flex items-center gap-1 font-medium">
+                        <TrendingUp className="h-3 w-3" />
+                        {lifestyle.expectedBenefit}
+                      </p>
+                    </div>
                   </div>
-                  <p className="text-sm text-muted-foreground mt-2 leading-relaxed">{lifestyle.recommendation}</p>
-                  <div className="mt-3 pt-3 border-t border-border">
-                    <p className="text-xs text-emerald-600 flex items-center gap-1 font-medium">
-                      <TrendingUp className="h-3 w-3" />
-                      {lifestyle.expectedBenefit}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
 
         {/* Metas Tab */}
@@ -386,52 +382,52 @@ function RecommendationsView({ recommendations }: RecommendationsViewProps) {
             </CardHeader>
             <CardContent className="space-y-4">
               {recommendations.healthGoals.map((goal, index) => (
-              <div
-                key={index}
-                className="p-4 rounded-lg border border-purple-200 bg-card hover:bg-purple-50/30 transition-all"
-              >
-                <div className="flex items-start gap-3">
-                  <div className="bg-purple-100 p-2 rounded-lg shrink-0">
-                    <Target className="h-4 w-4 text-purple-700" />
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="font-semibold text-base text-foreground mb-3">{goal.goal}</h4>
-
-                    <div className="grid grid-cols-2 gap-3 p-3 bg-purple-50 rounded-lg border border-purple-100">
-                      <div>
-                        <p className="text-xs text-muted-foreground font-medium mb-1">Status Atual</p>
-                        <p className="text-sm text-foreground font-semibold">{goal.currentStatus}</p>
-                      </div>
-                      <div>
-                        <p className="text-xs text-muted-foreground font-medium mb-1">Meta</p>
-                        <p className="text-sm text-purple-700 font-semibold">{goal.targetValue}</p>
-                      </div>
+                <div
+                  key={index}
+                  className="p-4 rounded-lg border border-purple-200 bg-card hover:bg-purple-50/30 transition-all"
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="bg-purple-100 p-2 rounded-lg shrink-0">
+                      <Target className="h-4 w-4 text-purple-700" />
                     </div>
+                    <div className="flex-1">
+                      <h4 className="font-semibold text-base text-foreground mb-3">{goal.goal}</h4>
 
-                    <div className="mt-3 flex items-center gap-2 text-xs text-muted-foreground">
-                      <CalendarIcon className="h-3 w-3" />
-                      Prazo: {goal.timeframe}
-                    </div>
-
-                    {goal.actionSteps.length > 0 && (
-                      <div className="mt-4 pt-4 border-t border-border">
-                        <h5 className="text-sm font-semibold text-foreground mb-2">Passos de Ação</h5>
-                        <ul className="space-y-2">
-                          {goal.actionSteps.map((step, stepIndex) => (
-                            <li key={stepIndex} className="text-sm text-foreground flex items-start gap-2 leading-relaxed">
-                              <CheckCircle2 className="h-4 w-4 text-emerald-600 mt-0.5 shrink-0" />
-                              {step}
-                            </li>
-                          ))}
-                        </ul>
+                      <div className="grid grid-cols-2 gap-3 p-3 bg-purple-50 rounded-lg border border-purple-100">
+                        <div>
+                          <p className="text-xs text-muted-foreground font-medium mb-1">Status Atual</p>
+                          <p className="text-sm text-foreground font-semibold">{goal.currentStatus}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-muted-foreground font-medium mb-1">Meta</p>
+                          <p className="text-sm text-purple-700 font-semibold">{goal.targetValue}</p>
+                        </div>
                       </div>
-                    )}
+
+                      <div className="mt-3 flex items-center gap-2 text-xs text-muted-foreground">
+                        <CalendarIcon className="h-3 w-3" />
+                        Prazo: {goal.timeframe}
+                      </div>
+
+                      {goal.actionSteps.length > 0 && (
+                        <div className="mt-4 pt-4 border-t border-border">
+                          <h5 className="text-sm font-semibold text-foreground mb-2">Passos de Ação</h5>
+                          <ul className="space-y-2">
+                            {goal.actionSteps.map((step, stepIndex) => (
+                              <li key={stepIndex} className="text-sm text-foreground flex items-start gap-2 leading-relaxed">
+                                <CheckCircle2 className="h-4 w-4 text-emerald-600 mt-0.5 shrink-0" />
+                                {step}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
+              ))}
+            </CardContent>
+          </Card>
         </TabsContent>
 
         {/* Alertas Tab */}
@@ -449,53 +445,53 @@ function RecommendationsView({ recommendations }: RecommendationsViewProps) {
             <CardContent>
               <div className="grid gap-3 md:grid-cols-2">
                 {recommendations.alerts.map((alert, index) => {
-                const alertConfig = {
-                  urgent: {
-                    bg: 'bg-red-50',
-                    border: 'border-red-200',
-                    iconBg: 'bg-red-100',
-                    color: 'text-red-700',
-                    badge: 'bg-red-100 text-red-700 border-red-200'
-                  },
-                  warning: {
-                    bg: 'bg-orange-50',
-                    border: 'border-orange-200',
-                    iconBg: 'bg-orange-100',
-                    color: 'text-orange-700',
-                    badge: 'bg-orange-100 text-orange-700 border-orange-200'
-                  },
-                  info: {
-                    bg: 'bg-sky-50',
-                    border: 'border-sky-200',
-                    iconBg: 'bg-sky-100',
-                    color: 'text-sky-700',
-                    badge: 'bg-sky-100 text-sky-700 border-sky-200'
-                  }
-                }[alert.type]
+                  const alertConfig = {
+                    urgent: {
+                      bg: 'bg-red-50',
+                      border: 'border-red-200',
+                      iconBg: 'bg-red-100',
+                      color: 'text-red-700',
+                      badge: 'bg-red-100 text-red-700 border-red-200'
+                    },
+                    warning: {
+                      bg: 'bg-orange-50',
+                      border: 'border-orange-200',
+                      iconBg: 'bg-orange-100',
+                      color: 'text-orange-700',
+                      badge: 'bg-orange-100 text-orange-700 border-orange-200'
+                    },
+                    info: {
+                      bg: 'bg-sky-50',
+                      border: 'border-sky-200',
+                      iconBg: 'bg-sky-100',
+                      color: 'text-sky-700',
+                      badge: 'bg-sky-100 text-sky-700 border-sky-200'
+                    }
+                  }[alert.type]
 
-                return (
-                  <div
-                    key={index}
-                    className={`p-4 rounded-lg border ${alertConfig.bg} ${alertConfig.border} hover:shadow-sm transition-all`}
-                  >
-                    <div className="flex items-start justify-between mb-3">
-                      <div className={`p-2 rounded-lg shrink-0 ${alertConfig.iconBg}`}>
-                        <AlertCircle className={`h-4 w-4 ${alertConfig.color}`} />
+                  return (
+                    <div
+                      key={index}
+                      className={`p-4 rounded-lg border ${alertConfig.bg} ${alertConfig.border} hover:shadow-sm transition-all`}
+                    >
+                      <div className="flex items-start justify-between mb-3">
+                        <div className={`p-2 rounded-lg shrink-0 ${alertConfig.iconBg}`}>
+                          <AlertCircle className={`h-4 w-4 ${alertConfig.color}`} />
+                        </div>
+                        <Badge className={`text-xs ${alertConfig.badge}`}>
+                          {alert.type === 'urgent' ? 'Urgente' : alert.type === 'warning' ? 'Atenção' : 'Info'}
+                        </Badge>
                       </div>
-                      <Badge className={`text-xs ${alertConfig.badge}`}>
-                        {alert.type === 'urgent' ? 'Urgente' : alert.type === 'warning' ? 'Atenção' : 'Info'}
-                      </Badge>
+                      <div>
+                        <p className={`font-semibold text-sm mb-2 ${alertConfig.color}`}>{alert.message}</p>
+                        <p className="text-sm text-foreground leading-relaxed">{alert.action}</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className={`font-semibold text-sm mb-2 ${alertConfig.color}`}>{alert.message}</p>
-                      <p className="text-sm text-foreground leading-relaxed">{alert.action}</p>
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-          </CardContent>
-        </Card>
+                  )
+                })}
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
     </div>
@@ -631,25 +627,23 @@ function WeeklyPlanView({ weeklyPlan }: WeeklyPlanViewProps) {
                     {category.items.map((item: any, itemIndex: number) => (
                       <div
                         key={itemIndex}
-                        className={`p-4 border rounded-lg transition-all ${
-                          item.priority === 'high'
+                        className={`p-4 border rounded-lg transition-all ${item.priority === 'high'
                             ? 'border-red-200 bg-card hover:bg-red-50/30'
                             : item.priority === 'medium'
-                            ? 'border-amber-200 bg-card hover:bg-amber-50/30'
-                            : 'border-border bg-card hover:border-sky-300 hover:bg-sky-50/30'
-                        }`}
+                              ? 'border-amber-200 bg-card hover:bg-amber-50/30'
+                              : 'border-border bg-card hover:border-sky-300 hover:bg-sky-50/30'
+                          }`}
                       >
                         <div className="flex items-start justify-between mb-2">
                           <p className="font-semibold text-sm text-foreground">{item.item}</p>
                           {item.priority && (
                             <Badge
-                              className={`text-xs ${
-                                item.priority === 'high'
+                              className={`text-xs ${item.priority === 'high'
                                   ? 'bg-red-100 text-red-700 border-red-200'
                                   : item.priority === 'medium'
-                                  ? 'bg-amber-100 text-amber-700 border-amber-200'
-                                  : 'bg-accent text-foreground border-border'
-                              }`}
+                                    ? 'bg-amber-100 text-amber-700 border-amber-200'
+                                    : 'bg-accent text-foreground border-border'
+                                }`}
                             >
                               {item.priority === 'high' ? 'High' : item.priority === 'medium' ? 'Medium' : 'Low'}
                             </Badge>
@@ -697,7 +691,7 @@ function WeeklyPlanView({ weeklyPlan }: WeeklyPlanViewProps) {
                 Plano de Refeições
               </CardTitle>
               <CardDescription>
-                {weeklyPlan.mealPlan.overview}
+                {/* {weeklyPlan.mealPlan.overview} */}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -810,15 +804,15 @@ function WeeklyPlanView({ weeklyPlan }: WeeklyPlanViewProps) {
                             workout.intensity === 'high'
                               ? 'bg-red-100 text-red-700 border-red-200'
                               : workout.intensity === 'medium'
-                              ? 'bg-amber-100 text-amber-700 border-amber-200'
-                              : 'bg-accent text-foreground border-border'
+                                ? 'bg-amber-100 text-amber-700 border-amber-200'
+                                : 'bg-accent text-foreground border-border'
                           }
                         >
                           {workout.intensity === 'high'
                             ? 'Alta'
                             : workout.intensity === 'medium'
-                            ? 'Média'
-                            : 'Baixa'}
+                              ? 'Média'
+                              : 'Baixa'}
                         </Badge>
                       )}
                     </div>

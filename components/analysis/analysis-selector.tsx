@@ -77,11 +77,11 @@ export function AnalysisSelector({
 
   const getAgentColor = (color: string) => {
     const colorMap: Record<string, string> = {
-      green: 'bg-green-100 text-green-700 border-green-300',
-      purple: 'bg-purple-100 text-purple-700 border-purple-300',
-      orange: 'bg-orange-100 text-orange-700 border-orange-300',
-      blue: 'bg-blue-100 text-blue-700 border-blue-300',
-      teal: 'bg-teal-100 text-teal-700 border-teal-300',
+      green: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 border-green-300 dark:border-green-700',
+      purple: 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 border-purple-300 dark:border-purple-700',
+      orange: 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 border-orange-300 dark:border-orange-700',
+      blue: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-blue-300 dark:border-blue-700',
+      teal: 'bg-teal-100 dark:bg-teal-900/30 text-teal-700 dark:text-teal-300 border-teal-300 dark:border-teal-700',
     }
     return colorMap[color] || colorMap.teal
   }
@@ -99,8 +99,8 @@ export function AnalysisSelector({
 
   if (error) {
     return (
-      <Card className={`p-6 bg-red-50 border-red-200 ${className}`}>
-        <p className="text-sm text-red-900">
+      <Card className={`p-6 bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-800 ${className}`}>
+        <p className="text-sm text-red-900 dark:text-red-100">
           <strong>Erro:</strong> {error}
         </p>
       </Card>

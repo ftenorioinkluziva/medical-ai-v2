@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
     console.log(`📚 [DOCUMENTS-API] Listing documents for user: ${userId}${patientId ? ' (doctor view)' : ''}`)
 
     // Build query
-    let query = db
+    const query = db
       .select({
         id: documents.id,
         fileName: documents.fileName,

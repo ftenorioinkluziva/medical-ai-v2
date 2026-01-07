@@ -475,7 +475,7 @@ export default function RecommendationsHistoryPage() {
                       </p>
                     ) : (
                       selectedRec.alerts.map((alert: any, index: number) => {
-                        const alertConfig = {
+                        const configMap: Record<string, any> = {
                           urgent: {
                             bg: 'bg-red-50 dark:bg-red-950/20',
                             border: 'border-red-200 dark:border-red-800',
@@ -494,7 +494,9 @@ export default function RecommendationsHistoryPage() {
                             iconColor: 'text-blue-600 dark:text-blue-400',
                             hover: 'hover:border-blue-300 hover:bg-blue-50/30 dark:hover:border-blue-700 dark:hover:bg-blue-900/30',
                           },
-                        }[alert.type]
+                        }
+
+                        const alertConfig = configMap[alert.type?.toLowerCase()] || configMap['info']
 
                         return (
                           <div

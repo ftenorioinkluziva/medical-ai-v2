@@ -79,6 +79,7 @@ export async function PUT(
     const body = await request.json()
 
     console.log(`🔧 [ADMIN-AGENT-API] Updating agent: ${id}`)
+    console.log(`📦 [ADMIN-AGENT-API] Request body:`, JSON.stringify(body, null, 2))
 
     // Update only provided fields
     const updateData: any = {}
@@ -116,7 +117,17 @@ export async function PUT(
     if (body.excludedArticleIds !== undefined) updateData.excludedArticleIds = body.excludedArticleIds
     if (body.includedArticleIds !== undefined) updateData.includedArticleIds = body.includedArticleIds
 
+    // Product Generator fields
+    if (body.agentType !== undefined) updateData.agentType = body.agentType
+    if (body.productType !== undefined) updateData.productType = body.productType
+    if (body.generatorKey !== undefined) updateData.generatorKey = body.generatorKey
+    if (body.outputSchema !== undefined) updateData.outputSchema = body.outputSchema
+    if (body.ragConfig !== undefined) updateData.ragConfig = body.ragConfig
+    if (body.executionOrder !== undefined) updateData.executionOrder = body.executionOrder
+
     updateData.updatedAt = new Date()
+
+    console.log(`💾 [ADMIN-AGENT-API] Update data:`, JSON.stringify(updateData, null, 2))
 
     const [updatedAgent] = await db
       .update(healthAgents)
@@ -132,6 +143,7 @@ export async function PUT(
     }
 
     console.log(`✅ [ADMIN-AGENT-API] Agent updated: ${id}`)
+    console.log(`📊 [ADMIN-AGENT-API] Updated fields:`, Object.keys(updateData).join(', '))
 
     return NextResponse.json({
       success: true,

@@ -1,0 +1,465 @@
+﻿.next/dev/types/validator.ts(531,31): error TS2344: Type 'typeof import("C:/projetos/medical-ai-v2/app/api/admin/medical-knowledge/biomarkers/[slug]/route")' does not satisfy the constraint 'RouteHandlerConfig<"/api/admin/medical-knowledge/biomarkers/[slug]">'.
+  Types of property 'GET' are incompatible.
+    Type '(request: NextRequest, { params }: { params: { slug: string; }; }) => Promise<NextResponse<{ error: string; }> | NextResponse<{ biomarker: { slug: string; name: string; category: string | null; ... 8 more ...; updatedAt: Date | null; }; }>>' is not assignable to type '(request: NextRequest, context: { params: Promise<{ slug: string; }>; }) => void | Response | Promise<void | Response>'.
+      Types of parameters '__1' and 'context' are incompatible.
+        Type '{ params: Promise<{ slug: string; }>; }' is not assignable to type '{ params: { slug: string; }; }'.
+          Types of property 'params' are incompatible.
+            Property 'slug' is missing in type 'Promise<{ slug: string; }>' but required in type '{ slug: string; }'.
+.next/types/validator.ts(531,31): error TS2344: Type 'typeof import("C:/projetos/medical-ai-v2/app/api/admin/medical-knowledge/biomarkers/[slug]/route")' does not satisfy the constraint 'RouteHandlerConfig<"/api/admin/medical-knowledge/biomarkers/[slug]">'.
+  Types of property 'GET' are incompatible.
+    Type '(request: NextRequest, { params }: { params: { slug: string; }; }) => Promise<NextResponse<{ error: string; }> | NextResponse<{ biomarker: { slug: string; name: string; category: string | null; ... 8 more ...; updatedAt: Date | null; }; }>>' is not assignable to type '(request: NextRequest, context: { params: Promise<{ slug: string; }>; }) => void | Response | Promise<void | Response>'.
+      Types of parameters '__1' and 'context' are incompatible.
+        Type '{ params: Promise<{ slug: string; }>; }' is not assignable to type '{ params: { slug: string; }; }'.
+          Types of property 'params' are incompatible.
+            Property 'slug' is missing in type 'Promise<{ slug: string; }>' but required in type '{ slug: string; }'.
+app/(dashboard)/admin/agents/page.tsx(30,8): error TS2307: Cannot find module '@/components/ui/alert-dialog' or its corresponding type declarations.
+app/(dashboard)/admin/knowledge/analyze/page.tsx(35,8): error TS2307: Cannot find module '@/components/ui/table' or its corresponding type declarations.
+app/(dashboard)/admin/users/page.tsx(29,8): error TS2307: Cannot find module '@/components/ui/alert-dialog' or its corresponding type declarations.
+app/(dashboard)/analyses/compare/page.tsx(12,26): error TS2307: Cannot find module '@/components/ui/checkbox' or its corresponding type declarations.
+app/(dashboard)/analyze-complete/[id]/page.tsx(15,53): error TS2307: Cannot find module '@/components/ui/alert' or its corresponding type declarations.
+app/(dashboard)/analyze-complete/[id]/page.tsx(163,41): error TS2322: Type '{ id: string; documentIds: string[]; status: "pending" | "analyzing_integrative" | "analyzing_specialized" | "generating_synthesis" | "generating_products" | "completed" | "failed"; ... 6 more ...; weeklyPlan: { ...; } | null; }' is not assignable to type 'CompleteAnalysis'.
+  Types of property 'createdAt' are incompatible.
+    Type 'Date' is not assignable to type 'string'.
+app/(dashboard)/analyze-complete/page.tsx(11,26): error TS2307: Cannot find module '@/components/ui/skeleton' or its corresponding type declarations.
+app/(dashboard)/dashboard/credits/page.tsx(13,41): error TS2307: Cannot find module '@/components/ui/alert' or its corresponding type declarations.
+app/(dashboard)/dashboard/page.tsx(156,63): error TS2322: Type 'string | null | undefined' is not assignable to type 'string | undefined'.
+  Type 'null' is not assignable to type 'string | undefined'.
+app/(dashboard)/dashboard/page.tsx(170,61): error TS2322: Type 'string | null | undefined' is not assignable to type 'string | undefined'.
+  Type 'null' is not assignable to type 'string | undefined'.
+app/(dashboard)/doctor/[patientId]/dashboard/page.tsx(13,41): error TS2307: Cannot find module '@/components/weekly-plan/dynamic-weekly-plan-widget' or its corresponding type declarations.
+app/(dashboard)/documents/[documentId]/page.tsx(51,49): error TS2339: Property 'modules' does not exist on type '{}'.
+app/(dashboard)/documents/[documentId]/page.tsx(78,9): error TS2322: Type 'unknown' is not assignable to type 'ReactNode'.
+app/(dashboard)/documents/[documentId]/page.tsx(137,69): error TS2339: Property 'modules' does not exist on type '{}'.
+app/(dashboard)/weekly-plan/page.tsx(16,26): error TS2307: Cannot find module '@/components/ui/checkbox' or its corresponding type declarations.
+app/api/admin/agents/generate-prompt/route.ts(60,29): error TS2339: Property 'errors' does not exist on type 'ZodError<{ promptType: "analysis" | "system"; agentData: { name: string; title: string; description: string; knowledgeAccessType: "full" | "restricted"; allowedCategories: string[]; }; }>'.
+app/api/admin/agents/generate-prompt/route.ts(61,15): error TS7006: Parameter 'e' implicitly has an 'any' type.
+app/api/admin/agents/generate-prompt/route.ts(156,11): error TS2353: Object literal may only specify known properties, and 'experimental_providerMetadata' does not exist in type 'SystemModelMessage'.
+app/api/admin/agents/route.ts(162,8): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(value: { name: string | SQL<unknown> | Placeholder<string, any>; agentKey: string | SQL<unknown> | Placeholder<string, any>; title: string | SQL<unknown> | Placeholder<...>; ... 28 more ...; updatedAt?: SQL<...> | ... 2 more ... | undefined; }): PgInsertBase<...>', gave the following error.
+    Object literal may only specify known properties, and 'requiresApproval' does not exist in type '{ name: string | SQL<unknown> | Placeholder<string, any>; agentKey: string | SQL<unknown> | Placeholder<string, any>; title: string | SQL<unknown> | Placeholder<string, any>; ... 28 more ...; updatedAt?: SQL<...> | ... 2 more ... | undefined; }'.
+  Overload 2 of 2, '(values: { name: string | SQL<unknown> | Placeholder<string, any>; agentKey: string | SQL<unknown> | Placeholder<string, any>; title: string | SQL<unknown> | Placeholder<...>; ... 28 more ...; updatedAt?: SQL<...> | ... 2 more ... | undefined; }[]): PgInsertBase<...>', gave the following error.
+    Object literal may only specify known properties, and 'agentKey' does not exist in type '{ name: string | SQL<unknown> | Placeholder<string, any>; agentKey: string | SQL<unknown> | Placeholder<string, any>; title: string | SQL<unknown> | Placeholder<string, any>; ... 28 more ...; updatedAt?: SQL<...> | ... 2 more ... | undefined; }[]'.
+app/api/admin/agents/route.ts(200,56): error TS18048: 'newAgent' is possibly 'undefined'.
+app/api/admin/knowledge/auto-upload/route.ts(16,17): error TS7016: Could not find a declaration file for module 'pdf-parse'. 'C:/projetos/medical-ai-v2/node_modules/.pnpm/pdf-parse@1.1.1/node_modules/pdf-parse/index.js' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/pdf-parse` if it exists or add a new declaration (.d.ts) file containing `declare module 'pdf-parse';`
+app/api/admin/knowledge/auto-upload/route.ts(188,11): error TS2322: Type 'string | undefined' is not assignable to type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+app/api/admin/knowledge/auto-upload/route.ts(193,11): error TS2322: Type 'string | undefined' is not assignable to type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+app/api/admin/knowledge/auto-upload/route.ts(260,52): error TS2339: Property 'stats' does not exist on type '{ success: boolean; articleId?: string | undefined; error?: string | undefined; }'.
+app/api/admin/knowledge/auto-upload/route.ts(277,29): error TS2339: Property 'stats' does not exist on type '{ success: boolean; articleId?: string | undefined; error?: string | undefined; }'.
+app/api/admin/knowledge/generate-metadata/route.ts(10,17): error TS7016: Could not find a declaration file for module 'pdf-parse/lib/pdf-parse'. 'C:/projetos/medical-ai-v2/node_modules/.pnpm/pdf-parse@1.1.1/node_modules/pdf-parse/lib/pdf-parse.js' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/pdf-parse` if it exists or add a new declaration (.d.ts) file containing `declare module 'pdf-parse/lib/pdf-parse';`
+app/api/admin/knowledge/generate-metadata/route.ts(125,9): error TS2322: Type 'string | undefined' is not assignable to type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+app/api/admin/knowledge/generate-metadata/route.ts(130,9): error TS2322: Type 'string | undefined' is not assignable to type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+app/api/admin/knowledge/upload/route.ts(9,17): error TS7016: Could not find a declaration file for module 'pdf-parse'. 'C:/projetos/medical-ai-v2/node_modules/.pnpm/pdf-parse@1.1.1/node_modules/pdf-parse/index.js' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/pdf-parse` if it exists or add a new declaration (.d.ts) file containing `declare module 'pdf-parse';`
+app/api/admin/knowledge/upload/route.ts(168,57): error TS2339: Property 'stats' does not exist on type '{ success: boolean; articleId?: string | undefined; error?: string | undefined; }'.
+app/api/admin/knowledge/upload/route.ts(176,29): error TS2339: Property 'stats' does not exist on type '{ success: boolean; articleId?: string | undefined; error?: string | undefined; }'.
+app/api/admin/medical-knowledge/biomarkers/route.ts(59,31): error TS18048: 'newBiomarker' is possibly 'undefined'.
+app/api/admin/medical-knowledge/protocols/route.ts(54,29): error TS18048: 'newProtocol' is possibly 'undefined'.
+app/api/agents/[agentId]/analyze/route.ts(62,9): error TS18048: 'userCreditsData' is possibly 'undefined'.
+app/api/agents/[agentId]/analyze/route.ts(63,44): error TS18048: 'userCreditsData' is possibly 'undefined'.
+app/api/agents/[agentId]/analyze/route.ts(69,22): error TS18048: 'userCreditsData' is possibly 'undefined'.
+app/api/agents/[agentId]/analyze/route.ts(71,38): error TS18048: 'userCreditsData' is possibly 'undefined'.
+app/api/agents/[agentId]/analyze/route.ts(248,28): error TS2339: Property 'exerciseIntensity' does not exist on type '{ id: string; userId: string; age: number | null; gender: string | null; height: number | null; weight: number | null; systolicPressure: number | null; diastolicPressure: number | null; ... 31 more ...; updatedAt: Date; }'.
+app/api/agents/[agentId]/analyze/route.ts(249,77): error TS2339: Property 'exerciseIntensity' does not exist on type '{ id: string; userId: string; age: number | null; gender: string | null; height: number | null; weight: number | null; systolicPressure: number | null; diastolicPressure: number | null; ... 31 more ...; updatedAt: Date; }'.
+app/api/agents/[agentId]/analyze/route.ts(252,28): error TS2339: Property 'exerciseFrequency' does not exist on type '{ id: string; userId: string; age: number | null; gender: string | null; height: number | null; weight: number | null; systolicPressure: number | null; diastolicPressure: number | null; ... 31 more ...; updatedAt: Date; }'.
+app/api/agents/[agentId]/analyze/route.ts(253,76): error TS2339: Property 'exerciseFrequency' does not exist on type '{ id: string; userId: string; age: number | null; gender: string | null; height: number | null; weight: number | null; systolicPressure: number | null; diastolicPressure: number | null; ... 31 more ...; updatedAt: Date; }'.
+app/api/agents/[agentId]/analyze/route.ts(351,37): error TS2339: Property 'model' does not exist on type '{ temperature: number; maxTokens: number; processingTimeMs: number; ragUsed: boolean; inputLength: number; autoCalculatedTokens: boolean; cachingEnabled: boolean; thinkingModeEnabled: boolean; }'.
+app/api/agents/[agentId]/analyze/route.ts(373,39): error TS2339: Property 'promptTokens' does not exist on type 'LanguageModelV2Usage'.
+app/api/agents/[agentId]/analyze/route.ts(374,43): error TS2339: Property 'completionTokens' does not exist on type 'LanguageModelV2Usage'.
+app/api/agents/[agentId]/analyze/route.ts(375,39): error TS2339: Property 'cachedTokens' does not exist on type 'LanguageModelV2Usage'.
+app/api/analyses/compare/route.ts(83,28): error TS2532: Object is possibly 'undefined'.
+app/api/analyses/compare/route.ts(83,52): error TS2532: Object is possibly 'undefined'.
+app/api/analyses/compare/route.ts(105,37): error TS2532: Object is possibly 'undefined'.
+app/api/analyses/compare/route.ts(105,112): error TS2532: Object is possibly 'undefined'.
+app/api/analyses/history/route.ts(76,14): error TS2339: Property 'count' does not exist on type '{ count: number; } | undefined'.
+app/api/auth/register/route.ts(49,33): error TS18048: 'newUser' is possibly 'undefined'.
+app/api/chat/[analysisId]/route.ts(123,9): error TS18048: 'userCreditsData' is possibly 'undefined'.
+app/api/chat/[analysisId]/route.ts(124,57): error TS18048: 'userCreditsData' is possibly 'undefined'.
+app/api/chat/[analysisId]/route.ts(130,22): error TS18048: 'userCreditsData' is possibly 'undefined'.
+app/api/chat/[analysisId]/route.ts(131,49): error TS18048: 'userCreditsData' is possibly 'undefined'.
+app/api/chat/[analysisId]/route.ts(140,54): error TS18048: 'userCreditsData' is possibly 'undefined'.
+app/api/chat/[analysisId]/route.ts(282,14): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{ 'gemini-3-pro-preview': LanguageModelV2; 'gemini-2.5-flash': LanguageModelV2; 'gemini-2.5-flash-lite': LanguageModelV2; 'gemini-2.5-pro': LanguageModelV2; ... 5 more ...; embedding: EmbeddingModelV2<...>; }'.
+  No index signature with a parameter of type 'string' was found on type '{ 'gemini-3-pro-preview': LanguageModelV2; 'gemini-2.5-flash': LanguageModelV2; 'gemini-2.5-flash-lite': LanguageModelV2; 'gemini-2.5-pro': LanguageModelV2; ... 5 more ...; embedding: EmbeddingModelV2<...>; }'.
+app/api/chat/[analysisId]/route.ts(286,7): error TS2353: Object literal may only specify known properties, and 'maxTokens' does not exist in type 'CallSettings & { system?: string | undefined; } & { messages: ModelMessage[]; prompt?: undefined; } & { model: LanguageModel; tools?: ToolSet | undefined; ... 18 more ...; _internal?: { ...; } | undefined; }'.
+app/api/chat/[analysisId]/route.ts(290,37): error TS2339: Property 'promptTokens' does not exist on type 'LanguageModelV2Usage'.
+app/api/chat/[analysisId]/route.ts(291,41): error TS2339: Property 'completionTokens' does not exist on type 'LanguageModelV2Usage'.
+app/api/chat/[analysisId]/route.ts(316,15): error TS2353: Object literal may only specify known properties, and 'messagePreview' does not exist in type '{ analysisId?: string | undefined; operation: string; modelName: string; promptTokens: number; completionTokens: number; cachedTokens?: number | undefined; }'.
+app/api/credits/balance/route.ts(16,16): error TS18048: 'credits' is possibly 'undefined'.
+app/api/credits/balance/route.ts(17,23): error TS18048: 'credits' is possibly 'undefined'.
+app/api/credits/balance/route.ts(18,18): error TS18048: 'credits' is possibly 'undefined'.
+app/api/dashboard/stats/route.ts(83,32): error TS2339: Property 'modules' does not exist on type '{}'.
+app/api/dashboard/stats/route.ts(85,26): error TS2339: Property 'modules' does not exist on type '{}'.
+app/api/dashboard/stats/route.ts(138,23): error TS18048: 'docsCount' is possibly 'undefined'.
+app/api/dashboard/stats/route.ts(139,22): error TS18048: 'analysesCount' is possibly 'undefined'.
+app/api/doctor/patients/route.ts(89,14): error TS2339: Property 'count' does not exist on type '{ count: number; } | undefined'.
+app/api/profile/route.ts(117,11): error TS2353: Object literal may only specify known properties, and 'exerciseTypes' does not exist in type '{ userId?: string | SQL<unknown> | PgColumn<ColumnBaseConfig<ColumnDataType, string>, {}, {}> | undefined; id?: string | SQL<unknown> | PgColumn<...> | undefined; ... 37 more ...; biomarkersUpdatedAt?: SQL<...> | ... 3 more ... | undefined; }'.
+app/api/profile/route.ts(158,10): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(value: { userId: string | SQL<unknown> | Placeholder<string, any>; id?: string | SQL<unknown> | Placeholder<string, any> | undefined; createdAt?: SQL<unknown> | Date | Placeholder<...> | undefined; ... 36 more ...; biomarkersUpdatedAt?: SQL<...> | ... 3 more ... | undefined; }): PgInsertBase<...>', gave the following error.
+    Object literal may only specify known properties, and 'exerciseTypes' does not exist in type '{ userId: string | SQL<unknown> | Placeholder<string, any>; id?: string | SQL<unknown> | Placeholder<string, any> | undefined; createdAt?: SQL<unknown> | Date | Placeholder<...> | undefined; ... 36 more ...; biomarkersUpdatedAt?: SQL<...> | ... 3 more ... | undefined; }'.
+  Overload 2 of 2, '(values: { userId: string | SQL<unknown> | Placeholder<string, any>; id?: string | SQL<unknown> | Placeholder<string, any> | undefined; createdAt?: SQL<unknown> | Date | Placeholder<...> | undefined; ... 36 more ...; biomarkersUpdatedAt?: SQL<...> | ... 3 more ... | undefined; }[]): PgInsertBase<...>', gave the following error.
+    Object literal may only specify known properties, and 'userId' does not exist in type '{ userId: string | SQL<unknown> | Placeholder<string, any>; id?: string | SQL<unknown> | Placeholder<string, any> | undefined; createdAt?: SQL<unknown> | Date | Placeholder<...> | undefined; ... 36 more ...; biomarkersUpdatedAt?: SQL<...> | ... 3 more ... | undefined; }[]'.
+app/api/recommendations/generate/route.ts(67,97): error TS18048: 'userCreditsData' is possibly 'undefined'.
+app/api/recommendations/generate/route.ts(69,9): error TS18048: 'userCreditsData' is possibly 'undefined'.
+app/api/recommendations/generate/route.ts(70,44): error TS18048: 'userCreditsData' is possibly 'undefined'.
+app/api/recommendations/generate/route.ts(77,22): error TS18048: 'userCreditsData' is possibly 'undefined'.
+app/api/recommendations/generate/route.ts(79,38): error TS18048: 'userCreditsData' is possibly 'undefined'.
+app/api/recommendations/generate/route.ts(101,11): error TS2353: Object literal may only specify known properties, and 'recommendationId' does not exist in type '{ analysisId?: string | undefined; operation: string; modelName: string; promptTokens: number; completionTokens: number; cachedTokens?: number | undefined; }'.
+app/api/recommendations/generate/route.ts(105,47): error TS2339: Property 'promptTokens' does not exist on type 'LanguageModelV2Usage'.
+app/api/recommendations/generate/route.ts(106,51): error TS2339: Property 'completionTokens' does not exist on type 'LanguageModelV2Usage'.
+app/api/recommendations/generate/route.ts(107,47): error TS2339: Property 'cachedTokens' does not exist on type 'LanguageModelV2Usage'.
+app/api/recommendations/generate/route.ts(122,45): error TS2551: Property 'examRecommendations' does not exist on type '{ id: string; recommendations: { examRecommendations: { exam: string; reason: string; urgency: "high" | "medium" | "low"; suggestedTimeframe: string; }[]; lifestyleRecommendations: { category: "nutrition" | ... 4 more ... | "habits"; recommendation: string; priority: "high" | ... 1 more ... | "low"; expectedBenefit:...'. Did you mean 'recommendations'?
+app/api/recommendations/generate/route.ts(123,50): error TS2339: Property 'lifestyleRecommendations' does not exist on type '{ id: string; recommendations: { examRecommendations: { exam: string; reason: string; urgency: "high" | "medium" | "low"; suggestedTimeframe: string; }[]; lifestyleRecommendations: { category: "nutrition" | ... 4 more ... | "habits"; recommendation: string; priority: "high" | ... 1 more ... | "low"; expectedBenefit:...'.
+app/api/recommendations/generate/route.ts(124,37): error TS2339: Property 'healthGoals' does not exist on type '{ id: string; recommendations: { examRecommendations: { exam: string; reason: string; urgency: "high" | "medium" | "low"; suggestedTimeframe: string; }[]; lifestyleRecommendations: { category: "nutrition" | ... 4 more ... | "habits"; recommendation: string; priority: "high" | ... 1 more ... | "low"; expectedBenefit:...'.
+app/api/recommendations/generate/route.ts(125,32): error TS2339: Property 'alerts' does not exist on type '{ id: string; recommendations: { examRecommendations: { exam: string; reason: string; urgency: "high" | "medium" | "low"; suggestedTimeframe: string; }[]; lifestyleRecommendations: { category: "nutrition" | ... 4 more ... | "habits"; recommendation: string; priority: "high" | ... 1 more ... | "low"; expectedBenefit:...'.
+app/api/webhooks/stripe/route.ts(20,14): error TS2503: Cannot find namespace 'Stripe'.
+app/api/weekly-plan/generate/route.ts(70,89): error TS18048: 'userCreditsData' is possibly 'undefined'.
+app/api/weekly-plan/generate/route.ts(72,9): error TS18048: 'userCreditsData' is possibly 'undefined'.
+app/api/weekly-plan/generate/route.ts(73,44): error TS18048: 'userCreditsData' is possibly 'undefined'.
+app/api/weekly-plan/generate/route.ts(80,22): error TS18048: 'userCreditsData' is possibly 'undefined'.
+app/api/weekly-plan/generate/route.ts(82,38): error TS18048: 'userCreditsData' is possibly 'undefined'.
+app/api/weekly-plan/generate/route.ts(152,8): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(value: { userId: string | SQL<unknown> | Placeholder<string, any>; analysisId: string | SQL<unknown> | Placeholder<string, any>; weekStartDate: string | SQL<...> | Placeholder<...>; ... 10 more ...; processingTimeMs?: number | ... 3 more ... | undefined; }): PgInsertBase<...>', gave the following error.
+    Type 'string | undefined' is not assignable to type 'string | SQL<unknown> | Placeholder<string, any>'.
+      Type 'undefined' is not assignable to type 'string | SQL<unknown> | Placeholder<string, any>'.
+  Overload 2 of 2, '(values: { userId: string | SQL<unknown> | Placeholder<string, any>; analysisId: string | SQL<unknown> | Placeholder<string, any>; weekStartDate: string | SQL<...> | Placeholder<...>; ... 10 more ...; processingTimeMs?: number | ... 3 more ... | undefined; }[]): PgInsertBase<...>', gave the following error.
+    Object literal may only specify known properties, and 'userId' does not exist in type '{ userId: string | SQL<unknown> | Placeholder<string, any>; analysisId: string | SQL<unknown> | Placeholder<string, any>; weekStartDate: string | SQL<unknown> | Placeholder<...>; ... 10 more ...; processingTimeMs?: number | ... 3 more ... | undefined; }[]'.
+app/api/weekly-plan/generate/route.ts(168,48): error TS18048: 'savedPlan' is possibly 'undefined'.
+app/api/weekly-plan/generate/route.ts(175,11): error TS2353: Object literal may only specify known properties, and 'weeklyPlanId' does not exist in type '{ analysisId?: string | undefined; operation: string; modelName: string; promptTokens: number; completionTokens: number; cachedTokens?: number | undefined; }'.
+app/api/weekly-plan/generate/route.ts(175,25): error TS18048: 'savedPlan' is possibly 'undefined'.
+app/api/weekly-plan/generate/route.ts(179,44): error TS2339: Property 'promptTokens' does not exist on type 'LanguageModelV2Usage'.
+app/api/weekly-plan/generate/route.ts(179,84): error TS2339: Property 'promptTokens' does not exist on type 'LanguageModelV2Usage'.
+app/api/weekly-plan/generate/route.ts(179,124): error TS2339: Property 'promptTokens' does not exist on type 'LanguageModelV2Usage'.
+app/api/weekly-plan/generate/route.ts(179,167): error TS2339: Property 'promptTokens' does not exist on type 'LanguageModelV2Usage'.
+app/api/weekly-plan/generate/route.ts(180,48): error TS2339: Property 'completionTokens' does not exist on type 'LanguageModelV2Usage'.
+app/api/weekly-plan/generate/route.ts(180,92): error TS2339: Property 'completionTokens' does not exist on type 'LanguageModelV2Usage'.
+app/api/weekly-plan/generate/route.ts(180,136): error TS2339: Property 'completionTokens' does not exist on type 'LanguageModelV2Usage'.
+app/api/weekly-plan/generate/route.ts(180,183): error TS2339: Property 'completionTokens' does not exist on type 'LanguageModelV2Usage'.
+app/api/weekly-plan/generate/route.ts(198,13): error TS18048: 'savedPlan' is possibly 'undefined'.
+app/api/weekly-plan/generate/route.ts(199,24): error TS18048: 'savedPlan' is possibly 'undefined'.
+app/api/weekly-plan/generate/route.ts(200,34): error TS18048: 'savedPlan' is possibly 'undefined'.
+app/api/weekly-plan/generate/route.ts(201,23): error TS18048: 'savedPlan' is possibly 'undefined'.
+app/api/weekly-plan/generate/route.ts(202,19): error TS18048: 'savedPlan' is possibly 'undefined'.
+app/api/weekly-plan/generate/route.ts(203,22): error TS18048: 'savedPlan' is possibly 'undefined'.
+app/api/weekly-plan/generate/route.ts(204,20): error TS18048: 'savedPlan' is possibly 'undefined'.
+app/recursos/page.tsx(164,47): error TS2339: Property 'icon' does not exist on type '{ icon: ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>; name: string; desc: string; } | { ...; }'.
+  Property 'icon' does not exist on type '{ name: string; desc: string; }'.
+components/admin/agent-form.tsx(21,26): error TS2307: Cannot find module '@/components/ui/checkbox' or its corresponding type declarations.
+components/admin/agent-form.tsx(22,44): error TS2307: Cannot find module '@/components/ui/radio-group' or its corresponding type declarations.
+components/admin/agent-form.tsx(1224,27): error TS7006: Parameter 'value' implicitly has an 'any' type.
+components/admin/agent-form.tsx(1313,49): error TS7006: Parameter 'checked' implicitly has an 'any' type.
+components/admin/agent-form.tsx(1397,49): error TS7006: Parameter 'checked' implicitly has an 'any' type.
+components/admin/agent-form.tsx(1484,49): error TS7006: Parameter 'checked' implicitly has an 'any' type.
+components/admin/credit-stats-cards.tsx(5,41): error TS2307: Cannot find module '@/components/ui/alert' or its corresponding type declarations.
+components/admin/display-configs/display-config-editor.tsx(15,33): error TS2307: Cannot find module '@/components/dynamic-renderer/product-renderer' or its corresponding type declarations.
+components/admin/display-configs/display-config-editor.tsx(51,11): error TS2532: Object is possibly 'undefined'.
+components/admin/display-configs/display-config-editor.tsx(64,11): error TS18048: 'fieldConfig' is possibly 'undefined'.
+components/admin/display-configs/display-config-editor.tsx(66,18): error TS18048: 'fieldConfig' is possibly 'undefined'.
+components/admin/display-configs/display-config-editor.tsx(69,54): error TS18048: 'fieldConfig' is possibly 'undefined'.
+components/admin/display-configs/sortable-fields.tsx(27,8): error TS2307: Cannot find module '@/components/ui/accordion' or its corresponding type declarations.
+components/admin/display-configs/sortable-fields.tsx(149,13): error TS2322: Type 'FieldConfig | undefined' is not assignable to type 'FieldConfig'.
+  Type 'undefined' is not assignable to type 'FieldConfig'.
+components/admin/knowledge-list.tsx(12,28): error TS2307: Cannot find module '@/components/ui/scroll-area' or its corresponding type declarations.
+components/admin/user-credits-table.tsx(5,79): error TS2307: Cannot find module '@/components/ui/table' or its corresponding type declarations.
+components/agents/agent-selector.tsx(122,24): error TS18048: 'colors' is possibly 'undefined'.
+components/agents/agent-selector.tsx(122,41): error TS18048: 'colors' is possibly 'undefined'.
+components/agents/agent-selector.tsx(123,143): error TS18048: 'colors' is possibly 'undefined'.
+components/analyses/analysis-history.tsx(13,28): error TS2307: Cannot find module '@/components/ui/scroll-area' or its corresponding type declarations.
+components/analyses/analysis-view-modal.tsx(13,28): error TS2307: Cannot find module '@/components/ui/scroll-area' or its corresponding type declarations.
+components/analysis/analysis-chat.tsx(14,40): error TS2307: Cannot find module '@/components/ui/avatar' or its corresponding type declarations.
+components/analysis/analysis-interface.tsx(13,26): error TS2307: Cannot find module '@/components/ui/checkbox' or its corresponding type declarations.
+components/analysis/analysis-interface.tsx(172,11): error TS2353: Object literal may only specify known properties, and 'insufficientCredits' does not exist in type 'AnalysisResult | ((prevState: AnalysisResult | null) => AnalysisResult | null)'.
+components/analysis/analysis-interface.tsx(326,35): error TS7006: Parameter 'checked' implicitly has an 'any' type.
+components/analysis/analysis-selector.tsx(11,40): error TS2307: Cannot find module '@/components/ui/avatar' or its corresponding type declarations.
+components/comparison/document-comparison.tsx(114,41): error TS2532: Object is possibly 'undefined'.
+components/comparison/document-comparison.tsx(115,40): error TS2532: Object is possibly 'undefined'.
+components/comparison/document-selector.tsx(10,26): error TS2307: Cannot find module '@/components/ui/checkbox' or its corresponding type declarations.
+components/comparison/document-selector.tsx(12,28): error TS2307: Cannot find module '@/components/ui/scroll-area' or its corresponding type declarations.
+components/complete-analysis/analysis-progress.tsx(10,26): error TS2307: Cannot find module '@/components/ui/progress' or its corresponding type declarations.
+components/complete-analysis/complete-analysis-result-view.tsx(11,78): error TS2307: Cannot find module '@/components/ui/accordion' or its corresponding type declarations.
+components/complete-analysis/complete-analysis-results.tsx(668,40): error TS2339: Property 'tips' does not exist on type '{ overview: string; categories: { category: string; items: { item: string; }[]; }[]; }'.
+components/complete-analysis/complete-analysis-results.tsx(668,72): error TS2339: Property 'tips' does not exist on type '{ overview: string; categories: { category: string; items: { item: string; }[]; }[]; }'.
+components/complete-analysis/complete-analysis-results.tsx(672,46): error TS2339: Property 'tips' does not exist on type '{ overview: string; categories: { category: string; items: { item: string; }[]; }[]; }'.
+components/complete-analysis/complete-analysis.ts(5,20): error TS2307: Cannot find module '@/lib/db' or its corresponding type declarations.
+components/complete-analysis/document-selector.tsx(9,26): error TS2307: Cannot find module '@/components/ui/checkbox' or its corresponding type declarations.
+components/complete-analysis/document-selector.tsx(138,27): error TS7006: Parameter 'e' implicitly has an 'any' type.
+components/credits/credit-balance-card.tsx(7,41): error TS2307: Cannot find module '@/components/ui/alert' or its corresponding type declarations.
+components/dashboard/sidebar-nav.tsx(12,28): error TS2307: Cannot find module '@/components/ui/scroll-area' or its corresponding type declarations.
+components/doctor/patient-selector.tsx(10,40): error TS2307: Cannot find module '@/components/ui/avatar' or its corresponding type declarations.
+components/doctor/patients-list.tsx(11,40): error TS2307: Cannot find module '@/components/ui/avatar' or its corresponding type declarations.
+components/documents/document-details.tsx(12,28): error TS2307: Cannot find module '@/components/ui/scroll-area' or its corresponding type declarations.
+components/documents/document-upload.tsx(284,41): error TS2339: Property 'modulesCount' does not exist on type '{ textLength: number; chunksCount: number; processingTimeMs: number; }'.
+components/documents/document-upload.tsx(285,70): error TS2339: Property 'modulesCount' does not exist on type '{ textLength: number; chunksCount: number; processingTimeMs: number; }'.
+components/documents/document-view-modal.tsx(11,28): error TS2307: Cannot find module '@/components/ui/scroll-area' or its corresponding type declarations.
+components/documents/structured-data-display.tsx(134,20): error TS18048: 'module.parameters' is possibly 'undefined'.
+components/documents/structured-data-display.tsx(183,24): error TS18048: 'module.parameters' is possibly 'undefined'.
+components/landing/force-light-theme.tsx(13,28): error TS2554: Expected 1 arguments, but got 0.
+components/profile/medical-profile-form.tsx(18,26): error TS2307: Cannot find module '@/components/ui/progress' or its corresponding type declarations.
+components/ui/animated-icon.tsx(157,8): error TS2322: Type '{ children: Element; title?: string | undefined; onSubmit?: FormEventHandler<HTMLDivElement> | undefined; suppressHydrationWarning?: boolean | undefined; ... 278 more ...; variants: Variants; }' is not assignable to type 'Omit<HTMLMotionProps<"div">, "ref">'.
+  Types of property 'onDrag' are incompatible.
+    Type 'DragEventHandler<HTMLDivElement> | undefined' is not assignable to type '((event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => void) | undefined'.
+      Type 'DragEventHandler<HTMLDivElement>' is not assignable to type '(event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => void'.
+        Types of parameters 'event' and 'event' are incompatible.
+          Type 'MouseEvent | TouchEvent | PointerEvent' is not assignable to type 'DragEvent<HTMLDivElement>'.
+            Type 'MouseEvent' is missing the following properties from type 'DragEvent<HTMLDivElement>': dataTransfer, nativeEvent, isDefaultPrevented, isPropagationStopped, persist
+components/weekly-plan/meal-plan-navigator.tsx(252,57): error TS2532: Object is possibly 'undefined'.
+components/weekly-plan/weekly-plan-widget.tsx(14,26): error TS2307: Cannot find module '@/components/ui/checkbox' or its corresponding type declarations.
+components/weekly-plan/weekly-plan-widget.tsx(355,46): error TS2339: Property 'hormonalSupport' does not exist on type '{ overview: string; supplements: { name: string; dosage: string; timing: string; purpose: string; }[]; }'.
+components/weekly-plan/weekly-plan-widget.tsx(356,46): error TS2339: Property 'hormonalSupport' does not exist on type '{ overview: string; supplements: { name: string; dosage: string; timing: string; purpose: string; }[]; }'.
+components/weekly-plan/weekly-plan-widget.tsx(362,54): error TS2339: Property 'hormonalSupport' does not exist on type '{ overview: string; supplements: { name: string; dosage: string; timing: string; purpose: string; }[]; }'.
+components/weekly-plan/weekly-plan-widget.tsx(376,46): error TS2339: Property 'nextExamRecommendations' does not exist on type '{ overview: string; supplements: { name: string; dosage: string; timing: string; purpose: string; }[]; }'.
+components/weekly-plan/weekly-plan-widget.tsx(377,46): error TS2339: Property 'nextExamRecommendations' does not exist on type '{ overview: string; supplements: { name: string; dosage: string; timing: string; purpose: string; }[]; }'.
+components/weekly-plan/weekly-plan-widget.tsx(383,54): error TS2339: Property 'nextExamRecommendations' does not exist on type '{ overview: string; supplements: { name: string; dosage: string; timing: string; purpose: string; }[]; }'.
+components/weekly-plan/weekly-plan-widget.tsx(400,35): error TS2339: Property 'estimatedCost' does not exist on type '{ overview: string; categories: { category: string; items: { item: string; }[]; }[]; }'.
+components/weekly-plan/weekly-plan-widget.tsx(403,41): error TS2339: Property 'estimatedCost' does not exist on type '{ overview: string; categories: { category: string; items: { item: string; }[]; }[]; }'.
+components/weekly-plan/weekly-plan-widget.tsx(490,35): error TS2339: Property 'tips' does not exist on type '{ overview: string; categories: { category: string; items: { item: string; }[]; }[]; }'.
+components/weekly-plan/weekly-plan-widget.tsx(490,62): error TS2339: Property 'tips' does not exist on type '{ overview: string; categories: { category: string; items: { item: string; }[]; }[]; }'.
+components/weekly-plan/weekly-plan-widget.tsx(496,43): error TS2339: Property 'tips' does not exist on type '{ overview: string; categories: { category: string; items: { item: string; }[]; }[]; }'.
+components/weekly-plan/weekly-plan-widget.tsx(511,32): error TS2739: Type '{ overview: string; meals: { day: string; }[]; }' is missing the following properties from type '{ overview: string; daily_calories_avg: string; weekly_plan: { day: string; meals: { breakfast: MealDefinition; morning_snack: MealDefinition; lunch: MealDefinition; ... 4 more ...; supper: MealDefinition; }; }[]; }': daily_calories_avg, weekly_plan
+components/weekly-plan/weekly-plan-widget.tsx(516,35): error TS2322: Type '{ overview: string; workouts: { day: string; type: string; }[]; }' is not assignable to type '{ overview: string; weeklyGoal?: string | undefined; workouts: { day: string; type: string; duration: string; intensity?: string | undefined; warmup?: string | undefined; exercises: { name: string; sets?: string | undefined; reps?: string | undefined; duration?: string | undefined; notes?: string | undefined; }[]; c...'.
+  Types of property 'workouts' are incompatible.
+    Type '{ day: string; type: string; }[]' is not assignable to type '{ day: string; type: string; duration: string; intensity?: string | undefined; warmup?: string | undefined; exercises: { name: string; sets?: string | undefined; reps?: string | undefined; duration?: string | undefined; notes?: string | undefined; }[]; cooldown?: string | undefined; }[]'.
+      Type '{ day: string; type: string; }' is missing the following properties from type '{ day: string; type: string; duration: string; intensity?: string | undefined; warmup?: string | undefined; exercises: { name: string; sets?: string | undefined; reps?: string | undefined; duration?: string | undefined; notes?: string | undefined; }[]; cooldown?: string | undefined; }': duration, exercises
+components/weekly-plan/workout-plan-navigator.tsx(14,26): error TS2307: Cannot find module '@/components/ui/checkbox' or its corresponding type declarations.
+components/weekly-plan/workout-plan-navigator.tsx(136,41): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+components/weekly-plan/workout-plan-navigator.tsx(137,39): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+lib/ai/core/dynamic-generator.ts(192,35): error TS2339: Property 'promptTokens' does not exist on type 'LanguageModelV2Usage'.
+lib/ai/core/dynamic-generator.ts(193,39): error TS2339: Property 'completionTokens' does not exist on type 'LanguageModelV2Usage'.
+lib/ai/core/generate.ts(141,5): error TS2353: Object literal may only specify known properties, and 'maxTokens' does not exist in type 'CallSettings & { system?: string | undefined; } & { messages: ModelMessage[]; prompt?: undefined; } & { model: LanguageModel; tools?: ToolSet | undefined; ... 13 more ...; _internal?: { ...; } | undefined; }'.
+lib/ai/core/generate.ts(157,89): error TS2339: Property 'completionTokens' does not exist on type 'LanguageModelV2Usage'.
+lib/ai/core/generate.ts(293,5): error TS2353: Object literal may only specify known properties, and 'maxTokens' does not exist in type 'Omit<CallSettings, "stopSequences"> & { system?: string | undefined; } & { messages: ModelMessage[]; prompt?: undefined; } & { schema: ZodObject<{ analysis: ZodString; insights: ZodArray<...>; actionItems: ZodArray<...>; }, $strip>; schemaName?: string | undefined; schemaDescription?: string | undefined; mode?: "aut...'.
+lib/ai/core/generate.ts(311,100): error TS2339: Property 'completionTokens' does not exist on type 'LanguageModelV2Usage'.
+lib/ai/knowledge/add-article.ts(63,51): error TS18048: 'article' is possibly 'undefined'.
+lib/ai/knowledge/add-article.ts(89,46): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(value: { content: string | SQL<unknown> | Placeholder<string, any>; embedding: SQL<unknown> | number[] | Placeholder<string, any>; chunkIndex: number | SQL<unknown> | Placeholder<...>; ... 4 more ...; createdAt?: SQL<...> | ... 2 more ... | undefined; }): PgInsertBase<...>', gave the following error.
+    Type 'EmbeddingModelV2Embedding | undefined' is not assignable to type 'SQL<unknown> | number[] | Placeholder<string, any>'.
+      Type 'undefined' is not assignable to type 'SQL<unknown> | number[] | Placeholder<string, any>'.
+  Overload 2 of 2, '(values: { content: string | SQL<unknown> | Placeholder<string, any>; embedding: SQL<unknown> | number[] | Placeholder<string, any>; chunkIndex: number | SQL<unknown> | Placeholder<...>; ... 4 more ...; createdAt?: SQL<...> | ... 2 more ... | undefined; }[]): PgInsertBase<...>', gave the following error.
+    Object literal may only specify known properties, and 'articleId' does not exist in type '{ content: string | SQL<unknown> | Placeholder<string, any>; embedding: SQL<unknown> | number[] | Placeholder<string, any>; chunkIndex: number | SQL<unknown> | Placeholder<...>; ... 4 more ...; createdAt?: SQL<...> | ... 2 more ... | undefined; }[]'.
+lib/ai/knowledge/add-article.ts(90,22): error TS18048: 'article' is possibly 'undefined'.
+lib/ai/knowledge/add-article.ts(104,18): error TS18048: 'article' is possibly 'undefined'.
+lib/ai/knowledge/add-article.ts(105,7): error TS2353: Object literal may only specify known properties, and 'stats' does not exist in type '{ success: boolean; articleId?: string | undefined; error?: string | undefined; }'.
+lib/ai/knowledge/search.ts(248,20): error TS18048: 'result' is possibly 'undefined'.
+lib/ai/knowledge/search.ts(249,22): error TS18048: 'result' is possibly 'undefined'.
+lib/ai/knowledge/search.ts(250,18): error TS18048: 'result' is possibly 'undefined'.
+lib/ai/knowledge/search.ts(251,17): error TS18048: 'result' is possibly 'undefined'.
+lib/ai/knowledge/search.ts(252,23): error TS18048: 'result' is possibly 'undefined'.
+lib/ai/orchestrator/complete-analysis.ts(39,57): error TS18048: 'analysisRecord' is possibly 'undefined'.
+lib/ai/orchestrator/complete-analysis.ts(148,19): error TS2339: Property 'exerciseIntensity' does not exist on type '{ id: string; userId: string; age: number | null; gender: string | null; height: number | null; weight: number | null; systolicPressure: number | null; diastolicPressure: number | null; ... 31 more ...; updatedAt: Date; }'.
+lib/ai/orchestrator/complete-analysis.ts(149,68): error TS2339: Property 'exerciseIntensity' does not exist on type '{ id: string; userId: string; age: number | null; gender: string | null; height: number | null; weight: number | null; systolicPressure: number | null; diastolicPressure: number | null; ... 31 more ...; updatedAt: Date; }'.
+lib/ai/orchestrator/complete-analysis.ts(152,19): error TS2339: Property 'exerciseFrequency' does not exist on type '{ id: string; userId: string; age: number | null; gender: string | null; height: number | null; weight: number | null; systolicPressure: number | null; diastolicPressure: number | null; ... 31 more ...; updatedAt: Date; }'.
+lib/ai/orchestrator/complete-analysis.ts(153,67): error TS2339: Property 'exerciseFrequency' does not exist on type '{ id: string; userId: string; age: number | null; gender: string | null; height: number | null; weight: number | null; systolicPressure: number | null; diastolicPressure: number | null; ... 31 more ...; updatedAt: Date; }'.
+lib/ai/orchestrator/complete-analysis.ts(223,14): error TS2322: Type '"analyzing_foundation"' is not assignable to type 'SQL<unknown> | PgColumn<ColumnBaseConfig<ColumnDataType, string>, {}, {}> | "pending" | "analyzing_integrative" | "analyzing_specialized" | ... 4 more ... | undefined'.
+lib/ai/orchestrator/complete-analysis.ts(224,38): error TS18048: 'analysisRecord' is possibly 'undefined'.
+lib/ai/orchestrator/complete-analysis.ts(290,10): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(value: { analysis: string | SQL<unknown> | Placeholder<string, any>; userId: string | SQL<unknown> | Placeholder<string, any>; agentId: string | SQL<unknown> | Placeholder<...>; ... 10 more ...; ragUsed?: boolean | ... 3 more ... | undefined; }): PgInsertBase<...>', gave the following error.
+    Object literal may only specify known properties, but 'documentId' does not exist in type '{ analysis: string | SQL<unknown> | Placeholder<string, any>; userId: string | SQL<unknown> | Placeholder<string, any>; agentId: string | SQL<unknown> | Placeholder<...>; ... 10 more ...; ragUsed?: boolean | ... 3 more ... | undefined; }'. Did you mean to write 'documentIds'?
+  Overload 2 of 2, '(values: { analysis: string | SQL<unknown> | Placeholder<string, any>; userId: string | SQL<unknown> | Placeholder<string, any>; agentId: string | SQL<unknown> | Placeholder<...>; ... 10 more ...; ragUsed?: boolean | ... 3 more ... | undefined; }[]): PgInsertBase<...>', gave the following error.
+    Object literal may only specify known properties, and 'userId' does not exist in type '{ analysis: string | SQL<unknown> | Placeholder<string, any>; userId: string | SQL<unknown> | Placeholder<string, any>; agentId: string | SQL<unknown> | Placeholder<...>; ... 10 more ...; ragUsed?: boolean | ... 3 more ... | undefined; }[]'.
+lib/ai/orchestrator/complete-analysis.ts(293,23): error TS2532: Object is possibly 'undefined'.
+lib/ai/orchestrator/complete-analysis.ts(307,84): error TS18048: 'savedFoundation' is possibly 'undefined'.
+lib/ai/orchestrator/complete-analysis.ts(314,25): error TS18048: 'savedFoundation' is possibly 'undefined'.
+lib/ai/orchestrator/complete-analysis.ts(317,59): error TS2339: Property 'promptTokens' does not exist on type 'LanguageModelV2Usage'.
+lib/ai/orchestrator/complete-analysis.ts(318,63): error TS2339: Property 'completionTokens' does not exist on type 'LanguageModelV2Usage'.
+lib/ai/orchestrator/complete-analysis.ts(335,38): error TS18048: 'analysisRecord' is possibly 'undefined'.
+lib/ai/orchestrator/complete-analysis.ts(341,23): error TS18048: 'a' is possibly 'undefined'.
+lib/ai/orchestrator/complete-analysis.ts(341,25): error TS2339: Property 'agentName' does not exist on type '{ id: string; analysis: string; createdAt: Date; userId: string; agentId: string; documentIds: string[] | null; prompt: string | null; medicalProfileSnapshot: unknown; insights: string[] | null; ... 4 more ...; ragUsed: boolean | null; }'.
+lib/ai/orchestrator/complete-analysis.ts(341,38): error TS18048: 'a' is possibly 'undefined'.
+lib/ai/orchestrator/complete-analysis.ts(341,54): error TS18048: 'a' is possibly 'undefined'.
+lib/ai/orchestrator/complete-analysis.ts(364,52): error TS2532: Object is possibly 'undefined'.
+lib/ai/orchestrator/complete-analysis.ts(450,10): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(value: { analysis: string | SQL<unknown> | Placeholder<string, any>; userId: string | SQL<unknown> | Placeholder<string, any>; agentId: string | SQL<unknown> | Placeholder<...>; ... 10 more ...; ragUsed?: boolean | ... 3 more ... | undefined; }): PgInsertBase<...>', gave the following error.
+    Object literal may only specify known properties, but 'documentId' does not exist in type '{ analysis: string | SQL<unknown> | Placeholder<string, any>; userId: string | SQL<unknown> | Placeholder<string, any>; agentId: string | SQL<unknown> | Placeholder<...>; ... 10 more ...; ragUsed?: boolean | ... 3 more ... | undefined; }'. Did you mean to write 'documentIds'?
+  Overload 2 of 2, '(values: { analysis: string | SQL<unknown> | Placeholder<string, any>; userId: string | SQL<unknown> | Placeholder<string, any>; agentId: string | SQL<unknown> | Placeholder<...>; ... 10 more ...; ragUsed?: boolean | ... 3 more ... | undefined; }[]): PgInsertBase<...>', gave the following error.
+    Object literal may only specify known properties, and 'userId' does not exist in type '{ analysis: string | SQL<unknown> | Placeholder<string, any>; userId: string | SQL<unknown> | Placeholder<string, any>; agentId: string | SQL<unknown> | Placeholder<...>; ... 10 more ...; ragUsed?: boolean | ... 3 more ... | undefined; }[]'.
+lib/ai/orchestrator/complete-analysis.ts(453,23): error TS2532: Object is possibly 'undefined'.
+lib/ai/orchestrator/complete-analysis.ts(473,42): error TS18048: 'savedAnalysis' is possibly 'undefined'.
+lib/ai/orchestrator/complete-analysis.ts(483,27): error TS18048: 'savedAnalysis' is possibly 'undefined'.
+lib/ai/orchestrator/complete-analysis.ts(486,51): error TS2339: Property 'promptTokens' does not exist on type 'LanguageModelV2Usage'.
+lib/ai/orchestrator/complete-analysis.ts(487,55): error TS2339: Property 'completionTokens' does not exist on type 'LanguageModelV2Usage'.
+lib/ai/orchestrator/complete-analysis.ts(503,38): error TS18048: 'analysisRecord' is possibly 'undefined'.
+lib/ai/orchestrator/complete-analysis.ts(511,16): error TS18048: 'fa' is possibly 'undefined'.
+lib/ai/orchestrator/complete-analysis.ts(511,19): error TS2339: Property 'agentName' does not exist on type '{ id: string; analysis: string; createdAt: Date; userId: string; agentId: string; documentIds: string[] | null; prompt: string | null; medicalProfileSnapshot: unknown; insights: string[] | null; ... 4 more ...; ragUsed: boolean | null; }'.
+lib/ai/orchestrator/complete-analysis.ts(512,19): error TS18048: 'fa' is possibly 'undefined'.
+lib/ai/orchestrator/complete-analysis.ts(512,22): error TS2339: Property 'agentKey' does not exist on type '{ id: string; analysis: string; createdAt: Date; userId: string; agentId: string; documentIds: string[] | null; prompt: string | null; medicalProfileSnapshot: unknown; insights: string[] | null; ... 4 more ...; ragUsed: boolean | null; }'.
+lib/ai/orchestrator/complete-analysis.ts(513,19): error TS18048: 'fa' is possibly 'undefined'.
+lib/ai/orchestrator/complete-analysis.ts(519,19): error TS18048: 'savedAnalysis' is possibly 'undefined'.
+lib/ai/orchestrator/complete-analysis.ts(539,38): error TS18048: 'analysisRecord' is possibly 'undefined'.
+lib/ai/orchestrator/complete-analysis.ts(545,39): error TS18048: 'fa' is possibly 'undefined'.
+lib/ai/orchestrator/complete-analysis.ts(546,62): error TS18048: 'savedAnalysis' is possibly 'undefined'.
+lib/ai/orchestrator/complete-analysis.ts(578,52): error TS2339: Property 'supplementationStrategy' does not exist on type '{ id: string; supplementation: any; shopping: any; meals: any; workout: any; createdAt: Date; }'.
+lib/ai/orchestrator/complete-analysis.ts(579,45): error TS2551: Property 'shoppingList' does not exist on type '{ id: string; supplementation: any; shopping: any; meals: any; workout: any; createdAt: Date; }'. Did you mean 'shopping'?
+lib/ai/orchestrator/complete-analysis.ts(580,42): error TS2339: Property 'mealPlan' does not exist on type '{ id: string; supplementation: any; shopping: any; meals: any; workout: any; createdAt: Date; }'.
+lib/ai/orchestrator/complete-analysis.ts(581,44): error TS2339: Property 'workoutPlan' does not exist on type '{ id: string; supplementation: any; shopping: any; meals: any; workout: any; createdAt: Date; }'.
+lib/ai/orchestrator/complete-analysis.ts(606,11): error TS2353: Object literal may only specify known properties, and 'description' does not exist in type '{ analysisId?: string | undefined; operation: string; modelName: string; promptTokens: number; completionTokens: number; cachedTokens?: number | undefined; }'.
+lib/ai/orchestrator/complete-analysis.ts(606,65): error TS18048: 'analysisRecord' is possibly 'undefined'.
+lib/ai/orchestrator/complete-analysis.ts(623,11): error TS2353: Object literal may only specify known properties, and 'description' does not exist in type '{ analysisId?: string | undefined; operation: string; modelName: string; promptTokens: number; completionTokens: number; cachedTokens?: number | undefined; }'.
+lib/ai/orchestrator/complete-analysis.ts(674,38): error TS18048: 'analysisRecord' is possibly 'undefined'.
+lib/ai/orchestrator/complete-analysis.ts(685,11): error TS18048: 'analysisRecord' is possibly 'undefined'.
+lib/ai/orchestrator/complete-analysis.ts(703,38): error TS18048: 'analysisRecord' is possibly 'undefined'.
+lib/ai/products/dynamic-orchestrator.ts(142,9): error TS2769: No overload matches this call.
+  Overload 2 of 2, '(values: { userId: string | SQL<unknown> | Placeholder<string, any>; analysisId: string | SQL<unknown> | Placeholder<string, any>; weekStartDate: string | SQL<...> | Placeholder<...>; ... 10 more ...; processingTimeMs?: number | ... 3 more ... | undefined; }[]): PgInsertBase<...>', gave the following error.
+    Object literal may only specify known properties, and 'userId' does not exist in type '{ userId: string | SQL<unknown> | Placeholder<string, any>; analysisId: string | SQL<unknown> | Placeholder<string, any>; weekStartDate: string | SQL<unknown> | Placeholder<...>; ... 10 more ...; processingTimeMs?: number | ... 3 more ... | undefined; }[]'.
+lib/ai/products/dynamic-orchestrator.ts(153,52): error TS18048: 'plan' is possibly 'undefined'.
+lib/ai/products/dynamic-orchestrator.ts(162,8): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(value: { userId: string | SQL<unknown> | Placeholder<string, any>; analysisId: string | SQL<unknown> | Placeholder<string, any>; examRecommendations: unknown; lifestyleRecommendations: unknown; ... 8 more ...; processingTimeMs?: number | ... 3 more ... | undefined; }): PgInsertBase<...>', gave the following error.
+    Type 'string | undefined' is not assignable to type 'string | SQL<unknown> | Placeholder<string, any>'.
+      Type 'undefined' is not assignable to type 'string | SQL<unknown> | Placeholder<string, any>'.
+  Overload 2 of 2, '(values: { userId: string | SQL<unknown> | Placeholder<string, any>; analysisId: string | SQL<unknown> | Placeholder<string, any>; examRecommendations: unknown; lifestyleRecommendations: unknown; ... 8 more ...; processingTimeMs?: number | ... 3 more ... | undefined; }[]): PgInsertBase<...>', gave the following error.
+    Object literal may only specify known properties, and 'userId' does not exist in type '{ userId: string | SQL<unknown> | Placeholder<string, any>; analysisId: string | SQL<unknown> | Placeholder<string, any>; examRecommendations: unknown; lifestyleRecommendations: unknown; ... 8 more ...; processingTimeMs?: number | ... 3 more ... | undefined; }[]'.
+lib/ai/products/dynamic-orchestrator.ts(178,56): error TS18048: 'recs' is possibly 'undefined'.
+lib/ai/products/dynamic-orchestrator.ts(184,5): error TS2322: Type '{ id: string; createdAt: Date; updatedAt: Date; userId: string; prompt: string | null; modelUsed: string | null; tokensUsed: number | null; processingTimeMs: number | null; ... 5 more ...; workoutPlan: { ...; }; } | null | undefined' is not assignable to type '{ id: string; supplementation: any; shopping: any; meals: any; workout: any; createdAt: Date; } | null'.
+  Type 'undefined' is not assignable to type '{ id: string; supplementation: any; shopping: any; meals: any; workout: any; createdAt: Date; } | null'.
+lib/ai/products/dynamic-orchestrator.ts(185,5): error TS2322: Type '{ id: string; createdAt: Date; updatedAt: Date; userId: string; prompt: string | null; modelUsed: string | null; tokensUsed: number | null; processingTimeMs: number | null; ... 4 more ...; alerts: unknown; } | null | undefined' is not assignable to type '{ id: string; examRecommendations: any[]; lifestyleRecommendations: any[]; healthGoals: any[]; alerts: any[]; createdAt: Date; } | null'.
+  Type 'undefined' is not assignable to type '{ id: string; examRecommendations: any[]; lifestyleRecommendations: any[]; healthGoals: any[]; alerts: any[]; createdAt: Date; } | null'.
+lib/ai/products/dynamic-orchestrator.ts(227,6): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(value: { userId: string | SQL<unknown> | Placeholder<string, any>; analysisId: string | SQL<unknown> | Placeholder<string, any>; weekStartDate: string | SQL<...> | Placeholder<...>; ... 10 more ...; processingTimeMs?: number | ... 3 more ... | undefined; }): PgInsertBase<...>', gave the following error.
+    Object literal may only specify known properties, and 'supplementation' does not exist in type '{ userId: string | SQL<unknown> | Placeholder<string, any>; analysisId: string | SQL<unknown> | Placeholder<string, any>; weekStartDate: string | SQL<unknown> | Placeholder<...>; ... 10 more ...; processingTimeMs?: number | ... 3 more ... | undefined; }'.
+  Overload 2 of 2, '(values: { userId: string | SQL<unknown> | Placeholder<string, any>; analysisId: string | SQL<unknown> | Placeholder<string, any>; weekStartDate: string | SQL<...> | Placeholder<...>; ... 10 more ...; processingTimeMs?: number | ... 3 more ... | undefined; }[]): PgInsertBase<...>', gave the following error.
+    Object literal may only specify known properties, and 'userId' does not exist in type '{ userId: string | SQL<unknown> | Placeholder<string, any>; analysisId: string | SQL<unknown> | Placeholder<string, any>; weekStartDate: string | SQL<unknown> | Placeholder<...>; ... 10 more ...; processingTimeMs?: number | ... 3 more ... | undefined; }[]'.
+lib/ai/products/dynamic-orchestrator.ts(236,41): error TS18048: 'savedPlan' is possibly 'undefined'.
+lib/ai/products/dynamic-orchestrator.ts(239,9): error TS18048: 'savedPlan' is possibly 'undefined'.
+lib/ai/products/dynamic-orchestrator.ts(285,31): error TS2532: Object is possibly 'undefined'.
+lib/ai/products/dynamic-orchestrator.ts(289,6): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(value: { userId: string | SQL<unknown> | Placeholder<string, any>; analysisId: string | SQL<unknown> | Placeholder<string, any>; examRecommendations: unknown; lifestyleRecommendations: unknown; ... 8 more ...; processingTimeMs?: number | ... 3 more ... | undefined; }): PgInsertBase<...>', gave the following error.
+    Type 'string | undefined' is not assignable to type 'string | SQL<unknown> | Placeholder<string, any>'.
+      Type 'undefined' is not assignable to type 'string | SQL<unknown> | Placeholder<string, any>'.
+  Overload 2 of 2, '(values: { userId: string | SQL<unknown> | Placeholder<string, any>; analysisId: string | SQL<unknown> | Placeholder<string, any>; examRecommendations: unknown; lifestyleRecommendations: unknown; ... 8 more ...; processingTimeMs?: number | ... 3 more ... | undefined; }[]): PgInsertBase<...>', gave the following error.
+    Object literal may only specify known properties, and 'userId' does not exist in type '{ userId: string | SQL<unknown> | Placeholder<string, any>; analysisId: string | SQL<unknown> | Placeholder<string, any>; examRecommendations: unknown; lifestyleRecommendations: unknown; ... 8 more ...; processingTimeMs?: number | ... 3 more ... | undefined; }[]'.
+lib/ai/products/dynamic-orchestrator.ts(296,19): error TS2532: Object is possibly 'undefined'.
+lib/ai/products/dynamic-orchestrator.ts(297,25): error TS2532: Object is possibly 'undefined'.
+lib/ai/products/dynamic-orchestrator.ts(298,18): error TS2532: Object is possibly 'undefined'.
+lib/ai/products/dynamic-orchestrator.ts(303,45): error TS18048: 'savedRecs' is possibly 'undefined'.
+lib/ai/products/dynamic-orchestrator.ts(306,9): error TS18048: 'savedRecs' is possibly 'undefined'.
+lib/ai/products/dynamic-orchestrator.ts(308,12): error TS2532: Object is possibly 'undefined'.
+lib/ai/rag/agent-knowledge-filter.ts(51,27): error TS2532: Object is possibly 'undefined'.
+lib/ai/rag/agent-knowledge-filter.ts(52,22): error TS2532: Object is possibly 'undefined'.
+lib/ai/rag/agent-knowledge-filter.ts(53,25): error TS2532: Object is possibly 'undefined'.
+lib/ai/rag/agent-knowledge-filter.ts(54,28): error TS2532: Object is possibly 'undefined'.
+lib/ai/rag/agent-knowledge-filter.ts(55,26): error TS2532: Object is possibly 'undefined'.
+lib/ai/rag/agent-knowledge-filter.ts(56,26): error TS2532: Object is possibly 'undefined'.
+lib/ai/recommendations/generate.ts(170,58): error TS18048: 'savedRec' is possibly 'undefined'.
+lib/ai/recommendations/generate.ts(173,9): error TS18048: 'savedRec' is possibly 'undefined'.
+lib/ai/recommendations/generate.ts(176,16): error TS18048: 'savedRec' is possibly 'undefined'.
+lib/ai/recommendations/multi-analysis-generator.ts(197,6): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(value: { userId: string | SQL<unknown> | Placeholder<string, any>; analysisId: string | SQL<unknown> | Placeholder<string, any>; examRecommendations: unknown; lifestyleRecommendations: unknown; ... 8 more ...; processingTimeMs?: number | ... 3 more ... | undefined; }): PgInsertBase<...>', gave the following error.
+    Type 'string | undefined' is not assignable to type 'string | SQL<unknown> | Placeholder<string, any>'.
+      Type 'undefined' is not assignable to type 'string | SQL<unknown> | Placeholder<string, any>'.
+  Overload 2 of 2, '(values: { userId: string | SQL<unknown> | Placeholder<string, any>; analysisId: string | SQL<unknown> | Placeholder<string, any>; examRecommendations: unknown; lifestyleRecommendations: unknown; ... 8 more ...; processingTimeMs?: number | ... 3 more ... | undefined; }[]): PgInsertBase<...>', gave the following error.
+    Object literal may only specify known properties, and 'userId' does not exist in type '{ userId: string | SQL<unknown> | Placeholder<string, any>; analysisId: string | SQL<unknown> | Placeholder<string, any>; examRecommendations: unknown; lifestyleRecommendations: unknown; ... 8 more ...; processingTimeMs?: number | ... 3 more ... | undefined; }[]'.
+lib/ai/recommendations/multi-analysis-generator.ts(207,64): error TS18048: 'savedRec' is possibly 'undefined'.
+lib/ai/recommendations/multi-analysis-generator.ts(210,9): error TS18048: 'savedRec' is possibly 'undefined'.
+lib/ai/recommendations/multi-analysis-generator.ts(213,16): error TS18048: 'savedRec' is possibly 'undefined'.
+lib/ai/weekly-plans/generators.ts(128,5): error TS2353: Object literal may only specify known properties, and 'maxTokens' does not exist in type 'Omit<CallSettings, "stopSequences"> & { system?: string | undefined; } & { prompt: string | ModelMessage[]; messages?: undefined; } & { schema: ZodObject<...>; schemaName?: string | undefined; schemaDescription?: string | undefined; mode?: "json" | ... 2 more ... | undefined; } & { ...; }'.
+lib/ai/weekly-plans/generators.ts(163,5): error TS2353: Object literal may only specify known properties, and 'maxTokens' does not exist in type 'Omit<CallSettings, "stopSequences"> & { system?: string | undefined; } & { prompt: string | ModelMessage[]; messages?: undefined; } & { schema: ZodObject<...>; schemaName?: string | undefined; schemaDescription?: string | undefined; mode?: "json" | ... 2 more ... | undefined; } & { ...; }'.
+lib/ai/weekly-plans/generators.ts(209,5): error TS2353: Object literal may only specify known properties, and 'maxTokens' does not exist in type 'Omit<CallSettings, "stopSequences"> & { system?: string | undefined; } & { prompt: string | ModelMessage[]; messages?: undefined; } & { schema: ZodObject<...>; schemaName?: string | undefined; schemaDescription?: string | undefined; mode?: "json" | ... 2 more ... | undefined; } & { ...; }'.
+lib/ai/weekly-plans/generators.ts(259,5): error TS2353: Object literal may only specify known properties, and 'maxTokens' does not exist in type 'Omit<CallSettings, "stopSequences"> & { system?: string | undefined; } & { prompt: string | ModelMessage[]; messages?: undefined; } & { schema: ZodObject<...>; schemaName?: string | undefined; schemaDescription?: string | undefined; mode?: "json" | ... 2 more ... | undefined; } & { ...; }'.
+lib/ai/weekly-plans/multi-analysis-orchestrator.ts(126,7): error TS2769: No overload matches this call.
+  Overload 2 of 2, '(values: { userId: string | SQL<unknown> | Placeholder<string, any>; analysisId: string | SQL<unknown> | Placeholder<string, any>; weekStartDate: string | SQL<...> | Placeholder<...>; ... 10 more ...; processingTimeMs?: number | ... 3 more ... | undefined; }[]): PgInsertBase<...>', gave the following error.
+    Object literal may only specify known properties, and 'userId' does not exist in type '{ userId: string | SQL<unknown> | Placeholder<string, any>; analysisId: string | SQL<unknown> | Placeholder<string, any>; weekStartDate: string | SQL<unknown> | Placeholder<...>; ... 10 more ...; processingTimeMs?: number | ... 3 more ... | undefined; }[]'.
+lib/ai/weekly-plans/multi-analysis-orchestrator.ts(136,52): error TS18048: 'savedPlan' is possibly 'undefined'.
+lib/ai/weekly-plans/multi-analysis-orchestrator.ts(145,9): error TS18048: 'savedPlan' is possibly 'undefined'.
+lib/ai/weekly-plans/multi-analysis-orchestrator.ts(146,20): error TS18048: 'savedPlan' is possibly 'undefined'.
+lib/ai/weekly-plans/multi-analysis-orchestrator.ts(147,30): error TS18048: 'savedPlan' is possibly 'undefined'.
+lib/ai/weekly-plans/multi-analysis-orchestrator.ts(148,19): error TS18048: 'savedPlan' is possibly 'undefined'.
+lib/ai/weekly-plans/multi-analysis-orchestrator.ts(149,15): error TS18048: 'savedPlan' is possibly 'undefined'.
+lib/ai/weekly-plans/multi-analysis-orchestrator.ts(150,18): error TS18048: 'savedPlan' is possibly 'undefined'.
+lib/ai/weekly-plans/multi-analysis-orchestrator.ts(151,16): error TS18048: 'savedPlan' is possibly 'undefined'.
+lib/ai/weekly-plans/multi-analysis-orchestrator.ts(158,40): error TS2339: Property 'promptTokens' does not exist on type 'LanguageModelV2Usage'.
+lib/ai/weekly-plans/multi-analysis-orchestrator.ts(159,40): error TS2339: Property 'promptTokens' does not exist on type 'LanguageModelV2Usage'.
+lib/ai/weekly-plans/multi-analysis-orchestrator.ts(160,40): error TS2339: Property 'promptTokens' does not exist on type 'LanguageModelV2Usage'.
+lib/ai/weekly-plans/multi-analysis-orchestrator.ts(161,43): error TS2339: Property 'promptTokens' does not exist on type 'LanguageModelV2Usage'.
+lib/ai/weekly-plans/multi-analysis-orchestrator.ts(162,44): error TS2339: Property 'completionTokens' does not exist on type 'LanguageModelV2Usage'.
+lib/ai/weekly-plans/multi-analysis-orchestrator.ts(163,43): error TS2339: Property 'completionTokens' does not exist on type 'LanguageModelV2Usage'.
+lib/ai/weekly-plans/multi-analysis-orchestrator.ts(164,43): error TS2339: Property 'completionTokens' does not exist on type 'LanguageModelV2Usage'.
+lib/ai/weekly-plans/multi-analysis-orchestrator.ts(165,46): error TS2339: Property 'completionTokens' does not exist on type 'LanguageModelV2Usage'.
+lib/api-keys/auth-middleware.ts(68,52): error TS18048: 'user' is possibly 'undefined'.
+lib/api-keys/auth-middleware.ts(68,67): error TS18048: 'user' is possibly 'undefined'.
+lib/api-keys/generate.ts(62,9): error TS2532: Object is possibly 'undefined'.
+lib/api-keys/generate.ts(68,16): error TS2532: Object is possibly 'undefined'.
+lib/api-keys/generate.ts(104,10): error TS18048: 'key' is possibly 'undefined'.
+lib/api-keys/generate.ts(109,9): error TS18048: 'key' is possibly 'undefined'.
+lib/api-keys/generate.ts(109,35): error TS18048: 'key' is possibly 'undefined'.
+lib/api-keys/generate.ts(117,29): error TS18048: 'key' is possibly 'undefined'.
+lib/api-keys/generate.ts(121,15): error TS18048: 'key' is possibly 'undefined'.
+lib/api-keys/generate.ts(122,14): error TS18048: 'key' is possibly 'undefined'.
+lib/auth/config.ts(72,14): error TS18048: 'foundUser' is possibly 'undefined'.
+lib/auth/config.ts(78,11): error TS18048: 'foundUser' is possibly 'undefined'.
+lib/auth/config.ts(87,15): error TS18048: 'foundUser' is possibly 'undefined'.
+lib/auth/config.ts(88,18): error TS18048: 'foundUser' is possibly 'undefined'.
+lib/auth/config.ts(89,17): error TS18048: 'foundUser' is possibly 'undefined'.
+lib/auth/config.ts(90,18): error TS18048: 'foundUser' is possibly 'undefined'.
+lib/auth/config.ts(91,17): error TS18048: 'foundUser' is possibly 'undefined'.
+lib/auth/config.ts(98,17): error TS7031: Binding element 'token' implicitly has an 'any' type.
+lib/auth/config.ts(98,24): error TS7031: Binding element 'user' implicitly has an 'any' type.
+lib/auth/config.ts(98,30): error TS7031: Binding element 'trigger' implicitly has an 'any' type.
+lib/auth/config.ts(98,39): error TS7031: Binding element 'session' implicitly has an 'any' type.
+lib/auth/config.ts(113,21): error TS7031: Binding element 'session' implicitly has an 'any' type.
+lib/auth/config.ts(113,30): error TS7031: Binding element 'token' implicitly has an 'any' type.
+lib/auth/config.ts(121,22): error TS7031: Binding element 'url' implicitly has an 'any' type.
+lib/auth/config.ts(121,27): error TS7031: Binding element 'baseUrl' implicitly has an 'any' type.
+lib/auth/config.ts(141,14): error TS2345: Argument of type '{ session: { strategy: "jwt"; maxAge: number; }; pages: { signIn: string; signOut: string; error: string; }; trustHost: boolean; providers: CredentialsConfig<Record<string, CredentialInput>>[]; callbacks: { ...; }; debug: boolean; }' is not assignable to parameter of type 'NextAuthConfig | ((request: NextRequest | undefined) => Awaitable<NextAuthConfig>)'.
+  Type '{ session: { strategy: "jwt"; maxAge: number; }; pages: { signIn: string; signOut: string; error: string; }; trustHost: boolean; providers: CredentialsConfig<Record<string, CredentialInput>>[]; callbacks: { ...; }; debug: boolean; }' is not assignable to type 'NextAuthConfig'.
+    Types of property 'callbacks' are incompatible.
+      Type '{ jwt({ token, user, trigger, session }: { token: any; user: any; trigger: any; session: any; }): Promise<any>; session({ session, token }: { session: any; token: any; }): Promise<any>; redirect({ url, baseUrl }: { url: any; baseUrl: any; }): Promise<...>; }' is not assignable to type '{ signIn?: ((params: { user: User | AdapterUser; account?: Account | null | undefined; profile?: Profile | undefined; email?: { verificationRequest?: boolean | undefined; } | undefined; credentials?: Record<...> | undefined; }) => Awaitable<...>) | undefined; redirect?: ((params: { ...; }) => Awaitable<...>) | undef...'.
+        Type '{ jwt({ token, user, trigger, session }: { token: any; user: any; trigger: any; session: any; }): Promise<any>; session({ session, token }: { session: any; token: any; }): Promise<any>; redirect({ url, baseUrl }: { url: any; baseUrl: any; }): Promise<...>; }' is not assignable to type '{ signIn?: ((params: { user: User | AdapterUser; account?: Account | null | undefined; profile?: Profile | undefined; email?: { verificationRequest?: boolean | undefined; } | undefined; credentials?: Record<...> | undefined; }) => Awaitable<...>) | undefined; redirect?: ((params: { ...; }) => Awaitable<...>) | undef...'.
+          Types of property 'jwt' are incompatible.
+            Type '({ token, user, trigger, session }: { token: any; user: any; trigger: any; session: any; }) => Promise<any>' is not assignable to type '(params: { token: JWT; user: User | AdapterUser; account?: Account | null | undefined; profile?: Profile | undefined; trigger?: "signIn" | "signUp" | "update" | undefined; isNewUser?: boolean | undefined; session?: any; }) => Awaitable<...>'.
+              Types of parameters '__0' and 'params' are incompatible.
+                Type '{ token: JWT; user: User | AdapterUser; account?: Account | null | undefined; profile?: Profile | undefined; trigger?: "signIn" | "signUp" | "update" | undefined; isNewUser?: boolean | undefined; session?: any; }' is not assignable to type '{ token: any; user: any; trigger: any; session: any; }'.
+                  Property 'trigger' is optional in type '{ token: JWT; user: User | AdapterUser; account?: Account | null | undefined; profile?: Profile | undefined; trigger?: "signIn" | "signUp" | "update" | undefined; isNewUser?: boolean | undefined; session?: any; }' but required in type '{ token: any; user: any; trigger: any; session: any; }'.
+lib/billing/credits.ts(91,10): error TS18048: 'credits' is possibly 'undefined'.
+lib/billing/credits.ts(165,22): error TS18048: 'transaction' is possibly 'undefined'.
+lib/billing/rate-limiting.ts(17,7): error TS2554: Expected 1 arguments, but got 2.
+lib/billing/rate-limiting.ts(36,7): error TS2554: Expected 1 arguments, but got 2.
+lib/billing/stripe-client.ts(12,7): error TS2322: Type '"2024-12-18.acacia"' is not assignable to type '"2025-12-15.clover"'.
+lib/billing/webhook-handlers.ts(53,69): error TS18048: 'transaction' is possibly 'undefined'.
+lib/billing/webhook-handlers.ts(66,20): error TS18048: 'transaction' is possibly 'undefined'.
+lib/db/seed/seed-test-users.ts(1108,47): error TS18048: 'profile' is possibly 'undefined'.
+lib/db/seed/seed-test-users.ts(1108,64): error TS18048: 'profile' is possibly 'undefined'.
+lib/db/seed/seed-test-users.ts(1113,14): error TS18048: 'profile' is possibly 'undefined'.
+lib/db/seed/seed-test-users.ts(1115,13): error TS18048: 'profile' is possibly 'undefined'.
+lib/db/seed/seed-test-users.ts(1119,38): error TS18048: 'user' is possibly 'undefined'.
+lib/db/seed/seed-test-users.ts(1123,15): error TS18048: 'user' is possibly 'undefined'.
+lib/db/seed/seed-test-users.ts(1124,12): error TS18048: 'profile' is possibly 'undefined'.
+lib/db/seed/seed-test-users.ts(1125,15): error TS18048: 'profile' is possibly 'undefined'.
+lib/db/seed/seed-test-users.ts(1126,15): error TS18048: 'profile' is possibly 'undefined'.
+lib/db/seed/seed-test-users.ts(1127,15): error TS18048: 'profile' is possibly 'undefined'.
+lib/db/seed/seed-test-users.ts(1129,27): error TS18048: 'profile' is possibly 'undefined'.
+lib/db/seed/seed-test-users.ts(1138,7): error TS18048: 'profile' is possibly 'undefined'.
+lib/db/seed/seed-test-users.ts(1139,7): error TS18048: 'profile' is possibly 'undefined'.
+lib/db/seed/seed-test-users.ts(1140,7): error TS18048: 'profile' is possibly 'undefined'.
+lib/db/seed/seed-test-users.ts(1142,7): error TS18048: 'profile' is possibly 'undefined'.
+lib/db/seed/seed-test-users.ts(1162,15): error TS18048: 'user' is possibly 'undefined'.
+lib/db/seed/seed-test-users.ts(1163,31): error TS18048: 'user' is possibly 'undefined'.
+lib/db/seed/seed-test-users.ts(1176,7): error TS18048: 'profile' is possibly 'undefined'.
+lib/db/seed/seed-test-users.ts(1177,7): error TS18048: 'profile' is possibly 'undefined'.
+lib/db/seed/seed-test-users.ts(1178,7): error TS18048: 'profile' is possibly 'undefined'.
+lib/db/seed/seed-test-users.ts(1198,15): error TS18048: 'user' is possibly 'undefined'.
+lib/db/seed/seed-test-users.ts(1199,33): error TS18048: 'user' is possibly 'undefined'.
+lib/db/seed/seed-test-users.ts(1210,29): error TS18048: 'profile' is possibly 'undefined'.
+lib/documents/chunking.ts(110,26): error TS18048: 'match' is possibly 'undefined'.
+lib/documents/chunking.ts(221,22): error TS2532: Object is possibly 'undefined'.
+lib/documents/pdf-processor.ts(7,17): error TS7016: Could not find a declaration file for module 'pdf-parse'. 'C:/projetos/medical-ai-v2/node_modules/.pnpm/pdf-parse@1.1.1/node_modules/pdf-parse/index.js' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/pdf-parse` if it exists or add a new declaration (.d.ts) file containing `declare module 'pdf-parse';`
+lib/documents/processor.ts(95,7): error TS2322: Type 'string' is not assignable to type 'DocumentType | undefined'.
+lib/documents/processor.ts(128,11): error TS18048: 'processedDoc.confidence' is possibly 'undefined'.
+lib/documents/processor.ts(219,38): error TS18048: 'doc' is possibly 'undefined'.
+lib/documents/processor.ts(233,19): error TS18048: 'doc' is possibly 'undefined'.
+lib/documents/structuring.ts(24,64): error TS2304: Cannot find name 'StructuredMedicalDocument'.
+lib/documents/structuring.ts(63,12): error TS2304: Cannot find name 'StructuredMedicalDocument'.
+lib/documents/structuring.ts(111,14): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{ 'gemini-3-pro-preview': LanguageModelV2; 'gemini-2.5-flash': LanguageModelV2; 'gemini-2.5-flash-lite': LanguageModelV2; 'gemini-2.5-pro': LanguageModelV2; ... 5 more ...; embedding: EmbeddingModelV2<...>; }'.
+  No index signature with a parameter of type 'string' was found on type '{ 'gemini-3-pro-preview': LanguageModelV2; 'gemini-2.5-flash': LanguageModelV2; 'gemini-2.5-flash-lite': LanguageModelV2; 'gemini-2.5-pro': LanguageModelV2; ... 5 more ...; embedding: EmbeddingModelV2<...>; }'.
+lib/documents/structuring.ts(165,47): error TS2304: Cannot find name 'StructuredMedicalDocument'.
+lib/documents/vision-processor.ts(234,54): error TS18048: 'result.usage.totalTokens' is possibly 'undefined'.
+lib/documents/vision-processor.ts(243,24): error TS18048: 'result.usage.totalTokens' is possibly 'undefined'.
+lib/logic/biomarker-extractor.ts(284,54): error TS2345: Argument of type '{ documentType: "lab_report" | "bioimpedance" | "medical_report" | "prescription" | "imaging" | "other"; patientInfo: { name?: string | undefined; age?: number | undefined; sex?: "M" | ... 1 more ... | undefined; id_cpf?: string | undefined; id_rg?: string | undefined; dateOfBirth?: string | undefined; }; providerIn...' is not assignable to parameter of type '{ documentType: "lab_report" | "bioimpedance" | "medical_report" | "prescription" | "imaging" | "other"; patientInfo: { name?: string | undefined; age?: number | undefined; sex?: "M" | "F" | undefined; id_cpf?: string | undefined; id_rg?: string | undefined; dateOfBirth?: string | undefined; }; providerInfo: { ...; ...'.
+  Type 'undefined' is not assignable to type '{ documentType: "lab_report" | "bioimpedance" | "medical_report" | "prescription" | "imaging" | "other"; patientInfo: { name?: string | undefined; age?: number | undefined; sex?: "M" | "F" | undefined; id_cpf?: string | undefined; id_rg?: string | undefined; dateOfBirth?: string | undefined; }; providerInfo: { ...; ...'.
+lib/logic/medical-engine.ts(272,9): error TS2322: Type '"unknown" | "optimal" | "suboptimal" | "abnormal"' is not assignable to type '"optimal" | "suboptimal" | "abnormal"'.
+  Type '"unknown"' is not assignable to type '"optimal" | "suboptimal" | "abnormal"'.

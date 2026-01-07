@@ -91,6 +91,18 @@ export function AgentForm({ agent, onSuccess, onCancel }: AgentFormProps) {
     allowedSubcategories: [] as string[],
     excludedArticleIds: [] as string[],
     includedArticleIds: [] as string[],
+    // Product Generator fields
+    agentType: 'analysis' as 'analysis' | 'product_generator',
+    productType: null as 'weekly_plan' | 'recommendations' | null,
+    generatorKey: '',
+    outputSchema: '',
+    ragConfig: {
+      enabled: false,
+      keywords: [] as string[],
+      maxChunks: 3,
+      maxCharsPerChunk: 1200,
+    },
+    executionOrder: null as number | null,
   })
 
   // Load filters (authors, categories, subcategories) on mount
@@ -166,6 +178,18 @@ export function AgentForm({ agent, onSuccess, onCancel }: AgentFormProps) {
         allowedSubcategories: Array.isArray(agent.allowedSubcategories) ? agent.allowedSubcategories : [],
         excludedArticleIds: Array.isArray(agent.excludedArticleIds) ? agent.excludedArticleIds : [],
         includedArticleIds: Array.isArray(agent.includedArticleIds) ? agent.includedArticleIds : [],
+        // Product Generator fields
+        agentType: agent.agentType || 'analysis',
+        productType: agent.productType || null,
+        generatorKey: agent.generatorKey || '',
+        outputSchema: agent.outputSchema ? JSON.stringify(agent.outputSchema, null, 2) : '',
+        ragConfig: agent.ragConfig || {
+          enabled: false,
+          keywords: [],
+          maxChunks: 3,
+          maxCharsPerChunk: 1200,
+        },
+        executionOrder: agent.executionOrder !== undefined && agent.executionOrder !== null ? agent.executionOrder : null,
       }
 
       setFormData(newFormData)
@@ -336,7 +360,19 @@ export function AgentForm({ agent, onSuccess, onCancel }: AgentFormProps) {
     setIsSubmitting(true)
 
     try {
-      const payload = {
+      // Validate and parse outputSchema for product generators
+      let parsedOutputSchema = null
+      if (formData.agentType === 'product_generator' && formData.outputSchema.trim()) {
+        try {
+          parsedOutputSchema = JSON.parse(formData.outputSchema.trim())
+        } catch (jsonError) {
+          alert('Erro no JSON Schema: ' + (jsonError instanceof Error ? jsonError.message : 'JSON inválido'))
+          setIsSubmitting(false)
+          return
+        }
+      }
+
+      const payload: any = {
         agentKey: formData.agentKey.trim(),
         name: formData.name.trim(),
         title: formData.title.trim(),
@@ -369,6 +405,13 @@ export function AgentForm({ agent, onSuccess, onCancel }: AgentFormProps) {
         allowedSubcategories: formData.allowedSubcategories,
         excludedArticleIds: formData.excludedArticleIds,
         includedArticleIds: formData.includedArticleIds,
+        // Product Generator fields
+        agentType: formData.agentType,
+        productType: formData.productType,
+        generatorKey: formData.generatorKey.trim() || null,
+        outputSchema: parsedOutputSchema,
+        ragConfig: formData.agentType === 'product_generator' ? formData.ragConfig : null,
+        executionOrder: formData.executionOrder,
       }
 
       const url = agent
@@ -384,13 +427,17 @@ export function AgentForm({ agent, onSuccess, onCancel }: AgentFormProps) {
       })
 
       if (!response.ok) {
-        throw new Error('Erro ao salvar agente')
+        const errorData = await response.json()
+        console.error('❌ Server error:', errorData)
+        throw new Error(errorData.error || 'Erro ao salvar agente')
       }
+
+      const result = await response.json()
 
       onSuccess()
     } catch (error) {
-      console.error('Error submitting form:', error)
-      alert('Erro ao salvar agente')
+      console.error('❌ Error submitting form:', error)
+      alert('Erro ao salvar agente: ' + (error instanceof Error ? error.message : 'Erro desconhecido'))
     } finally {
       setIsSubmitting(false)
     }
@@ -413,6 +460,29 @@ export function AgentForm({ agent, onSuccess, onCancel }: AgentFormProps) {
       {/* Basic Info */}
       <div className="space-y-4">
         <h3 className="font-semibold text-lg">Informações Básicas</h3>
+
+        {/* Agent Type Selector */}
+        <div className="space-y-2">
+          <Label htmlFor="agentType">Tipo de Agente *</Label>
+          <Select
+            value={formData.agentType}
+            onValueChange={(value) => handleChange('agentType', value as 'analysis' | 'product_generator')}
+            disabled={!!agent} // Can't change type after creation
+          >
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="analysis">Agente de Análise</SelectItem>
+              <SelectItem value="product_generator">Gerador de Produtos</SelectItem>
+            </SelectContent>
+          </Select>
+          <p className="text-xs text-muted-foreground">
+            {formData.agentType === 'analysis'
+              ? 'Agentes que analisam documentos médicos e geram insights'
+              : 'Agentes que geram produtos como planos semanais e recomendações'}
+          </p>
+        </div>
 
         <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
@@ -510,6 +580,169 @@ export function AgentForm({ agent, onSuccess, onCancel }: AgentFormProps) {
           />
         </div>
       </div>
+
+      {/* Product Generator Configuration */}
+      {formData.agentType === 'product_generator' && (
+        <div className="space-y-4 p-4 border-2 border-purple-300 dark:border-purple-700 rounded-lg bg-purple-50 dark:bg-purple-950/30">
+          <h3 className="font-semibold text-lg flex items-center gap-2">
+            <span className="text-purple-600 dark:text-purple-400">⚙️</span>
+            Configuração de Gerador de Produtos
+          </h3>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            {/* Product Type */}
+            <div className="space-y-2">
+              <Label htmlFor="productType">Tipo de Produto *</Label>
+              <Select
+                value={formData.productType || ''}
+                onValueChange={(value) => handleChange('productType', value as 'weekly_plan' | 'recommendations')}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione o tipo" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="weekly_plan">Plano Semanal</SelectItem>
+                  <SelectItem value="recommendations">Recomendações</SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">
+                Define o formato do produto gerado
+              </p>
+            </div>
+
+            {/* Generator Key */}
+            <div className="space-y-2">
+              <Label htmlFor="generatorKey">Chave do Gerador *</Label>
+              <Input
+                id="generatorKey"
+                placeholder="ex: supplementation, shopping, meals"
+                value={formData.generatorKey}
+                onChange={(e) => handleChange('generatorKey', e.target.value)}
+                disabled={!!agent} // Can't change key after creation
+              />
+              <p className="text-xs text-muted-foreground">
+                Identificador único do gerador
+              </p>
+            </div>
+          </div>
+
+          {/* Execution Order */}
+          <div className="space-y-2">
+            <Label htmlFor="executionOrder">Ordem de Execução</Label>
+            <Input
+              id="executionOrder"
+              type="number"
+              min="1"
+              placeholder="Ex: 1, 2, 3..."
+              value={formData.executionOrder || ''}
+              onChange={(e) => handleChange('executionOrder', e.target.value ? parseInt(e.target.value) : null)}
+            />
+            <p className="text-xs text-muted-foreground">
+              Define a ordem de execução dos geradores (menor = executa primeiro)
+            </p>
+          </div>
+
+          {/* Output Schema */}
+          <div className="space-y-2">
+            <Label htmlFor="outputSchema">JSON Schema (Estrutura de Saída) *</Label>
+            <Textarea
+              id="outputSchema"
+              placeholder='{"type": "object", "properties": {...}}'
+              value={formData.outputSchema}
+              onChange={(e) => handleChange('outputSchema', e.target.value)}
+              rows={10}
+              className="font-mono text-sm"
+            />
+            <p className="text-xs text-muted-foreground">
+              Define a estrutura do objeto retornado pelo gerador (formato JSON Schema)
+            </p>
+          </div>
+
+          {/* RAG Configuration */}
+          <div className="space-y-4 p-4 border rounded-lg">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="ragEnabled" className="font-medium">
+                Ativar RAG (Base de Conhecimento)
+              </Label>
+              <Switch
+                id="ragEnabled"
+                checked={formData.ragConfig.enabled}
+                onCheckedChange={(checked) =>
+                  handleChange('ragConfig', { ...formData.ragConfig, enabled: checked })
+                }
+              />
+            </div>
+
+            {formData.ragConfig.enabled && (
+              <div className="space-y-4 pt-2">
+                {/* Keywords */}
+                <div className="space-y-2">
+                  <Label htmlFor="ragKeywords">Palavras-chave para Busca</Label>
+                  <Input
+                    id="ragKeywords"
+                    placeholder="nutrição, suplementação, vitaminas (separado por vírgula)"
+                    value={formData.ragConfig.keywords.join(', ')}
+                    onChange={(e) =>
+                      handleChange('ragConfig', {
+                        ...formData.ragConfig,
+                        keywords: e.target.value.split(',').map((k) => k.trim()).filter((k) => k.length > 0),
+                      })
+                    }
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Termos usados para buscar artigos relevantes na base de conhecimento
+                  </p>
+                </div>
+
+                {/* Max Chunks */}
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="ragMaxChunks">Máximo de Chunks</Label>
+                    <Input
+                      id="ragMaxChunks"
+                      type="number"
+                      min="1"
+                      max="10"
+                      value={formData.ragConfig.maxChunks}
+                      onChange={(e) =>
+                        handleChange('ragConfig', {
+                          ...formData.ragConfig,
+                          maxChunks: parseInt(e.target.value) || 3,
+                        })
+                      }
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Número de trechos de conhecimento a incluir
+                    </p>
+                  </div>
+
+                  {/* Max Chars Per Chunk */}
+                  <div className="space-y-2">
+                    <Label htmlFor="ragMaxChars">Caracteres por Chunk</Label>
+                    <Input
+                      id="ragMaxChars"
+                      type="number"
+                      min="500"
+                      max="3000"
+                      step="100"
+                      value={formData.ragConfig.maxCharsPerChunk}
+                      onChange={(e) =>
+                        handleChange('ragConfig', {
+                          ...formData.ragConfig,
+                          maxCharsPerChunk: parseInt(e.target.value) || 1200,
+                        })
+                      }
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Tamanho máximo de cada trecho
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* AI Configuration */}
       <div className="space-y-4">
@@ -618,11 +851,10 @@ export function AgentForm({ agent, onSuccess, onCancel }: AgentFormProps) {
         {/* Generation Feedback */}
         {(generateError || generateStats) && (
           <div
-            className={`p-4 rounded-lg border ${
-              generateError
+            className={`p-4 rounded-lg border ${generateError
                 ? 'bg-red-50 border-red-200 dark:bg-red-950 dark:border-red-800'
                 : 'bg-green-50 border-green-200 dark:bg-green-950 dark:border-green-800'
-            }`}
+              }`}
           >
             {generateError ? (
               <div className="flex items-start gap-3">

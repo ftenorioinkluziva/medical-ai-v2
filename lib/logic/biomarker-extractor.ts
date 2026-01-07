@@ -130,7 +130,7 @@ function parseNumericValue(value: string | number): number | null {
   }
 
   // Remove common non-numeric characters but keep decimal separators
-  let cleaned = value
+  const cleaned = value
     .replace(/[<>≤≥]/g, '') // Remove comparison operators
     .replace(/,/g, '.') // Replace comma with dot for decimal
     .trim()

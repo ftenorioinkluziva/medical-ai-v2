@@ -1,9 +1,15 @@
-import { pgTable, uuid, varchar, text, json, boolean, integer, timestamp } from 'drizzle-orm/pg-core'
+import { pgTable, uuid, varchar, text, json, jsonb, boolean, integer, timestamp } from 'drizzle-orm/pg-core'
 
 // Health Agents configuration table
 export const healthAgents = pgTable('health_agents', {
   id: uuid('id').primaryKey().defaultRandom(),
   agentKey: varchar('agent_key', { length: 100 }).notNull().unique(), // e.g., integrativa, endocrinologia
+
+  // Agent Type (analysis agents vs product generators)
+  agentType: varchar('agent_type', { length: 50 })
+    .$type<'analysis' | 'product_generator'>()
+    .notNull()
+    .default('analysis'),
 
   // Display Info
   name: varchar('name', { length: 255 }).notNull(),
@@ -39,12 +45,26 @@ export const healthAgents = pgTable('health_agents', {
   // Extended Reasoning
   useThinkingMode: boolean('use_thinking_mode').notNull().default(false),
 
-  // Complete Analysis Workflow
+  // Complete Analysis Workflow (for analysis agents)
   analysisRole: varchar('analysis_role', { length: 50 })
     .$type<'foundation' | 'specialized' | 'none'>()
     .notNull()
     .default('none'),
-  analysisOrder: integer('analysis_order').default(null),
+  analysisOrder: integer('analysis_order'),
+
+  // Product Generator Configuration (for product_generator agents)
+  productType: varchar('product_type', { length: 50 })
+    .$type<'weekly_plan' | 'recommendations' | null>(), // null for analysis agents
+  generatorKey: varchar('generator_key', { length: 100 }).unique(), // supplementation, shopping, meals, workout, recommendations
+  outputSchema: jsonb('output_schema').$type<Record<string, any> | null>(), // JSON Schema for validation
+  displayConfig: jsonb('display_config').$type<DisplayConfig | null>(), // UI rendering configuration
+  ragConfig: jsonb('rag_config').$type<{
+    enabled: boolean
+    keywords: string[]
+    maxChunks: number
+    maxCharsPerChunk: number
+  } | null>(),
+  executionOrder: integer('execution_order'), // Order of execution for product generators
 
   // Access Control
   allowedRoles: json('allowed_roles').$type<string[]>().notNull(), // ['patient', 'doctor', 'admin']
@@ -68,3 +88,52 @@ export const healthAgents = pgTable('health_agents', {
 
 // Type for health agent
 export type HealthAgent = typeof healthAgents.$inferSelect
+
+// Type aliases for specific configurations
+export type AgentType = 'analysis' | 'product_generator'
+export type ProductType = 'weekly_plan' | 'recommendations'
+export type AnalysisRole = 'foundation' | 'specialized' | 'none'
+
+export type RAGConfig = {
+  enabled: boolean
+  keywords: string[]
+  maxChunks: number
+  maxCharsPerChunk: number
+}
+
+export type JSONSchemaDefinition = Record<string, any>
+
+// Display Configuration Types for Schema-Driven UI
+export type FieldDisplayType =
+  | 'text'
+  | 'list'
+  | 'card'
+  | 'table'
+  | 'timeline'
+  | 'pills'
+  | 'badge'
+  | 'grid'
+  | 'accordion'
+  | 'checklist'
+
+export type FieldLayout = 'grid' | 'list' | 'tabs' | 'accordion' | 'timeline'
+
+export type FieldConfig = {
+  label?: string
+  icon?: string // Lucide icon name
+  color?: string // Tailwind color name
+  displayType?: FieldDisplayType
+  order?: number
+  visible?: boolean
+  collapsible?: boolean
+  columns?: number // for grid layouts
+  layout?: FieldLayout
+  nested?: Record<string, FieldConfig>
+}
+
+export type DisplayConfig = {
+  title?: string
+  description?: string
+  layout?: FieldLayout
+  fields: Record<string, FieldConfig>
+}

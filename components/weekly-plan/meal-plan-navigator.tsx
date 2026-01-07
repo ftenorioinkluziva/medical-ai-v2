@@ -6,9 +6,9 @@
  */
 
 import { useState } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Separator } from '@/components/ui/separator'
 import { Badge } from '@/components/ui/badge'
 import {
@@ -19,54 +19,48 @@ import {
   Sunrise,
   Moon,
   Apple,
-  Clock,
   Flame,
+  ChefHat,
+  Dumbbell
 } from 'lucide-react'
+
+interface MealDefinition {
+  name: string
+  ingredients: string[]
+  instructions: string
+  calories: string
+  macros?: {
+    fats: string
+    carbs: string
+    protein: string
+  }
+}
 
 interface MealPlanNavigatorProps {
   mealPlan: {
     overview: string
-    dailyCalories?: string
-    macros?: {
-      protein?: string
-      carbs?: string
-      fats?: string
-    }
-    meals: Array<{
+    daily_calories_avg: string
+    weekly_plan: Array<{
       day: string
-      breakfast: {
-        name: string
-        ingredients: string[]
-        calories?: string
-        prepTime?: string
+      meals: {
+        breakfast: MealDefinition
+        morning_snack: MealDefinition
+        lunch: MealDefinition
+        afternoon_snack: MealDefinition
+        pre_workout: MealDefinition
+        post_workout: MealDefinition
+        dinner: MealDefinition
+        supper: MealDefinition
       }
-      lunch: {
-        name: string
-        ingredients: string[]
-        calories?: string
-        prepTime?: string
-      }
-      dinner: {
-        name: string
-        ingredients: string[]
-        calories?: string
-        prepTime?: string
-      }
-      snacks?: Array<{
-        name: string
-        timing: string
-        calories?: string
-      }>
     }>
-    mealPrepTips?: string[]
   }
 }
 
 export function MealPlanNavigator({ mealPlan }: MealPlanNavigatorProps) {
   // Get current day of week and pre-select it (0 = Monday, 6 = Sunday)
   const getCurrentDayIndex = () => {
-    // Safety check: ensure meals array exists and has items
-    if (!mealPlan?.meals || mealPlan.meals.length === 0) {
+    // Safety check: ensure weekly_plan array exists and has items
+    if (!mealPlan?.weekly_plan || mealPlan.weekly_plan.length === 0) {
       return 0
     }
 
@@ -74,7 +68,7 @@ export function MealPlanNavigator({ mealPlan }: MealPlanNavigatorProps) {
     // Convert to Monday-based index (0 = Monday, 6 = Sunday)
     const mondayBasedIndex = today === 0 ? 6 : today - 1
     // Ensure index is within bounds of meal plan
-    return Math.min(mondayBasedIndex, mealPlan.meals.length - 1)
+    return Math.min(mondayBasedIndex, mealPlan.weekly_plan.length - 1)
   }
 
   const [selectedDayIndex, setSelectedDayIndex] = useState(getCurrentDayIndex())
@@ -86,13 +80,13 @@ export function MealPlanNavigator({ mealPlan }: MealPlanNavigatorProps) {
   }
 
   const handleNextDay = () => {
-    if (selectedDayIndex < mealPlan.meals.length - 1) {
+    if (selectedDayIndex < mealPlan.weekly_plan.length - 1) {
       setSelectedDayIndex(selectedDayIndex + 1)
     }
   }
 
   // Safety check: ensure we have meals and selected index is valid
-  if (!mealPlan?.meals || mealPlan.meals.length === 0) {
+  if (!mealPlan?.weekly_plan || mealPlan.weekly_plan.length === 0) {
     return (
       <Card className="hover:shadow-md transition-shadow">
         <CardHeader>
@@ -110,7 +104,79 @@ export function MealPlanNavigator({ mealPlan }: MealPlanNavigatorProps) {
     )
   }
 
-  const selectedDay = mealPlan.meals[selectedDayIndex]
+  const selectedDay = mealPlan.weekly_plan[selectedDayIndex]
+  if (!selectedDay) return null
+
+  const renderMealCard = (title: string, icon: any, meal: MealDefinition, colorClass: string) => {
+    if (!meal) return null;
+
+    // Map color class to specific tailwind colors
+    const colors: Record<string, { border: string, text: string, bgTitle: string }> = {
+      amber: { border: 'border-amber-200', text: 'text-amber-600', bgTitle: '' },
+      emerald: { border: 'border-emerald-200', text: 'text-emerald-600', bgTitle: '' },
+      sky: { border: 'border-sky-200', text: 'text-sky-600', bgTitle: '' },
+      purple: { border: 'border-purple-200', text: 'text-purple-600', bgTitle: '' },
+      rose: { border: 'border-rose-200', text: 'text-rose-600', bgTitle: '' },
+      indigo: { border: 'border-indigo-200', text: 'text-indigo-600', bgTitle: '' },
+      slate: { border: 'border-slate-200', text: 'text-slate-600', bgTitle: '' },
+    }
+
+    const theme = colors[colorClass] || colors.amber;
+    if (!theme) return null;
+
+    return (
+      <Card className={`border-2 ${theme.border} bg-card hover:shadow-md transition-shadow`}>
+        <CardHeader className="pb-3">
+          <CardTitle className={`text-base font-semibold ${theme.text} flex items-center gap-2`}>
+            {icon}
+            {title}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <p className="font-semibold text-foreground">{meal.name}</p>
+
+          <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
+            {meal.calories && (
+              <Badge variant="secondary" className="gap-1 font-normal">
+                <Flame className="h-3 w-3" />
+                {meal.calories}
+              </Badge>
+            )}
+            {meal.macros && (
+              <>
+                {meal.macros.protein && <Badge variant="outline" className="font-normal">{meal.macros.protein} Proteína</Badge>}
+                {meal.macros.carbs && <Badge variant="outline" className="font-normal">{meal.macros.carbs} Carbo</Badge>}
+                {meal.macros.fats && <Badge variant="outline" className="font-normal">{meal.macros.fats} Gordura</Badge>}
+              </>
+            )}
+          </div>
+
+          <Separator />
+
+          <div className="space-y-2">
+            <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Ingredientes:</p>
+            <ul className="text-sm text-muted-foreground space-y-1 leading-relaxed">
+              {meal.ingredients.map((ing: string, i: number) => (
+                <li key={i} className="flex items-start gap-2">
+                  <span className={`${theme.text} mt-0.5`}>•</span>
+                  <span>{ing}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {meal.instructions && (
+            <div className="pt-2">
+              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1 flex items-center gap-1">
+                <ChefHat className="h-3 w-3" /> Preparo:
+              </p>
+              <p className="text-sm text-muted-foreground leading-relaxed">{meal.instructions}</p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    )
+  }
 
   return (
     <Card className="hover:shadow-md transition-shadow">
@@ -119,29 +185,13 @@ export function MealPlanNavigator({ mealPlan }: MealPlanNavigatorProps) {
           <UtensilsCrossed className="h-5 w-5 text-orange-600" />
           Plano de Refeições
         </CardTitle>
-        <CardDescription className="text-sm text-muted-foreground mt-1 leading-relaxed">
-          {mealPlan.overview}
-        </CardDescription>
-        {(mealPlan.dailyCalories || mealPlan.macros) && (
-          <div className="mt-3 p-3 bg-orange-50 border border-orange-200 rounded-lg space-y-2 dark:bg-orange-900/30 dark:border-orange-600">
-            {mealPlan.dailyCalories && (
-              <p className="text-sm text-orange-900 font-medium dark:text-orange-300">
-                {mealPlan.dailyCalories} calorias/dia
-              </p>
-            )}
-            {mealPlan.macros && (
-              <div className="flex gap-3 flex-wrap text-sm text-orange-900 dark:text-orange-300">
-                {mealPlan.macros.protein && (
-                  <span>Proteína: {mealPlan.macros.protein}</span>
-                )}
-                {mealPlan.macros.carbs && (
-                  <span>• Carbos: {mealPlan.macros.carbs}</span>
-                )}
-                {mealPlan.macros.fats && (
-                  <span>• Gorduras: {mealPlan.macros.fats}</span>
-                )}
-              </div>
-            )}
+
+        {mealPlan.daily_calories_avg && (
+          <div className="mt-3 inline-block">
+            <Badge variant="outline" className="text-orange-900 border-orange-200 bg-orange-50 dark:bg-orange-900/20 dark:text-orange-300 dark:border-orange-800 p-2 text-sm font-medium gap-2">
+              <Flame className="h-4 w-4" />
+              Média Diária: {mealPlan.daily_calories_avg}
+            </Badge>
           </div>
         )}
       </CardHeader>
@@ -164,7 +214,7 @@ export function MealPlanNavigator({ mealPlan }: MealPlanNavigatorProps) {
               variant="outline"
               size="sm"
               onClick={handleNextDay}
-              disabled={selectedDayIndex === mealPlan.meals.length - 1}
+              disabled={selectedDayIndex === mealPlan.weekly_plan.length - 1}
               className="flex-1"
             >
               <ChevronRight className="h-4 w-4" />
@@ -191,7 +241,7 @@ export function MealPlanNavigator({ mealPlan }: MealPlanNavigatorProps) {
               className="w-full"
             >
               <TabsList className="grid w-full grid-cols-7 bg-muted">
-                {mealPlan.meals.map((day, index) => (
+                {mealPlan.weekly_plan.map((day, index) => (
                   <TabsTrigger
                     key={index}
                     value={index.toString()}
@@ -211,7 +261,7 @@ export function MealPlanNavigator({ mealPlan }: MealPlanNavigatorProps) {
             variant="outline"
             size="sm"
             onClick={handleNextDay}
-            disabled={selectedDayIndex === mealPlan.meals.length - 1}
+            disabled={selectedDayIndex === mealPlan.weekly_plan.length - 1}
             className="gap-2 hidden sm:flex"
           >
             Próximo
@@ -224,170 +274,32 @@ export function MealPlanNavigator({ mealPlan }: MealPlanNavigatorProps) {
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-xl font-bold text-foreground">{selectedDay.day}</h3>
             <Badge className="bg-orange-600 text-white">
-              Dia {selectedDayIndex + 1} de {mealPlan.meals.length}
+              Dia {selectedDayIndex + 1} de {mealPlan.weekly_plan.length}
             </Badge>
           </div>
 
-          <div className="grid gap-4 md:grid-cols-2">
-            {/* Breakfast Card */}
-            <Card className="border-2 border-amber-200 bg-card hover:shadow-md transition-shadow">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-base font-semibold text-amber-600 flex items-center gap-2">
-                  <Sunrise className="h-5 w-5" />
-                  Café da Manhã
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <p className="font-semibold text-foreground">{selectedDay.breakfast.name}</p>
-                <div className="flex gap-3 text-xs text-muted-foreground">
-                  {selectedDay.breakfast.calories && (
-                    <span className="flex items-center gap-1">
-                      <Flame className="h-3 w-3" />
-                      {selectedDay.breakfast.calories}
-                    </span>
-                  )}
-                  {selectedDay.breakfast.prepTime && (
-                    <span className="flex items-center gap-1">
-                      <Clock className="h-3 w-3" />
-                      {selectedDay.breakfast.prepTime}
-                    </span>
-                  )}
-                </div>
-                <Separator />
-                <ul className="text-sm text-muted-foreground space-y-1 leading-relaxed">
-                  {selectedDay.breakfast.ingredients.map((ing: string, i: number) => (
-                    <li key={i} className="flex items-start gap-2">
-                      <span className="text-amber-600 mt-0.5">•</span>
-                      <span>{ing}</span>
-                    </li>
-                  ))}
-                </ul>
-              </CardContent>
-            </Card>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2">
 
-            {/* Lunch Card */}
-            <Card className="border-2 border-emerald-200 bg-card hover:shadow-md transition-shadow">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-base font-semibold text-emerald-600 flex items-center gap-2">
-                  <Sun className="h-5 w-5" />
-                  Almoço
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <p className="font-semibold text-foreground">{selectedDay.lunch.name}</p>
-                <div className="flex gap-3 text-xs text-muted-foreground">
-                  {selectedDay.lunch.calories && (
-                    <span className="flex items-center gap-1">
-                      <Flame className="h-3 w-3" />
-                      {selectedDay.lunch.calories}
-                    </span>
-                  )}
-                  {selectedDay.lunch.prepTime && (
-                    <span className="flex items-center gap-1">
-                      <Clock className="h-3 w-3" />
-                      {selectedDay.lunch.prepTime}
-                    </span>
-                  )}
-                </div>
-                <Separator />
-                <ul className="text-sm text-muted-foreground space-y-1 leading-relaxed">
-                  {selectedDay.lunch.ingredients.map((ing: string, i: number) => (
-                    <li key={i} className="flex items-start gap-2">
-                      <span className="text-emerald-600 mt-0.5">•</span>
-                      <span>{ing}</span>
-                    </li>
-                  ))}
-                </ul>
-              </CardContent>
-            </Card>
+            {/* Main Meals */}
+            {renderMealCard("Café da Manhã", <Sunrise className="h-5 w-5" />, selectedDay.meals.breakfast, "amber")}
+            {renderMealCard("Almoço", <Sun className="h-5 w-5" />, selectedDay.meals.lunch, "emerald")}
 
-            {/* Dinner Card */}
-            <Card className="border-2 border-sky-200 bg-card hover:shadow-md transition-shadow">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-base font-semibold text-sky-600 flex items-center gap-2">
-                  <Moon className="h-5 w-5" />
-                  Jantar
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <p className="font-semibold text-foreground">{selectedDay.dinner.name}</p>
-                <div className="flex gap-3 text-xs text-muted-foreground">
-                  {selectedDay.dinner.calories && (
-                    <span className="flex items-center gap-1">
-                      <Flame className="h-3 w-3" />
-                      {selectedDay.dinner.calories}
-                    </span>
-                  )}
-                  {selectedDay.dinner.prepTime && (
-                    <span className="flex items-center gap-1">
-                      <Clock className="h-3 w-3" />
-                      {selectedDay.dinner.prepTime}
-                    </span>
-                  )}
-                </div>
-                <Separator />
-                <ul className="text-sm text-muted-foreground space-y-1 leading-relaxed">
-                  {selectedDay.dinner.ingredients.map((ing: string, i: number) => (
-                    <li key={i} className="flex items-start gap-2">
-                      <span className="text-sky-600 mt-0.5">•</span>
-                      <span>{ing}</span>
-                    </li>
-                  ))}
-                </ul>
-              </CardContent>
-            </Card>
+            {/* Snacks */}
+            {renderMealCard("Lanche da Manhã", <Apple className="h-5 w-5" />, selectedDay.meals.morning_snack, "purple")}
+            {renderMealCard("Lanche da Tarde", <Apple className="h-5 w-5" />, selectedDay.meals.afternoon_snack, "purple")}
 
-            {/* Snacks Card */}
-            {selectedDay.snacks && selectedDay.snacks.length > 0 && (
-              <Card className="border-2 border-purple-200 bg-card hover:shadow-md transition-shadow">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-base font-semibold text-purple-600 flex items-center gap-2">
-                    <Apple className="h-5 w-5" />
-                    Lanches
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  {selectedDay.snacks.map((snack: any, i: number) => (
-                    <div key={i} className="pb-3 last:pb-0 border-b last:border-0">
-                      <p className="font-semibold text-foreground text-sm">{snack.name}</p>
-                      <div className="flex items-center gap-3 text-xs text-muted-foreground mt-1">
-                        <span className="flex items-center gap-1">
-                          <Clock className="h-3 w-3" />
-                          {snack.timing}
-                        </span>
-                        {snack.calories && (
-                          <span className="flex items-center gap-1">
-                            <Flame className="h-3 w-3" />
-                            {snack.calories}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </CardContent>
-              </Card>
-            )}
+            {/* Workout Nutrition */}
+            {renderMealCard("Pré-Treino", <Dumbbell className="h-5 w-5" />, selectedDay.meals.pre_workout, "rose")}
+            {renderMealCard("Pós-Treino", <Dumbbell className="h-5 w-5" />, selectedDay.meals.post_workout, "indigo")}
+
+            {/* Ending Meals */}
+            {renderMealCard("Jantar", <Moon className="h-5 w-5" />, selectedDay.meals.dinner, "sky")}
+            {renderMealCard("Ceia", <Moon className="h-4 w-4" />, selectedDay.meals.supper, "slate")}
+
           </div>
         </div>
-
-        {/* Meal Prep Tips */}
-        {mealPlan.mealPrepTips && mealPlan.mealPrepTips.length > 0 && (
-          <>
-            <Separator className="my-6" />
-            <div className="border border-orange-200 dark:border-orange-800 rounded-lg p-4 bg-card hover:bg-orange-50/30 dark:hover:bg-orange-950/30 transition-colors">
-              <h4 className="font-semibold text-base text-foreground mb-3">Dicas de Meal Prep</h4>
-              <ul className="space-y-2">
-                {mealPlan.mealPrepTips.map((tip: string, index: number) => (
-                  <li key={index} className="text-sm text-foreground flex items-start gap-2.5 leading-relaxed">
-                    <span className="text-orange-600 dark:text-orange-400 mt-0.5">•</span>
-                    {tip}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </>
-        )}
       </CardContent>
     </Card>
   )
 }
+

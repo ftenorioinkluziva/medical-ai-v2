@@ -101,7 +101,7 @@ export function RecommendationsWidget({ patientId }: RecommendationsWidgetProps 
 
       // Only log to console if it's an unexpected error (not the "no recommendations" case)
       if (!errorMessage.includes('Nenhuma recomendação encontrada') &&
-          !errorMessage.includes('Realize uma análise médica primeiro')) {
+        !errorMessage.includes('Realize uma análise médica primeiro')) {
         console.error('Error loading recommendations:', err)
       }
 
@@ -425,7 +425,13 @@ export function RecommendationsWidget({ patientId }: RecommendationsWidgetProps 
                     color: 'text-sky-600 dark:text-sky-400',
                     hover: 'hover:border-sky-300 hover:bg-sky-50/30 dark:hover:border-sky-700 dark:hover:bg-sky-900/30',
                   },
-                }[alert.type]
+                }[alert.type] || {
+                  bg: 'bg-sky-50 dark:bg-sky-950/20',
+                  border: 'border-sky-200 dark:border-sky-800',
+                  iconBg: 'bg-sky-100 dark:bg-sky-900/30',
+                  color: 'text-sky-600 dark:text-sky-400',
+                  hover: 'hover:border-sky-300 hover:bg-sky-50/30 dark:hover:border-sky-700 dark:hover:bg-sky-900/30',
+                }
 
                 return (
                   <div

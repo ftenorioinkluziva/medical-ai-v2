@@ -120,11 +120,11 @@ export function AnalysisChat({
 
   const getAgentColor = (color: string) => {
     const colorMap: Record<string, string> = {
-      green: 'bg-green-100 text-green-700 border-green-300',
-      purple: 'bg-purple-100 text-purple-700 border-purple-300',
-      orange: 'bg-orange-100 text-orange-700 border-orange-300',
-      blue: 'bg-blue-100 text-blue-700 border-blue-300',
-      teal: 'bg-teal-100 text-teal-700 border-teal-300',
+      green: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 border-green-300 dark:border-green-700',
+      purple: 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 border-purple-300 dark:border-purple-700',
+      orange: 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 border-orange-300 dark:border-orange-700',
+      blue: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-blue-300 dark:border-blue-700',
+      teal: 'bg-teal-100 dark:bg-teal-900/30 text-teal-700 dark:text-teal-300 border-teal-300 dark:border-teal-700',
     }
     return colorMap[color] || colorMap.teal
   }
@@ -145,8 +145,8 @@ export function AnalysisChat({
       <Card className={className}>
         <CardContent className="flex items-center justify-center py-12">
           <div className="text-center space-y-3">
-            <Loader2 className="h-8 w-8 animate-spin mx-auto text-teal-600" />
-            <p className="text-gray-600">Carregando conversa...</p>
+            <Loader2 className="h-8 w-8 animate-spin mx-auto text-teal-600 dark:text-teal-400" />
+            <p className="text-muted-foreground">Carregando conversa...</p>
           </div>
         </CardContent>
       </Card>
@@ -157,11 +157,11 @@ export function AnalysisChat({
     return (
       <Card className={className}>
         <CardContent className="p-6">
-          <div className="flex items-start gap-3 p-4 rounded-lg border bg-red-50 border-red-200">
-            <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
+          <div className="flex items-start gap-3 p-4 rounded-lg border bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-800">
+            <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
             <div>
-              <p className="font-semibold text-red-900">Erro ao carregar chat</p>
-              <p className="text-sm text-red-700 mt-1">{historyError}</p>
+              <p className="font-semibold text-red-900 dark:text-red-100">Erro ao carregar chat</p>
+              <p className="text-sm text-red-700 dark:text-red-300 mt-1">{historyError}</p>
             </div>
             <Button
               onClick={loadChatHistory}
@@ -209,7 +209,7 @@ export function AnalysisChat({
               {/* Avatar */}
               <Avatar className={`h-8 w-8 shrink-0 border-2 ${
                 message.role === 'user'
-                  ? 'bg-muted text-foreground border-gray-300'
+                  ? 'bg-muted text-foreground border-border'
                   : getAgentColor(agentColor)
               }`}>
                 <AvatarFallback className={
@@ -225,12 +225,12 @@ export function AnalysisChat({
               <div
                 className={`max-w-[80%] rounded-lg p-3 ${
                   message.role === 'user'
-                    ? 'bg-muted text-gray-900'
+                    ? 'bg-muted text-foreground'
                     : 'bg-card border border-border'
                 }`}
               >
                 {message.role === 'assistant' ? (
-                  <div className="prose prose-sm max-w-none">
+                  <div className="prose prose-sm max-w-none dark:prose-invert">
                     <ReactMarkdown>{getMessageText(message)}</ReactMarkdown>
                   </div>
                 ) : (
@@ -251,7 +251,7 @@ export function AnalysisChat({
               <div className="bg-card border border-border rounded-lg p-3">
                 <div className="flex items-center gap-2">
                   <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-                  <span className="text-sm text-gray-500">Pensando...</span>
+                  <span className="text-sm text-muted-foreground">Pensando...</span>
                 </div>
               </div>
             </div>
@@ -262,15 +262,15 @@ export function AnalysisChat({
 
         {/* Error Display */}
         {error && (
-          <div className="px-4 py-2 bg-red-50 border-t border-red-200">
-            <p className="text-sm text-red-700">
+          <div className="px-4 py-2 bg-red-50 dark:bg-red-950/20 border-t border-red-200 dark:border-red-800">
+            <p className="text-sm text-red-700 dark:text-red-300">
               ❌ Erro: {error.message || 'Falha ao enviar mensagem'}
             </p>
           </div>
         )}
 
         {/* Input Form */}
-        <form onSubmit={handleFormSubmit} className="p-4 border-t bg-gray-50">
+        <form onSubmit={handleFormSubmit} className="p-4 border-t bg-muted/30 dark:bg-muted/10">
           <div className="flex gap-2">
             <Textarea
               value={input}
@@ -301,7 +301,7 @@ export function AnalysisChat({
               )}
             </Button>
           </div>
-          <p className="text-xs text-gray-500 mt-2">
+          <p className="text-xs text-muted-foreground mt-2">
             Pressione Enter para enviar, Shift+Enter para nova linha • {input.length}/1000
           </p>
         </form>

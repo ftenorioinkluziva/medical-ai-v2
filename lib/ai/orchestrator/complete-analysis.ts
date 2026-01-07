@@ -10,6 +10,7 @@ import { analyzeWithAgent } from '@/lib/ai/agents/analyze'
 import { generateSynthesis } from '@/lib/ai/synthesis/generator'
 import { generateRecommendationsFromMultipleAnalyses } from '@/lib/ai/recommendations/multi-analysis-generator'
 import { generateCompleteWeeklyPlan } from '@/lib/ai/weekly-plans/multi-analysis-orchestrator'
+import { generateAllProducts } from '@/lib/ai/products/dynamic-orchestrator'
 import { buildKnowledgeContext } from '@/lib/ai/knowledge'
 import { getKnowledgeConfig } from '@/lib/db/settings'
 import { debitCredits, calculateCreditsFromTokens } from '@/lib/billing/credits'
@@ -545,10 +546,51 @@ ${agentKnowledge ? `## Base de Conhecimento Médico (Referências)\n${agentKnowl
       ...savedSpecializedAnalyses.map(({ savedAnalysis }) => savedAnalysis.id),
     ]
 
-    const [recommendations, weeklyPlan] = await Promise.all([
-      generateRecommendationsFromMultipleAnalyses(userId, allAnalysisIds),
-      generateCompleteWeeklyPlan(userId, allAnalysisIds),
-    ])
+    // Use dynamic generators (default) or fallback to hardcoded
+    const USE_DYNAMIC_GENERATORS = process.env.ENABLE_DYNAMIC_GENERATORS !== 'false'
+
+    let recommendations: any
+    let weeklyPlan: any
+
+    if (USE_DYNAMIC_GENERATORS) {
+      console.log('🔧 [COMPLETE-ANALYSIS] Using dynamic product generators from database')
+
+      const products = await generateAllProducts(userId, allAnalysisIds)
+
+      // Map to expected format
+      recommendations = products.recommendations
+        ? {
+            id: products.recommendations.id,
+            recommendations: {
+              examRecommendations: products.recommendations.examRecommendations,
+              lifestyleRecommendations: products.recommendations.lifestyleRecommendations,
+              healthGoals: products.recommendations.healthGoals,
+              alerts: products.recommendations.alerts,
+            },
+            usage: products.usage,
+          }
+        : null
+
+      weeklyPlan = products.weeklyPlan
+        ? {
+            id: products.weeklyPlan.id,
+            weeklyPlan: {
+              supplementation: products.weeklyPlan.supplementationStrategy,
+              shopping: products.weeklyPlan.shoppingList,
+              meals: products.weeklyPlan.mealPlan,
+              workout: products.weeklyPlan.workoutPlan,
+            },
+            usage: products.usage,
+          }
+        : null
+    } else {
+      console.log('⚠️ [COMPLETE-ANALYSIS] Using legacy hardcoded generators')
+
+      ;[recommendations, weeklyPlan] = await Promise.all([
+        generateRecommendationsFromMultipleAnalyses(userId, allAnalysisIds),
+        generateCompleteWeeklyPlan(userId, allAnalysisIds),
+      ])
+    }
 
     console.log('✅ [COMPLETE-ANALYSIS] Recommendations and Weekly Plan generated')
 

@@ -11,8 +11,6 @@ import Link from 'next/link'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { RecommendationsWidget } from '@/components/recommendations/recommendations-widget'
-import { WeeklyPlanWidget } from '@/components/weekly-plan/weekly-plan-widget'
 import { DocumentUploadWidget } from '@/components/documents/document-upload-widget'
 import { RecentDocumentsWidget } from '@/components/documents/recent-documents-widget'
 import { RecentAnalysesWidget } from '@/components/analyses/recent-analyses-widget'
@@ -22,9 +20,7 @@ import {
   ArrowRightIcon,
   UploadIcon,
   FileTextIcon,
-  BrainIcon,
-  LightbulbIcon,
-  CalendarIcon
+  BrainIcon
 } from '@/components/ui/animated-icon'
 
 interface DashboardStats {
@@ -106,7 +102,7 @@ export default function DashboardPage() {
         </p>
       </div>
 
-            {/* Quick Actions */}
+      {/* Quick Actions */}
       <Card className="hover:shadow-md transition-shadow">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
@@ -164,29 +160,6 @@ export default function DashboardPage() {
             <RecentAnalysesWidget limit={5} />
           </TabsContent>
         </Tabs>
-
-        <Tabs defaultValue="recommendations" className="w-full mt-4">
-          <TabsList className="grid w-full grid-cols-2 bg-muted">
-            <TabsTrigger value="recommendations" className="gap-1.5 text-xs sm:text-sm data-[state=active]:!bg-amber-600 dark:data-[state=active]:!bg-amber-500 data-[state=active]:!text-white">
-              <LightbulbIcon size={16} className="shrink-0" />
-              <span className="sm:hidden">Metas</span>
-              <span className="hidden sm:inline">Recomendações</span>
-            </TabsTrigger>
-            <TabsTrigger value="weekly-plan" className="gap-1.5 text-xs sm:text-sm data-[state=active]:!bg-teal-600 dark:data-[state=active]:!bg-teal-500 data-[state=active]:!text-white">
-              <CalendarIcon size={16} className="shrink-0" />
-              <span className="sm:hidden">Plano</span>
-              <span className="hidden sm:inline">Plano Semanal</span>
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="recommendations" className="mt-4">
-            <RecommendationsWidget />
-          </TabsContent>
-
-          <TabsContent value="weekly-plan" className="mt-4">
-            <WeeklyPlanWidget />
-          </TabsContent>
-        </Tabs>
       </div>
 
       {/* Desktop: Grid Layout */}
@@ -197,15 +170,7 @@ export default function DashboardPage() {
           <RecentDocumentsWidget key={refreshKey} limit={5} userName={session?.user?.name} />
           <RecentAnalysesWidget limit={5} />
         </div>
-
-        {/* Recommendations and Weekly Plan Section - 2 Column Grid */}
-        <div className="grid gap-6 grid-cols-2">
-          <RecommendationsWidget />
-          <WeeklyPlanWidget />
-        </div>
       </div>
-
-
     </div>
   )
 }

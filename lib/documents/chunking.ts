@@ -84,7 +84,7 @@ function chunkBySections(
 
   // Try to split by sections
   const sections: Array<{ start: number; end: number; content: string }> = []
-  let lastSectionEnd = 0
+  const lastSectionEnd = 0
 
   // Find all section boundaries
   const allMatches: Array<{ index: number; text: string }> = []

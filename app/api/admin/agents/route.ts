@@ -107,6 +107,13 @@ export async function POST(request: NextRequest) {
       allowedSubcategories,
       excludedArticleIds,
       includedArticleIds,
+      // Product Generator fields
+      agentType,
+      productType,
+      generatorKey,
+      outputSchema,
+      ragConfig,
+      executionOrder,
     } = body
 
     // Validate required fields
@@ -123,6 +130,28 @@ export async function POST(request: NextRequest) {
         { success: false, error: 'O campo "allowedRoles" é obrigatório e deve conter pelo menos uma função.' },
         { status: 400 }
       )
+    }
+
+    // Validate product_generator specific fields
+    if (agentType === 'product_generator') {
+      if (!generatorKey) {
+        return NextResponse.json(
+          { success: false, error: 'generatorKey é obrigatório para geradores de produtos' },
+          { status: 400 }
+        )
+      }
+      if (!productType) {
+        return NextResponse.json(
+          { success: false, error: 'productType é obrigatório para geradores de produtos' },
+          { status: 400 }
+        )
+      }
+      if (!outputSchema) {
+        return NextResponse.json(
+          { success: false, error: 'outputSchema é obrigatório para geradores de produtos' },
+          { status: 400 }
+        )
+      }
     }
 
     console.log(`🔧 [ADMIN-AGENTS-API] Creating new agent: ${agentKey}`)
@@ -158,6 +187,13 @@ export async function POST(request: NextRequest) {
         allowedSubcategories: allowedSubcategories || [],
         excludedArticleIds: excludedArticleIds || [],
         includedArticleIds: includedArticleIds || [],
+        // Product Generator fields
+        agentType: agentType || 'analysis',
+        productType: productType || null,
+        generatorKey: generatorKey || null,
+        outputSchema: outputSchema || null,
+        ragConfig: ragConfig || null,
+        executionOrder: executionOrder !== undefined ? executionOrder : null,
       })
       .returning()
 

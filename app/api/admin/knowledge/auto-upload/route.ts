@@ -41,12 +41,29 @@ export async function POST(request: NextRequest) {
 
     // Parse form data
     const formData = await request.formData()
+
+    // Debug: log all form data keys
+    const formKeys = Array.from(formData.keys())
+    console.log(`📋 [AUTO-UPLOAD] FormData keys: ${formKeys.join(', ') || 'NONE'}`)
+
     const file = formData.get('file') as File | null
 
     // Validate file
     if (!file) {
+      console.error('❌ [AUTO-UPLOAD] No file found in formData')
+      console.error(`   Available keys: ${formKeys.join(', ') || 'NONE'}`)
+      console.error(`   Expected key: "file"`)
+
       return NextResponse.json(
-        { success: false, error: 'Arquivo é obrigatório' },
+        {
+          success: false,
+          error: 'Arquivo é obrigatório',
+          debug: {
+            receivedKeys: formKeys,
+            expectedKey: 'file',
+            hint: 'Verifique se o campo no N8N está configurado como "file" em Parameter Name'
+          }
+        },
         { status: 400 }
       )
     }
