@@ -8,8 +8,6 @@ import { completeAnalyses, analyses, documents, healthAgents, medicalProfiles } 
 import { eq, inArray, and, ne } from 'drizzle-orm'
 import { analyzeWithAgent } from '@/lib/ai/agents/analyze'
 import { generateSynthesis } from '@/lib/ai/synthesis/generator'
-import { generateRecommendationsFromMultipleAnalyses } from '@/lib/ai/recommendations/multi-analysis-generator'
-import { generateCompleteWeeklyPlan } from '@/lib/ai/weekly-plans/multi-analysis-orchestrator'
 import { generateAllProducts } from '@/lib/ai/products/dynamic-orchestrator'
 import { buildKnowledgeContext } from '@/lib/ai/knowledge'
 import { getKnowledgeConfig } from '@/lib/db/settings'
@@ -546,64 +544,47 @@ ${agentKnowledge ? `## Base de Conhecimento Médico (Referências)\n${agentKnowl
       ...savedSpecializedAnalyses.map(({ savedAnalysis }) => savedAnalysis.id),
     ]
 
-    // Use dynamic generators (default) or fallback to hardcoded
-    const USE_DYNAMIC_GENERATORS = process.env.ENABLE_DYNAMIC_GENERATORS !== 'false'
+    const products = await generateAllProducts(userId, allAnalysisIds)
 
-    let recommendations: any
-    let weeklyPlan: any
+    // Map to expected format
+    const recommendations = products.recommendations
+      ? {
+        id: products.recommendations.id,
+        recommendations: {
+          examRecommendations: products.recommendations.examRecommendations,
+          lifestyleRecommendations: products.recommendations.lifestyleRecommendations,
+          healthGoals: products.recommendations.healthGoals,
+          alerts: products.recommendations.alerts,
+        },
+        usage: products.usage,
+      }
+      : null
 
-    if (USE_DYNAMIC_GENERATORS) {
-      console.log('🔧 [COMPLETE-ANALYSIS] Using dynamic product generators from database')
-
-      const products = await generateAllProducts(userId, allAnalysisIds)
-
-      // Map to expected format
-      recommendations = products.recommendations
-        ? {
-            id: products.recommendations.id,
-            recommendations: {
-              examRecommendations: products.recommendations.examRecommendations,
-              lifestyleRecommendations: products.recommendations.lifestyleRecommendations,
-              healthGoals: products.recommendations.healthGoals,
-              alerts: products.recommendations.alerts,
-            },
-            usage: products.usage,
-          }
-        : null
-
-      weeklyPlan = products.weeklyPlan
-        ? {
-            id: products.weeklyPlan.id,
-            weeklyPlan: {
-              supplementation: products.weeklyPlan.supplementationStrategy,
-              shopping: products.weeklyPlan.shoppingList,
-              meals: products.weeklyPlan.mealPlan,
-              workout: products.weeklyPlan.workoutPlan,
-            },
-            usage: products.usage,
-          }
-        : null
-    } else {
-      console.log('⚠️ [COMPLETE-ANALYSIS] Using legacy hardcoded generators')
-
-      ;[recommendations, weeklyPlan] = await Promise.all([
-        generateRecommendationsFromMultipleAnalyses(userId, allAnalysisIds),
-        generateCompleteWeeklyPlan(userId, allAnalysisIds),
-      ])
-    }
+    const weeklyPlan = products.weeklyPlan
+      ? {
+        id: products.weeklyPlan.id,
+        weeklyPlan: {
+          supplementation: products.weeklyPlan.supplementationStrategy,
+          shopping: products.weeklyPlan.shoppingList,
+          meals: products.weeklyPlan.mealPlan,
+          workout: products.weeklyPlan.workoutPlan,
+        },
+        usage: products.usage,
+      }
+      : null
 
     console.log('✅ [COMPLETE-ANALYSIS] Recommendations and Weekly Plan generated')
 
     // Debit credits for recommendations
     try {
-      const recTokens = recommendations.usage?.totalTokens || 0
-      if (recTokens > 0) {
+      if (recommendations && recommendations.usage?.totalTokens > 0) {
+        const recTokens = recommendations.usage.totalTokens
         await debitCredits(userId, recTokens, {
+          analysisId: analysisRecord?.id,
           operation: 'complete_analysis_recommendations',
           modelName: 'gemini-2.5-flash',
-          promptTokens: recommendations.usage?.promptTokens || 0,
-          completionTokens: recommendations.usage?.completionTokens || 0,
-          description: `Recommendations for complete analysis ${analysisRecord.id}`,
+          promptTokens: recommendations.usage.promptTokens || 0,
+          completionTokens: recommendations.usage.completionTokens || 0,
         })
         console.log(`💰 [COMPLETE-ANALYSIS] Debited ${calculateCreditsFromTokens(recTokens)} credits for recommendations`)
       }
@@ -611,16 +592,16 @@ ${agentKnowledge ? `## Base de Conhecimento Médico (Referências)\n${agentKnowl
       console.error('⚠️ [COMPLETE-ANALYSIS] Failed to debit credits for recommendations:', creditError)
     }
 
-    // Debit credits for weekly plan (sum of all 4 components)
+    // Debit credits for weekly plan
     try {
-      const planTokens = weeklyPlan.usage?.totalTokens || 0
-      if (planTokens > 0) {
+      if (weeklyPlan && weeklyPlan.usage?.totalTokens > 0) {
+        const planTokens = weeklyPlan.usage.totalTokens
         await debitCredits(userId, planTokens, {
+          analysisId: analysisRecord?.id,
           operation: 'complete_analysis_weekly_plan',
           modelName: 'gemini-2.5-flash',
-          promptTokens: weeklyPlan.usage?.promptTokens || 0,
-          completionTokens: weeklyPlan.usage?.completionTokens || 0,
-          description: `Weekly plan (Supp: ${weeklyPlan.usage?.supplementation || 0}, Shop: ${weeklyPlan.usage?.shopping || 0}, Meals: ${weeklyPlan.usage?.meals || 0}, Workout: ${weeklyPlan.usage?.workout || 0})`,
+          promptTokens: weeklyPlan.usage.promptTokens || 0,
+          completionTokens: weeklyPlan.usage.completionTokens || 0,
         })
         console.log(`💰 [COMPLETE-ANALYSIS] Debited ${calculateCreditsFromTokens(planTokens)} credits for weekly plan (${planTokens} tokens)`)
       }

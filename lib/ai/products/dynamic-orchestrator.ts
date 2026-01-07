@@ -15,22 +15,8 @@ import {
 } from '@/lib/ai/core/dynamic-generator'
 
 export type ProductsResult = {
-  weeklyPlan: {
-    id: string
-    supplementation: any
-    shopping: any
-    meals: any
-    workout: any
-    createdAt: Date
-  } | null
-  recommendations: {
-    id: string
-    examRecommendations: any[]
-    lifestyleRecommendations: any[]
-    healthGoals: any[]
-    alerts: any[]
-    createdAt: Date
-  } | null
+  weeklyPlan: any | null
+  recommendations: any | null
   usage: {
     promptTokens: number
     completionTokens: number
@@ -136,32 +122,38 @@ export async function generateAllProducts(
     weekStartDate.setDate(today.getDate() + daysUntilMonday)
     const weekStartDateString = weekStartDate.toISOString().split('T')[0]
 
-    const [plan] = await db
+    const insertedPlans = await db
       .insert(weeklyPlans)
       .values({
         userId,
-        analysisId: analysisIds[0], // Referência principal (primeiro agente - foundation)
-        weekStartDate: weekStartDateString, // Próxima segunda-feira
-        supplementationStrategy: weeklyPlanData.supplementation || {},
-        shoppingList: weeklyPlanData.shopping || {},
-        mealPlan: weeklyPlanData.meals || {},
-        workoutPlan: weeklyPlanData.workout || {},
-      })
+        analysisId: analysisIds[0] || '',
+        weekStartDate: weekStartDateString,
+        supplementationStrategy: (weeklyPlanData.supplementation as any) || {},
+        shoppingList: (weeklyPlanData.shopping as any) || {},
+        mealPlan: (weeklyPlanData.meals as any) || {},
+        workoutPlan: (weeklyPlanData.workout as any) || {},
+        // Metadata
+        tokensUsed: totalUsage.totalTokens,
+        modelUsed: weeklyPlanResults[0]?.modelUsed || 'gemini-2.5-flash',
+        prompt: 'Dynamic product generator - all products',
+      } as any)
       .returning()
 
-    savedWeeklyPlan = plan
-    console.log(`✅ [PRODUCTS] Weekly plan saved: ${plan.id}`)
+    savedWeeklyPlan = insertedPlans[0] || null
+    if (savedWeeklyPlan) {
+      console.log(`✅ [PRODUCTS] Weekly plan saved: ${savedWeeklyPlan.id}`)
+    }
   }
 
   // Save recommendations if we have the generator
   if (recommendationsData) {
     console.log('💾 [PRODUCTS] Saving recommendations...')
 
-    const [recs] = await db
+    const insertedRecs = await db
       .insert(recommendationsTable)
       .values({
         userId,
-        analysisId: analysisIds[0], // Reference first analysis
+        analysisId: analysisIds[0] || '',
         examRecommendations: recommendationsData.examRecommendations || [],
         lifestyleRecommendations: recommendationsData.lifestyleRecommendations || [],
         healthGoals: recommendationsData.healthGoals || [],
@@ -171,11 +163,13 @@ export async function generateAllProducts(
         processingTimeMs: recommendationsResults[0]?.processingTimeMs || null,
         modelUsed: recommendationsResults[0]?.modelUsed || null,
         prompt: 'Dynamic product generator - recommendations',
-      })
+      } as any)
       .returning()
 
-    savedRecommendations = recs
-    console.log(`✅ [PRODUCTS] Recommendations saved: ${recs.id}`)
+    savedRecommendations = insertedRecs[0] || null
+    if (savedRecommendations) {
+      console.log(`✅ [PRODUCTS] Recommendations saved: ${savedRecommendations.id}`)
+    }
   }
 
   console.log('\n✨ [PRODUCTS] All products generated successfully!\n')
@@ -217,21 +211,43 @@ export async function generateWeeklyPlanDynamic(
 
   const results = await executeGenerators(generators, consolidatedContext)
 
+  // 5. Group by generatorKey for easy access
   const weeklyPlanData: Record<string, any> = {}
   for (const result of results) {
     weeklyPlanData[result.generatorKey] = result.object
   }
 
-  const [savedPlan] = await db
+  // 6. Calculate next Monday for week_start_date (consistent with generateAllProducts)
+  const today = new Date()
+  const dayOfWeek = today.getDay()
+  const daysUntilMonday = dayOfWeek === 0 ? 1 : 8 - dayOfWeek
+  const weekStartDate = new Date(today)
+  weekStartDate.setDate(today.getDate() + daysUntilMonday)
+  const weekStartDateString = weekStartDate.toISOString().split('T')[0]
+
+  // 7. Save to database with CORRECT keys
+  const insertedPlans = await db
     .insert(weeklyPlans)
     .values({
       userId,
-      supplementation: weeklyPlanData.supplementation || null,
-      shopping: weeklyPlanData.shopping || null,
-      meals: weeklyPlanData.meals || null,
-      workout: weeklyPlanData.workout || null,
-    })
+      analysisId: analysisIds[0] || '',
+      weekStartDate: weekStartDateString,
+      supplementationStrategy: (weeklyPlanData.supplementation as any) || {},
+      shoppingList: (weeklyPlanData.shopping as any) || {},
+      mealPlan: (weeklyPlanData.meals as any) || {},
+      workoutPlan: (weeklyPlanData.workout as any) || {},
+      // Metadata
+      tokensUsed: results.reduce((acc, r) => acc + r.usage.totalTokens, 0),
+      modelUsed: results[0]?.modelUsed || 'gemini-2.5-flash',
+      prompt: 'Dynamic weekly plan generation',
+    } as any)
     .returning()
+
+  const savedPlan = insertedPlans[0]
+
+  if (!savedPlan) {
+    throw new Error('Failed to save weekly plan')
+  }
 
   console.log(`✅ [WEEKLY-PLAN] Saved: ${savedPlan.id}\n`)
 
@@ -282,23 +298,29 @@ export async function generateRecommendationsDynamic(
   }
 
   const results = await executeGenerators(generators, consolidatedContext)
-  const recommendationsData = results[0].object
+  const recommendationsData = results[0]?.object || {}
 
-  const [savedRecs] = await db
+  const insertedRecs = await db
     .insert(recommendationsTable)
     .values({
       userId,
-      analysisId: analysisIds[0],
-      examRecommendations: recommendationsData.examRecommendations || [],
-      lifestyleRecommendations: recommendationsData.lifestyleRecommendations || [],
-      healthGoals: recommendationsData.healthGoals || [],
-      alerts: recommendationsData.alerts || [],
-      tokensUsed: results[0].usage.totalTokens,
-      processingTimeMs: results[0].processingTimeMs,
-      modelUsed: results[0].modelUsed,
+      analysisId: (analysisIds && analysisIds[0]) || '',
+      examRecommendations: (recommendationsData.examRecommendations as any) || [],
+      lifestyleRecommendations: (recommendationsData.lifestyleRecommendations as any) || [],
+      healthGoals: (recommendationsData.healthGoals as any) || [],
+      alerts: (recommendationsData.alerts as any) || [],
+      tokensUsed: results[0]?.usage?.totalTokens || 0,
+      processingTimeMs: results[0]?.processingTimeMs || 0,
+      modelUsed: results[0]?.modelUsed || 'gemini-2.5-flash',
       prompt: 'Dynamic recommendations generator',
-    })
+    } as any)
     .returning()
+
+  const savedRecs = insertedRecs[0]
+
+  if (!savedRecs) {
+    throw new Error('Failed to save recommendations')
+  }
 
   console.log(`✅ [RECOMMENDATIONS] Saved: ${savedRecs.id}\n`)
 

@@ -39,22 +39,66 @@ interface WeeklyPlan {
       dosage: string
       timing: string
       purpose: string
+      duration?: string
     }>
+    hormonalSupport?: Array<{
+      hormone: string
+      strategy: string
+      monitoring: string
+    }>
+    nextExamRecommendations?: string[]
   }
   shoppingList: {
     overview: string
+    estimatedCost?: string
+    tips?: string[]
     categories: Array<{
       category: string
-      items: Array<{ item: string }>
+      items: Array<{
+        item: string
+        quantity?: string
+        notes?: string
+        priority?: 'high' | 'medium' | 'low'
+      }>
     }>
   }
   mealPlan: {
     overview: string
-    meals: Array<{ day: string }>
+    daily_calories_avg: string
+    weekly_plan: Array<{
+      day: string
+      meals: {
+        breakfast: any
+        morning_snack: any
+        lunch: any
+        afternoon_snack: any
+        pre_workout: any
+        post_workout: any
+        dinner: any
+        supper: any
+      }
+    }>
   }
   workoutPlan: {
     overview: string
-    workouts: Array<{ day: string; type: string }>
+    weeklyGoal?: string
+    workouts: Array<{
+      day: string
+      type: string
+      duration: string
+      intensity?: string
+      warmup?: string
+      exercises: Array<{
+        name: string
+        sets?: string
+        reps?: string
+        duration?: string
+        notes?: string
+      }>
+      cooldown?: string
+    }>
+    restDays?: string[]
+    progressionTips?: string[]
   }
   createdAt: string
 }
@@ -155,7 +199,7 @@ export function WeeklyPlanWidget({ patientId }: WeeklyPlanWidgetProps = {}) {
 
       // Only log to console if it's an unexpected error (not the "no plan" case)
       if (!errorMessage.includes('Nenhum plano') &&
-          !errorMessage.includes('Realize uma análise médica primeiro')) {
+        !errorMessage.includes('Realize uma análise médica primeiro')) {
         console.error('Error loading weekly plan:', err)
       }
 
@@ -209,7 +253,7 @@ export function WeeklyPlanWidget({ patientId }: WeeklyPlanWidgetProps = {}) {
 
   const totalSupplements = plan.supplementationStrategy?.supplements?.length || 0
   const totalCategories = plan.shoppingList?.categories?.length || 0
-  const totalMeals = plan.mealPlan?.meals?.length || 0
+  const totalMeals = plan.mealPlan?.weekly_plan?.length || 0
   const totalWorkouts = plan.workoutPlan?.workouts?.length || 0
 
   const getSectionTitle = (tab: string) => {
@@ -353,43 +397,43 @@ export function WeeklyPlanWidget({ patientId }: WeeklyPlanWidgetProps = {}) {
               ))}
 
               {plan.supplementationStrategy?.hormonalSupport &&
-               plan.supplementationStrategy?.hormonalSupport?.length > 0 && (
-                <>
-                  <Separator className="my-6" />
-                  <div>
-                    <h4 className="font-semibold text-base text-foreground mb-4">Suporte Hormonal</h4>
-                    <div className="space-y-3">
-                      {plan.supplementationStrategy?.hormonalSupport?.map((hormone: any, index: number) => (
-                        <div key={index} className="p-4 border border-purple-200 dark:border-purple-700 rounded-lg bg-card hover:bg-purple-50/30 dark:hover:bg-purple-950/30 transition-colors">
-                          <h5 className="font-semibold text-sm text-foreground">{hormone.hormone}</h5>
-                          <p className="text-sm text-foreground mt-2 leading-relaxed">{hormone.strategy}</p>
-                          <p className="text-xs text-muted-foreground mt-2">
-                            Monitoramento: {hormone.monitoring}
-                          </p>
-                        </div>
-                      ))}
+                plan.supplementationStrategy?.hormonalSupport?.length > 0 && (
+                  <>
+                    <Separator className="my-6" />
+                    <div>
+                      <h4 className="font-semibold text-base text-foreground mb-4">Suporte Hormonal</h4>
+                      <div className="space-y-3">
+                        {plan.supplementationStrategy?.hormonalSupport?.map((hormone: any, index: number) => (
+                          <div key={index} className="p-4 border border-purple-200 dark:border-purple-700 rounded-lg bg-card hover:bg-purple-50/30 dark:hover:bg-purple-950/30 transition-colors">
+                            <h5 className="font-semibold text-sm text-foreground">{hormone.hormone}</h5>
+                            <p className="text-sm text-foreground mt-2 leading-relaxed">{hormone.strategy}</p>
+                            <p className="text-xs text-muted-foreground mt-2">
+                              Monitoramento: {hormone.monitoring}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                </>
-              )}
+                  </>
+                )}
 
               {plan.supplementationStrategy?.nextExamRecommendations &&
-               plan.supplementationStrategy?.nextExamRecommendations?.length > 0 && (
-                <>
-                  <Separator className="my-6" />
-                  <div>
-                    <h4 className="font-semibold text-base text-foreground mb-4">Exames Recomendados para o Próximo Ciclo</h4>
-                    <ul className="space-y-2.5">
-                      {plan.supplementationStrategy?.nextExamRecommendations?.map((exam: string, index: number) => (
-                        <li key={index} className="flex items-start gap-2.5 text-sm">
-                          <span className="text-teal-600 mt-0.5">•</span>
-                          <span className="text-foreground leading-relaxed">{exam}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </>
-              )}
+                plan.supplementationStrategy?.nextExamRecommendations?.length > 0 && (
+                  <>
+                    <Separator className="my-6" />
+                    <div>
+                      <h4 className="font-semibold text-base text-foreground mb-4">Exames Recomendados para o Próximo Ciclo</h4>
+                      <ul className="space-y-2.5">
+                        {plan.supplementationStrategy?.nextExamRecommendations?.map((exam: string, index: number) => (
+                          <li key={index} className="flex items-start gap-2.5 text-sm">
+                            <span className="text-teal-600 mt-0.5">•</span>
+                            <span className="text-foreground leading-relaxed">{exam}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </>
+                )}
             </div>
           </TabsContent>
 
@@ -432,15 +476,14 @@ export function WeeklyPlanWidget({ patientId }: WeeklyPlanWidgetProps = {}) {
                       return (
                         <div
                           key={itemKey}
-                          className={`p-4 border rounded-lg transition-all ${
-                            isCompleted
-                              ? 'border-sky-500 bg-sky-50/50 dark:bg-sky-950/30 opacity-75'
-                              : item.priority === 'high'
+                          className={`p-4 border rounded-lg transition-all ${isCompleted
+                            ? 'border-sky-500 bg-sky-50/50 dark:bg-sky-950/30 opacity-75'
+                            : item.priority === 'high'
                               ? 'border-red-200 dark:border-red-800 bg-card hover:bg-red-50/30 dark:hover:bg-red-950/30'
                               : item.priority === 'medium'
-                              ? 'border-amber-200 dark:border-amber-800 bg-card hover:bg-amber-50/30 dark:hover:bg-amber-950/30'
-                              : 'border-border bg-card hover:border-sky-300 dark:hover:border-sky-700 hover:bg-sky-50/30 dark:hover:bg-sky-950/30'
-                          }`}
+                                ? 'border-amber-200 dark:border-amber-800 bg-card hover:bg-amber-50/30 dark:hover:bg-amber-950/30'
+                                : 'border-border bg-card hover:border-sky-300 dark:hover:border-sky-700 hover:bg-sky-50/30 dark:hover:bg-sky-950/30'
+                            }`}
                         >
                           <div className="flex items-start gap-3">
                             <Checkbox
@@ -453,19 +496,17 @@ export function WeeklyPlanWidget({ patientId }: WeeklyPlanWidgetProps = {}) {
                               <div className="flex items-start justify-between mb-2">
                                 <label
                                   htmlFor={itemKey}
-                                  className={`font-semibold text-sm cursor-pointer ${
-                                    isCompleted ? 'line-through text-muted-foreground' : 'text-foreground'
-                                  }`}
+                                  className={`font-semibold text-sm cursor-pointer ${isCompleted ? 'line-through text-muted-foreground' : 'text-foreground'
+                                    }`}
                                 >
                                   {item.item}
                                 </label>
                                 {item.priority && !isCompleted && (
                                   <Badge
-                                    className={`text-xs ml-2 ${
-                                      item.priority === 'high'
-                                        ? 'bg-red-100 dark:bg-red-950/30 text-red-700 dark:text-red-300 border-red-200 dark:border-red-700'
-                                        : 'bg-amber-100 dark:bg-amber-950/30 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-700'
-                                    }`}
+                                    className={`text-xs ml-2 ${item.priority === 'high'
+                                      ? 'bg-red-100 dark:bg-red-950/30 text-red-700 dark:text-red-300 border-red-200 dark:border-red-700'
+                                      : 'bg-amber-100 dark:bg-amber-950/30 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-700'
+                                      }`}
                                   >
                                     {item.priority}
                                   </Badge>

@@ -1,11 +1,12 @@
 /**
  * Recommendations Generation API
  * Generates personalized health recommendations from an analysis on-demand
+ * Uses the Dynamic Product Generator system (Unified Orchestrator)
  */
 
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth/config'
-import { generateRecommendationsFromAnalysis } from '@/lib/ai/recommendations/generate'
+import { generateRecommendationsDynamic } from '@/lib/ai/products/dynamic-orchestrator'
 import { db } from '@/lib/db/client'
 import { analyses } from '@/lib/db/schema'
 import { eq } from 'drizzle-orm'
@@ -32,7 +33,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    console.log(`💡 [RECOMMENDATIONS-API] Generating recommendations for analysis: ${analysisId}`)
+    console.log(`💡 [RECOMMENDATIONS-API] Generating dynamic recommendations for analysis: ${analysisId}`)
 
     // Get the analysis to verify ownership
     const [analysis] = await db
@@ -64,6 +65,13 @@ export async function POST(request: NextRequest) {
     const estimatedCredits = calculateCreditsFromTokens(ESTIMATED_TOKENS)
     const userCreditsData = await getUserCredits(session.user.id)
 
+    if (!userCreditsData) {
+      return NextResponse.json(
+        { success: false, error: 'Erro ao verificar créditos' },
+        { status: 500 }
+      )
+    }
+
     console.log(`💰 [RECOMMENDATIONS-API] Credit check: required=${estimatedCredits}, current=${userCreditsData.balance}`)
 
     if (userCreditsData.balance < estimatedCredits) {
@@ -71,12 +79,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          error: `Créditos insuficientes. Você precisa de mais ${shortfall} créditos para gerar recomendações.`,
+          error: `Créditos insuficientes. Você precisa de mais ${shortfall} créditos.`,
           details: {
             required: estimatedCredits,
             current: userCreditsData.balance,
-            shortfall: shortfall,
-            message: `Saldo atual: ${userCreditsData.balance} créditos | Necessário: ${estimatedCredits} créditos | Faltam: ${shortfall} créditos`
+            shortfall: shortfall
           },
         },
         { status: 402 }
@@ -84,50 +91,33 @@ export async function POST(request: NextRequest) {
     }
     // ======================================
 
-    // Generate recommendations
-    const recommendation = await generateRecommendationsFromAnalysis(
-      analysisId,
-      analysis.userId
-    )
+    // Generate recommendations using the Dynamic Orchestrator
+    const result = await generateRecommendationsDynamic(analysis.userId, [analysisId])
 
-    console.log(`✅ [RECOMMENDATIONS-API] Recommendations generated: ${recommendation.id}`)
+    console.log(`✅ [RECOMMENDATIONS-API] Dynamic recommendations generated: ${result.id}`)
 
     // ============ DEBIT CREDITS ============
     try {
-      const tokensUsed = recommendation.usage?.totalTokens || 0
-
+      const tokensUsed = result.usage?.totalTokens || 0
       if (tokensUsed > 0) {
         await debitCredits(session.user.id, tokensUsed, {
-          recommendationId: recommendation.id,
           analysisId,
-          operation: 'generate_recommendations',
+          operation: 'generate_recommendations_dynamic',
           modelName: 'gemini-2.5-flash',
-          promptTokens: recommendation.usage?.promptTokens || 0,
-          completionTokens: recommendation.usage?.completionTokens || 0,
-          cachedTokens: recommendation.usage?.cachedTokens,
+          promptTokens: result.usage?.promptTokens || 0,
+          completionTokens: result.usage?.completionTokens || 0,
         })
-        console.log(`💰 [RECOMMENDATIONS-API] Debited ${calculateCreditsFromTokens(tokensUsed)} credits for ${tokensUsed} tokens`)
+        console.log(`💰 [RECOMMENDATIONS-API] Debited credits for ${tokensUsed} tokens`)
       }
     } catch (creditError) {
       console.error('⚠️ [RECOMMENDATIONS-API] Failed to debit credits:', creditError)
-      // Don't fail the operation, log for manual review
     }
     // =======================================
 
     return NextResponse.json({
       success: true,
-      recommendation: {
-        id: recommendation.id,
-        analysisId: recommendation.analysisId,
-        examRecommendations: recommendation.examRecommendations,
-        lifestyleRecommendations: recommendation.lifestyleRecommendations,
-        healthGoals: recommendation.healthGoals,
-        alerts: recommendation.alerts,
-        createdAt: recommendation.createdAt,
-      },
-      creditsDebited: recommendation.usage?.totalTokens
-        ? calculateCreditsFromTokens(recommendation.usage.totalTokens)
-        : 0,
+      recommendationId: result.id,
+      usage: result.usage,
       message: 'Recomendações geradas com sucesso!',
     })
   } catch (error) {

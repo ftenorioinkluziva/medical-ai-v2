@@ -55,38 +55,36 @@ const shoppingListSchema = z.object({
   tips: z.array(z.string()).optional().describe('Dicas de compra'),
 })
 
-// 3. Meal Plan Schema
-const mealSchema = z.object({
-  name: z.string().describe('Nome da refeição'),
-  ingredients: z.array(z.string()).describe('Ingredientes'),
-  calories: z.string().optional().describe('Calorias aproximadas'),
-  prepTime: z.string().optional().describe('Tempo de preparo'),
+const mealDefinitionSchema = z.object({
+  name: z.string().describe('Nome curto da refeição (máx 5 palavras)'),
+  ingredients: z.array(z.string()).describe('Lista de ingredientes (máx 5 itens)'),
+  instructions: z.string().describe('Instruções EXTREMAMENTE curtas (máx 20 palavras)'),
+  calories: z.string().describe('Ex: "450 kcal"'),
+  macros: z.object({
+    fats: z.string().describe('Ex: "15g"'),
+    carbs: z.string().describe('Ex: "45g"'),
+    protein: z.string().describe('Ex: "30g"'),
+  }).optional().describe('Macronutrientes'),
 })
 
 const mealPlanSchema = z.object({
-  overview: z.string().describe('Visão geral do plano alimentar'),
-  dailyCalories: z.string().optional().describe('Calorias diárias'),
-  macros: z.object({
-    protein: z.string().optional(),
-    carbs: z.string().optional(),
-    fats: z.string().optional(),
-  }).optional().describe('Distribuição de macronutrientes'),
-  meals: z.array(
+  overview: z.string().describe('Visão geral da estratégia nutricional da semana'),
+  daily_calories_avg: z.string().describe('Média de calorias diárias (ex: "2100 kcal")'),
+  weekly_plan: z.array(
     z.object({
-      day: z.string().describe('Dia da semana'),
-      breakfast: mealSchema,
-      lunch: mealSchema,
-      dinner: mealSchema,
-      snacks: z.array(
-        z.object({
-          name: z.string(),
-          timing: z.string(),
-          calories: z.string().optional(),
-        })
-      ).optional(),
+      day: z.string().describe('Dia da semana por extenso (ex: "Segunda-feira")'),
+      meals: z.object({
+        breakfast: mealDefinitionSchema,
+        morning_snack: mealDefinitionSchema,
+        lunch: mealDefinitionSchema,
+        afternoon_snack: mealDefinitionSchema,
+        pre_workout: mealDefinitionSchema,
+        post_workout: mealDefinitionSchema,
+        dinner: mealDefinitionSchema,
+        supper: mealDefinitionSchema,
+      }),
     })
-  ).describe('Plano de refeições para cada dia'),
-  mealPrepTips: z.array(z.string()).optional().describe('Dicas de preparo'),
+  ).describe('Plano detalhado para os 7 dias da semana'),
 })
 
 // 4. Workout Plan Schema
@@ -165,17 +163,13 @@ export const productGenerators = [
 
     systemPrompt: 'Você é um médico especialista em medicina integrativa e nutrição funcional.',
 
-    analysisPrompt: `Baseado na análise médica, elabore uma estratégia completa de suplementação e reposição hormonal para a próxima semana/mês até o próximo exame.
+    analysisPrompt: `Baseado na análise médica, elabore uma estratégia de suplementação e suporte hormonal.
 
-INSTRUÇÕES:
-1. Liste suplementos específicos com dosagens, horários e propósitos
-2. Se houver indicações hormonais, inclua estratégias de suporte/reposição
-3. Recomende exames para monitoramento futuro
-4. Seja específico e prático
-5. Considere interações e contraindicações
-6. Priorize segurança e evidências científicas
-
-IMPORTANTE: Esta é uma orientação educacional. O paciente deve consultar um médico antes de iniciar qualquer suplementação.`,
+REGRAS DE OURO:
+1. Máximo 8 suplementos no total.
+2. Dose e timing: Seja extremamente curto (ex: "5g ao acordar").
+3. Propósito: Máximo 10 palavras.
+4. Use SOMENTE o que for necessário para o ciclo atual.`,
 
     outputSchema: zodToJsonSchema(supplementationSchema),
 
@@ -214,17 +208,13 @@ IMPORTANTE: Esta é uma orientação educacional. O paciente deve consultar um m
 
     systemPrompt: 'Você é um nutricionista especializado em planejamento alimentar prático.',
 
-    analysisPrompt: `Baseado na análise médica e nas necessidades nutricionais identificadas, crie uma lista de compras completa e prática para a semana.
+    analysisPrompt: `Crie uma lista de compras prática baseada na análise.
 
-INSTRUÇÕES:
-1. Organize por categorias (Proteínas, Vegetais, Frutas, Grãos, etc)
-2. Sugira quantidades apropriadas para uma semana
-3. Priorize alimentos que atendam as necessidades específicas identificadas
-4. Inclua dicas de escolha e conservação
-5. Considere praticidade e disponibilidade
-6. Indique estimativa de custo se possível
-
-Seja prático e realista.`,
+REGRAS DE OURO:
+1. Máximo 5 itens por categoria.
+2. Nome do item: Máximo 3 palavras.
+3. Quantidade: Curta (ex: "500g", "1 bandeja").
+4. Liste apenas o essencial para o plano alimentar.`,
 
     outputSchema: zodToJsonSchema(shoppingListSchema),
 
@@ -263,18 +253,17 @@ Seja prático e realista.`,
 
     systemPrompt: 'Você é um nutricionista especializado em planejamento de refeições e culinária saudável.',
 
-    analysisPrompt: `Baseado na análise médica e nas necessidades nutricionais, crie um plano de refeições completo para 7 dias.
+    analysisPrompt: `Crie um plano alimentar para 7 dias baseado na análise médica.
 
-INSTRUÇÕES:
-1. Inclua café da manhã, almoço, jantar e lanches
-2. Especifique ingredientes e modo de preparo
-3. Considere as necessidades nutricionais específicas identificadas
-4. Varie as opções ao longo da semana
-5. Indique calorias aproximadas e macronutrientes
-6. Seja prático e realista quanto ao preparo
-7. Inclua dicas de meal prep
+ESTRUTURA OBRIGATÓRIA (7 refeições/dia):
+- Café da manhã, Lanche manhã, Almoço, Lanche tarde, Pré-treino, Pós-treino, Jantar, Ceia.
 
-Foque em refeições saborosas, nutritivas e fáceis de preparar.`,
+REGRAS DE OURO PARA CONCISÃO (VITAL para evitar erros de truncagem):
+1. Nome do prato: Máximo 5 palavras.
+2. Ingredientes: Máximo 5 itens.
+3. Instruções: Máximo 20 palavras por prato.
+4. TUDO em português e ingredientes brasileiros.
+5. Macros e calorias por refeição são obrigatórios.`,
 
     outputSchema: zodToJsonSchema(mealPlanSchema),
 

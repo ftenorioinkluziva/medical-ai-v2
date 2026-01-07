@@ -249,7 +249,7 @@ export function MealPlanNavigator({ mealPlan }: MealPlanNavigatorProps) {
                   >
                     {/* Show 1 letter on mobile, 3 letters on desktop */}
                     <span className="sm:hidden">{day.day.charAt(0)}</span>
-                    <span className="hidden sm:inline">{day.day.split('-')[0].substring(0, 3)}</span>
+                    <span className="hidden sm:inline">{day.day.split('-')[0]?.substring(0, 3)}</span>
                   </TabsTrigger>
                 ))}
               </TabsList>

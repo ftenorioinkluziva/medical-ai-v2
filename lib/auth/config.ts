@@ -56,17 +56,17 @@ const authConfig = {
         const { compare } = await import('bcryptjs')
 
         // Find user by email
-        const user = await db
+        const userResults = await db
           .select()
           .from(users)
           .where(eq(users.email, credentials.email as string))
           .limit(1)
 
-        if (!user || user.length === 0) {
+        const foundUser = userResults[0]
+
+        if (!foundUser) {
           throw new Error('Credenciais inválidas')
         }
-
-        const foundUser = user[0]
 
         // Verify password
         if (!foundUser.passwordHash) {
@@ -95,7 +95,7 @@ const authConfig = {
   ],
 
   callbacks: {
-    async jwt({ token, user, trigger, session }) {
+    async jwt({ token, user, trigger, session }: any) {
       // Initial sign in
       if (user) {
         token.id = user.id
@@ -110,7 +110,7 @@ const authConfig = {
       return token
     },
 
-    async session({ session, token }) {
+    async session({ session, token }: any) {
       if (token && session.user) {
         session.user.id = token.id as string
         session.user.role = token.role as string
@@ -118,19 +118,19 @@ const authConfig = {
       return session
     },
 
-    async redirect({ url, baseUrl }) {
+    async redirect({ url, baseUrl }: any) {
       // If a callback URL is provided, use it
       if (url.startsWith(baseUrl)) {
         return url
       }
 
       // Otherwise redirect to appropriate dashboard based on role
-      // Note: We can't access the session here directly, so the middleware will handle final routing
+      // Note: We can't access the session here directly, so the proxy will handle final routing
       return baseUrl
     },
   },
 
-  debug: process.env.NODE_ENV === 'development',
+  debug: false,
 }
 
 export const {
