@@ -10,7 +10,7 @@ import Link from 'next/link'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { RecommendationsWidget } from '@/components/recommendations/recommendations-widget'
-import { DynamicWeeklyPlanWidget } from '@/components/weekly-plan/dynamic-weekly-plan-widget'
+import { WeeklyPlanWidget } from '@/components/weekly-plan/weekly-plan-widget'
 import { DocumentUploadWidget } from '@/components/documents/document-upload-widget'
 import { RecentDocumentsWidget } from '@/components/documents/recent-documents-widget'
 import { RecentAnalysesWidget } from '@/components/analyses/recent-analyses-widget'
@@ -125,7 +125,7 @@ export default function PatientDashboardPage({ params }: PageProps) {
       {/* Recommendations and Weekly Plan Section - 2 Column Grid */}
       <div className="grid gap-6 lg:grid-cols-2">
         <RecommendationsWidget patientId={patientId} />
-        <DynamicWeeklyPlanWidget patientId={patientId} />
+        <WeeklyPlanWidget patientId={patientId} />
       </div>
     </div>
   )
