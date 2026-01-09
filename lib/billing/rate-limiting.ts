@@ -6,8 +6,10 @@ import { eq, gte, sum } from 'drizzle-orm'
  * Check if user has exceeded hourly rate limit
  */
 export async function checkHourlyRateLimit(userId: string, limitTokens = 500000): Promise<boolean> {
-  const oneHourAgo = new Date()
-  oneHourAgo.setHours(oneHourAgo.getHours() - 1)
+  const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000) // Calculate 1 hour ago in UTC timestamp
+
+  console.log('🔍 [RATE-LIMIT-DEBUG] Checking usage for:', userId)
+  console.log('🕒 [RATE-LIMIT-DEBUG] One hour ago:', oneHourAgo.toISOString(), '| Local:', oneHourAgo.toString())
 
   const [result] = await db
     .select({ total: sum(tokenUsageLogs.totalTokens) })
@@ -18,6 +20,8 @@ export async function checkHourlyRateLimit(userId: string, limitTokens = 500000)
     )
 
   const tokensUsedLastHour = parseInt(result?.total || '0')
+  console.log('📈 [RATE-LIMIT-DEBUG] Tokens used:', tokensUsedLastHour, '| Limit:', limitTokens)
+
   return tokensUsedLastHour >= limitTokens
 }
 
@@ -25,8 +29,7 @@ export async function checkHourlyRateLimit(userId: string, limitTokens = 500000)
  * Check if user has exceeded daily rate limit
  */
 export async function checkDailyRateLimit(userId: string, limitTokens = 2000000): Promise<boolean> {
-  const oneDayAgo = new Date()
-  oneDayAgo.setDate(oneDayAgo.getDate() - 1)
+  const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000) // Calculate 24 hours ago in UTC timestamp
 
   const [result] = await db
     .select({ total: sum(tokenUsageLogs.totalTokens) })

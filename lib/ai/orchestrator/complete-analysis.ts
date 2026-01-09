@@ -664,8 +664,8 @@ ${synthesis.mainRecommendations.map(r => `- ${r}`).join('\n')}
       .set({
         analysisIds: allAnalysisIds,
         synthesis: synthesis as any,
-        recommendationsId: recommendations.id,
-        weeklyPlanId: weeklyPlan.id,
+        recommendationsId: recommendations?.id || null,
+        weeklyPlanId: weeklyPlan?.id || null,
         status: 'completed',
         completedAt: new Date(),
       })
