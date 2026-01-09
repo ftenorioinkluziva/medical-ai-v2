@@ -102,6 +102,7 @@ export function AgentForm({ agent, onSuccess, onCancel }: AgentFormProps) {
       keywords: [] as string[],
       maxChunks: 3,
       maxCharsPerChunk: 1200,
+      restrictedPriority: 0.7, // Default: 70% from restricted articles, 30% from general
     },
     executionOrder: null as number | null,
   })
@@ -185,11 +186,18 @@ export function AgentForm({ agent, onSuccess, onCancel }: AgentFormProps) {
         productType: agent.productType || null,
         generatorKey: agent.generatorKey || '',
         outputSchema: agent.outputSchema ? JSON.stringify(agent.outputSchema, null, 2) : '',
-        ragConfig: agent.ragConfig || {
+        ragConfig: agent.ragConfig ? {
+          enabled: agent.ragConfig.enabled || false,
+          keywords: agent.ragConfig.keywords || [],
+          maxChunks: agent.ragConfig.maxChunks || 3,
+          maxCharsPerChunk: agent.ragConfig.maxCharsPerChunk || 1200,
+          restrictedPriority: agent.ragConfig.restrictedPriority !== undefined ? agent.ragConfig.restrictedPriority : 0.7,
+        } : {
           enabled: false,
           keywords: [],
           maxChunks: 3,
           maxCharsPerChunk: 1200,
+          restrictedPriority: 0.7,
         },
         executionOrder: agent.executionOrder !== undefined && agent.executionOrder !== null ? agent.executionOrder : null,
       }
@@ -750,6 +758,54 @@ export function AgentForm({ agent, onSuccess, onCancel }: AgentFormProps) {
                     </p>
                   </div>
                 </div>
+
+                {/* Restricted Priority */}
+                {formData.knowledgeAccessType === 'restricted' && (
+                  <div className="space-y-3 p-4 border rounded-lg bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-950/20 dark:to-blue-950/20">
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="ragRestrictedPriority" className="font-medium">
+                        Prioridade de Artigos Restritos
+                      </Label>
+                      <span className="text-sm font-bold text-purple-600 dark:text-purple-400">
+                        {Math.round(formData.ragConfig.restrictedPriority * 100)}%
+                      </span>
+                    </div>
+                    <Input
+                      id="ragRestrictedPriority"
+                      type="range"
+                      min="0"
+                      max="1"
+                      step="0.05"
+                      value={formData.ragConfig.restrictedPriority}
+                      onChange={(e) =>
+                        handleChange('ragConfig', {
+                          ...formData.ragConfig,
+                          restrictedPriority: parseFloat(e.target.value),
+                        })
+                      }
+                      className="w-full cursor-pointer"
+                    />
+                    <div className="grid grid-cols-2 gap-3 text-xs">
+                      <div className="p-2 bg-white dark:bg-gray-800 rounded border">
+                        <p className="font-semibold text-purple-600 dark:text-purple-400">
+                          ~{Math.round(formData.ragConfig.maxChunks * formData.ragConfig.restrictedPriority)} chunks
+                        </p>
+                        <p className="text-muted-foreground">dos artigos restritos</p>
+                      </div>
+                      <div className="p-2 bg-white dark:bg-gray-800 rounded border">
+                        <p className="font-semibold text-blue-600 dark:text-blue-400">
+                          ~{Math.round(formData.ragConfig.maxChunks * (1 - formData.ragConfig.restrictedPriority))} chunks
+                        </p>
+                        <p className="text-muted-foreground">de toda a base</p>
+                      </div>
+                    </div>
+                    <div className="text-xs text-muted-foreground space-y-1">
+                      <p>• <strong>100%</strong> = Busca APENAS em artigos restritos (mais seguro)</p>
+                      <p>• <strong>70%</strong> = 70% restritos + 30% gerais (balanceado) ⭐</p>
+                      <p>• <strong>0%</strong> = Ignora completamente as restrições (mais inteligente)</p>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>

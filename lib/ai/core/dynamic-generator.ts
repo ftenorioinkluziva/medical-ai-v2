@@ -134,6 +134,7 @@ export async function executeGenerator(
         maxChunks: ragConfig.maxChunks,
         maxCharsPerChunk: ragConfig.maxCharsPerChunk,
         agentId: generator.id, // ✅ Pass agentId to respect knowledgeAccessType restrictions
+        restrictedPriority: ragConfig.restrictedPriority, // ✅ Pass restrictedPriority for cascading search
         // Note: buildKnowledgeContext uses embeddings from analysis text
         // ragConfig.keywords could be used for additional filtering in the future
       })

@@ -146,6 +146,7 @@ export async function buildKnowledgeContext(
     categories?: string[]
     articleIds?: string[] | null
     agentId?: string // New: automatically get article IDs from agent config
+    restrictedPriority?: number // 0-1: % of chunks from restricted articles (only applies when agentId + restrictedPriority provided)
   } = {}
 ): Promise<string> {
   const {
@@ -154,6 +155,7 @@ export async function buildKnowledgeContext(
     categories,
     articleIds: providedArticleIds,
     agentId,
+    restrictedPriority,
   } = options
 
   console.log(`🧠 [KNOWLEDGE] Building context for query...`)
@@ -172,13 +174,52 @@ export async function buildKnowledgeContext(
     }
   }
 
-  // Search with provided filters (NO FALLBACK for restricted agents)
-  const results = await searchKnowledgeBase(query, {
-    limit: maxChunks,
-    threshold: 0.5,
-    categories,
-    articleIds,
-  })
+  // Cascading search with restrictedPriority (if configured)
+  let results: KnowledgeSearchResult[] = []
+
+  if (restrictedPriority !== undefined && restrictedPriority < 1 && articleIds && articleIds.length > 0) {
+    // Cascading search: restricted articles + general articles
+    const restrictedChunks = Math.round(maxChunks * restrictedPriority)
+    const generalChunks = maxChunks - restrictedChunks
+
+    console.log(`🔀 [KNOWLEDGE] Cascading search: ${restrictedChunks} restricted + ${generalChunks} general`)
+
+    // Phase 1: Search in restricted articles
+    if (restrictedChunks > 0) {
+      const restrictedResults = await searchKnowledgeBase(query, {
+        limit: restrictedChunks,
+        threshold: 0.5,
+        categories,
+        articleIds,
+      })
+      results.push(...restrictedResults)
+      console.log(`  ✓ Phase 1: Found ${restrictedResults.length} chunks from restricted articles`)
+    }
+
+    // Phase 2: Search in general articles (if needed)
+    if (generalChunks > 0) {
+      const usedArticleIds = new Set(results.map(r => r.articleId))
+      const generalResults = await searchKnowledgeBase(query, {
+        limit: generalChunks,
+        threshold: 0.75, // Higher threshold for general search (more selective)
+        categories,
+        articleIds: null, // Search all articles
+      })
+
+      // Filter out articles already used in Phase 1
+      const newGeneralResults = generalResults.filter(r => !usedArticleIds.has(r.articleId))
+      results.push(...newGeneralResults.slice(0, generalChunks))
+      console.log(`  ✓ Phase 2: Found ${newGeneralResults.length} chunks from general articles`)
+    }
+  } else {
+    // Standard search (no cascading)
+    results = await searchKnowledgeBase(query, {
+      limit: maxChunks,
+      threshold: 0.5,
+      categories,
+      articleIds,
+    })
+  }
 
   if (results.length === 0) {
     if (articleIds && articleIds.length > 0) {

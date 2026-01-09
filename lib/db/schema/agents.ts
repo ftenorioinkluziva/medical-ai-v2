@@ -63,6 +63,7 @@ export const healthAgents = pgTable('health_agents', {
     keywords: string[]
     maxChunks: number
     maxCharsPerChunk: number
+    restrictedPriority: number // 0-1: % of chunks from restricted articles (1 = 100% restricted, 0 = ignore restrictions)
   } | null>(),
   executionOrder: integer('execution_order'), // Order of execution for product generators
 
@@ -114,6 +115,7 @@ export type RAGConfig = {
   keywords: string[]
   maxChunks: number
   maxCharsPerChunk: number
+  restrictedPriority: number // 0-1: % of chunks from restricted articles (1 = 100% restricted, 0 = ignore restrictions)
 }
 
 export type JSONSchemaDefinition = Record<string, any>
