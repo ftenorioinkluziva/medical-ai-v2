@@ -51,6 +51,8 @@ interface AnalysisResult {
   metadata?: any
   usage?: any
   error?: string
+  insufficientCredits?: boolean
+  details?: any
 }
 
 interface SelectedAnalysis {
@@ -232,30 +234,53 @@ export function AnalysisInterface({
                 <p className="text-xs mt-1">Faça upload de documentos primeiro</p>
               </div>
             ) : (
-              <div className="space-y-2 max-h-64 overflow-y-auto border rounded-md p-3">
-                {documents.map((doc) => (
-                  <label
-                    key={doc.id}
-                    htmlFor={`doc-${doc.id}`}
-                    className="flex items-start space-x-3 p-3 hover:bg-muted/50 rounded-md cursor-pointer transition-colors"
+              <div className="space-y-2 border rounded-md p-3">
+                {/* Select All */}
+                <div className="flex items-center gap-2 pb-2 mb-2 border-b">
+                  <Checkbox
+                    id="select-all-docs"
+                    checked={selectedDocumentIds.length === documents.length && documents.length > 0}
+                    onCheckedChange={(checked) => {
+                      if (checked) {
+                        setSelectedDocumentIds(documents.map(d => d.id))
+                      } else {
+                        setSelectedDocumentIds([])
+                      }
+                    }}
+                  />
+                  <Label
+                    htmlFor="select-all-docs"
+                    className="text-sm font-medium cursor-pointer"
                   >
-                    <Checkbox
-                      id={`doc-${doc.id}`}
-                      checked={selectedDocumentIds.includes(doc.id)}
-                      onCheckedChange={() => toggleDocument(doc.id)}
-                      className="mt-0.5"
-                    />
-                    <div className="flex items-center gap-2 flex-1 min-w-0">
-                      <File className="h-4 w-4 flex-shrink-0 text-muted-foreground" />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium truncate">{doc.fileName}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {new Date(doc.createdAt).toLocaleDateString('pt-BR')}
-                        </p>
+                    Selecionar todos
+                  </Label>
+                </div>
+
+                <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
+                  {documents.map((doc) => (
+                    <label
+                      key={doc.id}
+                      htmlFor={`doc-${doc.id}`}
+                      className="flex items-start space-x-3 p-2 hover:bg-muted/50 rounded-md cursor-pointer transition-colors"
+                    >
+                      <Checkbox
+                        id={`doc-${doc.id}`}
+                        checked={selectedDocumentIds.includes(doc.id)}
+                        onCheckedChange={() => toggleDocument(doc.id)}
+                        className="mt-0.5"
+                      />
+                      <div className="flex items-center gap-2 flex-1 min-w-0">
+                        <File className="h-4 w-4 flex-shrink-0 text-muted-foreground" />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium truncate">{doc.fileName}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {new Date(doc.createdAt).toLocaleDateString('pt-BR')}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                  </label>
-                ))}
+                    </label>
+                  ))}
+                </div>
               </div>
             )}
             <p className="text-xs text-muted-foreground">

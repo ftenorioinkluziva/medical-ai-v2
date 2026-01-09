@@ -57,6 +57,39 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Prepare Synthesis Context if available
+    let synthesisContext: string | undefined = undefined
+    if (analysis && (analysis as any).synthesis) {
+      try {
+        const synthesisObj = (analysis as any).synthesis
+        synthesisContext = `# SÍNTESE CLÍNICA CONSOLIDADA\n\n`
+
+        if (synthesisObj.executiveSummary) {
+          synthesisContext += `## Resumo Executivo\n${synthesisObj.executiveSummary}\n\n`
+        }
+
+        if (synthesisObj.keyFindings && Array.isArray(synthesisObj.keyFindings)) {
+          synthesisContext += `## Principais Descobertas\n`
+          synthesisObj.keyFindings.forEach((f: any) => {
+            synthesisContext += `- **${f.category}**: ${f.finding} (Impacto: ${f.impact})\n`
+          })
+          synthesisContext += '\n'
+        }
+
+        if (synthesisObj.mainRecommendations && Array.isArray(synthesisObj.mainRecommendations)) {
+          synthesisContext += `## Principais Recomendações\n`
+          synthesisObj.mainRecommendations.forEach((r: any) => {
+            synthesisContext += `- ${r.title}: ${r.description} (Prioridade: ${r.priority})\n`
+          })
+          synthesisContext += '\n'
+        }
+
+        console.log('✅ [WEEKLY-PLAN] Synthesis context prepared from DB')
+      } catch (e) {
+        console.warn('⚠️ [WEEKLY-PLAN] Failed to parse synthesis:', e)
+      }
+    }
+
     // ============ CREDIT CHECK ============
     // Estimate based on 4 parallel generations
     const ESTIMATED_TOKENS = 80000
@@ -84,8 +117,12 @@ export async function POST(request: NextRequest) {
 
     console.log(`🤖 [WEEKLY-PLAN] Executing dynamic generators...`)
 
-    // Call the Unified Orchestrator for weekly plans
-    const result = await generateWeeklyPlanDynamic(session.user.id, [analysisId])
+    // Call the Unified Orchestrator for weekly plans (with synthesis context)
+    const result = await generateWeeklyPlanDynamic(
+      session.user.id,
+      [analysisId],
+      synthesisContext
+    )
 
     console.log(`✅ [WEEKLY-PLAN] Dynamic generation completed. ID: ${result.id}`)
 

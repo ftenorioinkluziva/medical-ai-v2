@@ -12,7 +12,7 @@ import { SortableFields } from './sortable-fields'
 import { updateDisplayConfig } from '@/app/(admin)/display-configs/actions'
 import { toast } from 'sonner'
 import { Loader2 } from 'lucide-react'
-import { ProductRenderer } from '@/components/dynamic-renderer/product-renderer'
+// import { ProductRenderer } from '@/components/dynamic-renderer/product-renderer'
 
 interface DisplayConfigEditorProps {
   agents: HealthAgent[]
@@ -157,18 +157,19 @@ export function DisplayConfigEditor({ agents }: DisplayConfigEditorProps) {
 
       <div className="lg:col-span-5">
         {currentConfig ? (
-            <Card>
-                <CardHeader>
-                    <CardTitle>Live Preview</CardTitle>
-                </CardHeader>
-                <CardContent className="prose dark:prose-invert">
-                    <ProductRenderer data={mockData} displayConfig={currentConfig} />
-                </CardContent>
-            </Card>
-        ): (
-            <Card className="flex items-center justify-center h-[400px] text-muted-foreground">
-                <p>Select an agent to see a preview.</p>
-            </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>Live Preview</CardTitle>
+            </CardHeader>
+            <CardContent className="prose dark:prose-invert">
+              {/* <ProductRenderer data={mockData} displayConfig={currentConfig} /> */}
+              <p>Preview temporarily disabled (Component missing)</p>
+            </CardContent>
+          </Card>
+        ) : (
+          <Card className="flex items-center justify-center h-[400px] text-muted-foreground">
+            <p>Select an agent to see a preview.</p>
+          </Card>
         )}
       </div>
     </div>

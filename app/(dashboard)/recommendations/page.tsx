@@ -6,6 +6,7 @@
  */
 
 import { useEffect, useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -50,6 +51,9 @@ export default function RecommendationsHistoryPage() {
   const [isGenerating, setIsGenerating] = useState(false)
   const [activeTab, setActiveTab] = useState('exams')
 
+  const searchParams = useSearchParams()
+  const fromAnalysisId = searchParams.get('fromAnalysis')
+
   useEffect(() => {
     loadHistory()
   }, [])
@@ -65,11 +69,21 @@ export default function RecommendationsHistoryPage() {
       }
 
       const data = await response.json()
-      setRecommendations(data.recommendations || [])
+      const loadedRecs = data.recommendations || []
+      setRecommendations(loadedRecs)
 
-      // Select first recommendation by default
-      if (data.recommendations && data.recommendations.length > 0) {
-        setSelectedRec(data.recommendations[0])
+      // Select recommendation by analysis ID or default to first
+      if (loadedRecs.length > 0) {
+        if (fromAnalysisId) {
+          const match = loadedRecs.find((r: any) => r.analysisId === fromAnalysisId)
+          if (match) {
+            setSelectedRec(match)
+          } else {
+            setSelectedRec(loadedRecs[0])
+          }
+        } else {
+          setSelectedRec(loadedRecs[0])
+        }
       }
     } catch (err) {
       console.error('Error loading history:', err)
@@ -195,6 +209,8 @@ export default function RecommendationsHistoryPage() {
     }
   }
 
+  const backLink = fromAnalysisId ? `/dashboard?openAnalysis=${fromAnalysisId}` : '/dashboard'
+
   if (isLoading) {
     return (
       <div className="container mx-auto px-4 py-4 sm:px-6 sm:py-6">
@@ -272,7 +288,7 @@ export default function RecommendationsHistoryPage() {
       <div className="flex flex-col gap-4">
         <div>
           <div className="flex items-center gap-3 mb-2">
-            <Link href="/dashboard">
+            <Link href={backLink}>
               <Button variant="ghost" size="sm" className="gap-2">
                 <ArrowLeft className="h-4 w-4" />
                 Voltar

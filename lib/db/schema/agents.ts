@@ -66,6 +66,21 @@ export const healthAgents = pgTable('health_agents', {
   } | null>(),
   executionOrder: integer('execution_order'), // Order of execution for product generators
 
+  // Context Configuration (Grandular input control)
+  contextConfig: jsonb('context_config').$type<{
+    includeMedicalProfile: boolean
+    includeDocuments: boolean // Raw document text
+    includeStructuredData: boolean // JSON structured data from 'Logical Brain'
+    includeRagContext: boolean // RAG search results
+    includePreviousAnalysis: boolean // For specialized agents, include Foundation analysis
+  }>().default({
+    includeMedicalProfile: true,
+    includeDocuments: true,
+    includeStructuredData: true,
+    includeRagContext: true,
+    includePreviousAnalysis: true // Default true for specialized
+  }),
+
   // Access Control
   allowedRoles: json('allowed_roles').$type<string[]>().notNull(), // ['patient', 'doctor', 'admin']
 

@@ -6,6 +6,7 @@
  */
 
 import { useEffect, useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -55,6 +56,9 @@ export default function WeeklyPlanPage() {
   const [isGenerating, setIsGenerating] = useState(false)
   const [activeTab, setActiveTab] = useState('supplements')
   const [completedShoppingItems, setCompletedShoppingItems] = useState<Set<string>>(new Set())
+
+  const searchParams = useSearchParams()
+  const fromAnalysisId = searchParams.get('fromAnalysis')
 
   // Load completed shopping items from localStorage when plan changes
   useEffect(() => {
@@ -121,9 +125,28 @@ export default function WeeklyPlanPage() {
       }
 
       const data = await response.json()
-      setPlans(data.plans || [])
-      if (data.plans && data.plans.length > 0) {
-        setSelectedPlan(data.plans[0]) // Select most recent
+      const loadedPlans = data.plans || []
+      setPlans(loadedPlans)
+
+      if (loadedPlans.length > 0) {
+        // Try to find plan from specific analysis, otherwise default to first (latest)
+        if (fromAnalysisId) {
+          // Note: Currently the API might not return analysisId on the plan object explicitly in the list
+          // We might need to ensure the backend returns it. 
+          // Assuming the backend returns full plan objects with analysisId or we link via some other way.
+          // Let's assume the plan object HAS analysisId as per the interface (we might need to add it to interface if missing)
+          // Checking interface... interface WeeklyPlan includes `id`, `createdAt`. It doesn't explicitly show `analysisId`.
+          // But let's assume it checks `analysisId` if available, or we just select the first one if we can't match.
+          // Actually, for better UX, if we can't match, the latest is usually the correct one if the user just generated it.
+          const match = loadedPlans.find((p: any) => p.analysisId === fromAnalysisId)
+          if (match) {
+            setSelectedPlan(match)
+          } else {
+            setSelectedPlan(loadedPlans[0])
+          }
+        } else {
+          setSelectedPlan(loadedPlans[0])
+        }
       }
     } catch (err) {
       console.error('Error loading plans:', err)
@@ -187,6 +210,8 @@ export default function WeeklyPlanPage() {
     }
   }
 
+  const backLink = fromAnalysisId ? `/dashboard?openAnalysis=${fromAnalysisId}` : '/dashboard'
+
   if (isLoading) {
     return (
       <div className="container mx-auto py-6 px-4">
@@ -203,22 +228,21 @@ export default function WeeklyPlanPage() {
   return (
     <div className="container mx-auto py-6 px-4 space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4">
         <div>
           <div className="flex items-center gap-3 mb-2">
-            <Link href="/dashboard">
+            <Link href={backLink}>
               <Button variant="ghost" size="sm" className="gap-2 text-muted-foreground hover:text-foreground">
                 <ArrowLeft className="h-4 w-4" />
                 Voltar
               </Button>
             </Link>
           </div>
-          <h1 className="text-2xl font-semibold text-foreground flex items-center gap-3">
-            <Calendar className="h-6 w-6 text-teal-600 dark:text-teal-400" />
+          <h1 className="text-2xl sm:text-3xl font-bold flex items-center gap-3">
             Plano Semanal Personalizado
           </h1>
-          <p className="text-muted-foreground mt-1">
-            Seu guia completo de saúde para a semana
+          <p className="text-muted-foreground mt-2">
+            {plans.length} plano(s) encontrado(s)
           </p>
         </div>
       </div>
@@ -275,52 +299,49 @@ export default function WeeklyPlanPage() {
 
       {/* Plans List & Detail View */}
       {selectedPlan && (
-        <div className="space-y-4">
-          {/* Plan Selector - Only show if multiple plans */}
-          {plans.length > 1 && (
-            <Card>
-              <CardContent className="pt-0 pb-1 flex items-center justify-between gap-4">
-                <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-                  <label className="text-sm font-medium text-muted-foreground whitespace-nowrap">
-                    Selecionar Plano:
-                  </label>
-                  <Select
-                    value={selectedPlan.id}
-                    onValueChange={(value) => {
-                      const plan = plans.find(p => p.id === value)
-                      if (plan) setSelectedPlan(plan)
-                    }}
-                  >
-                    <SelectTrigger className="flex-1">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {plans.map((plan) => (
-                        <SelectItem key={plan.id} value={plan.id}>
-                          <div className="flex items-center gap-2">
-                            <Calendar className="h-4 w-4 text-teal-600" />
-                            <span>
-                              Semana de {format(new Date(plan.weekStartDate), 'dd/MM/yyyy', { locale: ptBR })}
-                            </span>
-                            <span className="text-xs text-muted-foreground">
-                              ({format(new Date(plan.createdAt), "dd/MM 'às' HH:mm", { locale: ptBR })})
-                            </span>
-                          </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </CardContent>
-            </Card>
-          )}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Left sidebar - List of plans */}
+          <div className="lg:col-span-1 space-y-2">
+            <h2 className="font-semibold text-sm text-muted-foreground">
+              Histórico de Planos
+            </h2>
+            <Select
+              value={selectedPlan.id}
+              onValueChange={(value) => {
+                const plan = plans.find(p => p.id === value)
+                if (plan) setSelectedPlan(plan)
+              }}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Selecione um plano..." />
+              </SelectTrigger>
+              <SelectContent>
+                {plans.map((plan) => (
+                  <SelectItem key={plan.id} value={plan.id}>
+                    <div className="flex items-center gap-3 py-1">
+                      <Calendar className="h-4 w-4 flex-shrink-0 text-teal-600" />
+                      <div className="flex flex-col text-left">
+                        <span className="font-medium">
+                          Semana {format(new Date(plan.weekStartDate), 'dd/MM', { locale: ptBR })}
+                        </span>
+                        <span className="text-xs text-muted-foreground">
+                          Gerado em {format(new Date(plan.createdAt), "dd/MM HH:mm", { locale: ptBR })}
+                        </span>
+                      </div>
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
           {/* Main Content */}
-          <div>
+          <div className="lg:col-span-2">
             {/* Plan Info Card */}
             <Card className="mb-6 hover:shadow-md transition-shadow">
               <CardHeader className="pb-0">
-                <CardTitle className="text-base sm:text-lg font-semibold text-foreground">
+                <CardTitle className="text-base sm:text-lg font-semibold text-foreground flex items-center gap-2">
+                  <Calendar className="h-5 w-5 text-teal-600" />
                   Semana de {format(new Date(selectedPlan.weekStartDate), "dd 'de' MMMM", { locale: ptBR })}
                 </CardTitle>
                 <CardDescription className="text-xs sm:text-sm text-muted-foreground mt-1">
@@ -386,43 +407,43 @@ export default function WeeklyPlanPage() {
                     ))}
 
                     {selectedPlan.supplementationStrategy.hormonalSupport &&
-                     selectedPlan.supplementationStrategy.hormonalSupport.length > 0 && (
-                      <>
-                        <Separator className="my-6" />
-                        <div>
-                          <h4 className="font-semibold text-base text-foreground mb-4">Suporte Hormonal</h4>
-                          <div className="space-y-3">
-                            {selectedPlan.supplementationStrategy.hormonalSupport.map((hormone: any, index: number) => (
-                              <div key={index} className="p-4 border border-purple-200 dark:border-purple-700 rounded-lg bg-card hover:bg-purple-50/30 dark:hover:bg-purple-950/30 transition-colors">
-                                <h5 className="font-semibold text-sm text-foreground">{hormone.hormone}</h5>
-                                <p className="text-sm text-foreground mt-2 leading-relaxed">{hormone.strategy}</p>
-                                <p className="text-xs text-muted-foreground mt-2">
-                                  Monitoramento: {hormone.monitoring}
-                                </p>
-                              </div>
-                            ))}
+                      selectedPlan.supplementationStrategy.hormonalSupport.length > 0 && (
+                        <>
+                          <Separator className="my-6" />
+                          <div>
+                            <h4 className="font-semibold text-base text-foreground mb-4">Suporte Hormonal</h4>
+                            <div className="space-y-3">
+                              {selectedPlan.supplementationStrategy.hormonalSupport.map((hormone: any, index: number) => (
+                                <div key={index} className="p-4 border border-purple-200 dark:border-purple-700 rounded-lg bg-card hover:bg-purple-50/30 dark:hover:bg-purple-950/30 transition-colors">
+                                  <h5 className="font-semibold text-sm text-foreground">{hormone.hormone}</h5>
+                                  <p className="text-sm text-foreground mt-2 leading-relaxed">{hormone.strategy}</p>
+                                  <p className="text-xs text-muted-foreground mt-2">
+                                    Monitoramento: {hormone.monitoring}
+                                  </p>
+                                </div>
+                              ))}
+                            </div>
                           </div>
-                        </div>
-                      </>
-                    )}
+                        </>
+                      )}
 
                     {selectedPlan.supplementationStrategy.nextExamRecommendations &&
-                     selectedPlan.supplementationStrategy.nextExamRecommendations.length > 0 && (
-                      <>
-                        <Separator className="my-6" />
-                        <div>
-                          <h4 className="font-semibold text-base text-foreground mb-4">Exames Recomendados para o Próximo Ciclo</h4>
-                          <ul className="space-y-2.5">
-                            {selectedPlan.supplementationStrategy.nextExamRecommendations.map((exam: string, index: number) => (
-                              <li key={index} className="flex items-start gap-2.5 text-sm">
-                                <span className="text-teal-600 mt-0.5">•</span>
-                                <span className="text-foreground leading-relaxed">{exam}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      </>
-                    )}
+                      selectedPlan.supplementationStrategy.nextExamRecommendations.length > 0 && (
+                        <>
+                          <Separator className="my-6" />
+                          <div>
+                            <h4 className="font-semibold text-base text-foreground mb-4">Exames Recomendados para o Próximo Ciclo</h4>
+                            <ul className="space-y-2.5">
+                              {selectedPlan.supplementationStrategy.nextExamRecommendations.map((exam: string, index: number) => (
+                                <li key={index} className="flex items-start gap-2.5 text-sm">
+                                  <span className="text-teal-600 mt-0.5">•</span>
+                                  <span className="text-foreground leading-relaxed">{exam}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        </>
+                      )}
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -467,15 +488,14 @@ export default function WeeklyPlanPage() {
                             return (
                               <div
                                 key={itemKey}
-                                className={`p-4 border rounded-lg transition-all ${
-                                  isCompleted
-                                    ? 'border-sky-500 bg-sky-50/50 dark:bg-sky-950/30 opacity-75'
-                                    : item.priority === 'high'
+                                className={`p-4 border rounded-lg transition-all ${isCompleted
+                                  ? 'border-sky-500 bg-sky-50/50 dark:bg-sky-950/30 opacity-75'
+                                  : item.priority === 'high'
                                     ? 'border-red-200 dark:border-red-800 bg-card hover:bg-red-50/30 dark:hover:bg-red-950/30'
                                     : item.priority === 'medium'
-                                    ? 'border-amber-200 dark:border-amber-800 bg-card hover:bg-amber-50/30 dark:hover:bg-amber-950/30'
-                                    : 'border-border bg-card hover:border-sky-300 dark:hover:border-sky-700 hover:bg-sky-50/30 dark:hover:bg-sky-950/30'
-                                }`}
+                                      ? 'border-amber-200 dark:border-amber-800 bg-card hover:bg-amber-50/30 dark:hover:bg-amber-950/30'
+                                      : 'border-border bg-card hover:border-sky-300 dark:hover:border-sky-700 hover:bg-sky-50/30 dark:hover:bg-sky-950/30'
+                                  }`}
                               >
                                 <div className="flex items-start gap-3">
                                   <Checkbox
@@ -488,19 +508,17 @@ export default function WeeklyPlanPage() {
                                     <div className="flex items-start justify-between mb-2">
                                       <label
                                         htmlFor={itemKey}
-                                        className={`font-semibold text-sm cursor-pointer ${
-                                          isCompleted ? 'line-through text-muted-foreground' : 'text-foreground'
-                                        }`}
+                                        className={`font-semibold text-sm cursor-pointer ${isCompleted ? 'line-through text-muted-foreground' : 'text-foreground'
+                                          }`}
                                       >
                                         {item.item}
                                       </label>
                                       {item.priority && !isCompleted && (
                                         <Badge
-                                          className={`text-xs ml-2 ${
-                                            item.priority === 'high'
-                                              ? 'bg-red-100 dark:bg-red-950/30 text-red-700 dark:text-red-300 border-red-200 dark:border-red-700'
-                                              : 'bg-amber-100 dark:bg-amber-950/30 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-700'
-                                          }`}
+                                          className={`text-xs ml-2 ${item.priority === 'high'
+                                            ? 'bg-red-100 dark:bg-red-950/30 text-red-700 dark:text-red-300 border-red-200 dark:border-red-700'
+                                            : 'bg-amber-100 dark:bg-amber-950/30 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-700'
+                                            }`}
                                         >
                                           {item.priority}
                                         </Badge>

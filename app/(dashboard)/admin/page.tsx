@@ -18,6 +18,7 @@ import {
   Activity,
   TrendingUp,
   Brain,
+  Workflow,
 } from 'lucide-react'
 
 export default function AdminPage() {
@@ -88,6 +89,15 @@ export default function AdminPage() {
       borderColor: 'border-gray-200 dark:border-gray-800',
       disabled: true,
     },
+    {
+      title: 'Workflow de Análise',
+      description: 'Executar análise completa multi-agente',
+      icon: Workflow,
+      href: '/admin/workflow',
+      color: 'text-teal-600 dark:text-teal-400',
+      bgColor: 'bg-teal-50/50 dark:bg-teal-950/20',
+      borderColor: 'border-teal-200 dark:border-teal-800',
+    },
   ]
 
   return (
@@ -153,11 +163,10 @@ export default function AdminPage() {
 
             const CardComponent = (
               <Card
-                className={`transition-all ${
-                  isDisabled
-                    ? 'opacity-50 cursor-not-allowed'
-                    : 'hover:shadow-lg cursor-pointer'
-                } border-2 ${section.borderColor} ${section.bgColor}`}
+                className={`transition-all ${isDisabled
+                  ? 'opacity-50 cursor-not-allowed'
+                  : 'hover:shadow-lg cursor-pointer'
+                  } border-2 ${section.borderColor} ${section.bgColor}`}
               >
                 <CardHeader>
                   <div className="flex items-start justify-between">

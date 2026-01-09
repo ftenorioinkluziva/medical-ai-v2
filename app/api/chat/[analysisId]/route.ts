@@ -65,7 +65,7 @@ export async function POST(
         id: analyses.id,
         userId: analyses.userId,
         agentId: analyses.agentId,
-        analysis: analyses.analysis,
+        synthesis: analyses.synthesis, // Use synthesis instead of raw analysis
         documentIds: analyses.documentIds,
         medicalProfileSnapshot: analyses.medicalProfileSnapshot,
         createdAt: analyses.createdAt,
@@ -177,33 +177,6 @@ export async function POST(
       console.log('ℹ️ [CHAT-API] No weekly plan found for this analysis')
     }
 
-    // Get documents for context (if available)
-    let documentsContext = ''
-    if (analysis.documentIds && analysis.documentIds.length > 0) {
-      const { inArray } = await import('drizzle-orm')
-      const userDocuments = await db
-        .select({
-          fileName: documents.fileName,
-          structuredData: documents.structuredData,
-          extractedText: documents.extractedText,
-        })
-        .from(documents)
-        .where(inArray(documents.id, analysis.documentIds))
-        .limit(5)
-
-      if (userDocuments.length > 0) {
-        documentsContext = userDocuments
-          .map(doc => {
-            if (doc.structuredData) {
-              const structured = doc.structuredData as any
-              return `Documento: ${doc.fileName}\n${structured.overallSummary || ''}\n`
-            }
-            return `Documento: ${doc.fileName}\n${doc.extractedText?.substring(0, 500) || ''}\n`
-          })
-          .join('\n---\n')
-      }
-    }
-
     // Search knowledge base for relevant information based on user question
     console.log('🧠 [CHAT-API] Searching knowledge base for user question...')
     let knowledgeContext = ''
@@ -232,9 +205,7 @@ export async function POST(
 Você está conversando com o paciente sobre uma análise médica que você mesmo gerou anteriormente.
 
 ### ANÁLISE ORIGINAL QUE VOCÊ FEZ:
-${analysis.analysis}
-
-${documentsContext ? `### DADOS MÉDICOS DO PACIENTE:\n${documentsContext}` : ''}
+${JSON.stringify(analysis.synthesis, null, 2)}
 
 ${analysis.medicalProfileSnapshot ? `### PERFIL DO PACIENTE:\n${JSON.stringify(analysis.medicalProfileSnapshot, null, 2)}` : ''}
 
@@ -257,10 +228,10 @@ ${knowledgeContext ? `### CONHECIMENTO MÉDICO RELEVANTE:\n${knowledgeContext}\n
 
 IMPORTANTE: Esta é uma conversa de follow-up. O paciente já leu sua análise e quer esclarecer dúvidas específicas.`
 
-    console.log(`🤖 [CHAT-API] Generating streaming response with ${agent.modelName}`)
+    console.log(`机器人 [CHAT-API] Generating streaming response with ${agent.modelName}`)
     console.log(`📊 [CHAT-API] Context sizes:`)
     console.log(`   - Chat history: ${chatHistory.length} messages`)
-    console.log(`   - Documents: ${documentsContext.length} chars`)
+    // Documents context removed
     console.log(`   - Weekly plan: ${weeklyPlanContext.length} chars`)
     console.log(`   - Knowledge: ${knowledgeContext.length} chars`)
     console.log(`   - Total system prompt: ${systemPrompt.length} chars`)

@@ -60,6 +60,39 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Prepare Synthesis Context if available
+    let synthesisContext: string | undefined = undefined
+    if (analysis && (analysis as any).synthesis) {
+      try {
+        const synthesisObj = (analysis as any).synthesis
+        synthesisContext = `# SÍNTESE CLÍNICA CONSOLIDADA\n\n`
+
+        if (synthesisObj.executiveSummary) {
+          synthesisContext += `## Resumo Executivo\n${synthesisObj.executiveSummary}\n\n`
+        }
+
+        if (synthesisObj.keyFindings && Array.isArray(synthesisObj.keyFindings)) {
+          synthesisContext += `## Principais Descobertas\n`
+          synthesisObj.keyFindings.forEach((f: any) => {
+            synthesisContext += `- **${f.category}**: ${f.finding} (Impacto: ${f.impact})\n`
+          })
+          synthesisContext += '\n'
+        }
+
+        if (synthesisObj.mainRecommendations && Array.isArray(synthesisObj.mainRecommendations)) {
+          synthesisContext += `## Principais Recomendações\n`
+          synthesisObj.mainRecommendations.forEach((r: any) => {
+            synthesisContext += `- ${r.title}: ${r.description} (Prioridade: ${r.priority})\n`
+          })
+          synthesisContext += '\n'
+        }
+
+        console.log('✅ [RECOMMENDATIONS-API] Synthesis context prepared from DB')
+      } catch (e) {
+        console.warn('⚠️ [RECOMMENDATIONS-API] Failed to parse synthesis:', e)
+      }
+    }
+
     // ============ CREDIT CHECK ============
     const ESTIMATED_TOKENS = 100000 // Estimate for recommendations generation
     const estimatedCredits = calculateCreditsFromTokens(ESTIMATED_TOKENS)
@@ -91,8 +124,12 @@ export async function POST(request: NextRequest) {
     }
     // ======================================
 
-    // Generate recommendations using the Dynamic Orchestrator
-    const result = await generateRecommendationsDynamic(analysis.userId, [analysisId])
+    // Generate recommendations using the Dynamic Orchestrator (with synthesis context)
+    const result = await generateRecommendationsDynamic(
+      analysis.userId,
+      [analysisId],
+      synthesisContext
+    )
 
     console.log(`✅ [RECOMMENDATIONS-API] Dynamic recommendations generated: ${result.id}`)
 

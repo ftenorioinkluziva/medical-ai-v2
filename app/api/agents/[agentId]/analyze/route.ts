@@ -10,6 +10,7 @@ import { healthAgents, medicalProfiles, documents, analyses } from '@/lib/db/sch
 import { eq, desc } from 'drizzle-orm'
 import { analyzeWithAgent } from '@/lib/ai/agents/analyze'
 import { buildKnowledgeContext } from '@/lib/ai/knowledge'
+import { generateSynthesis } from '@/lib/ai/synthesis/generator'
 import type { StructuredMedicalDocument } from '@/lib/documents/structuring'
 import { getKnowledgeConfig } from '@/lib/db/settings'
 import { getUserCredits, calculateCreditsFromTokens, debitCredits } from '@/lib/billing/credits'
@@ -336,6 +337,26 @@ ${prevAnalysis.analysis}
 
     console.log('✅ [ANALYSIS-API] Analysis completed successfully')
 
+    // Generate Synthesis for Single Analysis
+    let synthesisResult = null
+    try {
+      console.log('🧠 [ANALYSIS-API] Generating synthesis for single analysis...')
+      synthesisResult = await generateSynthesis(
+        [{
+          agent: agent.name,
+          agentKey: agent.agentKey || 'agent',
+          analysis: result.analysis
+        }],
+        {
+          structuredDocuments,
+          enableValidation: true
+        }
+      )
+      console.log('✅ [ANALYSIS-API] Synthesis generated')
+    } catch (synthesisError) {
+      console.error('⚠️ [ANALYSIS-API] Failed to generate synthesis:', synthesisError)
+    }
+
     // Save analysis to history
     let savedAnalysis: any = null
     try {
@@ -348,6 +369,11 @@ ${prevAnalysis.analysis}
         prompt: analysisPrompt,
         medicalProfileSnapshot: profile || null,
         analysis: result.analysis,
+        // ✅ NEW: Save full synthesis object
+        synthesis: synthesisResult,
+        // Legacy fields left null as requested (user relies on synthesis now)
+        insights: null,
+        actionItems: null,
         modelUsed: result.metadata?.model || agent.modelName,
         tokensUsed: result.usage?.totalTokens || null,
         processingTimeMs: result.metadata?.processingTimeMs || null,

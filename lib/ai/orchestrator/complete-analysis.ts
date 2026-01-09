@@ -544,7 +544,24 @@ ${agentKnowledge ? `## Base de Conhecimento Médico (Referências)\n${agentKnowl
       ...savedSpecializedAnalyses.map(({ savedAnalysis }) => savedAnalysis.id),
     ]
 
-    const products = await generateAllProducts(userId, allAnalysisIds)
+    // Format synthesis as context for products
+    const synthesisContext = `
+# SÍNTESE CLÍNICA CONSOLIDADA
+
+## RESUMO EXECUTIVO
+${synthesis.executiveSummary}
+
+## PRINCIPAIS ACHADOS
+${synthesis.keyFindings.map(f => `- ${f}`).join('\n')}
+
+## ALERTAS CRÍTICOS
+${synthesis.criticalAlerts.map(a => `- 🚨 ${a}`).join('\n')}
+
+## RECOMENDAÇÕES PRIORITÁRIAS
+${synthesis.mainRecommendations.map(r => `- ${r}`).join('\n')}
+`
+
+    const products = await generateAllProducts(userId, allAnalysisIds, synthesisContext)
 
     // Map to expected format
     const recommendations = products.recommendations
@@ -556,7 +573,7 @@ ${agentKnowledge ? `## Base de Conhecimento Médico (Referências)\n${agentKnowl
           healthGoals: products.recommendations.healthGoals,
           alerts: products.recommendations.alerts,
         },
-        usage: products.usage,
+        usage: products.recommendationsUsage || products.usage,
       }
       : null
 
@@ -569,7 +586,7 @@ ${agentKnowledge ? `## Base de Conhecimento Médico (Referências)\n${agentKnowl
           meals: products.weeklyPlan.mealPlan,
           workout: products.weeklyPlan.workoutPlan,
         },
-        usage: products.usage,
+        usage: products.weeklyPlanUsage || products.usage,
       }
       : null
 

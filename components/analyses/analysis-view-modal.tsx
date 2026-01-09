@@ -129,7 +129,7 @@ export function AnalysisViewModal({ analysis, isOpen, onClose }: AnalysisViewMod
   }
 
   const handleViewRecommendations = () => {
-    router.push('/recommendations')
+    router.push(`/recommendations?fromAnalysis=${analysis.id}`)
     onClose()
   }
 
@@ -175,7 +175,7 @@ export function AnalysisViewModal({ analysis, isOpen, onClose }: AnalysisViewMod
   }
 
   const handleViewWeeklyPlan = () => {
-    router.push('/weekly-plan')
+    router.push(`/weekly-plan?fromAnalysis=${analysis.id}`)
     onClose()
   }
 
@@ -217,20 +217,20 @@ export function AnalysisViewModal({ analysis, isOpen, onClose }: AnalysisViewMod
               analysis.analysis.includes('⚠️') ||
               analysis.analysis.includes('ALERTA') ||
               analysis.analysis.includes('preocupante')) && (
-              <div className="bg-amber-50 dark:bg-amber-950/20 border-l-4 border-amber-500 p-3 sm:p-4 rounded-r-lg">
-                <div className="flex items-start gap-2 sm:gap-3">
-                  <AlertTriangle className="h-4 w-4 sm:h-5 sm:w-5 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
-                  <div className="flex-1">
-                    <h4 className="text-sm sm:text-base font-semibold text-amber-900 dark:text-amber-100 mb-1">
-                      Atenção: Pontos Importantes
-                    </h4>
-                    <p className="text-xs sm:text-sm text-amber-800 dark:text-amber-200">
-                      Esta análise contém informações que requerem atenção especial.
-                    </p>
+                <div className="bg-amber-50 dark:bg-amber-950/20 border-l-4 border-amber-500 p-3 sm:p-4 rounded-r-lg">
+                  <div className="flex items-start gap-2 sm:gap-3">
+                    <AlertTriangle className="h-4 w-4 sm:h-5 sm:w-5 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
+                    <div className="flex-1">
+                      <h4 className="text-sm sm:text-base font-semibold text-amber-900 dark:text-amber-100 mb-1">
+                        Atenção: Pontos Importantes
+                      </h4>
+                      <p className="text-xs sm:text-sm text-amber-800 dark:text-amber-200">
+                        Esta análise contém informações que requerem atenção especial.
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
+              )}
 
             {/* Quick Summary Card */}
             {analysis.documentIds && analysis.documentIds.length > 0 && (

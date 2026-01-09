@@ -5,33 +5,14 @@
  * Displays user's current credit balance in the navigation header
  */
 
-import { useEffect, useState } from 'react'
 import { Coins } from 'lucide-react'
 import Link from 'next/link'
+import { useCredits } from '@/hooks/use-credits'
 
 export function CreditBadge() {
-  const [balance, setBalance] = useState<number | null>(null)
-  const [loading, setLoading] = useState(true)
+  const { balance, loading } = useCredits()
 
-  useEffect(() => {
-    fetchBalance()
-  }, [])
-
-  async function fetchBalance() {
-    try {
-      const res = await fetch('/api/credits/balance')
-      if (res.ok) {
-        const data = await res.json()
-        setBalance(data.balance)
-      }
-    } catch (error) {
-      console.error('Failed to fetch credit balance:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  if (loading) {
+  if (loading && balance === null) {
     return (
       <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-muted/50">
         <Coins className="h-3.5 w-3.5 text-muted-foreground animate-pulse" />

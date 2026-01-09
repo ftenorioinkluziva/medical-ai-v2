@@ -5,6 +5,7 @@ import { signOut } from '@/lib/auth/config'
 import { DashboardNav } from '@/components/dashboard/dashboard-nav'
 import { SidebarNav } from '@/components/dashboard/sidebar-nav'
 import { BottomNav } from '@/components/dashboard/bottom-nav'
+import { CreditsProvider } from '@/components/providers/credits-provider'
 
 export default async function DashboardLayout({
   children,
@@ -14,14 +15,16 @@ export default async function DashboardLayout({
   const session = await requireAuth()
 
   return (
-    <div className="min-h-screen bg-background">
-      <DashboardNav
-        userName={session.user?.name || ''}
-        userRole={session.user?.role || 'patient'}
-      />
-      <SidebarNav userRole={session.user?.role || 'patient'} />
-      <main className="pb-16 lg:pb-0 lg:pl-64 transition-all duration-300">{children}</main>
-      <BottomNav userRole={session.user?.role || 'patient'} />
-    </div>
+    <CreditsProvider>
+      <div className="min-h-screen bg-background">
+        <DashboardNav
+          userName={session.user?.name || ''}
+          userRole={session.user?.role || 'patient'}
+        />
+        <SidebarNav userRole={session.user?.role || 'patient'} />
+        <main className="pb-16 lg:pb-0 lg:pl-64 transition-all duration-300">{children}</main>
+        <BottomNav userRole={session.user?.role || 'patient'} />
+      </div>
+    </CreditsProvider>
   )
 }

@@ -21,6 +21,7 @@ import {
 } from 'lucide-react'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 
 interface Analysis {
@@ -51,9 +52,26 @@ export function RecentAnalysesWidget({ limit = 5, onAnalysesLoad, patientId }: R
   const [selectedAnalysis, setSelectedAnalysis] = useState<Analysis | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
 
+  const searchParams = useSearchParams()
+  const openAnalysisId = searchParams.get('openAnalysis')
+  const router = useRouter()
+
   useEffect(() => {
     loadAnalyses()
   }, [patientId])
+
+  // Effect to handle opening analysis from URL param
+  useEffect(() => {
+    if (openAnalysisId && analyses.length > 0 && !isModalOpen) {
+      const targetAnalysis = analyses.find(a => a.id === openAnalysisId)
+      if (targetAnalysis) {
+        setSelectedAnalysis(targetAnalysis)
+        setIsModalOpen(true)
+        // Optional: clear the param so refreshing doesn't re-open if closed? 
+        // Or keep it to support sharing URLs. Keeping it is fine.
+      }
+    }
+  }, [openAnalysisId, analyses, isModalOpen])
 
   const loadAnalyses = async () => {
     try {
@@ -150,7 +168,8 @@ export function RecentAnalysesWidget({ limit = 5, onAnalysesLoad, patientId }: R
               {analyses.map((analysis) => (
                 <div
                   key={analysis.id}
-                  className="p-2.5 sm:p-3 rounded-lg border border-gray-200 hover:border-teal-300 hover:bg-teal-50/50 transition-colors dark:border-gray-700 dark:hover:bg-teal-900/30 cursor-pointer overflow-hidden"
+                  onClick={() => handleViewAnalysis(analysis)}
+                  className="p-2.5 sm:p-3 rounded-lg border border-gray-200 hover:border-teal-300 hover:bg-teal-50/50 transition-colors dark:border-gray-700 dark:hover:bg-teal-900/30 cursor-pointer overflow-hidden group"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex items-start gap-3 flex-1 min-w-0">
@@ -159,7 +178,7 @@ export function RecentAnalysesWidget({ limit = 5, onAnalysesLoad, patientId }: R
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1 min-w-0">
-                          <p className="text-sm font-medium text-foreground truncate">
+                          <p className="text-sm font-medium text-foreground truncate group-hover:text-teal-700 transition-colors">
                             {analysis.agentName}
                           </p>
                           {analysis.ragUsed && (
@@ -179,14 +198,9 @@ export function RecentAnalysesWidget({ limit = 5, onAnalysesLoad, patientId }: R
                         </div>
                       </div>
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleViewAnalysis(analysis)}
-                      className="shrink-0"
-                    >
+                    <div className="shrink-0 text-muted-foreground group-hover:text-teal-600 transition-colors">
                       <Eye className="h-4 w-4" />
-                    </Button>
+                    </div>
                   </div>
                 </div>
               ))}

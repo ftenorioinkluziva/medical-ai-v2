@@ -22,6 +22,16 @@ export type ProductsResult = {
     completionTokens: number
     totalTokens: number
   }
+  weeklyPlanUsage?: {
+    promptTokens: number
+    completionTokens: number
+    totalTokens: number
+  }
+  recommendationsUsage?: {
+    promptTokens: number
+    completionTokens: number
+    totalTokens: number
+  }
 }
 
 /**
@@ -30,7 +40,8 @@ export type ProductsResult = {
  */
 export async function generateAllProducts(
   userId: string,
-  analysisIds: string[]
+  analysisIds: string[],
+  synthesisContext?: string // ✅ New optional parameter
 ): Promise<ProductsResult> {
   console.log(`\n🏭 [PRODUCTS] Generating all products for user ${userId}`)
   console.log(`📊 [PRODUCTS] Based on ${analysisIds.length} analyses\n`)
@@ -50,14 +61,23 @@ export async function generateAllProducts(
 
   console.log(`📄 [PRODUCTS] Loaded ${allAnalyses.length} analyses`)
 
-  // 2. Build consolidated context
-  let consolidatedContext = '# ANÁLISES MÉDICAS CONSOLIDADAS\n\n'
-  consolidatedContext += `**Total de Especialistas:** ${allAnalyses.length}\n\n`
+  // 2. Build consolidated context (Use synthesis if available, else build from analyses)
+  let consolidatedContext = ''
 
-  for (const analysis of allAnalyses) {
-    consolidatedContext += `## ${analysis.agentName} - ${analysis.agentTitle}\n\n`
-    consolidatedContext += `${analysis.analysis}\n\n`
-    consolidatedContext += '---\n\n'
+  if (synthesisContext) {
+    console.log('✨ [PRODUCTS] Using provided SYNTHESIS context')
+    console.log('📝 [PRODUCTS] Synthesis Preview:', synthesisContext.substring(0, 100).replace(/\n/g, ' ') + '...')
+    consolidatedContext = synthesisContext
+  } else {
+    console.log('⚠️ [PRODUCTS] No synthesis context provided, building from raw analyses')
+    consolidatedContext = '# ANÁLISES MÉDICAS CONSOLIDADAS\n\n'
+    consolidatedContext += `**Total de Especialistas:** ${allAnalyses.length}\n\n`
+
+    for (const analysis of allAnalyses) {
+      consolidatedContext += `## ${analysis.agentName} - ${analysis.agentTitle}\n\n`
+      consolidatedContext += `${analysis.analysis}\n\n`
+      consolidatedContext += '---\n\n'
+    }
   }
 
   console.log(`📝 [PRODUCTS] Consolidated context: ${consolidatedContext.length} chars\n`)
@@ -74,19 +94,40 @@ export async function generateAllProducts(
   console.log(`  - Weekly Plan generators: ${weeklyPlanGenerators.length}`)
   console.log(`  - Recommendations generators: ${recommendationsGenerators.length}\n`)
 
-  // 5. Execute generators in parallel
-  const [weeklyPlanResults, recommendationsResults] = await Promise.all([
-    weeklyPlanGenerators.length > 0
-      ? executeGenerators(weeklyPlanGenerators, consolidatedContext)
+  // 5. Execute generators
+  // Weekly Plan: Sequential (Meals -> Shopping)
+  const shoppingGen = weeklyPlanGenerators.find(g => g.generatorKey === 'shopping')
+  const otherWeeklyGens = weeklyPlanGenerators.filter(g => g.generatorKey !== 'shopping')
+
+  // Phase 1: Run non-shopping weekly generators and all recommendations
+  const [phase1WeeklyResults, recommendationsResults] = await Promise.all([
+    otherWeeklyGens.length > 0
+      ? executeGenerators(otherWeeklyGens, consolidatedContext)
       : Promise.resolve([]),
     recommendationsGenerators.length > 0
       ? executeGenerators(recommendationsGenerators, consolidatedContext)
       : Promise.resolve([]),
   ])
 
-  // 6. Calculate total token usage
-  const allResults = [...weeklyPlanResults, ...recommendationsResults]
-  const totalUsage = allResults.reduce(
+  // Phase 2: Run Shopping List (dependent on Meals)
+  let shoppingResults: GeneratorResult[] = []
+  if (shoppingGen) {
+    const mealsResult = phase1WeeklyResults.find(r => r.generatorKey === 'meals')
+    let shoppingContext = consolidatedContext
+
+    if (mealsResult) {
+      console.log('🔄 [PRODUCTS] Injecting Meal Plan into Shopping List context')
+      shoppingContext += `\n\n# PLANO DE REFEIÇÕES GERADO (Use este plano para criar a lista de compras)\n`
+      shoppingContext += JSON.stringify(mealsResult.object, null, 2)
+    }
+
+    shoppingResults = await executeGenerators([shoppingGen], shoppingContext)
+  }
+
+  const weeklyPlanResults = [...phase1WeeklyResults, ...shoppingResults]
+
+  // 6. Calculate separate token usage
+  const calculateUsage = (results: GeneratorResult[]) => results.reduce(
     (acc, result) => ({
       promptTokens: acc.promptTokens + result.usage.promptTokens,
       completionTokens: acc.completionTokens + result.usage.completionTokens,
@@ -94,6 +135,15 @@ export async function generateAllProducts(
     }),
     { promptTokens: 0, completionTokens: 0, totalTokens: 0 }
   )
+
+  const weeklyPlanUsage = calculateUsage(weeklyPlanResults)
+  const recommendationsUsage = calculateUsage(recommendationsResults)
+
+  const totalUsage = {
+    promptTokens: weeklyPlanUsage.promptTokens + recommendationsUsage.promptTokens,
+    completionTokens: weeklyPlanUsage.completionTokens + recommendationsUsage.completionTokens,
+    totalTokens: weeklyPlanUsage.totalTokens + recommendationsUsage.totalTokens,
+  }
 
   console.log(`\n💰 [PRODUCTS] Total token usage: ${totalUsage.totalTokens}`)
 
@@ -133,7 +183,7 @@ export async function generateAllProducts(
         mealPlan: (weeklyPlanData.meals as any) || {},
         workoutPlan: (weeklyPlanData.workout as any) || {},
         // Metadata
-        tokensUsed: totalUsage.totalTokens,
+        tokensUsed: weeklyPlanUsage.totalTokens,
         modelUsed: weeklyPlanResults[0]?.modelUsed || 'gemini-2.5-flash',
         prompt: 'Dynamic product generator - all products',
       } as any)
@@ -159,7 +209,7 @@ export async function generateAllProducts(
         healthGoals: recommendationsData.healthGoals || [],
         alerts: recommendationsData.alerts || [],
         // Metadata
-        tokensUsed: totalUsage.totalTokens,
+        tokensUsed: recommendationsUsage.totalTokens,
         processingTimeMs: recommendationsResults[0]?.processingTimeMs || null,
         modelUsed: recommendationsResults[0]?.modelUsed || null,
         prompt: 'Dynamic product generator - recommendations',
@@ -178,6 +228,8 @@ export async function generateAllProducts(
     weeklyPlan: savedWeeklyPlan,
     recommendations: savedRecommendations,
     usage: totalUsage,
+    weeklyPlanUsage,
+    recommendationsUsage,
   }
 }
 
@@ -187,29 +239,61 @@ export async function generateAllProducts(
  */
 export async function generateWeeklyPlanDynamic(
   userId: string,
-  analysisIds: string[]
+  analysisIds: string[],
+  synthesisContext?: string // ✅ New param
 ) {
   console.log(`\n📅 [WEEKLY-PLAN] Generating weekly plan for user ${userId}`)
 
-  const allAnalyses = await db
-    .select({
-      id: analyses.id,
-      analysis: analyses.analysis,
-      agentName: healthAgents.name,
-    })
-    .from(analyses)
-    .innerJoin(healthAgents, eq(analyses.agentId, healthAgents.id))
-    .where(inArray(analyses.id, analysisIds))
+  // 1. Build context (Synthesis OR Raw Analyses)
+  let consolidatedContext = ''
 
-  let consolidatedContext = '# ANÁLISES CONSOLIDADAS\n\n'
-  for (const analysis of allAnalyses) {
-    consolidatedContext += `## ${analysis.agentName}\n${analysis.analysis}\n\n---\n\n`
+  if (synthesisContext) {
+    console.log('✨ [WEEKLY-PLAN] Using provided SYNTHESIS context')
+    consolidatedContext = synthesisContext
+  } else {
+    // Fallback to raw analyses
+    const allAnalyses = await db
+      .select({
+        id: analyses.id,
+        analysis: analyses.analysis,
+        agentName: healthAgents.name,
+      })
+      .from(analyses)
+      .innerJoin(healthAgents, eq(analyses.agentId, healthAgents.id))
+      .where(inArray(analyses.id, analysisIds))
+
+    consolidatedContext = '# ANÁLISES CONSOLIDADAS\n\n'
+    for (const analysis of allAnalyses) {
+      consolidatedContext += `## ${analysis.agentName}\n${analysis.analysis}\n\n---\n\n`
+    }
   }
 
   const generators = await loadGeneratorsByType('weekly_plan')
   console.log(`🔧 [WEEKLY-PLAN] Loaded ${generators.length} generators`)
 
-  const results = await executeGenerators(generators, consolidatedContext)
+  // Sequential Execution: Meals -> Shopping
+  const shoppingGen = generators.find(g => g.generatorKey === 'shopping')
+  const otherGens = generators.filter(g => g.generatorKey !== 'shopping')
+
+  // Phase 1: Standard generators (parallel)
+  const phase1Results = await executeGenerators(otherGens, consolidatedContext)
+
+  // Phase 2: Shopping List (dependent)
+  let shoppingResults: GeneratorResult[] = []
+  if (shoppingGen) {
+    const mealsResult = phase1Results.find(r => r.generatorKey === 'meals')
+    let shoppingContext = consolidatedContext
+
+    if (mealsResult) {
+      console.log('🔄 [WEEKLY-PLAN] Injecting Meal Plan into Shopping List context')
+      shoppingContext += `\n\n# PLANO DE REFEIÇÕES GERADO (Use este plano para criar a lista de compras)\n`
+      shoppingContext += JSON.stringify(mealsResult.object, null, 2)
+    }
+
+    shoppingResults = await executeGenerators([shoppingGen], shoppingContext)
+  }
+
+  const results = [...phase1Results, ...shoppingResults]
 
   // 5. Group by generatorKey for easy access
   const weeklyPlanData: Record<string, any> = {}
@@ -271,23 +355,34 @@ export async function generateWeeklyPlanDynamic(
  */
 export async function generateRecommendationsDynamic(
   userId: string,
-  analysisIds: string[]
+  analysisIds: string[],
+  synthesisContext?: string // ✅ New param
 ) {
   console.log(`\n💡 [RECOMMENDATIONS] Generating for user ${userId}`)
 
-  const allAnalyses = await db
-    .select({
-      id: analyses.id,
-      analysis: analyses.analysis,
-      agentName: healthAgents.name,
-    })
-    .from(analyses)
-    .innerJoin(healthAgents, eq(analyses.agentId, healthAgents.id))
-    .where(inArray(analyses.id, analysisIds))
+  // 1. Build context (Synthesis OR Raw Analyses)
+  let consolidatedContext = ''
 
-  let consolidatedContext = '# ANÁLISES CONSOLIDADAS\n\n'
-  for (const analysis of allAnalyses) {
-    consolidatedContext += `## ${analysis.agentName}\n${analysis.analysis}\n\n---\n\n`
+  if (synthesisContext) {
+    console.log('✨ [RECOMMENDATIONS] Using provided SYNTHESIS context')
+    console.log('📝 [RECOMMENDATIONS] Synthesis Preview:', synthesisContext.substring(0, 100).replace(/\n/g, ' ') + '...')
+    consolidatedContext = synthesisContext
+  } else {
+    // Fallback to raw analyses
+    const allAnalyses = await db
+      .select({
+        id: analyses.id,
+        analysis: analyses.analysis,
+        agentName: healthAgents.name,
+      })
+      .from(analyses)
+      .innerJoin(healthAgents, eq(analyses.agentId, healthAgents.id))
+      .where(inArray(analyses.id, analysisIds))
+
+    consolidatedContext = '# ANÁLISES CONSOLIDADAS\n\n'
+    for (const analysis of allAnalyses) {
+      consolidatedContext += `## ${analysis.agentName}\n${analysis.analysis}\n\n---\n\n`
+    }
   }
 
   const generators = await loadGeneratorsByType('recommendations')

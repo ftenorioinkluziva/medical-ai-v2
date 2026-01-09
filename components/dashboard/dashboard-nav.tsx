@@ -23,6 +23,7 @@ import {
   Sparkles,
   ArrowLeftRight,
   MessageCircle,
+  GitMerge,
 } from 'lucide-react'
 import { HeartIcon } from '@/components/ui/animated-icon'
 import { handleSignOut } from '@/app/actions/auth'
@@ -48,42 +49,43 @@ export function DashboardNav({ userName, userRole }: DashboardNavProps) {
   // Desktop navigation (all links) - shown on lg+ screens
   const desktopNavLinks = userRole === 'admin'
     ? [
-        { href: '/admin', label: 'Admin', icon: Home },
-        { href: '/admin/credits', label: 'Créditos', icon: Coins },
-      ]
+      { href: '/admin', label: 'Admin', icon: Home },
+      { href: '/admin/workflow', label: 'Fluxo de Análise', icon: GitMerge },
+      { href: '/admin/credits', label: 'Créditos', icon: Coins },
+    ]
     : [
-        { href: '/dashboard', label: 'Dashboard', icon: Home },
-        { href: '/documents', label: 'Documentos', icon: FolderOpen },
-        { href: '/analyze', label: 'Análise', icon: FileText },
-        { href: '/chat', label: 'Chat com Agente', icon: MessageCircle },
-        { href: '/analyze-complete', label: 'Análise Completa', icon: Sparkles },
-        { href: '/recommendations', label: 'Recomendações', icon: TrendingUp },
-        { href: '/weekly-plan', label: 'Plano Semanal', icon: Calendar },
-        { href: '/analyses/compare', label: 'Comparar Análises', icon: ArrowLeftRight },
-        { href: '/compare', label: 'Comparar Exames', icon: GitCompare },
-        { href: '/dashboard/credits', label: 'Créditos', icon: Coins },
-        { href: '/profile', label: 'Perfil', icon: User },
-      ]
+      { href: '/dashboard', label: 'Dashboard', icon: Home },
+      { href: '/documents', label: 'Documentos', icon: FolderOpen },
+      { href: '/analyze', label: 'Análise', icon: FileText },
+      { href: '/chat', label: 'Chat com Agente', icon: MessageCircle },
+      { href: '/analyze-complete', label: 'Análise Completa', icon: Sparkles },
+      { href: '/recommendations', label: 'Recomendações', icon: TrendingUp },
+      { href: '/weekly-plan', label: 'Plano Semanal', icon: Calendar },
+      { href: '/analyses/compare', label: 'Comparar Análises', icon: ArrowLeftRight },
+      { href: '/compare', label: 'Comparar Exames', icon: GitCompare },
+      { href: '/dashboard/credits', label: 'Créditos', icon: Coins },
+      { href: '/profile', label: 'Perfil', icon: User },
+    ]
 
   // Mobile menu navigation (all options, same as desktop)
   const mobileMenuLinks = userRole === 'admin'
     ? [
-        { href: '/admin', label: 'Admin', icon: Home },
-        { href: '/admin/credits', label: 'Créditos', icon: Coins },
-      ]
+      { href: '/admin', label: 'Admin', icon: Home },
+      { href: '/admin/credits', label: 'Créditos', icon: Coins },
+    ]
     : [
-        { href: '/dashboard', label: 'Dashboard', icon: Home },
-        { href: '/documents', label: 'Documentos', icon: FolderOpen },
-        { href: '/analyze', label: 'Análise', icon: FileText },
-        { href: '/chat', label: 'Chat com Agente', icon: MessageCircle },
-        { href: '/analyze-complete', label: 'Análise Completa', icon: Sparkles },
-        { href: '/recommendations', label: 'Recomendações', icon: TrendingUp },
-        { href: '/weekly-plan', label: 'Plano Semanal', icon: Calendar },
-        { href: '/analyses/compare', label: 'Comparar Análises', icon: ArrowLeftRight },
-        { href: '/compare', label: 'Comparar Exames', icon: GitCompare },
-        { href: '/dashboard/credits', label: 'Créditos', icon: Coins },
-        { href: '/profile', label: 'Perfil', icon: User },
-      ]
+      { href: '/dashboard', label: 'Dashboard', icon: Home },
+      { href: '/documents', label: 'Documentos', icon: FolderOpen },
+      { href: '/analyze', label: 'Análise', icon: FileText },
+      { href: '/chat', label: 'Chat com Agente', icon: MessageCircle },
+      { href: '/analyze-complete', label: 'Análise Completa', icon: Sparkles },
+      { href: '/recommendations', label: 'Recomendações', icon: TrendingUp },
+      { href: '/weekly-plan', label: 'Plano Semanal', icon: Calendar },
+      { href: '/analyses/compare', label: 'Comparar Análises', icon: ArrowLeftRight },
+      { href: '/compare', label: 'Comparar Exames', icon: GitCompare },
+      { href: '/dashboard/credits', label: 'Créditos', icon: Coins },
+      { href: '/profile', label: 'Perfil', icon: User },
+    ]
 
   const isActive = (href: string) => pathname === href
 
@@ -187,11 +189,10 @@ export function DashboardNav({ userName, userRole }: DashboardNavProps) {
                             key={link.href}
                             href={link.href}
                             onClick={() => setIsOpen(false)}
-                            className={`flex items-center gap-3 px-4 py-3 rounded-md text-sm font-medium transition-colors min-h-[44px] ${
-                              isActive(link.href)
-                                ? 'bg-accent text-accent-foreground'
-                                : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-                            }`}
+                            className={`flex items-center gap-3 px-4 py-3 rounded-md text-sm font-medium transition-colors min-h-[44px] ${isActive(link.href)
+                              ? 'bg-accent text-accent-foreground'
+                              : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                              }`}
                           >
                             <Icon className="h-5 w-5 flex-shrink-0" />
                             <span>{link.label}</span>

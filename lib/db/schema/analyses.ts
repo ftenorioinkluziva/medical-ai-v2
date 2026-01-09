@@ -19,6 +19,7 @@ export const analyses = pgTable('analyses', {
 
   // Output
   analysis: text('analysis').notNull(),
+  synthesis: json('synthesis'), // Unified synthesis object
   insights: json('insights').$type<string[]>(), // Structured key insights
   actionItems: json('action_items').$type<string[]>(), // Actionable recommendations
 
