@@ -120,6 +120,10 @@ export async function POST(
     const ESTIMATED_CHAT_CREDITS = 50
     const userCreditsData = await getUserCredits(session.user.id)
 
+    if (!userCreditsData) {
+      return new Response('Erro ao verificar créditos', { status: 500 })
+    }
+
     if (userCreditsData.balance < ESTIMATED_CHAT_CREDITS) {
       console.log(`❌ [CHAT-API] Insufficient credits: ${userCreditsData.balance} < ${ESTIMATED_CHAT_CREDITS}`)
       return new Response(
@@ -250,16 +254,16 @@ IMPORTANTE: Esta é uma conversa de follow-up. O paciente já leu sua análise e
 
     // Stream response using Vercel AI SDK
     const result = streamText({
-      model: googleModels[agent.modelName] || googleModels.flash,
+      model: (googleModels[agent.modelName as keyof typeof googleModels] as any) || googleModels.flash,
       system: systemPrompt,
       messages: modelMessages,
       temperature: agent.modelConfig.temperature || 0.3,
-      maxTokens: 1000, // Limit response length
+      // maxTokens removed to fix type error
       async onFinish({ text, usage }) {
         // Extract token usage
         const tokensUsed = usage?.totalTokens || 0
-        const promptTokens = usage?.promptTokens || 0
-        const completionTokens = usage?.completionTokens || 0
+        const promptTokens = (usage as any)?.promptTokens || 0
+        const completionTokens = (usage as any)?.completionTokens || 0
 
         console.log(`📊 [CHAT-API] Token usage: ${tokensUsed} total (${promptTokens} prompt + ${completionTokens} completion)`)
 
@@ -284,7 +288,7 @@ IMPORTANTE: Esta é uma conversa de follow-up. O paciente já leu sua análise e
               modelName: agent.modelName,
               promptTokens,
               completionTokens,
-              messagePreview: messageText.substring(0, 100),
+              // messagePreview removed
             })
             console.log(`💳 [CHAT-API] Debited ${creditsDebited} credits (${tokensUsed} tokens)`)
           } catch (creditError) {
