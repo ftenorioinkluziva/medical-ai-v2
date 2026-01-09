@@ -663,17 +663,26 @@ export function AgentForm({ agent, onSuccess, onCancel }: AgentFormProps) {
 
           {/* RAG Configuration */}
           <div className="space-y-4 p-4 border rounded-lg">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="ragEnabled" className="font-medium">
-                Ativar RAG (Base de Conhecimento)
-              </Label>
-              <Switch
-                id="ragEnabled"
-                checked={formData.ragConfig.enabled}
-                onCheckedChange={(checked) =>
-                  handleChange('ragConfig', { ...formData.ragConfig, enabled: checked })
-                }
-              />
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="ragEnabled" className="font-medium">
+                  Ativar RAG (Base de Conhecimento)
+                </Label>
+                <Switch
+                  id="ragEnabled"
+                  checked={formData.ragConfig.enabled}
+                  onCheckedChange={(checked) =>
+                    handleChange('ragConfig', { ...formData.ragConfig, enabled: checked })
+                  }
+                />
+              </div>
+              <div className="p-3 bg-purple-50 dark:bg-purple-950/20 border border-purple-200 dark:border-purple-800 rounded-lg">
+                <p className="text-xs text-purple-900 dark:text-purple-100">
+                  <strong>Comportamento de Busca:</strong> Define <strong>COMO buscar</strong> conhecimento durante a geração.
+                  Os artigos acessíveis são limitados pela "Configuração de Conhecimento" acima.
+                  Aqui você controla quantos chunks buscar e seu tamanho máximo.
+                </p>
+              </div>
             </div>
 
             {formData.ragConfig.enabled && (
@@ -1217,9 +1226,18 @@ export function AgentForm({ agent, onSuccess, onCancel }: AgentFormProps) {
           <BookOpen className="h-5 w-5" />
           <h3 className="font-semibold text-lg">Configuração de Conhecimento</h3>
         </div>
-        <p className="text-sm text-muted-foreground">
-          Defina quais artigos da base de conhecimento este agente pode acessar
-        </p>
+        <div className="p-3 bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+          <p className="text-sm text-blue-900 dark:text-blue-100">
+            <strong>Permissões de Acesso:</strong> Define <strong>QUAIS artigos</strong> da base de conhecimento este agente pode acessar.
+            Esta configuração funciona como um filtro de permissões.
+          </p>
+          {formData.agentType === 'product_generator' && (
+            <p className="text-xs text-blue-800 dark:text-blue-200 mt-2 pt-2 border-t border-blue-200 dark:border-blue-700">
+              💡 <strong>Para Geradores de Produtos:</strong> Esta configuração também se aplica ao RAG (se habilitado na seção abaixo).
+              Os artigos acessíveis aqui limitam o que o RAG pode buscar.
+            </p>
+          )}
+        </div>
 
         {/* Access Type */}
         <RadioGroup

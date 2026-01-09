@@ -133,8 +133,9 @@ export async function executeGenerator(
       knowledgeContext = await buildKnowledgeContext(analysisText, {
         maxChunks: ragConfig.maxChunks,
         maxCharsPerChunk: ragConfig.maxCharsPerChunk,
+        agentId: generator.id, // ✅ Pass agentId to respect knowledgeAccessType restrictions
         // Note: buildKnowledgeContext uses embeddings from analysis text
-        // We could enhance this to use ragConfig.keywords for targeted search
+        // ragConfig.keywords could be used for additional filtering in the future
       })
 
       if (knowledgeContext) {
