@@ -54,14 +54,29 @@ interface Alert {
 }
 
 interface Recommendations {
-  examRecommendations: ExamRecommendation[]
-  lifestyleRecommendations: LifestyleRecommendation[]
-  healthGoals: HealthGoal[]
-  alerts: Alert[]
+  examRecommendations: ExamRecommendation[] | any
+  lifestyleRecommendations: LifestyleRecommendation[] | any
+  healthGoals: HealthGoal[] | any
+  alerts: Alert[] | any
 }
 
 interface RecommendationsWidgetProps {
   patientId?: string
+}
+
+// Helper function to ensure data is an array
+const ensureArray = (data: any): any[] => {
+  if (Array.isArray(data)) return data
+  if (data === null || data === undefined) return []
+  if (typeof data === 'string') {
+    try {
+      const parsed = JSON.parse(data)
+      return Array.isArray(parsed) ? parsed : []
+    } catch {
+      return []
+    }
+  }
+  return []
 }
 
 export function RecommendationsWidget({ patientId }: RecommendationsWidgetProps = {}) {
@@ -138,13 +153,13 @@ export function RecommendationsWidget({ patientId }: RecommendationsWidgetProps 
   const getSectionTitle = (tab: string) => {
     switch (tab) {
       case 'exams':
-        return `Exames (${recommendations?.examRecommendations.length || 0})`
+        return `Exames (${ensureArray(recommendations?.examRecommendations).length})`
       case 'lifestyle':
-        return `Lifestyle (${recommendations?.lifestyleRecommendations.length || 0})`
+        return `Lifestyle (${ensureArray(recommendations?.lifestyleRecommendations).length})`
       case 'goals':
-        return `Metas (${recommendations?.healthGoals.length || 0})`
+        return `Metas (${ensureArray(recommendations?.healthGoals).length})`
       case 'alerts':
-        return `Alertas (${recommendations?.alerts.length || 0})`
+        return `Alertas (${ensureArray(recommendations?.alerts).length})`
       default:
         return ''
     }
@@ -268,12 +283,12 @@ export function RecommendationsWidget({ patientId }: RecommendationsWidgetProps 
 
           {/* Exams Tab */}
           <TabsContent value="exams" className="mt-0 space-y-2.5 sm:space-y-3">
-            {recommendations.examRecommendations.length === 0 ? (
+            {ensureArray(recommendations.examRecommendations).length === 0 ? (
               <p className="text-sm text-muted-foreground text-center py-8">
                 Nenhum exame recomendado no momento
               </p>
             ) : (
-              recommendations.examRecommendations.map((exam, index) => (
+              ensureArray(recommendations.examRecommendations).map((exam, index) => (
                 <div
                   key={index}
                   className="p-4 rounded-lg border border-border bg-card hover:border-sky-300 hover:bg-sky-50/30 transition-all dark:border-gray-700 dark:hover:bg-sky-900/30 dark:hover:border-sky-700"
@@ -303,12 +318,12 @@ export function RecommendationsWidget({ patientId }: RecommendationsWidgetProps 
 
           {/* Lifestyle Tab */}
           <TabsContent value="lifestyle" className="mt-0 space-y-2.5 sm:space-y-3">
-            {recommendations.lifestyleRecommendations.length === 0 ? (
+            {ensureArray(recommendations.lifestyleRecommendations).length === 0 ? (
               <p className="text-sm text-muted-foreground text-center py-8">
                 Nenhuma recomendação de lifestyle no momento
               </p>
             ) : (
-              recommendations.lifestyleRecommendations.map((lifestyle, index) => (
+              ensureArray(recommendations.lifestyleRecommendations).map((lifestyle, index) => (
                 <div
                   key={index}
                   className="p-4 rounded-lg border border-border bg-card hover:border-teal-300 hover:bg-teal-50/30 transition-all dark:border-gray-700 dark:hover:bg-teal-900/30 dark:hover:border-teal-700"
@@ -340,12 +355,12 @@ export function RecommendationsWidget({ patientId }: RecommendationsWidgetProps 
 
           {/* Goals Tab */}
           <TabsContent value="goals" className="mt-0 space-y-2.5 sm:space-y-3">
-            {recommendations.healthGoals.length === 0 ? (
+            {ensureArray(recommendations.healthGoals).length === 0 ? (
               <p className="text-sm text-muted-foreground text-center py-8">
                 Nenhuma meta definida no momento
               </p>
             ) : (
-              recommendations.healthGoals.map((goal, index) => (
+              ensureArray(recommendations.healthGoals).map((goal, index) => (
                 <div
                   key={index}
                   className="p-4 rounded-lg border border-border bg-card hover:border-purple-300 hover:bg-purple-50/30 transition-all dark:border-gray-700 dark:hover:bg-purple-900/30 dark:hover:border-purple-700"
@@ -393,7 +408,7 @@ export function RecommendationsWidget({ patientId }: RecommendationsWidgetProps 
 
           {/* Alerts Tab */}
           <TabsContent value="alerts" className="mt-0 space-y-2.5 sm:space-y-3">
-            {recommendations.alerts.length === 0 ? (
+            {ensureArray(recommendations.alerts).length === 0 ? (
               <div className="text-center py-8">
                 <div className="bg-emerald-50 dark:bg-emerald-950/20 rounded-lg p-4 mb-4 inline-block">
                   <CheckCircle2 className="h-12 w-12 text-emerald-600 dark:text-emerald-400" />
@@ -402,7 +417,7 @@ export function RecommendationsWidget({ patientId }: RecommendationsWidgetProps 
                 <p className="text-xs text-muted-foreground mt-1">Nenhum alerta no momento</p>
               </div>
             ) : (
-              recommendations.alerts.map((alert, index) => {
+              ensureArray(recommendations.alerts).map((alert, index) => {
                 const alertConfig = {
                   urgent: {
                     bg: 'bg-red-50 dark:bg-red-950/20',

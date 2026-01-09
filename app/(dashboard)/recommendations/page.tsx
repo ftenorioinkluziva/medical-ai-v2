@@ -32,15 +32,30 @@ import {
 interface RecommendationHistory {
   id: string
   analysisId: string
-  examRecommendations: any[]
-  lifestyleRecommendations: any[]
-  healthGoals: any[]
-  alerts: any[]
+  examRecommendations: any[] | any
+  lifestyleRecommendations: any[] | any
+  healthGoals: any[] | any
+  alerts: any[] | any
   createdAt: string
   analysisDate: string
   agentName: string
   agentTitle: string
   agentColor: string
+}
+
+// Helper function to ensure data is an array
+const ensureArray = (data: any): any[] => {
+  if (Array.isArray(data)) return data
+  if (data === null || data === undefined) return []
+  if (typeof data === 'string') {
+    try {
+      const parsed = JSON.parse(data)
+      return Array.isArray(parsed) ? parsed : []
+    } catch {
+      return []
+    }
+  }
+  return []
 }
 
 export default function RecommendationsHistoryPage() {
@@ -197,13 +212,13 @@ export default function RecommendationsHistoryPage() {
     if (!selectedRec) return ''
     switch (tab) {
       case 'exams':
-        return `Exames (${selectedRec.examRecommendations.length})`
+        return `Exames (${ensureArray(selectedRec.examRecommendations).length})`
       case 'lifestyle':
-        return `Lifestyle (${selectedRec.lifestyleRecommendations.length})`
+        return `Lifestyle (${ensureArray(selectedRec.lifestyleRecommendations).length})`
       case 'goals':
-        return `Metas (${selectedRec.healthGoals.length})`
+        return `Metas (${ensureArray(selectedRec.healthGoals).length})`
       case 'alerts':
-        return `Alertas (${selectedRec.alerts.length})`
+        return `Alertas (${ensureArray(selectedRec.alerts).length})`
       default:
         return ''
     }
@@ -385,12 +400,12 @@ export default function RecommendationsHistoryPage() {
 
                   {/* Exams Tab */}
                   <TabsContent value="exams" className="mt-0 space-y-3">
-                    {selectedRec.examRecommendations.length === 0 ? (
+                    {ensureArray(selectedRec.examRecommendations).length === 0 ? (
                       <p className="text-sm text-muted-foreground text-center py-8">
                         Nenhum exame recomendado
                       </p>
                     ) : (
-                      selectedRec.examRecommendations.map((exam: any, index: number) => (
+                      ensureArray(selectedRec.examRecommendations).map((exam: any, index: number) => (
                         <div
                           key={index}
                           className="border rounded-lg p-4 space-y-2 transition-colors hover:border-sky-300 hover:bg-sky-50/30 dark:hover:border-sky-700 dark:hover:bg-sky-900/30"
@@ -412,12 +427,12 @@ export default function RecommendationsHistoryPage() {
 
                   {/* Lifestyle Tab */}
                   <TabsContent value="lifestyle" className="mt-0 space-y-3">
-                    {selectedRec.lifestyleRecommendations.length === 0 ? (
+                    {ensureArray(selectedRec.lifestyleRecommendations).length === 0 ? (
                       <p className="text-sm text-muted-foreground text-center py-8">
                         Nenhuma recomendação de lifestyle
                       </p>
                     ) : (
-                      selectedRec.lifestyleRecommendations.map((lifestyle: any, index: number) => (
+                      ensureArray(selectedRec.lifestyleRecommendations).map((lifestyle: any, index: number) => (
                         <div
                           key={index}
                           className="border rounded-lg p-4 space-y-2 transition-colors hover:border-teal-300 hover:bg-teal-50/30 dark:hover:border-teal-700 dark:hover:bg-teal-900/30"
@@ -442,12 +457,12 @@ export default function RecommendationsHistoryPage() {
 
                   {/* Goals Tab */}
                   <TabsContent value="goals" className="mt-0 space-y-3">
-                    {selectedRec.healthGoals.length === 0 ? (
+                    {ensureArray(selectedRec.healthGoals).length === 0 ? (
                       <p className="text-sm text-muted-foreground text-center py-8">
                         Nenhuma meta de saúde definida
                       </p>
                     ) : (
-                      selectedRec.healthGoals.map((goal: any, index: number) => (
+                      ensureArray(selectedRec.healthGoals).map((goal: any, index: number) => (
                         <div
                           key={index}
                           className="border rounded-lg p-4 space-y-3 transition-colors hover:border-purple-300 hover:bg-purple-50/30 dark:hover:border-purple-700 dark:hover:bg-purple-900/30"
@@ -485,12 +500,12 @@ export default function RecommendationsHistoryPage() {
 
                   {/* Alerts Tab */}
                   <TabsContent value="alerts" className="mt-0 space-y-3">
-                    {selectedRec.alerts.length === 0 ? (
+                    {ensureArray(selectedRec.alerts).length === 0 ? (
                       <p className="text-sm text-muted-foreground text-center py-8">
                         Nenhum alerta
                       </p>
                     ) : (
-                      selectedRec.alerts.map((alert: any, index: number) => {
+                      ensureArray(selectedRec.alerts).map((alert: any, index: number) => {
                         const configMap: Record<string, any> = {
                           urgent: {
                             bg: 'bg-red-50 dark:bg-red-950/20',
