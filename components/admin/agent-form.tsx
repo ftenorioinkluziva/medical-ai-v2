@@ -45,6 +45,11 @@ export function AgentForm({ agent, onSuccess, onCancel }: AgentFormProps) {
     processingTimeMs?: number
     categoriesIncluded?: string[]
   } | null>(null)
+  const [knowledgeAnalysis, setKnowledgeAnalysis] = useState<{
+    recommendedMaxChunks: number
+    recommendedMaxCharsPerChunk: number
+    avgChunksPerArticle: number
+  } | null>(null)
   // Model limits configuration (from official Gemini API docs)
   const modelLimits: Record<string, { maxOutputTokens: number; contextWindow: string; description: string }> = {
     // Gemini 3 Series
@@ -107,17 +112,18 @@ export function AgentForm({ agent, onSuccess, onCancel }: AgentFormProps) {
     executionOrder: null as number | null,
   })
 
-  // Load filters (authors, categories, subcategories) on mount
+  // Load filters and knowledge analysis on mount
   useEffect(() => {
-    const loadFilters = async () => {
+    const loadData = async () => {
       try {
         setIsLoadingFilters(true)
 
-        // Load all filters in parallel
-        const [authorsRes, categoriesRes, subcategoriesRes] = await Promise.all([
+        // Load all data in parallel
+        const [authorsRes, categoriesRes, subcategoriesRes, knowledgeAnalysisRes] = await Promise.all([
           fetch('/api/admin/knowledge/authors'),
           fetch('/api/admin/knowledge/categories'),
           fetch('/api/admin/knowledge/subcategories'),
+          fetch('/api/admin/knowledge/analyze'),
         ])
 
         if (authorsRes.ok) {
@@ -134,14 +140,46 @@ export function AgentForm({ agent, onSuccess, onCancel }: AgentFormProps) {
           const data = await subcategoriesRes.json()
           setSubcategories(data.subcategories || [])
         }
+
+        // Load knowledge base analysis for intelligent defaults
+        if (knowledgeAnalysisRes.ok) {
+          const data = await knowledgeAnalysisRes.json()
+          if (data.success) {
+            // Calculate average chunk size from distribution
+            const avgChunkLength = data.distribution.length > 0
+              ? Math.round(
+                  data.distribution.reduce((sum: number, d: any) => sum + d.avg_chunk_length, 0) /
+                  data.distribution.length
+                )
+              : 1200
+
+            setKnowledgeAnalysis({
+              recommendedMaxChunks: data.recommendations.balanced,
+              recommendedMaxCharsPerChunk: avgChunkLength,
+              avgChunksPerArticle: data.stats.avgChunksPerArticle,
+            })
+
+            // Update form defaults only if creating new agent (not editing)
+            if (!agent) {
+              setFormData(prev => ({
+                ...prev,
+                ragConfig: {
+                  ...prev.ragConfig,
+                  maxChunks: data.recommendations.balanced,
+                  maxCharsPerChunk: avgChunkLength,
+                }
+              }))
+            }
+          }
+        }
       } catch (error) {
-        console.error('Error loading filters:', error)
+        console.error('Error loading data:', error)
       } finally {
         setIsLoadingFilters(false)
       }
     }
 
-    loadFilters()
+    loadData()
   }, [])
 
   useEffect(() => {
@@ -695,6 +733,21 @@ export function AgentForm({ agent, onSuccess, onCancel }: AgentFormProps) {
 
             {formData.ragConfig.enabled && (
               <div className="space-y-4 pt-2">
+                {/* Intelligent Defaults Info */}
+                {knowledgeAnalysis && (
+                  <div className="p-3 bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 rounded-lg">
+                    <p className="text-xs text-green-900 dark:text-green-100 flex items-start gap-2">
+                      <Sparkles className="h-4 w-4 flex-shrink-0 mt-0.5" />
+                      <span>
+                        <strong>Valores Inteligentes:</strong> Os campos abaixo foram preenchidos automaticamente com base
+                        na análise da sua base de conhecimento ({knowledgeAnalysis.recommendedMaxChunks} chunks balanceados
+                        para ~{Math.floor(knowledgeAnalysis.recommendedMaxChunks / knowledgeAnalysis.avgChunksPerArticle)} artigos).
+                        Você pode ajustar manualmente se necessário.
+                      </span>
+                    </p>
+                  </div>
+                )}
+
                 {/* Keywords */}
                 <div className="space-y-2">
                   <Label htmlFor="ragKeywords">Palavras-chave para Busca</Label>
@@ -717,12 +770,19 @@ export function AgentForm({ agent, onSuccess, onCancel }: AgentFormProps) {
                 {/* Max Chunks */}
                 <div className="grid gap-4 md:grid-cols-2">
                   <div className="space-y-2">
-                    <Label htmlFor="ragMaxChunks">Máximo de Chunks</Label>
+                    <div className="flex items-center gap-2">
+                      <Label htmlFor="ragMaxChunks">Máximo de Chunks</Label>
+                      {knowledgeAnalysis && (
+                        <Badge variant="secondary" className="text-xs bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400">
+                          ✓ Otimizado
+                        </Badge>
+                      )}
+                    </div>
                     <Input
                       id="ragMaxChunks"
                       type="number"
                       min="1"
-                      max="10"
+                      max="500"
                       value={formData.ragConfig.maxChunks}
                       onChange={(e) =>
                         handleChange('ragConfig', {
@@ -731,6 +791,12 @@ export function AgentForm({ agent, onSuccess, onCancel }: AgentFormProps) {
                         })
                       }
                     />
+                    {knowledgeAnalysis && (
+                      <p className="text-xs text-green-600 dark:text-green-400">
+                        📊 Recomendado: {knowledgeAnalysis.recommendedMaxChunks} chunks
+                        (~{Math.floor(knowledgeAnalysis.recommendedMaxChunks / knowledgeAnalysis.avgChunksPerArticle)} artigos)
+                      </p>
+                    )}
                     <p className="text-xs text-muted-foreground">
                       Número de trechos de conhecimento a incluir
                     </p>
@@ -738,7 +804,14 @@ export function AgentForm({ agent, onSuccess, onCancel }: AgentFormProps) {
 
                   {/* Max Chars Per Chunk */}
                   <div className="space-y-2">
-                    <Label htmlFor="ragMaxChars">Caracteres por Chunk</Label>
+                    <div className="flex items-center gap-2">
+                      <Label htmlFor="ragMaxChars">Caracteres por Chunk</Label>
+                      {knowledgeAnalysis && (
+                        <Badge variant="secondary" className="text-xs bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400">
+                          ✓ Otimizado
+                        </Badge>
+                      )}
+                    </div>
                     <Input
                       id="ragMaxChars"
                       type="number"
@@ -753,6 +826,12 @@ export function AgentForm({ agent, onSuccess, onCancel }: AgentFormProps) {
                         })
                       }
                     />
+                    {knowledgeAnalysis && (
+                      <p className="text-xs text-green-600 dark:text-green-400">
+                        📊 Recomendado: {knowledgeAnalysis.recommendedMaxCharsPerChunk} chars
+                        (média da base)
+                      </p>
+                    )}
                     <p className="text-xs text-muted-foreground">
                       Tamanho máximo de cada trecho
                     </p>
