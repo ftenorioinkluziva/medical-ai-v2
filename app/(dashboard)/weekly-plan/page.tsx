@@ -453,7 +453,6 @@ export default function WeeklyPlanPage() {
                 <Card className="hover:shadow-md transition-shadow">
                   <CardHeader className="pb-4">
                     <CardTitle className="text-lg font-semibold text-foreground">Lista de Compras</CardTitle>
-                    <CardDescription className="text-sm text-muted-foreground mt-1 leading-relaxed">{selectedPlan.shoppingList.overview}</CardDescription>
                     {selectedPlan.shoppingList.estimatedCost && (
                       <div className="mt-3 p-3 bg-sky-50 dark:bg-sky-950/20 border border-sky-200 dark:border-sky-800 rounded-lg space-y-2">
                         <p className="text-sm text-sky-900 dark:text-sky-100 leading-relaxed font-medium">

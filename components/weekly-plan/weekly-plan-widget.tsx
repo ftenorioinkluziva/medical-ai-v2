@@ -440,7 +440,6 @@ export function WeeklyPlanWidget({ patientId }: WeeklyPlanWidgetProps = {}) {
           {/* Shopping Tab */}
           <TabsContent value="shopping" className="mt-0">
             <div className="mb-4">
-              <p className="text-sm text-muted-foreground leading-relaxed">{plan.shoppingList?.overview}</p>
               {plan.shoppingList?.estimatedCost && (
                 <div className="mt-3 p-3 bg-sky-50 dark:bg-sky-950/20 border border-sky-200 dark:border-sky-800 rounded-lg space-y-2">
                   <p className="text-sm text-sky-900 dark:text-sky-100 leading-relaxed font-medium">

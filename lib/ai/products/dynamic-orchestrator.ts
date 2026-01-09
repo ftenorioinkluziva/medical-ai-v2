@@ -276,7 +276,10 @@ export async function generateWeeklyPlanDynamic(
   const otherGens = generators.filter(g => g.generatorKey !== 'shopping')
 
   // Phase 1: Standard generators (parallel)
+  console.log(`⏱️  [WEEKLY-PLAN] Starting Phase 1 (${otherGens.length} generators)...`)
+  const phase1Start = Date.now()
   const phase1Results = await executeGenerators(otherGens, consolidatedContext)
+  console.log(`✅ [WEEKLY-PLAN] Phase 1 completed in ${Date.now() - phase1Start}ms`)
 
   // Phase 2: Shopping List (dependent)
   let shoppingResults: GeneratorResult[] = []

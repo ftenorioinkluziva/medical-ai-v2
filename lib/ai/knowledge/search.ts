@@ -98,8 +98,16 @@ export async function searchKnowledgeBase(
     LIMIT ${limit}
   `
 
-  // Search with cosine similarity
-  const results = await db.execute(searchQuery)
+  // Search with cosine similarity (with timeout protection)
+  const results = await Promise.race([
+    db.execute(searchQuery),
+    new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('Knowledge search timeout')), 15000)
+    )
+  ]).catch(error => {
+    console.warn('⚠️ [KNOWLEDGE] Search timeout or error:', error)
+    return { rows: [] }
+  }) as any
 
   const searchResults = results.rows.map((row: any) => ({
     id: row.id,

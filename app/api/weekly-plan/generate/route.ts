@@ -13,6 +13,8 @@ import { generateWeeklyPlanDynamic } from '@/lib/ai/products/dynamic-orchestrato
 import { getUserCredits, calculateCreditsFromTokens, debitCredits } from '@/lib/billing/credits'
 
 export async function POST(request: NextRequest) {
+  const startTime = Date.now()
+
   try {
     // Authenticate
     const session = await auth()
@@ -124,7 +126,9 @@ export async function POST(request: NextRequest) {
       synthesisContext
     )
 
+    const generationTime = Date.now() - startTime
     console.log(`✅ [WEEKLY-PLAN] Dynamic generation completed. ID: ${result.id}`)
+    console.log(`⏱️  [WEEKLY-PLAN] Total execution time: ${generationTime}ms (${(generationTime / 1000).toFixed(1)}s)`)
 
     // ============ DEBIT CREDITS ============
     try {

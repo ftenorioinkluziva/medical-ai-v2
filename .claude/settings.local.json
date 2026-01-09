@@ -72,7 +72,8 @@
       "Bash(grep:*)",
       "Bash(pnpm db:check:*)",
       "Bash(del scriptstest-ref-resolution.mjs)",
-      "Bash(pnpm exec dotenv:*)"
+      "Bash(pnpm exec dotenv:*)",
+      "Bash(del C:projetosmedical-ai-v2vercel.json)"
     ],
     "deny": [],
     "ask": []
