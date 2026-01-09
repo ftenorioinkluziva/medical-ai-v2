@@ -85,6 +85,7 @@ export function AgentForm({ agent, onSuccess, onCancel }: AgentFormProps) {
     useThinkingMode: false,
     analysisRole: 'none' as 'foundation' | 'specialized' | 'none',
     analysisOrder: null as number | null,
+    allowedRoles: ['patient', 'doctor', 'admin'] as ('patient' | 'doctor' | 'admin')[],
     knowledgeAccessType: 'full' as 'full' | 'restricted',
     allowedAuthors: [] as string[],
     allowedCategories: [] as string[],
@@ -172,6 +173,7 @@ export function AgentForm({ agent, onSuccess, onCancel }: AgentFormProps) {
         useThinkingMode: agent.useThinkingMode !== undefined ? agent.useThinkingMode : false,
         analysisRole: agent.analysisRole || 'none',
         analysisOrder: agent.analysisOrder !== undefined && agent.analysisOrder !== null ? agent.analysisOrder : null,
+        allowedRoles: Array.isArray(agent.allowedRoles) && agent.allowedRoles.length > 0 ? agent.allowedRoles : ['patient', 'doctor', 'admin'],
         knowledgeAccessType: agent.knowledgeAccessType || 'full',
         allowedAuthors: Array.isArray(agent.allowedAuthors) ? agent.allowedAuthors : [],
         allowedCategories: Array.isArray(agent.allowedCategories) ? agent.allowedCategories : [],
@@ -393,6 +395,7 @@ export function AgentForm({ agent, onSuccess, onCancel }: AgentFormProps) {
         useThinkingMode: formData.useThinkingMode,
         analysisRole: formData.analysisRole,
         analysisOrder: formData.analysisOrder,
+        allowedRoles: formData.allowedRoles,
         isActive: formData.isActive,
         requiresApproval: formData.requiresApproval,
         tags: formData.tags
