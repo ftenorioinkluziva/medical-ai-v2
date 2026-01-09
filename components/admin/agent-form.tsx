@@ -9,6 +9,7 @@ import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Badge } from '@/components/ui/badge'
 import { Textarea } from '@/components/ui/textarea'
 import {
   Select,
@@ -148,9 +149,9 @@ export function AgentForm({ agent, onSuccess, onCancel }: AgentFormProps) {
             // Calculate average chunk size from distribution
             const avgChunkLength = data.distribution.length > 0
               ? Math.round(
-                  data.distribution.reduce((sum: number, d: any) => sum + d.avg_chunk_length, 0) /
-                  data.distribution.length
-                )
+                data.distribution.reduce((sum: number, d: any) => sum + d.avg_chunk_length, 0) /
+                data.distribution.length
+              )
               : 1200
 
             setKnowledgeAnalysis({
@@ -999,8 +1000,8 @@ export function AgentForm({ agent, onSuccess, onCancel }: AgentFormProps) {
         {(generateError || generateStats) && (
           <div
             className={`p-4 rounded-lg border ${generateError
-                ? 'bg-red-50 border-red-200 dark:bg-red-950 dark:border-red-800'
-                : 'bg-green-50 border-green-200 dark:bg-green-950 dark:border-green-800'
+              ? 'bg-red-50 border-red-200 dark:bg-red-950 dark:border-red-800'
+              : 'bg-green-50 border-green-200 dark:bg-green-950 dark:border-green-800'
               }`}
           >
             {generateError ? (
