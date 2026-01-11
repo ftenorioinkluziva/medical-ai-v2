@@ -113,6 +113,13 @@
       "when": 1767712248713,
       "tag": "0015_sloppy_thena",
       "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1768009202026,
+      "tag": "0016_lame_scorpion",
+      "breakpoints": true
     }
   ]
 }

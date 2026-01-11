@@ -1,4 +1,5 @@
 import { pgTable, uuid, varchar, text, decimal, timestamp, jsonb } from 'drizzle-orm/pg-core'
+import { knowledgeArticles } from './knowledge-base'
 
 /**
  * Tabela de Referência de Biomarcadores
@@ -17,6 +18,10 @@ export const biomarkersReference = pgTable('biomarkers_reference', {
   metaphor: text('metaphor'),
   sourceRef: varchar('source_ref', { length: 200 }),
   updatedAt: timestamp('updated_at').defaultNow(),
+
+  // Sync metadata
+  lastSyncedFrom: uuid('last_synced_from').references(() => knowledgeArticles.id), // Artigo que originou última atualização
+  syncMetadata: jsonb('sync_metadata'), // { suggestedBy, approvedBy, confidence, etc }
 })
 
 /**
@@ -46,4 +51,8 @@ export const protocols = pgTable('protocols', {
   dosage: varchar('dosage', { length: 200 }),
   sourceRef: varchar('source_ref', { length: 200 }),
   createdAt: timestamp('created_at').defaultNow().notNull(),
+
+  // Sync metadata
+  lastSyncedFrom: uuid('last_synced_from').references(() => knowledgeArticles.id), // Artigo que originou última atualização
+  syncMetadata: jsonb('sync_metadata'), // { suggestedBy, approvedBy, confidence, etc }
 })

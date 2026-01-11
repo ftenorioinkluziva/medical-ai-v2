@@ -19,6 +19,7 @@ import {
   TrendingUp,
   Brain,
   Workflow,
+  RefreshCcw,
 } from 'lucide-react'
 
 export default function AdminPage() {
@@ -58,6 +59,15 @@ export default function AdminPage() {
       color: 'text-cyan-600 dark:text-cyan-400',
       bgColor: 'bg-cyan-50/50 dark:bg-cyan-950/20',
       borderColor: 'border-cyan-200 dark:border-cyan-800',
+    },
+    {
+      title: 'Sincronização de Conhecimento',
+      description: 'Sincronizar Base de Conhecimento com Cérebro Lógico',
+      icon: RefreshCcw,
+      href: '/admin/knowledge-sync',
+      color: 'text-indigo-600 dark:text-indigo-400',
+      bgColor: 'bg-indigo-50/50 dark:bg-indigo-950/20',
+      borderColor: 'border-indigo-200 dark:border-indigo-800',
     },
     {
       title: 'Estatísticas',

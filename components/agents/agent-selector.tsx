@@ -58,7 +58,8 @@ export function AgentSelector({
   const fetchAgents = async () => {
     setIsLoading(true)
     try {
-      const response = await fetch('/api/agents')
+      // Fetch only analysis agents (not product generators)
+      const response = await fetch('/api/agents?type=analysis')
       const data = await response.json()
 
       if (data.success) {

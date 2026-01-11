@@ -7,6 +7,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db/client'
 import { biomarkersReference } from '@/lib/db/schema'
 import { auth } from '@/lib/auth/config'
+import { sql } from 'drizzle-orm'
 
 export async function POST(request: NextRequest) {
   try {
@@ -76,14 +77,73 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const biomarkers = await db
-      .select()
-      .from(biomarkersReference)
-      .orderBy(biomarkersReference.category, biomarkersReference.name)
+    const { searchParams } = new URL(request.url)
+    const search = searchParams.get('search') || ''
+    const category = searchParams.get('category')
+    const limit = parseInt(searchParams.get('limit') || '50')
+    const offset = parseInt(searchParams.get('offset') || '0')
 
-    return NextResponse.json({ biomarkers })
+    // Build query
+    let query = db.select().from(biomarkersReference)
+
+    // Apply filters
+    if (search || category) {
+      const conditions = []
+
+      if (search) {
+        const searchPattern = `%${search}%`
+        conditions.push(
+          sql`(${biomarkersReference.name} ILIKE ${searchPattern} OR ${biomarkersReference.slug} ILIKE ${searchPattern})`
+        )
+      }
+
+      if (category) {
+        conditions.push(sql`${biomarkersReference.category} = ${category}`)
+      }
+
+      query = query.where(sql`${sql.join(conditions, sql` AND `)}`)
+    }
+
+    // Execute query with pagination
+    const biomarkers = await query
+      .orderBy(biomarkersReference.category, biomarkersReference.name)
+      .limit(limit)
+      .offset(offset)
+
+    // Get total count for pagination
+    const countConditions = []
+    if (search) {
+      const searchPattern = `%${search}%`
+      countConditions.push(
+        sql`(${biomarkersReference.name} ILIKE ${searchPattern} OR ${biomarkersReference.slug} ILIKE ${searchPattern})`
+      )
+    }
+    if (category) {
+      countConditions.push(sql`${biomarkersReference.category} = ${category}`)
+    }
+
+    const [{ count }] = await db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(biomarkersReference)
+      .where(countConditions.length > 0 ? sql`${sql.join(countConditions, sql` AND `)}` : undefined)
+
+    // Get unique categories for filters
+    const categories = await db
+      .selectDistinct({ category: biomarkersReference.category })
+      .from(biomarkersReference)
+      .where(sql`${biomarkersReference.category} IS NOT NULL`)
+      .orderBy(biomarkersReference.category)
+
+    return NextResponse.json({
+      success: true,
+      biomarkers,
+      total: count,
+      categories: categories.map(c => c.category).filter(Boolean),
+      limit,
+      offset,
+    })
   } catch (error) {
     console.error('❌ Erro ao buscar biomarcadores:', error)
     return NextResponse.json(

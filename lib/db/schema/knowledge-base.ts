@@ -33,6 +33,10 @@ export const knowledgeArticles = pgTable('knowledge_articles', {
   // Stats
   usageCount: integer('usage_count').notNull().default(0), // How many times used in analyses
 
+  // Sync tracking
+  lastAnalyzedAt: timestamp('last_analyzed_at'), // Última análise para sincronização
+  analysisVersion: varchar('analysis_version', { length: 50 }), // Versão do analyzer usado
+
   // Timestamps
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
