@@ -1,273 +1,116 @@
+'use client'
+
 /**
  * Medical Knowledge Admin Page
  * Manage biomarkers and protocols from the Logical Brain
  */
 
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { db } from '@/lib/db/client'
-import { biomarkersReference, calculatedMetrics, protocols } from '@/lib/db/schema'
-import { Card } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Activity, Calculator, FileText, ArrowLeft } from 'lucide-react'
+import { Input } from '@/components/ui/input'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Activity, Calculator, FileText, ArrowLeft, Search, Brain } from 'lucide-react'
+import { BiomarkersList } from '@/components/admin/medical-knowledge/biomarkers-list'
+import { MetricsList } from '@/components/admin/medical-knowledge/metrics-list'
+import { ProtocolsList } from '@/components/admin/medical-knowledge/protocols-list'
+import { MedicalKnowledgeStats } from '@/components/admin/medical-knowledge/stats'
 
-export const metadata = {
-  title: 'Conhecimento Médico | Admin',
-  description: 'Gerenciar biomarcadores e protocolos do Cérebro Lógico',
-}
+export default function MedicalKnowledgePage() {
+  const [searchQuery, setSearchQuery] = useState('')
+  const [stats, setStats] = useState({ biomarkers: 0, metrics: 0, protocols: 0 })
+  const [isLoading, setIsLoading] = useState(true)
 
-async function getBiomarkers() {
-  return await db
-    .select()
-    .from(biomarkersReference)
-    .orderBy(biomarkersReference.category, biomarkersReference.name)
-}
+  useEffect(() => {
+    loadStats()
+  }, [])
 
-async function getMetrics() {
-  return await db
-    .select()
-    .from(calculatedMetrics)
-    .orderBy(calculatedMetrics.name)
-}
-
-async function getProtocols() {
-  return await db
-    .select()
-    .from(protocols)
-    .orderBy(protocols.type, protocols.title)
-}
-
-export default async function MedicalKnowledgePage() {
-  const [biomarkers, metrics, protocolsList] = await Promise.all([
-    getBiomarkers(),
-    getMetrics(),
-    getProtocols(),
-  ])
-
-  // Group biomarkers by category
-  const biomarkersByCategory = biomarkers.reduce((acc, bio) => {
-    const category = bio.category || 'Outros'
-    if (!acc[category]) {
-      acc[category] = []
+  const loadStats = async () => {
+    try {
+      setIsLoading(true)
+      // Fetch stats from API
+      const response = await fetch('/api/admin/medical-knowledge/stats')
+      if (response.ok) {
+        const data = await response.json()
+        setStats(data.stats)
+      }
+    } catch (error) {
+      console.error('Error loading stats:', error)
+    } finally {
+      setIsLoading(false)
     }
-    acc[category].push(bio)
-    return acc
-  }, {} as Record<string, typeof biomarkers>)
-
-  // Group protocols by type
-  const protocolsByType = protocolsList.reduce((acc, proto) => {
-    const type = proto.type || 'Outros'
-    if (!acc[type]) {
-      acc[type] = []
-    }
-    acc[type].push(proto)
-    return acc
-  }, {} as Record<string, typeof protocolsList>)
+  }
 
   return (
     <div className="container mx-auto p-6 space-y-6">
       {/* Header */}
       <div>
-        <div className="flex items-center gap-3">
-          <Link href="/admin">
-            <Button variant="ghost" size="sm" className="gap-2">
-              <ArrowLeft className="h-4 w-4" />
-              Voltar
-            </Button>
-          </Link>
-          <h1 className="text-3xl font-bold">Cérebro Lógico - Conhecimento Médico</h1>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Link href="/admin">
+              <Button variant="ghost" size="sm" className="gap-2">
+                <ArrowLeft className="h-4 w-4" />
+                Voltar
+              </Button>
+            </Link>
+            <div>
+              <h1 className="text-3xl font-bold flex items-center gap-3">
+                <Brain className="h-8 w-8" />
+                Cérebro Lógico
+              </h1>
+              <p className="text-muted-foreground mt-1">
+                Base de conhecimento para análise determinística de biomarcadores
+              </p>
+            </div>
+          </div>
         </div>
-        <p className="text-muted-foreground mt-2">
-          Base de conhecimento para análise determinística de biomarcadores
-        </p>
       </div>
 
       {/* Statistics */}
-      <div className="grid gap-4 md:grid-cols-3">
-        <Card className="p-6">
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-              <Activity className="h-6 w-6 text-blue-600 dark:text-blue-400" />
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Biomarcadores</p>
-              <p className="text-2xl font-bold">{biomarkers.length}</p>
-            </div>
-          </div>
-        </Card>
+      <MedicalKnowledgeStats stats={stats} isLoading={isLoading} />
 
-        <Card className="p-6">
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
-              <Calculator className="h-6 w-6 text-purple-600 dark:text-purple-400" />
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Métricas Calculadas</p>
-              <p className="text-2xl font-bold">{metrics.length}</p>
-            </div>
-          </div>
-        </Card>
-
-        <Card className="p-6">
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-green-100 dark:bg-green-900/30 rounded-lg">
-              <FileText className="h-6 w-6 text-green-600 dark:text-green-400" />
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Protocolos</p>
-              <p className="text-2xl font-bold">{protocolsList.length}</p>
-            </div>
-          </div>
-        </Card>
+      {/* Search */}
+      <div className="flex items-center gap-4">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Buscar biomarcadores, métricas ou protocolos..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-10"
+          />
+        </div>
       </div>
 
-      {/* Biomarkers by Category */}
-      <div className="space-y-4">
-        <h2 className="text-2xl font-semibold">Biomarcadores por Categoria</h2>
+      {/* Tabs */}
+      <Tabs defaultValue="biomarkers" className="space-y-6">
+        <TabsList>
+          <TabsTrigger value="biomarkers" className="gap-2">
+            <Activity className="h-4 w-4" />
+            Biomarcadores
+          </TabsTrigger>
+          <TabsTrigger value="metrics" className="gap-2">
+            <Calculator className="h-4 w-4" />
+            Métricas Calculadas
+          </TabsTrigger>
+          <TabsTrigger value="protocols" className="gap-2">
+            <FileText className="h-4 w-4" />
+            Protocolos
+          </TabsTrigger>
+        </TabsList>
 
-        {Object.entries(biomarkersByCategory).map(([category, categoryBiomarkers]) => (
-          <Card key={category} className="p-6">
-            <h3 className="text-lg font-semibold mb-4">{category}</h3>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {categoryBiomarkers.map((bio) => (
-                <div key={bio.slug} className="border rounded-lg p-4 space-y-2">
-                  <div className="flex items-start justify-between">
-                    <h4 className="font-medium">{bio.name}</h4>
-                    <Badge variant="outline" className="text-xs">
-                      {bio.slug}
-                    </Badge>
-                  </div>
+        <TabsContent value="biomarkers">
+          <BiomarkersList searchQuery={searchQuery} />
+        </TabsContent>
 
-                  {bio.unit && (
-                    <p className="text-sm text-muted-foreground">Unidade: {bio.unit}</p>
-                  )}
+        <TabsContent value="metrics">
+          <MetricsList searchQuery={searchQuery} />
+        </TabsContent>
 
-                  {(bio.optimalMin || bio.optimalMax) && (
-                    <div className="text-sm">
-                      <span className="font-medium">Faixa Ótima:</span>{' '}
-                      {bio.optimalMin || '-'} a {bio.optimalMax || '-'}
-                    </div>
-                  )}
-
-                  {(bio.labMin || bio.labMax) && (
-                    <div className="text-sm">
-                      <span className="font-medium">Faixa Lab:</span>{' '}
-                      {bio.labMin || '-'} a {bio.labMax || '-'}
-                    </div>
-                  )}
-
-                  {bio.clinicalInsight && (
-                    <p className="text-xs text-muted-foreground italic">
-                      {bio.clinicalInsight}
-                    </p>
-                  )}
-
-                  {bio.metaphor && (
-                    <p className="text-xs bg-blue-50 dark:bg-blue-950/20 text-blue-900 dark:text-blue-100 p-2 rounded">
-                      💡 {bio.metaphor}
-                    </p>
-                  )}
-
-                  {bio.sourceRef && (
-                    <p className="text-xs text-muted-foreground">
-                      Fonte: {bio.sourceRef}
-                    </p>
-                  )}
-                </div>
-              ))}
-            </div>
-          </Card>
-        ))}
-      </div>
-
-      {/* Calculated Metrics */}
-      <div className="space-y-4">
-        <h2 className="text-2xl font-semibold">Métricas Calculadas</h2>
-
-        <Card className="p-6">
-          <div className="space-y-4">
-            {metrics.map((metric) => (
-              <div key={metric.slug} className="border rounded-lg p-4">
-                <div className="flex items-start justify-between mb-2">
-                  <h4 className="font-medium">{metric.name}</h4>
-                  <Badge variant="outline" className="text-xs">
-                    {metric.slug}
-                  </Badge>
-                </div>
-
-                <div className="space-y-2">
-                  <div className="text-sm bg-gray-50 dark:bg-gray-900 p-2 rounded font-mono">
-                    <span className="font-medium">Fórmula:</span> {metric.formula}
-                  </div>
-
-                  {(metric.targetMin || metric.targetMax) && (
-                    <div className="text-sm">
-                      <span className="font-medium">Alvo:</span>{' '}
-                      {metric.targetMin ? `≥ ${metric.targetMin}` : ''}
-                      {metric.targetMin && metric.targetMax ? ' e ' : ''}
-                      {metric.targetMax ? `≤ ${metric.targetMax}` : ''}
-                    </div>
-                  )}
-
-                  {metric.riskInsight && (
-                    <p className="text-sm text-muted-foreground">
-                      <span className="font-medium">Insight de Risco:</span> {metric.riskInsight}
-                    </p>
-                  )}
-
-                  {metric.sourceRef && (
-                    <p className="text-xs text-muted-foreground">
-                      Fonte: {metric.sourceRef}
-                    </p>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        </Card>
-      </div>
-
-      {/* Protocols by Type */}
-      <div className="space-y-4">
-        <h2 className="text-2xl font-semibold">Protocolos por Tipo</h2>
-
-        {Object.entries(protocolsByType).map(([type, typeProtocols]) => (
-          <Card key={type} className="p-6">
-            <h3 className="text-lg font-semibold mb-4">{type}</h3>
-            <div className="space-y-4">
-              {typeProtocols.map((proto) => (
-                <div key={proto.id} className="border rounded-lg p-4">
-                  <div className="flex items-start justify-between mb-2">
-                    <h4 className="font-medium">{proto.title}</h4>
-                    <Badge>{proto.type}</Badge>
-                  </div>
-
-                  <div className="space-y-2">
-                    <div className="text-sm bg-yellow-50 dark:bg-yellow-950/20 text-yellow-900 dark:text-yellow-100 p-2 rounded">
-                      <span className="font-medium">Condição de Ativação:</span>{' '}
-                      <code className="text-xs">{proto.triggerCondition}</code>
-                    </div>
-
-                    <p className="text-sm">{proto.description}</p>
-
-                    {proto.dosage && (
-                      <p className="text-sm">
-                        <span className="font-medium">Dosagem:</span> {proto.dosage}
-                      </p>
-                    )}
-
-                    {proto.sourceRef && (
-                      <p className="text-xs text-muted-foreground">
-                        Fonte: {proto.sourceRef}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </Card>
-        ))}
-      </div>
+        <TabsContent value="protocols">
+          <ProtocolsList searchQuery={searchQuery} />
+        </TabsContent>
+      </Tabs>
     </div>
   )
 }

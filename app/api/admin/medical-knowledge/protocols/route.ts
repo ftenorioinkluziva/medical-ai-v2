@@ -7,6 +7,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db/client'
 import { protocols } from '@/lib/db/schema'
 import { auth } from '@/lib/auth/config'
+import { sql } from 'drizzle-orm'
 
 export async function POST(request: NextRequest) {
   try {
@@ -62,14 +63,58 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const allProtocols = await db
+    const { searchParams } = new URL(request.url)
+    const search = searchParams.get('search') || ''
+    const type = searchParams.get('type')
+    const limit = parseInt(searchParams.get('limit') || '50')
+    const offset = parseInt(searchParams.get('offset') || '0')
+
+    // Build conditions
+    const conditions = []
+
+    if (search) {
+      const searchPattern = `%${search}%`
+      conditions.push(
+        sql`(${protocols.title} ILIKE ${searchPattern} OR ${protocols.description} ILIKE ${searchPattern})`
+      )
+    }
+
+    if (type) {
+      conditions.push(sql`${protocols.type} = ${type}`)
+    }
+
+    // Fetch protocols
+    const protocolsList = await db
       .select()
       .from(protocols)
+      .where(conditions.length > 0 ? sql`${sql.join(conditions, sql` AND `)}` : undefined)
       .orderBy(protocols.type, protocols.title)
+      .limit(limit)
+      .offset(offset)
 
-    return NextResponse.json({ protocols: allProtocols })
+    // Get total count
+    const [{ count }] = await db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(protocols)
+      .where(conditions.length > 0 ? sql`${sql.join(conditions, sql` AND `)}` : undefined)
+
+    // Get unique types for filters
+    const types = await db
+      .selectDistinct({ type: protocols.type })
+      .from(protocols)
+      .where(sql`${protocols.type} IS NOT NULL`)
+      .orderBy(protocols.type)
+
+    return NextResponse.json({
+      success: true,
+      protocols: protocolsList,
+      total: count,
+      types: types.map(t => t.type).filter(Boolean),
+      limit,
+      offset,
+    })
   } catch (error) {
     console.error('❌ Erro ao buscar protocolos:', error)
     return NextResponse.json(

@@ -1,12 +1,12 @@
 /**
- * Biomarker Update API
- * PATCH /api/admin/medical-knowledge/biomarkers/[slug]
+ * Metric Update API
+ * PATCH /api/admin/medical-knowledge/metrics/[slug]
  */
 
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth/config'
 import { db } from '@/lib/db/client'
-import { biomarkersReference } from '@/lib/db/schema'
+import { calculatedMetrics } from '@/lib/db/schema'
 import { eq } from 'drizzle-orm'
 
 export async function PATCH(
@@ -28,53 +28,48 @@ export async function PATCH(
     const { slug } = await params
     const body = await request.json()
 
-    // Check if biomarker exists
+    // Check if metric exists
     const existing = await db
       .select()
-      .from(biomarkersReference)
-      .where(eq(biomarkersReference.slug, slug))
+      .from(calculatedMetrics)
+      .where(eq(calculatedMetrics.slug, slug))
 
     if (existing.length === 0) {
       return NextResponse.json(
-        { success: false, error: 'Biomarcador não encontrado' },
+        { success: false, error: 'Métrica não encontrada' },
         { status: 404 }
       )
     }
 
-    // Update biomarker
+    // Update metric
     const [updated] = await db
-      .update(biomarkersReference)
+      .update(calculatedMetrics)
       .set({
         name: body.name,
-        category: body.category || null,
-        unit: body.unit || null,
-        optimalMin: body.optimalMin || null,
-        optimalMax: body.optimalMax || null,
-        labMin: body.labMin || null,
-        labMax: body.labMax || null,
-        clinicalInsight: body.clinicalInsight || null,
-        metaphor: body.metaphor || null,
+        formula: body.formula,
+        targetMin: body.targetMin || null,
+        targetMax: body.targetMax || null,
+        riskInsight: body.riskInsight || null,
         sourceRef: body.sourceRef || null,
-        updatedAt: new Date(),
       })
-      .where(eq(biomarkersReference.slug, slug))
+      .where(eq(calculatedMetrics.slug, slug))
       .returning()
 
-    console.log(`✅ [MEDICAL-KNOWLEDGE] Biomarker updated: ${slug}`)
+    console.log(`✅ [MEDICAL-KNOWLEDGE] Metric updated: ${slug}`)
     console.log(`   By: ${session.user.email}`)
 
     return NextResponse.json({
       success: true,
-      biomarker: updated,
-      message: `Biomarcador ${updated.name} atualizado com sucesso`,
+      metric: updated,
+      message: `Métrica ${updated.name} atualizada com sucesso`,
     })
   } catch (error) {
-    console.error('❌ [MEDICAL-KNOWLEDGE] Error updating biomarker:', error)
+    console.error('❌ [MEDICAL-KNOWLEDGE] Error updating metric:', error)
 
     return NextResponse.json(
       {
         success: false,
-        error: error instanceof Error ? error.message : 'Erro ao atualizar biomarcador',
+        error: error instanceof Error ? error.message : 'Erro ao atualizar métrica',
       },
       { status: 500 }
     )
