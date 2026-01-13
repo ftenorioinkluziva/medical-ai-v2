@@ -22,14 +22,18 @@ export const medicalProfiles = pgTable('medical_profiles', {
 
   // Lifestyle - Sleep
   sleepHours: real('sleep_hours'),
-  napTime: integer('nap_time'), // minutes
+  timeInBed: real('time_in_bed'), // hours in bed
   sleepQuality: integer('sleep_quality'), // 1-10
+  sleepRegularity: integer('sleep_regularity'), // 1-10
   sleepIssues: text('sleep_issues'),
+  firstSunlightExposureTime: varchar('first_sunlight_exposure_time', { length: 5 }), // HH:MM format (24h)
+  lastMealTime: varchar('last_meal_time', { length: 5 }), // HH:MM format (24h)
+  artificialLightExposureStart: varchar('artificial_light_exposure_start', { length: 5 }), // HH:MM format (24h)
+  artificialLightExposureEnd: varchar('artificial_light_exposure_end', { length: 5 }), // HH:MM format (24h)
 
   // Lifestyle - Stress
   stressLevel: integer('stress_level'), // 1-10
   stressManagement: text('stress_management'),
-  morningSunlightExposure: varchar('morning_sunlight_exposure', { length: 10 }), // 'yes' or 'no'
 
   // Exercise
   exerciseActivities: json('exercise_activities').$type<Array<{

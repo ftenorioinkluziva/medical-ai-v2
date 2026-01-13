@@ -59,13 +59,17 @@ interface MedicalProfile {
   restingHeartRate: number | null
   // Lifestyle - Sleep
   sleepHours: number | null
-  napTime: number | null
+  timeInBed: number | null
   sleepQuality: number | null
+  sleepRegularity: number | null
   sleepIssues: string | null
+  firstSunlightExposureTime: string | null
+  lastMealTime: string | null
+  artificialLightExposureStart: string | null
+  artificialLightExposureEnd: string | null
   // Lifestyle - Stress
   stressLevel: number | null
   stressManagement: string | null
-  morningSunlightExposure: string | null
   // Exercise (old fields for backward compatibility)
   exerciseTypes: string[] | null
   exerciseFrequency: number | null
@@ -174,12 +178,16 @@ export function MedicalProfileForm({ userId, onProfileSaved }: MedicalProfileFor
     diastolicPressure: null,
     restingHeartRate: null,
     sleepHours: null,
-    napTime: null,
+    timeInBed: null,
     sleepQuality: 5,
+    sleepRegularity: 5,
     sleepIssues: null,
+    firstSunlightExposureTime: null,
+    lastMealTime: null,
+    artificialLightExposureStart: null,
+    artificialLightExposureEnd: null,
     stressLevel: 5,
     stressManagement: null,
-    morningSunlightExposure: null,
     exerciseTypes: [],
     exerciseFrequency: null,
     exerciseDuration: null,
@@ -838,17 +846,18 @@ export function MedicalProfileForm({ userId, onProfileSaved }: MedicalProfileFor
                   </div>
 
                   <div>
-                    <Label htmlFor="napTime">Tempo de Soneca</Label>
+                    <Label htmlFor="timeInBed">Horas na Cama</Label>
                     <div className="flex items-center gap-2">
                       <Input
-                        id="napTime"
+                        id="timeInBed"
                         type="number"
-                        value={profile.napTime || ''}
-                        onChange={(e) => handleInputChange('napTime', parseInt(e.target.value) || null)}
-                        placeholder="30"
+                        step="0.5"
+                        value={profile.timeInBed || ''}
+                        onChange={(e) => handleInputChange('timeInBed', parseFloat(e.target.value) || null)}
+                        placeholder="8.0"
                         className="max-w-[120px]"
                       />
-                      <span className="text-sm text-muted-foreground">min</span>
+                      <span className="text-sm text-muted-foreground">h/noite</span>
                     </div>
                   </div>
 
@@ -872,19 +881,22 @@ export function MedicalProfileForm({ userId, onProfileSaved }: MedicalProfileFor
                   </div>
 
                   <div>
-                    <Label htmlFor="dailyWaterIntake">Hidratação</Label>
-                    <div className="flex items-center gap-2">
-                      <Input
-                        id="dailyWaterIntake"
-                        type="number"
-                        step="0.1"
-                        value={profile.dailyWaterIntake || ''}
-                        onChange={(e) => handleInputChange('dailyWaterIntake', parseFloat(e.target.value) || null)}
-                        placeholder="2.5"
-                        className="max-w-[120px]"
-                      />
-                      <span className="text-sm text-muted-foreground">L/dia</span>
-                    </div>
+                    <Label htmlFor="sleepRegularity">Regularidade na hora que acorda</Label>
+                    <Select
+                      value={String(profile.sleepRegularity || 5)}
+                      onValueChange={(value) => handleInputChange('sleepRegularity', parseInt(value))}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
+                          <SelectItem key={num} value={String(num)}>
+                            {num} - {num <= 3 ? 'Pouco regular' : num <= 6 ? 'Regular' : num <= 8 ? 'Muito regular' : 'Extremamente regular'}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
 
@@ -896,6 +908,70 @@ export function MedicalProfileForm({ userId, onProfileSaved }: MedicalProfileFor
                     onChange={(e) => handleInputChange('sleepIssues', e.target.value)}
                     placeholder="Ex: Insônia, apneia do sono, roncos..."
                   />
+                </div>
+
+                {/* Timing - Horários importantes */}
+                <div className="space-y-3">
+                  <Label className="text-base font-medium">Timing (Horários)</Label>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="firstSunlightExposureTime" className="text-sm">
+                        Primeira exposição à luz solar
+                      </Label>
+                      <Input
+                        id="firstSunlightExposureTime"
+                        type="time"
+                        value={profile.firstSunlightExposureTime || ''}
+                        onChange={(e) => handleInputChange('firstSunlightExposureTime', e.target.value)}
+                        placeholder="07:00"
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="lastMealTime" className="text-sm">
+                        Última refeição
+                      </Label>
+                      <Input
+                        id="lastMealTime"
+                        type="time"
+                        value={profile.lastMealTime || ''}
+                        onChange={(e) => handleInputChange('lastMealTime', e.target.value)}
+                        placeholder="20:00"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label className="text-sm">
+                      Período de exposição à luz artificial intensa
+                    </Label>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="artificialLightExposureStart" className="text-xs text-muted-foreground">
+                          De
+                        </Label>
+                        <Input
+                          id="artificialLightExposureStart"
+                          type="time"
+                          value={profile.artificialLightExposureStart || ''}
+                          onChange={(e) => handleInputChange('artificialLightExposureStart', e.target.value)}
+                          placeholder="22:00"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="artificialLightExposureEnd" className="text-xs text-muted-foreground">
+                          Até
+                        </Label>
+                        <Input
+                          id="artificialLightExposureEnd"
+                          type="time"
+                          value={profile.artificialLightExposureEnd || ''}
+                          onChange={(e) => handleInputChange('artificialLightExposureEnd', e.target.value)}
+                          placeholder="04:00"
+                        />
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
                 <div className="bg-indigo-50 border border-indigo-200 rounded-md p-3 text-sm space-y-1 dark:bg-indigo-900/10 dark:border-indigo-900/20">
@@ -923,7 +999,7 @@ export function MedicalProfileForm({ userId, onProfileSaved }: MedicalProfileFor
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="stressLevel">Nível de Estresse</Label>
                     <Select
@@ -951,22 +1027,6 @@ export function MedicalProfileForm({ userId, onProfileSaved }: MedicalProfileFor
                       onChange={(e) => handleInputChange('stressManagement', e.target.value)}
                       placeholder="Ex: Meditação, yoga, terapia..."
                     />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="morningSunlightExposure">Luz Solar Matinal</Label>
-                    <Select
-                      value={profile.morningSunlightExposure || ''}
-                      onValueChange={(value) => handleInputChange('morningSunlightExposure', value)}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="yes">Sim (primeiros 60min)</SelectItem>
-                        <SelectItem value="no">Não</SelectItem>
-                      </SelectContent>
-                    </Select>
                   </div>
                 </div>
 
@@ -1190,6 +1250,22 @@ export function MedicalProfileForm({ userId, onProfileSaved }: MedicalProfileFor
                     <p className="text-sm text-muted-foreground">
                       Alimentação balanceada é fundamental para energia, imunidade e prevenção de doenças
                     </p>
+                  </div>
+                </div>
+
+                <div>
+                  <Label htmlFor="dailyWaterIntake">Hidratação Diária</Label>
+                  <div className="flex items-center gap-2">
+                    <Input
+                      id="dailyWaterIntake"
+                      type="number"
+                      step="0.1"
+                      value={profile.dailyWaterIntake || ''}
+                      onChange={(e) => handleInputChange('dailyWaterIntake', parseFloat(e.target.value) || null)}
+                      placeholder="2.5"
+                      className="max-w-[140px]"
+                    />
+                    <span className="text-sm text-muted-foreground">L/dia</span>
                   </div>
                 </div>
 

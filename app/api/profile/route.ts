@@ -106,8 +106,14 @@ export async function POST(request: NextRequest) {
 
           // Lifestyle - Sleep
           sleepHours: body.sleepHours || null,
+          timeInBed: body.timeInBed || null,
           sleepQuality: body.sleepQuality || null,
+          sleepRegularity: body.sleepRegularity || null,
           sleepIssues: body.sleepIssues || null,
+          firstSunlightExposureTime: body.firstSunlightExposureTime || null,
+          lastMealTime: body.lastMealTime || null,
+          artificialLightExposureStart: body.artificialLightExposureStart || null,
+          artificialLightExposureEnd: body.artificialLightExposureEnd || null,
 
           // Lifestyle - Stress
           stressLevel: body.stressLevel || null,
@@ -118,14 +124,19 @@ export async function POST(request: NextRequest) {
           exerciseFrequency: body.exerciseFrequency || null,
           exerciseDuration: body.exerciseDuration || null,
           exerciseIntensity: body.exerciseIntensity || null,
+          exerciseActivities: body.exerciseActivities || null,
           physicalLimitations: body.physicalLimitations || null,
 
           // Functional Tests
           handgripStrength: body.handgripStrength || null,
           sitToStandTime: body.sitToStandTime || null,
+          co2ToleranceTest: body.co2ToleranceTest || null,
+          vo2Max: body.vo2Max || null,
+          bodyFatPercentage: body.bodyFatPercentage || null,
 
           // Nutrition
           currentDiet: body.currentDiet || null,
+          supplementation: body.supplementation || null,
           dailyWaterIntake: body.dailyWaterIntake || null,
 
           // Health
@@ -170,8 +181,14 @@ export async function POST(request: NextRequest) {
 
           // Lifestyle - Sleep
           sleepHours: body.sleepHours || null,
+          timeInBed: body.timeInBed || null,
           sleepQuality: body.sleepQuality || null,
+          sleepRegularity: body.sleepRegularity || null,
           sleepIssues: body.sleepIssues || null,
+          firstSunlightExposureTime: body.firstSunlightExposureTime || null,
+          lastMealTime: body.lastMealTime || null,
+          artificialLightExposureStart: body.artificialLightExposureStart || null,
+          artificialLightExposureEnd: body.artificialLightExposureEnd || null,
 
           // Lifestyle - Stress
           stressLevel: body.stressLevel || null,
@@ -182,14 +199,19 @@ export async function POST(request: NextRequest) {
           exerciseFrequency: body.exerciseFrequency || null,
           exerciseDuration: body.exerciseDuration || null,
           exerciseIntensity: body.exerciseIntensity || null,
+          exerciseActivities: body.exerciseActivities || null,
           physicalLimitations: body.physicalLimitations || null,
 
           // Functional Tests
           handgripStrength: body.handgripStrength || null,
           sitToStandTime: body.sitToStandTime || null,
+          co2ToleranceTest: body.co2ToleranceTest || null,
+          vo2Max: body.vo2Max || null,
+          bodyFatPercentage: body.bodyFatPercentage || null,
 
           // Nutrition
           currentDiet: body.currentDiet || null,
+          supplementation: body.supplementation || null,
           dailyWaterIntake: body.dailyWaterIntake || null,
 
           // Health
