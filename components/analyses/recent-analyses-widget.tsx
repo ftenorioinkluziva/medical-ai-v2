@@ -111,12 +111,36 @@ export function RecentAnalysesWidget({ limit = 5, onAnalysesLoad, patientId }: R
 
   const getAgentColor = (agentKey: string) => {
     const colors: Record<string, string> = {
-      integrative: 'bg-green-100 text-green-700',
-      endocrinology: 'bg-purple-100 text-purple-700',
-      nutrition: 'bg-orange-100 text-orange-700',
-      exercise: 'bg-blue-100 text-blue-700',
+      integrative: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400',
+      endocrinology: 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400',
+      nutrition: 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400',
+      exercise: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400',
     }
-    return colors[agentKey] || 'bg-accent text-foreground'
+    return colors[agentKey] || 'bg-gray-100 dark:bg-gray-900/30 text-gray-700 dark:text-gray-400'
+  }
+
+  const getAgentIcon = (agentKey: string) => {
+    const icons: Record<string, string> = {
+      integrative: '🧘',
+      endocrinology: '⚕️',
+      nutrition: '🥗',
+      exercise: '💪',
+    }
+    return icons[agentKey] || '🤖'
+  }
+
+  const getAnalysisPreview = (analysisText: string, maxLength: number = 80) => {
+    if (!analysisText) return 'Sem prévia disponível'
+    const preview = analysisText.replace(/[#*_\n]/g, ' ').trim()
+    return preview.length > maxLength
+      ? preview.substring(0, maxLength) + '...'
+      : preview
+  }
+
+  const formatProcessingTime = (ms: number | null) => {
+    if (!ms) return null
+    if (ms < 1000) return `${ms}ms`
+    return `${(ms / 1000).toFixed(1)}s`
   }
 
   return (
@@ -164,42 +188,74 @@ export function RecentAnalysesWidget({ limit = 5, onAnalysesLoad, patientId }: R
               </Link>
             </div>
           ) : (
-            <div className="space-y-3 max-h-[200px] overflow-y-auto overflow-x-hidden">
+            <div className="space-y-3 max-h-[320px] overflow-y-auto overflow-x-hidden">
               {analyses.map((analysis) => (
                 <div
                   key={analysis.id}
-                  onClick={() => handleViewAnalysis(analysis)}
-                  className="p-2.5 sm:p-3 rounded-lg border border-gray-200 hover:border-teal-300 hover:bg-teal-50/50 transition-colors dark:border-gray-700 dark:hover:bg-teal-900/30 cursor-pointer overflow-hidden group"
+                  className="p-3 rounded-lg border border-border hover:border-teal-300 hover:bg-teal-50/50 transition-all dark:hover:bg-teal-900/20 cursor-pointer group"
                 >
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="flex items-start gap-3 flex-1 min-w-0">
-                      <div className={`p-1.5 sm:p-2 rounded ${getAgentColor(analysis.agentKey)}`}>
-                        <Brain className="h-4 w-4" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1 min-w-0">
-                          <p className="text-sm font-medium text-foreground truncate group-hover:text-teal-700 transition-colors">
-                            {analysis.agentName}
-                          </p>
-                          {analysis.ragUsed && (
-                            <Badge variant="secondary" className="text-xs">
-                              RAG
-                            </Badge>
-                          )}
-                        </div>
-                        <p className="text-xs text-muted-foreground line-clamp-2 mb-2">
-                          {analysis.prompt}
-                        </p>
-                        <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                          <Calendar className="h-3 w-3" />
-                          <span>
-                            {format(new Date(analysis.createdAt), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
-                          </span>
-                        </div>
-                      </div>
+                  <div className="flex items-start gap-3">
+                    {/* Icon with agent color */}
+                    <div className={`p-2 rounded-lg shrink-0 text-xl ${getAgentColor(analysis.agentKey)}`}>
+                      {getAgentIcon(analysis.agentKey)}
                     </div>
-                    <div className="shrink-0 text-muted-foreground group-hover:text-teal-600 transition-colors">
-                      <Eye className="h-4 w-4" />
+
+                    {/* Content */}
+                    <div className="flex-1 min-w-0 space-y-1.5">
+                      {/* Title with badges */}
+                      <div className="flex items-start justify-between gap-2">
+                        <p
+                          className="text-sm font-semibold text-foreground truncate flex-1 leading-tight group-hover:text-teal-700 dark:group-hover:text-teal-400 transition-colors"
+                          onClick={() => handleViewAnalysis(analysis)}
+                        >
+                          {analysis.agentName}
+                        </p>
+                        {analysis.ragUsed && (
+                          <Badge variant="secondary" className="text-xs shrink-0">
+                            <Sparkles className="h-3 w-3 mr-1" />
+                            RAG
+                          </Badge>
+                        )}
+                      </div>
+
+                      {/* Analysis preview */}
+                      <div className="text-xs text-muted-foreground italic line-clamp-2 leading-relaxed">
+                        "{getAnalysisPreview(analysis.analysis)}"
+                      </div>
+
+                      {/* Metadata row */}
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground flex-wrap">
+                        <span className="flex items-center gap-1">
+                          <Calendar className="h-3 w-3" />
+                          {format(new Date(analysis.createdAt), "dd/MM HH:mm", { locale: ptBR })}
+                        </span>
+                        {formatProcessingTime(analysis.processingTimeMs) && (
+                          <>
+                            <span>•</span>
+                            <span>{formatProcessingTime(analysis.processingTimeMs)}</span>
+                          </>
+                        )}
+                        {analysis.tokensUsed && (
+                          <>
+                            <span>•</span>
+                            <span>{analysis.tokensUsed.toLocaleString()} tokens</span>
+                          </>
+                        )}
+                      </div>
+
+                      {/* Action button */}
+                      <div className="pt-1">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="h-7 text-xs gap-1.5 text-teal-600 hover:text-teal-700 hover:bg-teal-100 dark:hover:bg-teal-900/30"
+                          onClick={() => handleViewAnalysis(analysis)}
+                        >
+                          <Eye className="h-3 w-3" />
+                          Ver Completa
+                          <ArrowRight className="h-3 w-3" />
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 </div>

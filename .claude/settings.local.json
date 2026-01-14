@@ -73,7 +73,12 @@
       "Bash(pnpm db:check:*)",
       "Bash(del scriptstest-ref-resolution.mjs)",
       "Bash(pnpm exec dotenv:*)",
-      "Bash(del C:projetosmedical-ai-v2vercel.json)"
+      "Bash(del C:projetosmedical-ai-v2vercel.json)",
+      "Bash(\"C:\\\\projetos\\\\medical-ai-v2\\\\app\\\\api\\\\admin\\\\medical-knowledge\\\\biomarkers\\\\[slug]\\\\route.ts\")",
+      "Bash(pnpm drizzle-kit:*)",
+      "Bash(chmod:*)",
+      "Bash(python3:*)",
+      "Bash(python:*)"
     ],
     "deny": [],
     "ask": []

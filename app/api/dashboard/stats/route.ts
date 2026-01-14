@@ -134,11 +134,22 @@ export async function GET(request: NextRequest) {
       trends.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
     })
 
+    // Calculate last activity
+    const lastActivity = (() => {
+      const allActivities = [
+        ...recentDocuments.map(d => ({ date: d.createdAt, type: 'document' })),
+        ...recentAnalyses.map(a => ({ date: a.createdAt, type: 'analysis' }))
+      ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+
+      return allActivities[0] || null
+    })()
+
     const stats = {
       documentsCount: docsCount.count || 0,
       analysesCount: analysesCount.count || 0,
       agentsUsedCount: agentsUsed.length || 0,
       abnormalParametersCount: healthMetrics.length || 0,
+      lastActivity,
       recentDocuments,
       recentAnalyses,
       healthMetrics,

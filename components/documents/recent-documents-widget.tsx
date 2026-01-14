@@ -118,6 +118,39 @@ export function RecentDocumentsWidget({ limit = 5, onDocumentsLoad, patientId, u
     return types[type] || type
   }
 
+  const getDocumentTypeIcon = (type: string) => {
+    const icons: Record<string, string> = {
+      lab_report: '🧪',
+      bioimpedance: '⚡',
+      medical_report: '📋',
+      prescription: '💊',
+      imaging: '🔬',
+      other: '📄',
+    }
+    return icons[type] || '📄'
+  }
+
+  const getDocumentTypeColor = (type: string) => {
+    const colors: Record<string, string> = {
+      lab_report: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400',
+      bioimpedance: 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400',
+      medical_report: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400',
+      prescription: 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400',
+      imaging: 'bg-pink-100 dark:bg-pink-900/30 text-pink-700 dark:text-pink-400',
+      other: 'bg-gray-100 dark:bg-gray-900/30 text-gray-700 dark:text-gray-400',
+    }
+    return colors[type] || colors.other
+  }
+
+  const getParametersCount = (doc: Document) => {
+    if (!doc.structuredData?.modules) return 0
+    let count = 0
+    doc.structuredData.modules.forEach((module: any) => {
+      count += module.parameters?.length || 0
+    })
+    return count
+  }
+
   const handleViewDocument = (doc: Document) => {
     setSelectedDocument(doc)
     setIsModalOpen(true)
@@ -175,46 +208,74 @@ export function RecentDocumentsWidget({ limit = 5, onDocumentsLoad, patientId, u
             </p>
           </div>
         ) : (
-          <div className="space-y-2 max-h-[280px] overflow-y-auto overflow-x-hidden">
-            {documents.map((doc) => (
-              <div
-                key={doc.id}
-                onClick={() => handleViewDocument(doc)}
-                className="p-2.5 rounded-lg border border-border hover:border-teal-300 hover:bg-teal-50/50 transition-all dark:hover:bg-teal-900/30 cursor-pointer group"
-              >
-                <div className="flex items-start gap-2.5">
-                  <div className="p-1.5 rounded bg-teal-100 dark:bg-teal-900/30 shrink-0">
-                    <FileText className="h-3.5 w-3.5 text-teal-700 dark:text-teal-400" />
-                  </div>
-                  <div className="flex-1 min-w-0 space-y-1">
-                    {/* Title with status icon */}
-                    <div className="flex items-start gap-2">
-                      <p className="text-sm font-medium text-foreground truncate flex-1 leading-tight">
-                        {doc.fileName}
-                      </p>
-                      {getStatusIcon(doc.processingStatus)}
+          <div className="space-y-3 max-h-[320px] overflow-y-auto overflow-x-hidden">
+            {documents.map((doc) => {
+              const paramsCount = getParametersCount(doc)
+              return (
+                <div
+                  key={doc.id}
+                  className="p-3 rounded-lg border border-border hover:border-sky-300 hover:bg-sky-50/50 transition-all dark:hover:bg-sky-900/20 cursor-pointer group"
+                >
+                  <div className="flex items-start gap-3">
+                    {/* Icon with type color */}
+                    <div className={`p-2 rounded-lg shrink-0 text-xl ${getDocumentTypeColor(doc.documentType)}`}>
+                      {getDocumentTypeIcon(doc.documentType)}
                     </div>
 
-                    {/* Metadata - Stack on mobile */}
-                    <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 text-xs text-muted-foreground">
-                      <div className="flex items-center gap-1.5">
-                        <Badge variant="outline" className="text-xs py-0">
+                    {/* Content */}
+                    <div className="flex-1 min-w-0 space-y-1.5">
+                      {/* Title with status */}
+                      <div className="flex items-start justify-between gap-2">
+                        <p
+                          className="text-sm font-semibold text-foreground truncate flex-1 leading-tight group-hover:text-sky-700 dark:group-hover:text-sky-400 transition-colors"
+                          onClick={() => handleViewDocument(doc)}
+                        >
+                          {doc.fileName}
+                        </p>
+                        {getStatusIcon(doc.processingStatus)}
+                      </div>
+
+                      {/* Parameters info */}
+                      {paramsCount > 0 && (
+                        <div className="flex items-center gap-1.5 text-xs text-green-700 dark:text-green-400">
+                          <CheckCircle2 className="h-3 w-3" />
+                          <span className="font-medium">{paramsCount} parâmetros extraídos</span>
+                        </div>
+                      )}
+
+                      {/* Metadata row */}
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                        <Badge variant="outline" className="text-xs">
                           {getDocumentTypeLabel(doc.documentType)}
                         </Badge>
-                        <span className="text-xs">{formatFileSize(doc.fileSize)}</span>
-                      </div>
-                      <span className="hidden sm:inline text-xs">•</span>
-                      <div className="flex items-center gap-1">
-                        <Calendar className="h-3 w-3 shrink-0" />
-                        <span className="truncate text-xs">
-                          {format(new Date(doc.createdAt), "dd/MM/yy HH:mm", { locale: ptBR })}
+                        <span>•</span>
+                        <span>{formatFileSize(doc.fileSize)}</span>
+                        <span>•</span>
+                        <span className="truncate">
+                          {format(new Date(doc.createdAt), "dd/MM HH:mm", { locale: ptBR })}
                         </span>
+                      </div>
+
+                      {/* Action button */}
+                      <div className="pt-1">
+                        <Link href={`/analyze?documentId=${doc.id}`}>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="h-7 text-xs gap-1.5 text-sky-600 hover:text-sky-700 hover:bg-sky-100 dark:hover:bg-sky-900/30"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <Eye className="h-3 w-3" />
+                            Analisar
+                            <ArrowRight className="h-3 w-3" />
+                          </Button>
+                        </Link>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              )
+            })}
 
             {/* View All Link */}
             <div className="pt-2">
