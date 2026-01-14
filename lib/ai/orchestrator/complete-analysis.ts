@@ -12,6 +12,7 @@ import { generateAllProducts } from '@/lib/ai/products/dynamic-orchestrator'
 import { buildKnowledgeContext } from '@/lib/ai/knowledge'
 import { getKnowledgeConfig } from '@/lib/db/settings'
 import { debitCredits, calculateCreditsFromTokens } from '@/lib/billing/credits'
+import type { StructuredMedicalDocument } from '@/lib/documents/structuring'
 
 /**
  * Run complete multi-agent analysis workflow
@@ -30,11 +31,15 @@ export async function runCompleteAnalysis(
       userId,
       documentIds,
       status: 'pending',
-      synthesis: null as any,
+      synthesis: null,
     })
     .returning()
 
-  console.log(`📝 [COMPLETE-ANALYSIS] Created record: ${analysisRecord.id}`)
+  console.log(`📝 [COMPLETE-ANALYSIS] Created record: ${analysisRecord?.id}`)
+
+  if (!analysisRecord) {
+    throw new Error('Failed to create analysis record')
+  }
 
   try {
     // 2. Validar e filtrar documentIds
@@ -98,9 +103,10 @@ export async function runCompleteAnalysis(
         console.log(`  Document ${idx + 1}: ${doc.name}, structuredData: ${doc.structuredData ? 'present' : 'null'}`)
         return doc.structuredData
       })
-      .filter((sd): sd is any => {
+      .filter((sd): sd is StructuredMedicalDocument => {
         if (!sd || typeof sd !== 'object') return false
-        return 'modules' in sd && Array.isArray((sd as any).modules)
+        const candidate = sd as Partial<StructuredMedicalDocument>
+        return 'modules' in candidate && Array.isArray(candidate.modules)
       })
 
     console.log(`🧠 [COMPLETE-ANALYSIS] Structured documents for Logical Brain: ${structuredDocuments.length}`)
@@ -143,12 +149,11 @@ export async function runCompleteAnalysis(
         profileParts.push(`**Alergias:** ${profile.allergies.join(', ')}`)
       }
 
-      if (profile.exerciseIntensity) {
-        profileParts.push(`**Intensidade de Exercício:** ${profile.exerciseIntensity}`)
-      }
-
-      if (profile.exerciseFrequency) {
-        profileParts.push(`**Frequência de Exercício:** ${profile.exerciseFrequency}x por semana`)
+      if (profile.exerciseActivities && Array.isArray(profile.exerciseActivities) && profile.exerciseActivities.length > 0) {
+        const activities = profile.exerciseActivities.map((a: { type: string; frequency: number; duration: number; intensity: string }) =>
+          `${a.type} (${a.frequency}x/sem, ${a.duration}min, ${a.intensity})`
+        ).join(', ')
+        profileParts.push(`**Atividades Físicas:** ${activities}`)
       }
 
       if (profile.currentDiet) {
@@ -221,7 +226,7 @@ export async function runCompleteAnalysis(
       .set({ status: 'analyzing_foundation' })
       .where(eq(completeAnalyses.id, analysisRecord.id))
 
-    const foundationAnalyses = []
+    const foundationAnalyses: (typeof analyses.$inferSelect & { agentName: string; agentKey: string })[] = []
 
     // Run foundation agents sequentially (in case there are multiple)
     for (const foundationAgent of foundationAgents) {
@@ -288,19 +293,20 @@ ${foundationKnowledge ? `## Base de Conhecimento Médico (Referências)\n${found
         .values({
           userId,
           agentId: foundationAgent.id,
-          documentId: docs[0].id,
           documentIds: docs.map(d => d.id),
           prompt: foundationPromptUsed,
           medicalProfileSnapshot: profile || null,
           analysis: foundationAnalysisResult.analysis,
-          insights: foundationAnalysisResult.insights as any,
-          actionItems: foundationAnalysisResult.actionItems as any,
+          insights: foundationAnalysisResult.insights as unknown as string[],
+          actionItems: foundationAnalysisResult.actionItems as unknown as string[],
           modelUsed: foundationAnalysisResult.model,
           tokensUsed: foundationAnalysisResult.usage?.totalTokens || null,
           processingTimeMs: foundationAnalysisResult.metadata?.processingTimeMs || null,
           ragUsed: !!foundationKnowledge,
         })
         .returning()
+
+      if (!savedFoundation) throw new Error('Failed to save foundation analysis')
 
       console.log(`✅ [COMPLETE-ANALYSIS] ${foundationAgent.name} analysis saved: ${savedFoundation.id}`)
 
@@ -312,8 +318,8 @@ ${foundationKnowledge ? `## Base de Conhecimento Médico (Referências)\n${found
             analysisId: savedFoundation.id,
             operation: `complete_analysis_foundation_${foundationAgent.agentKey}`,
             modelName: foundationAgent.modelName || 'gemini-2.5-flash',
-            promptTokens: foundationAnalysisResult.usage?.promptTokens || 0,
-            completionTokens: foundationAnalysisResult.usage?.completionTokens || 0,
+            promptTokens: (foundationAnalysisResult.usage as { promptTokens?: number })?.promptTokens || 0,
+            completionTokens: (foundationAnalysisResult.usage as { completionTokens?: number })?.completionTokens || 0,
           })
           console.log(`💰 [COMPLETE-ANALYSIS] Debited ${calculateCreditsFromTokens(tokensUsed)} credits for ${foundationAgent.name} analysis`)
         }
@@ -321,7 +327,11 @@ ${foundationKnowledge ? `## Base de Conhecimento Médico (Referências)\n${found
         console.error('⚠️ [COMPLETE-ANALYSIS] Failed to debit credits:', creditError)
       }
 
-      foundationAnalyses.push(savedFoundation)
+      foundationAnalyses.push({
+        ...savedFoundation,
+        agentName: foundationAgent.name,
+        agentKey: foundationAgent.agentKey
+      })
     }
 
     // ================================================================
@@ -359,7 +369,7 @@ ${foundationKnowledge ? `## Base de Conhecimento Médico (Referências)\n${found
 
     specializedKnowledgeResults.forEach((knowledge, idx) => {
       if (knowledge) {
-        console.log(`✅ [COMPLETE-ANALYSIS] Found ${specializedAgents[idx].name} knowledge: ${knowledge.length} chars`)
+        console.log(`✅ [COMPLETE-ANALYSIS] Found ${specializedAgents[idx]?.name} knowledge: ${knowledge.length} chars`)
       }
     })
 
@@ -448,20 +458,23 @@ ${agentKnowledge ? `## Base de Conhecimento Médico (Referências)\n${agentKnowl
         .values({
           userId,
           agentId: agent.id,
-          documentId: docs[0].id,
+          // documentId removed
           documentIds: docs.map(d => d.id),
           prompt: promptUsed,
           medicalProfileSnapshot: profile || null,
           analysis: analysisResult.analysis,
-          insights: analysisResult.insights as any,
-          actionItems: analysisResult.actionItems as any,
+          insights: analysisResult.insights as unknown as string[],
+          actionItems: analysisResult.actionItems as unknown as string[],
           modelUsed: analysisResult.model,
           tokensUsed: analysisResult.usage?.totalTokens || null,
           processingTimeMs: analysisResult.metadata?.processingTimeMs || null,
           ragUsed: !!agentKnowledge,
         })
         .returning()
-        .then(r => ({ savedAnalysis: r[0], agent, analysisResult }))
+        .then(r => {
+          if (!r[0]) throw new Error(`Failed to save analysis for agent ${agent.name}`)
+          return { savedAnalysis: r[0], agent, analysisResult }
+        })
     })
 
     const savedSpecializedAnalyses = await Promise.all(savedSpecializedPromises)
@@ -481,8 +494,8 @@ ${agentKnowledge ? `## Base de Conhecimento Médico (Referências)\n${agentKnowl
               analysisId: savedAnalysis.id,
               operation: `complete_analysis_${agent.agentKey}`,
               modelName: agent.modelName || 'gemini-2.5-flash',
-              promptTokens: analysisResult.usage?.promptTokens || 0,
-              completionTokens: analysisResult.usage?.completionTokens || 0,
+              promptTokens: (analysisResult.usage as { promptTokens?: number })?.promptTokens || 0,
+              completionTokens: (analysisResult.usage as { completionTokens?: number })?.completionTokens || 0,
             })
             console.log(`💰 [COMPLETE-ANALYSIS] Debited ${calculateCreditsFromTokens(tokens)} credits for ${agent.name} analysis`)
           }
@@ -663,7 +676,12 @@ ${synthesis.mainRecommendations.map(r => `- ${r}`).join('\n')}
       .update(completeAnalyses)
       .set({
         analysisIds: allAnalysisIds,
-        synthesis: synthesis as any,
+        synthesis: synthesis as unknown as {
+          executiveSummary: string
+          keyFindings: string[]
+          criticalAlerts: string[]
+          mainRecommendations: string[]
+        },
         recommendationsId: recommendations?.id || null,
         weeklyPlanId: weeklyPlan?.id || null,
         status: 'completed',

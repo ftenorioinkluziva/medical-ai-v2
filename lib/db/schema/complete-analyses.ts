@@ -37,7 +37,7 @@ export const completeAnalyses = pgTable('complete_analyses', {
 
   // Workflow status
   status: text('status')
-    .$type<'pending' | 'analyzing_integrative' | 'analyzing_specialized' | 'generating_synthesis' | 'generating_products' | 'completed' | 'failed'>()
+    .$type<'pending' | 'analyzing_foundation' | 'analyzing_integrative' | 'analyzing_specialized' | 'generating_synthesis' | 'generating_products' | 'completed' | 'failed'>()
     .notNull()
     .default('pending'),
 
