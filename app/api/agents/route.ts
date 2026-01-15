@@ -24,8 +24,9 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const completeAnalysisOnly = searchParams.get('completeAnalysisOnly') === 'true'
     const type = searchParams.get('type') as 'analysis' | 'product_generator' | null
+    const analysisRole = searchParams.get('analysisRole') as 'foundation' | 'specialized' | 'none' | null
 
-    console.log(`🔧 [AGENTS-API] Fetching active agents (completeAnalysisOnly: ${completeAnalysisOnly}, type: ${type || 'all'})`)
+    console.log(`🔧 [AGENTS-API] Fetching active agents (completeAnalysisOnly: ${completeAnalysisOnly}, type: ${type || 'all'}, analysisRole: ${analysisRole || 'all'})`)
 
     // Build where conditions
     const conditions = [eq(healthAgents.isActive, true)]
@@ -33,6 +34,11 @@ export async function GET(request: NextRequest) {
     // Filter by agentType if specified
     if (type) {
       conditions.push(eq(healthAgents.agentType, type))
+    }
+
+    // Filter by analysisRole if specified
+    if (analysisRole) {
+      conditions.push(eq(healthAgents.analysisRole, analysisRole))
     }
 
     // Get all active agents

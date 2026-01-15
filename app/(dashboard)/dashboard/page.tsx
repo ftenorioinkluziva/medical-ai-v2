@@ -155,7 +155,7 @@ export default function DashboardPage() {
         </Card>
 
         <Card className="hover:shadow-lg hover:border-purple-400 transition-all cursor-pointer group border-purple-200 dark:border-purple-900">
-          <Link href="/analyses/new">
+          <Link href="/analyze">
             <CardHeader>
               <div className="flex items-center gap-3">
                 <div className="p-2 rounded-lg bg-purple-100 dark:bg-purple-900 group-hover:bg-purple-200 dark:group-hover:bg-purple-800 transition-colors">

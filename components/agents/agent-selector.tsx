@@ -44,22 +44,27 @@ const ICON_EMOJI: Record<string, string> = {
 export function AgentSelector({
   onSelectAgent,
   selectedAgentId,
+  analysisRole,
 }: {
   onSelectAgent: (agent: HealthAgent) => void
   selectedAgentId?: string
+  analysisRole?: 'foundation' | 'specialized' | 'none'
 }) {
   const [agents, setAgents] = useState<HealthAgent[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     fetchAgents()
-  }, [])
+  }, [analysisRole])
 
   const fetchAgents = async () => {
     setIsLoading(true)
     try {
-      // Fetch only analysis agents (not product generators)
-      const response = await fetch('/api/agents?type=analysis')
+      const params = new URLSearchParams({ type: 'analysis' })
+      if (analysisRole) {
+        params.set('analysisRole', analysisRole)
+      }
+      const response = await fetch(`/api/agents?${params.toString()}`)
       const data = await response.json()
 
       if (data.success) {

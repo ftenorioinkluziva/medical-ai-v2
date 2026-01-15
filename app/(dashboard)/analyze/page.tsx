@@ -96,10 +96,11 @@ export default function AnalyzePage() {
 
         {/* New Analysis Tab */}
         <TabsContent value="new" className="space-y-6 mt-6">
-          {/* Agent Selector */}
+          {/* Agent Selector - Only foundation agents */}
           <AgentSelector
             selectedAgentId={selectedAgent?.id}
             onSelectAgent={(agent) => setSelectedAgent(agent)}
+            analysisRole="foundation"
           />
 
           {/* Analysis Interface */}
