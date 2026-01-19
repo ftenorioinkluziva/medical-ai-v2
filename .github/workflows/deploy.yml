@@ -19,11 +19,6 @@ jobs:
           script: |
             cd /root/medical-ai
 
-            git reset --hard
-            git pull origin main
+            git pull 
 
-            export DOCKER_BUILDKIT=1
-            export COMPOSE_DOCKER_CLI_BUILD=1
-            docker compose build
-            docker compose up -d
-            docker image prune -f
+            docker compose build --no-cache

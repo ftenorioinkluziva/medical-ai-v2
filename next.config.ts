@@ -1,12 +1,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
   reactCompiler: true,
+  output: 'standalone',
 
-  // Production optimizations
   experimental: {
-    // Ensure server actions are properly handled
     serverActions: {
       bodySizeLimit: '2mb',
     },
