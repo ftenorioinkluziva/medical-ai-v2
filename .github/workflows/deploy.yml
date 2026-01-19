@@ -17,13 +17,13 @@ jobs:
           port: 22
           command_timeout: 30m
           script: |
-            # --- MUDAR APENAS ESTA LINHA ABAIXO ---
             cd /root/medical-ai
-            # --------------------------------------
-            
+
             git reset --hard
             git pull origin main
-            
-            docker compose build --no-cache
+
+            export DOCKER_BUILDKIT=1
+            export COMPOSE_DOCKER_CLI_BUILD=1
+            docker compose build
             docker compose up -d
             docker image prune -f
