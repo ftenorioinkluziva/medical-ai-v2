@@ -20,6 +20,4 @@ jobs:
             cd /root/medical-ai
 
             git pull 
-
-            
-            docker compose up -d --force-recreate
+            docker compose up -d --build
