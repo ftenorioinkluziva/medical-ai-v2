@@ -19,6 +19,11 @@ export interface AnalyzeWithAgentOptions {
   documentIds?: string[]
   instruction?: string
   enableValidation?: boolean
+  cachedLogicalAnalysis?: {
+    context: string
+    availableParameters: string[]
+    parametersContext: string
+  }
 }
 
 /**
@@ -39,6 +44,7 @@ export async function analyzeWithAgent(
     documentIds = [],
     instruction = '',
     enableValidation = true,
+    cachedLogicalAnalysis,
   } = options
 
   console.log(`🤖 [AGENT] Starting analysis with: ${agent.name}`)
@@ -46,28 +52,33 @@ export async function analyzeWithAgent(
   console.log(`🔍 [AGENT] Validation enabled: ${enableValidation}`)
 
   if (previousAnalysesContext) {
-    // Count number of previous analyses included
     const analysisCount = (previousAnalysesContext.match(/## Análise Prévia:/g) || []).length
     console.log(`📋 [AGENT] Including ${analysisCount} previous analysis/analyses from other specialists`)
   }
 
-  // Extract available parameters for validation
   let parametersContext = ''
   let availableParameters: string[] = []
-
-  if (structuredDocuments.length > 0 && enableValidation) {
-    parametersContext = buildParametersContext(structuredDocuments)
-    const extracted = extractAvailableParameters(structuredDocuments)
-    availableParameters = extracted.allParameters
-
-    console.log(`✅ [AGENT] Extracted ${availableParameters.length} available parameters for validation`)
-    console.log(`   First 10:`, availableParameters.slice(0, 10).join(', '), '...')
-  }
-
-  // ========== CÉREBRO LÓGICO (LOGICAL BRAIN) ==========
   let logicalContext = ''
 
-  if (structuredDocuments.length > 0) {
+  // ========== USE CACHED LOGICAL ANALYSIS IF PROVIDED ==========
+  if (cachedLogicalAnalysis) {
+    console.log(`⚡ [AGENT] Using cached Logical Brain analysis`)
+    logicalContext = cachedLogicalAnalysis.context
+    parametersContext = cachedLogicalAnalysis.parametersContext
+    availableParameters = cachedLogicalAnalysis.availableParameters
+    console.log(`   - Parameters: ${availableParameters.length}`)
+  } else if (structuredDocuments.length > 0) {
+    // Extract available parameters for validation
+    if (enableValidation) {
+      parametersContext = buildParametersContext(structuredDocuments)
+      const extracted = extractAvailableParameters(structuredDocuments)
+      availableParameters = extracted.allParameters
+
+      console.log(`✅ [AGENT] Extracted ${availableParameters.length} available parameters for validation`)
+      console.log(`   First 10:`, availableParameters.slice(0, 10).join(', '), '...')
+    }
+
+    // ========== CÉREBRO LÓGICO (LOGICAL BRAIN) ==========
     console.log(`🧠 [LOGICAL-BRAIN] Running deterministic analysis on ${structuredDocuments.length} documents...`)
 
     try {
@@ -86,7 +97,6 @@ export async function analyzeWithAgent(
       }
     } catch (error) {
       console.error('❌ [LOGICAL-BRAIN] Error during logical analysis:', error)
-      // Continue without logical analysis - don't block the agent
     }
   }
 

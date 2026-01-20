@@ -114,6 +114,25 @@ const BIOMARKER_NAME_MAP: Record<string, string[]> = {
   // Others
   albumina: ['albumina', 'albumin'],
   proteina_total: ['proteina total', 'total protein'],
+
+  // Body Composition (Bioimpedance)
+  peso_corporal: ['peso', 'peso corporal', 'weight', 'body weight'],
+  massa_muscular_esqueletica: ['massa muscular esqueletica', 'massa muscular', 'skeletal muscle mass', 'smm'],
+  massa_gordura: ['massa de gordura', 'massa gorda', 'fat mass', 'body fat mass'],
+  percentual_gordura: ['pgc', 'percentual de gordura corporal', 'body fat percentage', '%gc'],
+  imc: ['imc', 'indice de massa corporal', 'bmi', 'body mass index'],
+  agua_corporal: ['agua corporal total', 'agua corporal', 'total body water', 'tbw'],
+  proteina_corporal: ['proteina corporal', 'body protein'],
+  minerais_corporais: ['minerais', 'minerais corporais', 'minerals', 'body minerals'],
+  gordura_visceral: ['nivel de gordura visceral', 'gordura visceral', 'visceral fat level', 'vfl'],
+  taxa_metabolica_basal: ['taxa metabolica basal', 'tmb', 'basal metabolic rate', 'bmr'],
+  relacao_cintura_quadril: ['relacao cintura-quadril', 'relacao cintura quadril', 'rcq', 'waist-hip ratio', 'whr'],
+  pontuacao_inbody: ['pontuacao inbody', 'inbody score'],
+  grau_obesidade: ['grau de obesidade', 'obesity degree'],
+  peso_ideal: ['peso ideal', 'ideal weight'],
+  controle_peso: ['controle de peso', 'weight control'],
+  controle_gordura: ['controle de gordura', 'fat control'],
+  controle_muscular: ['controle muscular', 'muscle control'],
 }
 
 /**

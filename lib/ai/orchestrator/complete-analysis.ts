@@ -13,6 +13,8 @@ import { buildKnowledgeContext } from '@/lib/ai/knowledge'
 import { getKnowledgeConfig } from '@/lib/db/settings'
 import { debitCredits, calculateCreditsFromTokens } from '@/lib/billing/credits'
 import type { StructuredMedicalDocument } from '@/lib/documents/structuring'
+import { runLogicalAnalysis, formatLogicalAnalysisForPrompt } from '@/lib/logic'
+import { buildParametersContext, extractAvailableParameters } from '@/lib/ai/synthesis/parameter-extractor'
 
 /**
  * Run complete multi-agent analysis workflow
@@ -110,6 +112,41 @@ export async function runCompleteAnalysis(
       })
 
     console.log(`🧠 [COMPLETE-ANALYSIS] Structured documents for Logical Brain: ${structuredDocuments.length}`)
+
+    // ================================================================
+    // RUN LOGICAL BRAIN ONCE (cached for all agents)
+    // ================================================================
+    let cachedLogicalAnalysis: {
+      context: string
+      availableParameters: string[]
+      parametersContext: string
+    } | undefined
+
+    if (structuredDocuments.length > 0) {
+      console.log(`🧠 [COMPLETE-ANALYSIS] Running Logical Brain analysis ONCE for all agents...`)
+      try {
+        const logicalAnalysis = await runLogicalAnalysis(structuredDocuments, validDocumentIds)
+
+        if (logicalAnalysis.biomarkers.length > 0) {
+          const context = formatLogicalAnalysisForPrompt(logicalAnalysis)
+          const parametersContext = buildParametersContext(structuredDocuments)
+          const extracted = extractAvailableParameters(structuredDocuments)
+
+          cachedLogicalAnalysis = {
+            context,
+            availableParameters: extracted.allParameters,
+            parametersContext,
+          }
+
+          console.log(`✅ [COMPLETE-ANALYSIS] Logical Brain cached:`)
+          console.log(`   - Biomarkers: ${logicalAnalysis.biomarkers.length}`)
+          console.log(`   - Parameters: ${extracted.allParameters.length}`)
+          console.log(`   - Protocols: ${logicalAnalysis.protocols.length}`)
+        }
+      } catch (error) {
+        console.error('❌ [COMPLETE-ANALYSIS] Logical Brain error:', error)
+      }
+    }
 
     // Concatenar texto extraído dos documentos
     const documentsContext = docs
@@ -256,11 +293,12 @@ export async function runCompleteAnalysis(
         foundationAgent,
         foundationAgent.analysisPrompt,
         {
-          documentsContext: '',  // ❌ REMOVIDO temporariamente - Gemini estava alucinando mesmo sem RAG
+          documentsContext: '',
           medicalProfileContext,
           knowledgeContext: foundationKnowledge,
           structuredDocuments: structuredDocuments || [],
           documentIds: docs.map(d => d.id),
+          cachedLogicalAnalysis,
           instruction: `Esta é a ANÁLISE FUNDACIONAL que será usada por outros especialistas.
 
 ⚠️ REGRA CRÍTICA: Analise APENAS os dados e parâmetros que estão EFETIVAMENTE DISPONÍVEIS nos documentos.
@@ -421,11 +459,12 @@ Agora, analise os documentos sob sua perspectiva especializada.`
         agent,
         agent.analysisPrompt,
         {
-          documentsContext: '',  // Using Logical Brain only
+          documentsContext: '',
           medicalProfileContext,
           knowledgeContext: agentKnowledge,
           structuredDocuments: structuredDocuments || [],
           documentIds: docs.map(d => d.id),
+          cachedLogicalAnalysis,
           instruction,
         }
       ).then(analysisResult => ({

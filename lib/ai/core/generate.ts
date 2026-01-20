@@ -293,6 +293,41 @@ export async function generateStructuredMedicalAnalysis(
     maxTokens: optimalMaxTokens,
     topP,
     topK,
+    experimental_repairText: async ({ text, error }) => {
+      console.log(`🔧 [AI-STRUCTURED] Attempting to repair malformed output...`)
+      console.log(`❌ [AI-STRUCTURED] Original error: ${error.message}`)
+
+      const repairResult = await generateText({
+        model: getGoogleModel(model),
+        messages: [
+          {
+            role: 'system',
+            content: `You are a JSON repair assistant. Fix the malformed JSON to match the required schema.
+
+The JSON must have exactly these fields:
+- "analysis": string (medical analysis in markdown)
+- "insights": array of 3-7 strings (key clinical insights)
+- "actionItems": array of 3-7 strings (actionable recommendations)
+
+Rules:
+- Keep only valid insights in the insights array (remove any misplaced actionItems)
+- Keep only valid actionItems in the actionItems array
+- Ensure arrays have between 3-7 items (truncate if needed, keeping the most important)
+- Fix any JSON syntax errors
+- Return ONLY the fixed JSON, no explanations`
+          },
+          {
+            role: 'user',
+            content: `Fix this malformed JSON:\n\n${text}\n\nError: ${error.message}`
+          }
+        ],
+        temperature: 0.1,
+        maxTokens: optimalMaxTokens,
+      })
+
+      console.log(`✅ [AI-STRUCTURED] Repair attempt completed`)
+      return repairResult.text
+    },
     ...(useThinkingMode && {
       experimental_providerMetadata: {
         google: {

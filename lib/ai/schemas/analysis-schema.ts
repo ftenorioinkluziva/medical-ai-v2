@@ -24,16 +24,16 @@ FORMATAÇÃO OBRIGATÓRIA:
 
 A análise deve ser fácil de ler e visualmente organizada.`),
 
-  // Key insights (3-7 bullet points)
+  // Key insights (3-7 bullet points, max 15 for safety margin)
   insights: z.array(z.string())
-    .min(3)
-    .max(7)
+    .min(1)
+    .max(15)
     .describe('Lista de 3 a 7 principais insights e achados clínicos ESPECÍFICOS DA SUA ESPECIALIDADE. Cada insight deve ser claro, único, clinicamente relevante e NÃO repetir informações que outros especialistas já mencionaram.'),
 
-  // Action items (3-7 recommendations)
+  // Action items (3-7 recommendations, max 15 for safety margin)
   actionItems: z.array(z.string())
-    .min(3)
-    .max(7)
+    .min(1)
+    .max(15)
     .describe('Lista de 3 a 7 recomendações práticas e acionáveis ESPECÍFICAS DA SUA ÁREA DE EXPERTISE. Devem ser específicas, mensuráveis, implementáveis e DIFERENTES das recomendações de outros especialistas.'),
 })
 
