@@ -17,7 +17,20 @@ jobs:
           port: 22
           command_timeout: 30m
           script: |
+            set -e
+
             cd /root/medical-ai
 
-            git pull 
-            docker compose up -d --build
+            # Ensure clean state before pulling
+            git fetch origin main
+            git reset --hard origin/main
+
+            # Ensure BuildKit is enabled for Docker cache mounts
+            export DOCKER_BUILDKIT=1
+            export COMPOSE_DOCKER_CLI_BUILD=1
+
+            # Build and deploy
+            docker compose up -d --build --force-recreate
+
+            # Clean up old images
+            docker image prune -f

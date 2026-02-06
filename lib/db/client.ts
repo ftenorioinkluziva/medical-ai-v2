@@ -4,25 +4,45 @@ import * as schema from './schema'
 
 // Next.js automatically loads .env.local - no need for dotenv in Edge Runtime
 
-if (!process.env.DATABASE_URL) {
-  throw new Error('DATABASE_URL environment variable is not set')
+// Lazy initialization to avoid throwing during Next.js build page data collection
+let _pool: Pool | null = null
+let _db: ReturnType<typeof drizzle<typeof schema>> | null = null
+
+function getPool() {
+  if (!_pool) {
+    if (!process.env.DATABASE_URL) {
+      throw new Error('DATABASE_URL environment variable is not set')
+    }
+    _pool = new Pool({
+      connectionString: process.env.DATABASE_URL,
+      max: 20,
+      idleTimeoutMillis: 30000,
+      connectionTimeoutMillis: 20000,
+      statement_timeout: 60000,
+      keepAlive: true,
+      keepAliveInitialDelayMillis: 10000,
+      ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : undefined,
+    })
+  }
+  return _pool
 }
 
-// Create PostgreSQL connection pool
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  max: 20, // Maximum number of clients in the pool
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 20000, // 20 seconds for remote databases (increased for production stability)
-  statement_timeout: 60000, // 60 seconds for query execution (increased for complex queries)
-  keepAlive: true,
-  keepAliveInitialDelayMillis: 10000,
-  // Additional production settings
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : undefined,
+function getDb() {
+  if (!_db) {
+    _db = drizzle(getPool(), { schema })
+  }
+  return _db
+}
+
+// Export proxied instances that initialize lazily
+export const pool = new Proxy({} as Pool, {
+  get(target, prop) {
+    return (getPool() as any)[prop]
+  },
 })
 
-// Create Drizzle ORM instance
-export const db = drizzle(pool, { schema })
-
-// Export pool for raw queries if needed
-export { pool }
+export const db = new Proxy({} as ReturnType<typeof drizzle<typeof schema>>, {
+  get(target, prop) {
+    return (getDb() as any)[prop]
+  },
+})

@@ -38,7 +38,7 @@ ENV NODE_OPTIONS="--max-old-space-size=4096"
 ENV NEXT_TELEMETRY_DISABLED=1
 
 RUN --mount=type=cache,id=nextjs,target=/app/.next/cache \
-    corepack enable pnpm && pnpm run build
+    corepack enable pnpm && pnpm run build -- --webpack
 
 FROM base AS runner
 WORKDIR /app

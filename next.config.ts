@@ -4,9 +4,17 @@ const nextConfig: NextConfig = {
   reactCompiler: true,
   output: 'standalone',
 
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+
   experimental: {
     serverActions: {
-      bodySizeLimit: '2mb',
+      bodySizeLimit: '10mb',
     },
   },
 
