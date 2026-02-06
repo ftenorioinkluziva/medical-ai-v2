@@ -78,7 +78,9 @@
       "Bash(pnpm drizzle-kit:*)",
       "Bash(chmod:*)",
       "Bash(python3:*)",
-      "Bash(python:*)"
+      "Bash(python:*)",
+      "Bash(Get-Content \"C:\\\\projetos\\\\medical-ai-v2\\\\lib\\\\db\\\\migrations\\\\*.sql\")",
+      "Bash(Select-String -Pattern \"medical_profiles\" -Context 0,1)"
     ],
     "deny": [],
     "ask": []

@@ -60,7 +60,7 @@ export async function generateEmbedding(
       console.log(`⚡ [EMBEDDINGS] Cache hit for ${provider} embedding`)
       return {
         embedding: cached.embedding,
-        model: provider === 'google' ? 'text-embedding-004' : 'text-embedding-3-small',
+        model: provider === 'google' ? 'gemini-embedding-001' : 'text-embedding-3-small',
         provider: provider as 'google' | 'openai',
         dimensions: cached.embedding.length,
         usage: { tokens: 0 },
@@ -86,7 +86,7 @@ export async function generateEmbedding(
 
       return {
         embedding: result.embedding,
-        model: 'text-embedding-004',
+        model: 'gemini-embedding-001',
         provider: 'google' as const,
         dimensions: result.embedding.length,
         usage: result.usage,
@@ -144,7 +144,7 @@ export async function generateBatchEmbeddings(
 
   return {
     embeddings: result.embeddings,
-    model: provider === 'google' ? 'text-embedding-004' : 'text-embedding-3-small',
+    model: provider === 'google' ? 'gemini-embedding-001' : 'text-embedding-3-small',
     provider,
     usage: result.usage,
   }

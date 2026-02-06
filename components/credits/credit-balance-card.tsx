@@ -1,32 +1,16 @@
 'use client'
 
-import { useEffect, useState } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { CreditCard, AlertCircle } from 'lucide-react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
+import { useCredits } from '@/hooks/use-credits'
+import Link from 'next/link'
 
 export function CreditBalanceCard() {
-  const [balance, setBalance] = useState<number | null>(null)
-  const [loading, setLoading] = useState(true)
+  const { balance, loading } = useCredits()
 
-  useEffect(() => {
-    fetchBalance()
-  }, [])
-
-  async function fetchBalance() {
-    try {
-      const res = await fetch('/api/credits/balance')
-      const data = await res.json()
-      setBalance(data.balance)
-    } catch (error) {
-      console.error('Failed to fetch balance:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  if (loading) {
+  if (loading && balance === null) {
     return (
       <Card>
         <CardHeader>
@@ -63,7 +47,7 @@ export function CreditBalanceCard() {
         )}
 
         <Button className="w-full" asChild>
-          <a href="/dashboard/credits">Adicionar Créditos</a>
+          <Link href="/dashboard/credits">Adicionar Créditos</Link>
         </Button>
       </CardContent>
     </Card>

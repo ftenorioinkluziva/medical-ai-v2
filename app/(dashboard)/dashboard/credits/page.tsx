@@ -6,7 +6,6 @@
  */
 
 import { useEffect, useState } from 'react'
-import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -23,8 +22,9 @@ import {
   Info,
 } from 'lucide-react'
 
-interface CreditBalance {
-  balance: number
+import { useCredits } from '@/hooks/use-credits'
+
+interface CreditBalanceStats {
   totalPurchased: number
   totalUsed: number
 }
@@ -38,10 +38,10 @@ interface Package {
 }
 
 export default function CreditsPage() {
-  const { data: session } = useSession()
-  const [balance, setBalance] = useState<CreditBalance | null>(null)
+  const { balance: contextBalance, loading: creditsLoading } = useCredits()
+  const [balanceStats, setBalanceStats] = useState<CreditBalanceStats | null>(null)
   const [packages, setPackages] = useState<Package[]>([])
-  const [loading, setLoading] = useState(true)
+  const [loadingData, setLoadingData] = useState(true)
   const [purchasing, setPurchasing] = useState<string | null>(null)
 
   useEffect(() => {
@@ -50,15 +50,17 @@ export default function CreditsPage() {
 
   async function loadData() {
     try {
-      setLoading(true)
+      setLoadingData(true)
       const [balanceRes, packagesRes] = await Promise.all([
         fetch('/api/credits/balance'),
         fetch('/api/credits/packages'),
       ])
 
       if (balanceRes.ok) {
+        // We only really need totalPurchased and totalUsed from here
+        // The actual balance comes from the context
         const balanceData = await balanceRes.json()
-        setBalance(balanceData)
+        setBalanceStats(balanceData)
       }
 
       if (packagesRes.ok) {
@@ -68,7 +70,7 @@ export default function CreditsPage() {
     } catch (error) {
       console.error('Failed to load credits data:', error)
     } finally {
-      setLoading(false)
+      setLoadingData(false)
     }
   }
 
@@ -100,6 +102,10 @@ export default function CreditsPage() {
     }
   }
 
+  // Combine loading states - for the page content, we mainly care about packages
+  // The balance might come from context which is separate
+  const loading = loadingData || (creditsLoading && contextBalance === null)
+
   if (loading) {
     return (
       <div className="container mx-auto p-6">
@@ -113,8 +119,8 @@ export default function CreditsPage() {
     )
   }
 
-  const lowBalance = balance && balance.balance < 50
-  const hasBalance = balance && balance.balance > 0
+  const lowBalance = contextBalance !== null && contextBalance < 50
+  const hasBalance = contextBalance !== null && contextBalance > 0
 
   return (
     <div className="container mx-auto p-6 space-y-6">
@@ -144,7 +150,7 @@ export default function CreditsPage() {
           <CardContent className="space-y-4">
             <div className="flex items-baseline gap-2">
               <span className="text-5xl font-bold text-foreground">
-                {balance?.balance?.toLocaleString('pt-BR') || 0}
+                {(contextBalance ?? 0).toLocaleString('pt-BR')}
               </span>
               <span className="text-lg text-muted-foreground">créditos</span>
             </div>
@@ -161,7 +167,7 @@ export default function CreditsPage() {
             {hasBalance && !lowBalance && (
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Sparkles className="h-4 w-4" />
-                <span>Você tem créditos suficientes para ~{Math.floor((balance?.balance || 0) / 75)} análises completas</span>
+                <span>Você tem créditos suficientes para ~{Math.floor((contextBalance || 0) / 75)} análises completas</span>
               </div>
             )}
 
@@ -169,13 +175,13 @@ export default function CreditsPage() {
               <div>
                 <p className="text-xs text-muted-foreground">Total Adquirido</p>
                 <p className="text-xl font-semibold text-foreground">
-                  {balance?.totalPurchased?.toLocaleString('pt-BR') || 0}
+                  {balanceStats?.totalPurchased?.toLocaleString('pt-BR') || 0}
                 </p>
               </div>
               <div>
                 <p className="text-xs text-muted-foreground">Total Utilizado</p>
                 <p className="text-xl font-semibold text-foreground">
-                  {balance?.totalUsed?.toLocaleString('pt-BR') || 0}
+                  {balanceStats?.totalUsed?.toLocaleString('pt-BR') || 0}
                 </p>
               </div>
             </div>
@@ -265,9 +271,8 @@ export default function CreditsPage() {
             return (
               <Card
                 key={pkg.id}
-                className={`flex flex-col relative ${
-                  isPopular ? 'border-primary shadow-lg' : ''
-                }`}
+                className={`flex flex-col relative ${isPopular ? 'border-primary shadow-lg' : ''
+                  }`}
               >
                 {isPopular && (
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2">

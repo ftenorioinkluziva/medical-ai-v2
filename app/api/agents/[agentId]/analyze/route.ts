@@ -56,7 +56,7 @@ export async function POST(
     }
 
     // ============ CREDIT CHECK ============
-    const ESTIMATED_TOKENS = 100000
+    const ESTIMATED_TOKENS = 70000
     const estimatedCredits = calculateCreditsFromTokens(ESTIMATED_TOKENS)
     const userCreditsData = await getUserCredits(session.user.id)
 

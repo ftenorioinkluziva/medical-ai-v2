@@ -31,7 +31,7 @@ export const googleModels = {
   pro: google('gemini-2.5-pro'),
 
   // Embedding model
-  embedding: google.textEmbeddingModel('text-embedding-004'),
+  embedding: google.textEmbeddingModel('gemini-embedding-001'),
 }
 
 // Safety settings to use when calling generateText/streamText
