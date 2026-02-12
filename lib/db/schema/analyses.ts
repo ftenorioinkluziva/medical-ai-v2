@@ -48,7 +48,7 @@ export const chatMessages = pgTable('chat_messages', {
   content: text('content').notNull(),
 
   // Context - optional link to analysis
-  analysisId: uuid('analysis_id').references(() => analyses.id),
+  analysisId: uuid('analysis_id').references(() => analyses.id, { onDelete: 'cascade' }),
 
   // Metadata
   modelUsed: varchar('model_used', { length: 100 }),
