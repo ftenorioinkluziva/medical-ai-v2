@@ -10,13 +10,32 @@ function getGoogleInstance() {
   })
 }
 
+// text-embedding-004 is only available on v1 (not v1beta)
+function getGoogleV1Instance() {
+  if (!process.env.GOOGLE_GENERATIVE_AI_API_KEY) {
+    throw new Error('GOOGLE_GENERATIVE_AI_API_KEY environment variable is not set')
+  }
+  return createGoogleGenerativeAI({
+    apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY,
+    baseURL: 'https://generativelanguage.googleapis.com/v1',
+  })
+}
+
 let _googleInstance: ReturnType<typeof createGoogleGenerativeAI> | null = null
+let _googleV1Instance: ReturnType<typeof createGoogleGenerativeAI> | null = null
 
 function getGoogle() {
   if (!_googleInstance) {
     _googleInstance = getGoogleInstance()
   }
   return _googleInstance
+}
+
+function getGoogleV1() {
+  if (!_googleV1Instance) {
+    _googleV1Instance = getGoogleV1Instance()
+  }
+  return _googleV1Instance
 }
 
 // Export a proxy that initializes on first access
@@ -68,9 +87,9 @@ export const googleModels = {
     return getGoogle()('gemini-2.5-pro')
   },
 
-  // Embedding model
+  // Embedding model — text-embedding-004 requires v1 API (not v1beta)
   get embedding() {
-    return getGoogle().textEmbeddingModel('gemini-embedding-001')
+    return getGoogleV1().textEmbeddingModel('text-embedding-004')
   },
 }
 
