@@ -13,7 +13,7 @@ import { authenticateRequest, isAdmin } from '@/lib/api-keys/auth-middleware'
 import { addKnowledgeArticle } from '@/lib/ai/knowledge'
 import { generateText } from 'ai'
 import { googleModels } from '@/lib/ai/providers'
-import pdf from 'pdf-parse'
+import pdf from 'pdf-parse/lib/pdf-parse'
 
 export async function POST(request: NextRequest) {
   try {

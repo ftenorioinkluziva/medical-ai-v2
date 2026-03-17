@@ -4,7 +4,7 @@
  */
 
 import type { ProcessedDocument, DocumentMetadata } from './types'
-import pdf from 'pdf-parse'
+import pdf from 'pdf-parse/lib/pdf-parse'
 
 /**
  * Extract text from PDF buffer

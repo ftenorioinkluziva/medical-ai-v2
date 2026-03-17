@@ -6,7 +6,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth/config'
 import { addKnowledgeArticle } from '@/lib/ai/knowledge'
-import pdf from 'pdf-parse'
+import pdf from 'pdf-parse/lib/pdf-parse'
 
 export async function POST(request: NextRequest) {
   try {
