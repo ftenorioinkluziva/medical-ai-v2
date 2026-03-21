@@ -80,7 +80,13 @@
       "Bash(python3:*)",
       "Bash(python:*)",
       "Bash(Get-Content \"C:\\\\projetos\\\\medical-ai-v2\\\\lib\\\\db\\\\migrations\\\\*.sql\")",
-      "Bash(Select-String -Pattern \"medical_profiles\" -Context 0,1)"
+      "Bash(Select-String -Pattern \"medical_profiles\" -Context 0,1)",
+      "Skill(commit-commands:commit-push-pr)",
+      "Bash(winget list:*)",
+      "Bash(git pull:*)",
+      "Bash(git stash:*)",
+      "mcp__plugin_context7_context7__resolve-library-id",
+      "mcp__plugin_context7_context7__query-docs"
     ],
     "deny": [],
     "ask": []
